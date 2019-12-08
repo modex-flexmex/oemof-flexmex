@@ -1,0 +1,2 @@
+name,type,carrier,tech,capacity,bus,marginal_cost,profile,output_parameters
+slack,dispatchable,gas,gt,,DE-el,40,1,{}
