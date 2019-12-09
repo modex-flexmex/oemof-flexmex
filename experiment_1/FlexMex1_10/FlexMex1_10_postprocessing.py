@@ -37,15 +37,16 @@ template_scalars = template_scalars.loc[template_scalars['UseCase'] == name]
 bus_results_files = (file for file in os.listdir(results_dir) if re.search('el-bus.csv', file))
 for file in bus_results_files:
     region = file.split('-')[0]
-    print(region)
 
     bus_results = pd.read_csv(os.path.join(results_dir, file))
 
-    # 'EnergyConversion_Curtailment_Electricity_RE': el-curtailment
+    # EnergyConversion_Curtailment_Electricity_RE
     energy_conversion_curtailment_electricity_re = bus_results.filter(regex='curtailment', axis=1)
+
     energy_conversion_curtailment_electricity_re.columns = [
         'EnergyConversion_Curtailment_Electricity_RE'
     ]
+
     energy_conversion_curtailment_electricity_re.to_csv(
         os.path.join(
             postprocessed_results_dir,
@@ -55,14 +56,16 @@ for file in bus_results_files:
         )
     )
 
-    # 'EnergyConversion_SecondaryEnergy_RE'
+    # EnergyConversion_SecondaryEnergy_RE
     energy_conversion_secondary_energy_re = bus_results.filter(regex='el-wind|solarpv', axis=1)
-    energy_conversion_secondary_energy_re = energy_conversion_secondary_energy_re.sum(axis=1)
-    # energy_conversion_secondary_energy_re -= energy_conversion_curtailment_electricity_re
 
-    energy_conversion_secondary_energy_re = energy_conversion_secondary_energy_re.rename(
-        'EnergyConversion_SecondaryEnergy_RE'
+    energy_conversion_secondary_energy_re = pd.DataFrame(
+        energy_conversion_secondary_energy_re.sum(axis=1)
     )
+
+    energy_conversion_secondary_energy_re -= energy_conversion_curtailment_electricity_re
+
+    energy_conversion_secondary_energy_re.columns = ['EnergyConversion_SecondaryEnergy_RE']
     energy_conversion_secondary_energy_re.to_csv(
         os.path.join(
             postprocessed_results_dir,
@@ -73,9 +76,11 @@ for file in bus_results_files:
         header=True,
     )
 
-    # 'Transmission_Import_Electricity_Grid': 'import'
+    # Transmission_Import_Electricity_Grid
     transmission_import_electricity_grid = bus_results.filter(regex='import', axis=1)
+
     transmission_import_electricity_grid.columns = ['Transmission_Import_Electricity_Grid']
+
     transmission_import_electricity_grid.to_csv(
         os.path.join(
             postprocessed_results_dir,
