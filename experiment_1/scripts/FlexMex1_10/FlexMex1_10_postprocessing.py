@@ -63,9 +63,12 @@ for file in bus_results_files:
         energy_conversion_secondary_energy_re.sum(axis=1)
     )
 
-    energy_conversion_secondary_energy_re -= energy_conversion_curtailment_electricity_re
-
     energy_conversion_secondary_energy_re.columns = ['EnergyConversion_SecondaryEnergy_RE']
+
+    energy_conversion_secondary_energy_re[
+        'EnergyConversion_SecondaryEnergy_RE'
+    ] -= energy_conversion_curtailment_electricity_re['EnergyConversion_Curtailment_Electricity_RE']
+
     energy_conversion_secondary_energy_re.to_csv(
         os.path.join(
             postprocessed_results_dir,
