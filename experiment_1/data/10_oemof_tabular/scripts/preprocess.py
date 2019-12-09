@@ -79,15 +79,15 @@ def create_shortage_file():
             'output_parameters',
         ]
     )
-    shortage['name'] = ['-'.join(bus.split('-')[:2] + ['slack']) for bus in bus_list]
+    shortage['name'] = ['-'.join(bus.split('-')[:2] + ['shortage']) for bus in bus_list]
 
     shortage['bus'] = bus_list
 
     shortage['type'] = 'dispatchable'
 
-    shortage['carrier'] = 'slack'
+    shortage['carrier'] = 'shortage'
 
-    shortage['tech'] = 'slack'
+    shortage['tech'] = 'shortage'
 
     shortage['profile'] = 1
 
@@ -114,21 +114,21 @@ def create_curtailment_file():
             'output_parameters',
         ]
     )
-    curtailment['name'] = ['-'.join(bus.split('-')[:2] + ['slack']) for bus in bus_list]
+    curtailment['name'] = ['-'.join(bus.split('-')[:2] + ['curtailment']) for bus in bus_list]
 
     curtailment['bus'] = bus_list
 
-    curtailment['type'] = 'dispatchable'
+    curtailment['type'] = 'excess'
 
-    curtailment['carrier'] = 'slack'
+    curtailment['carrier'] = 'curtailment'
 
-    curtailment['tech'] = 'slack'
+    curtailment['tech'] = 'curtailment'
 
     curtailment['profile'] = 1
 
     curtailment['output_parameters'] = '{}'
 
-    curtailment['marginal_cost'] = 5000
+    curtailment['marginal_cost'] = 0
 
     curtailment.to_csv(
         os.path.join(data_preprocessed_path, 'elements', 'curtailment.csv'), index=False,
