@@ -161,6 +161,7 @@ def create_volatile_file():
             'carrier',
             'tech',
             'capacity',
+            'capacity_cost',
             'bus',
             'marginal_cost',
             'profile',
@@ -170,7 +171,10 @@ def create_volatile_file():
 
     # wind onshore
     wind_onshore = volatile.copy()
-    scalars_wind_onshore = scalars.loc[scalars['Parameter'] == 'Energy_PrimaryEnergy_Wind_Onshore']
+
+    scalars_wind_onshore = scalars.loc[
+        scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Wind_Onshore'
+    ]
 
     wind_onshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-onshore']) for bus in bus_list]
 
@@ -178,32 +182,42 @@ def create_volatile_file():
 
     wind_onshore['tech'] = 'onshore'
 
-    wind_onshore['capacity'] = 'XXX'
+    wind_onshore['capacity'] = scalars_wind_onshore['Value'].values
 
     wind_onshore['bus'] = bus_list
 
-    wind_onshore['profile'] = 'wind-onshore-profile'
+    wind_onshore['profile'] = [
+        '-'.join(bus.split('-')[:2] + ['wind-onshore-profile']) for bus in bus_list
+    ]
 
     # wind offshore
     wind_offshore = volatile.copy()
-    scalars_wind_onshore = scalars.loc[scalars['Parameter'] == 'Energy_PrimaryEnergy_Wind_Offshore']
+
+    scalars_wind_offshore = scalars.loc[
+        scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Wind_Offshore'
+    ]
+
     wind_offshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-offshore']) for bus in bus_list]
 
     wind_offshore['carrier'] = 'wind'
 
     wind_offshore['tech'] = 'offshore'
 
-    wind_offshore['capacity'] = 'XXX'
+    wind_offshore['capacity'] = scalars_wind_offshore['Value'].values
 
     wind_offshore['bus'] = bus_list
 
-    wind_offshore['profile'] = 'wind-offshore-profile'
+    wind_offshore['profile'] = [
+        '-'.join(bus.split('-')[:2] + ['wind-offshore-profile']) for bus in bus_list
+    ]
 
     # solarpv
     # name,carrier,tech,capacity,capacity_cost,bus,marginal_cost,profile,output_parameters
     solarpv = volatile.copy()
 
-    scalars_solarpv = scalars.loc[scalars['Parameter'] == 'Energy_PrimaryEnergy_Solar_PV']
+    scalars_solarpv = scalars.loc[
+        scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Solar_PV'
+    ]
 
     solarpv['name'] = ['-'.join(bus.split('-')[:2] + ['solarpv']) for bus in bus_list]
 
@@ -211,11 +225,11 @@ def create_volatile_file():
 
     solarpv['tech'] = 'pv'
 
-    solarpv['capacity'] = 'XXX'
+    solarpv['capacity'] = scalars_solarpv['Value'].values
 
     solarpv['bus'] = bus_list
 
-    solarpv['profile'] = 'solarpv-profile'
+    solarpv['profile'] = ['-'.join(bus.split('-')[:2] + ['solar-pv-profile']) for bus in bus_list]
 
     volatile = pd.concat([wind_onshore, wind_offshore, solarpv], axis=0)
 
@@ -226,7 +240,7 @@ def create_volatile_file():
     volatile['output_parameters'] = '{}'
 
     volatile.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'volatile_test.csv'), index=False,
+        os.path.join(data_preprocessed_path, 'elements', 'volatile.csv'), index=False,
     )
 
 
@@ -236,7 +250,7 @@ def create_volatile_profiles():
     )
 
     wind_onshore_profile_df = combine_profiles(
-        raw_wind_onshore_profile_paths, 'wind-onshore-profile'
+        raw_wind_onshore_profile_paths, 'el-wind-onshore-profile'
     )
 
     raw_wind_offshore_profile_paths = os.path.join(
@@ -244,14 +258,14 @@ def create_volatile_profiles():
     )
 
     wind_offshore_profile_df = combine_profiles(
-        raw_wind_offshore_profile_paths, 'wind-offshore-profile'
+        raw_wind_offshore_profile_paths, 'el-wind-offshore-profile'
     )
 
     raw_solar_pv_profile_paths = os.path.join(
         data_raw_path, 'Energy', 'SecondaryEnergy', 'Solar', 'PV'
     )
 
-    solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'solar-pv-profile')
+    solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'el-solar-pv-profile')
 
     volatile_df = pd.concat(
         [wind_onshore_profile_df, wind_offshore_profile_df, solar_pv_profile_df], axis=1, sort=True
