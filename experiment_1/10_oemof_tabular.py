@@ -13,10 +13,10 @@ name = "10_oemof_tabular"
 abspath = os.path.abspath(os.path.dirname(__file__))
 
 # path to directory with datapackage to load
-datapackage_dir = os.path.join(abspath, 'data', name)
+datapackage_dir = os.path.join(abspath, 'input_data', name)
 
 # create  path for results (we use the datapackage_dir to store results)
-results_path = os.path.join(os.path.expanduser("~"), "oemof-results", name, "output")
+results_path = os.path.join(abspath, 'optimization_results', name)
 if not os.path.exists(results_path):
     os.makedirs(results_path)
 
@@ -30,6 +30,9 @@ m = Model(es)
 
 # if you want dual variables / shadow prices uncomment line below
 # m.receive_duals()
+
+lp_file_dir = os.path.join(results_path, '{}.lp'.format(name))
+m.write(lp_file_dir, io_options={'symbolic_solver_labels': True})
 
 # select solver 'gurobi', 'cplex', 'glpk' etc
 m.solve("cbc")
