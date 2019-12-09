@@ -142,7 +142,7 @@ def create_load_file():
 
     scalars_load = scalars.loc[scalars['Parameter'] == 'Energy_FinalEnergy_Electricity']
 
-    load['amount'] = scalars_load['Value'].values
+    load['amount'] = scalars_load['Value'].values * 1e6  # TWh to MWh
 
     load['profile'] = ['{}-el-load-profile'.format(bus.split('-')[0]) for bus in bus_list]
 
@@ -154,7 +154,7 @@ def create_load_file():
 
 
 def combine_profiles(raw_profile_path, column_name):
-    profile_file_list = os.listdir(raw_profile_path)
+    profile_file_list = sorted(os.listdir(raw_profile_path))
 
     profile_list = []
     for file in profile_file_list:
@@ -170,12 +170,12 @@ def combine_profiles(raw_profile_path, column_name):
 
         profile_list.append(load_profile)
 
-    profile_df = pd.concat(profile_list, axis=1)
+    profile_df = pd.concat(profile_list, axis=1, sort=True)
 
     profile_df = profile_df.set_index(datetimeindex, drop=True)
 
     profile_df.index.name = 'timeindex'
-    profile_df = profile_df.iloc[:5]
+
     return profile_df
 
 
