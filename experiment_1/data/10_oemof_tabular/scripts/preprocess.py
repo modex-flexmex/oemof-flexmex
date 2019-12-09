@@ -119,31 +119,37 @@ def create_load_file():
     load.to_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'), index=False)
 
 
-def create_load_profiles():
-    raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
+def combine_profiles(raw_profile_path):
+    profile_file_list = os.listdir(raw_profile_path)
 
-    raw_load_profile_file_list = os.listdir(raw_load_profile_path)
-
-    load_profile_list = []
-    for file in raw_load_profile_file_list:
+    profile_list = []
+    for file in profile_file_list:
         region = file.split('_')[1]
 
         print("Load load for region {}".format(region))
 
-        raw_load_profile = pd.read_csv(os.path.join(raw_load_profile_path, file))
+        raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file))
 
         load_profile = raw_load_profile['load']
 
         load_profile.name = '{}-el-load-profile'.format(region)
 
-        load_profile_list.append(load_profile)
+        profile_list.append(load_profile)
 
-    load_profile_df = pd.concat(load_profile_list, axis=1)
+    profile_df = pd.concat(profile_list, axis=1)
 
-    load_profile_df = load_profile_df.set_index(datetimeindex, drop=True)
+    profile_df = profile_df.set_index(datetimeindex, drop=True)
 
-    load_profile_df.index.name = 'timeindex'
-    print(load_profile_df.head(2))
+    profile_df.index.name = 'timeindex'
+
+    return profile_df
+
+
+def create_load_profiles():
+    raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
+
+    load_profile_df = combine_profiles(raw_load_profile_path)
+
     load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
 
 
