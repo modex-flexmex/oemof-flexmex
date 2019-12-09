@@ -1,0 +1,7 @@
+.idea/
+*.egg-info/
+__pycache__/
+00_raw/
+data/
+optimization_results/
+postprocessed_results/
