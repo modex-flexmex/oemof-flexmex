@@ -331,7 +331,10 @@ def create_link_file():
     link['capacity'] = transmission_capacity['Value'].values
 
     link['loss'] = (
-        transmission_length['Value'].values * 0.01 * transmission_loss_per_100km['Value'].values
+        transmission_length['Value'].values
+        * 0.01
+        * transmission_loss_per_100km['Value'].values
+        / transmission_capacity['Value'].values
     )
 
     link['from_bus'] = [link.split('-')[0] + '-el-bus' for link in link_list]
