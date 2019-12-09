@@ -31,6 +31,7 @@ m = Model(es)
 # if you want dual variables / shadow prices uncomment line below
 # m.receive_duals()
 
+# save lp file together with optimization results
 lp_file_dir = os.path.join(results_path, '{}.lp'.format(name))
 m.write(lp_file_dir, io_options={'symbolic_solver_labels': True})
 
@@ -42,4 +43,4 @@ m.results = m.results()
 
 # now we use the write results method to write the results in oemof-tabular
 # format
-pp.write_results(m, results_path)
+pp.write_results(m, results_path, raw=True)
