@@ -3,5 +3,6 @@
 __pycache__/
 00_raw/
 data/
+datapackage.json
 optimization_results/
 postprocessed_results/
