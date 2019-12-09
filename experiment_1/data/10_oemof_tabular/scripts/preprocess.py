@@ -50,6 +50,8 @@ link_list = [
     'FR-LU',
 ]
 
+datetimeindex = pd.DatetimeIndex(start='2019-01-01', freq='H', periods=8760)
+
 
 def create_bus_file():
     bus = pd.DataFrame(columns=['name', 'type', 'balanced'])
@@ -80,9 +82,7 @@ def create_dispatchable_file():
 
     dispatchable['bus'] = bus_list
 
-    dispatchable['name'] = [
-        '-'.join(bus.split('-')[:2] + ['slack']) for bus in bus_list
-    ]
+    dispatchable['name'] = ['-'.join(bus.split('-')[:2] + ['slack']) for bus in bus_list]
 
     dispatchable['type'] = 'dispatchable'
 
@@ -97,8 +97,7 @@ def create_dispatchable_file():
     dispatchable['output_parameters'] = '{}'
 
     dispatchable.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'dispatchable.csv'),
-        index=False,
+        os.path.join(data_preprocessed_path, 'elements', 'dispatchable.csv'), index=False,
     )
 
 
@@ -111,20 +110,41 @@ def create_load_file():
 
     load['amount'] = scalars_load['Value'].values
 
-    load['profile'] = 'electricity-load-profile'
+    load['profile'] = ['{}-el-load-profile'.format(bus.split('-')[0]) for bus in bus_list]
 
     load['type'] = 'load'
 
     load['bus'] = bus_list
 
-    load.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'load.csv'), index=False
-    )
+    load.to_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'), index=False)
 
 
 def create_load_profiles():
-    raw_load_profile_paths = os.listdir(os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity'))
-    print(raw_load_profile_paths)
+    raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
+
+    raw_load_profile_file_list = os.listdir(raw_load_profile_path)
+
+    load_profile_list = []
+    for file in raw_load_profile_file_list:
+        region = file.split('_')[1]
+
+        print("Load load for region {}".format(region))
+
+        raw_load_profile = pd.read_csv(os.path.join(raw_load_profile_path, file))
+
+        load_profile = raw_load_profile['load']
+
+        load_profile.name = '{}-el-load-profile'.format(region)
+
+        load_profile_list.append(load_profile)
+
+    load_profile_df = pd.concat(load_profile_list, axis=1)
+
+    load_profile_df = load_profile_df.set_index(datetimeindex, drop=True)
+
+    load_profile_df.index.name = 'timeindex'
+    print(load_profile_df.head(2))
+    load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
 
 
 def create_volatile_file():
@@ -144,13 +164,9 @@ def create_volatile_file():
 
     # wind onshore
     wind_onshore = volatile.copy()
-    scalars_wind_onshore = scalars.loc[
-        scalars['Parameter'] == 'Energy_PrimaryEnergy_Wind_Onshore'
-    ]
+    scalars_wind_onshore = scalars.loc[scalars['Parameter'] == 'Energy_PrimaryEnergy_Wind_Onshore']
 
-    wind_onshore['name'] = [
-        '-'.join(bus.split('-')[:2] + ['wind-onshore']) for bus in bus_list
-    ]
+    wind_onshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-onshore']) for bus in bus_list]
 
     wind_onshore['carrier'] = 'wind'
 
@@ -164,12 +180,8 @@ def create_volatile_file():
 
     # wind offshore
     wind_offshore = volatile.copy()
-    scalars_wind_onshore = scalars.loc[
-        scalars['Parameter'] == 'Energy_PrimaryEnergy_Wind_Offshore'
-    ]
-    wind_offshore['name'] = [
-        '-'.join(bus.split('-')[:2] + ['wind-offshore']) for bus in bus_list
-    ]
+    scalars_wind_onshore = scalars.loc[scalars['Parameter'] == 'Energy_PrimaryEnergy_Wind_Offshore']
+    wind_offshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-offshore']) for bus in bus_list]
 
     wind_offshore['carrier'] = 'wind'
 
@@ -185,9 +197,7 @@ def create_volatile_file():
     # name,carrier,tech,capacity,capacity_cost,bus,marginal_cost,profile,output_parameters
     solarpv = volatile.copy()
 
-    scalars_solarpv = scalars.loc[
-        scalars['Parameter'] == 'Energy_PrimaryEnergy_Solar_PV'
-    ]
+    scalars_solarpv = scalars.loc[scalars['Parameter'] == 'Energy_PrimaryEnergy_Solar_PV']
 
     solarpv['name'] = ['-'.join(bus.split('-')[:2] + ['solarpv']) for bus in bus_list]
 
@@ -210,29 +220,26 @@ def create_volatile_file():
     volatile['output_parameters'] = '{}'
 
     volatile.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'volatile_test.csv'),
-        index=False,
+        os.path.join(data_preprocessed_path, 'elements', 'volatile_test.csv'), index=False,
     )
 
 
 def create_volatile_profiles():
-    raw_wind_onshore_profile_paths = os.listdir(os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Onshore'))
-    raw_wind_offshore_profile_paths = os.listdir(os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Offshore'))
-    raw_solar_pv_profile_paths = os.listdir(os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Solar', 'PV'))
+    raw_wind_onshore_profile_paths = os.listdir(
+        os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Onshore')
+    )
+    raw_wind_offshore_profile_paths = os.listdir(
+        os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Offshore')
+    )
+    raw_solar_pv_profile_paths = os.listdir(
+        os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Solar', 'PV')
+    )
     print(raw_wind_onshore_profile_paths)
 
 
 def create_link_file():
     link = pd.DataFrame(
-        columns=[
-            'name',
-            'type',
-            'capacity',
-            'capacity_cost',
-            'loss',
-            'from_bus',
-            'to_bus',
-        ]
+        columns=['name', 'type', 'capacity', 'capacity_cost', 'loss', 'from_bus', 'to_bus']
     )
     transmission_loss_per_100km = scalars.loc[
         scalars['Parameter'] == 'Transmission_Losses_Electricity_Grid'
@@ -253,9 +260,7 @@ def create_link_file():
     link['capacity'] = transmission_capacity['Value'].values
 
     link['loss'] = (
-        transmission_length['Value'].values
-        * 0.01
-        * transmission_loss_per_100km['Value'].values
+        transmission_length['Value'].values * 0.01 * transmission_loss_per_100km['Value'].values
     )
 
     link['from_bus'] = [link.split('-')[0] + '-el-bus' for link in link_list]
