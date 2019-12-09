@@ -321,7 +321,7 @@ def create_link_file():
     ]
 
     transmission_capacity = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Length_Electricity_Grid'
+        scalars['Parameter'] == 'Transmission_Capacity_Electricity_Grid'
     ]
 
     link['name'] = link_list
