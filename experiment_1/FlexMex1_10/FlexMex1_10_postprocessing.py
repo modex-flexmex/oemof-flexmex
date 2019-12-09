@@ -3,8 +3,8 @@ import re
 
 import pandas as pd
 
-
-name = "10_oemof_tabular"
+year = 2050
+name = "FlexMex1_10"
 abspath = os.path.abspath(os.path.dirname(__file__))
 
 # path to directory with datapackage to load
@@ -30,20 +30,29 @@ for subdir in postprocessed_results_subdir_list:
 # load template
 template_scalars = pd.read_csv(os.path.join(template_dir, 'Scalars.csv'))
 
-template_scalars = template_scalars.loc[template_scalars['UseCase'] == 'FlexMex1_10']
+template_scalars = template_scalars.loc[template_scalars['UseCase'] == name]
 
 
 # load results
 bus_results_files = (file for file in os.listdir(results_dir) if re.search('el-bus.csv', file))
 for file in bus_results_files:
-    print(file)
+    region = file.split('-')[0]
+    print(region)
 
     bus_results = pd.read_csv(os.path.join(results_dir, file))
 
     # 'EnergyConversion_Curtailment_Electricity_RE': el-curtailment
     energy_conversion_curtailment_electricity_re = bus_results.filter(regex='curtailment', axis=1)
+    energy_conversion_curtailment_electricity_re.columns = [
+        'EnergyConversion_Curtailment_Electricity_RE'
+    ]
     energy_conversion_curtailment_electricity_re.to_csv(
-        os.path.join(postprocessed_results_dir, 'RE', 'Curtailment', file)
+        os.path.join(
+            postprocessed_results_dir,
+            'RE',
+            'Curtailment',
+            '{}_oemof_{}_{}.csv'.format(name, region, year),
+        )
     )
 
     # 'EnergyConversion_SecondaryEnergy_RE'
@@ -52,14 +61,26 @@ for file in bus_results_files:
     # energy_conversion_secondary_energy_re -= energy_conversion_curtailment_electricity_re
 
     energy_conversion_secondary_energy_re = energy_conversion_secondary_energy_re.rename(
-        'energy_conversion_secondary_energy_re'
+        'EnergyConversion_SecondaryEnergy_RE'
     )
     energy_conversion_secondary_energy_re.to_csv(
-        os.path.join(postprocessed_results_dir, 'RE', 'Generation', file), header=True
+        os.path.join(
+            postprocessed_results_dir,
+            'RE',
+            'Generation',
+            '{}_oemof_{}_{}.csv'.format(name, region, year),
+        ),
+        header=True,
     )
 
     # 'Transmission_Import_Electricity_Grid': 'import'
     transmission_import_electricity_grid = bus_results.filter(regex='import', axis=1)
+    transmission_import_electricity_grid.columns = ['Transmission_Import_Electricity_Grid']
     transmission_import_electricity_grid.to_csv(
-        os.path.join(postprocessed_results_dir, 'Transmission', 'ImportExport', file)
+        os.path.join(
+            postprocessed_results_dir,
+            'Transmission',
+            'ImportExport',
+            '{}_oemof_{}_{}.csv'.format(name, region, year),
+        )
     )
