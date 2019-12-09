@@ -119,20 +119,20 @@ def create_load_file():
     load.to_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'), index=False)
 
 
-def combine_profiles(raw_profile_path):
+def combine_profiles(raw_profile_path, column_name):
     profile_file_list = os.listdir(raw_profile_path)
 
     profile_list = []
     for file in profile_file_list:
         region = file.split('_')[1]
 
-        print("Load load for region {}".format(region))
+        print("Load profile for region {}".format(region))
 
-        raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file))
+        raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file), index_col=0)
 
-        load_profile = raw_load_profile['load']
+        load_profile = raw_load_profile.iloc[:, 0]
 
-        load_profile.name = '{}-el-load-profile'.format(region)
+        load_profile.name = region + '-' + column_name
 
         profile_list.append(load_profile)
 
@@ -148,7 +148,7 @@ def combine_profiles(raw_profile_path):
 def create_load_profiles():
     raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
 
-    load_profile_df = combine_profiles(raw_load_profile_path)
+    load_profile_df = combine_profiles(raw_load_profile_path, 'el-load-profile')
 
     load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
 
@@ -231,16 +231,33 @@ def create_volatile_file():
 
 
 def create_volatile_profiles():
-    raw_wind_onshore_profile_paths = os.listdir(
-        os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Onshore')
+    raw_wind_onshore_profile_paths = os.path.join(
+        data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Onshore'
     )
-    raw_wind_offshore_profile_paths = os.listdir(
-        os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Offshore')
+
+    wind_onshore_profile_df = combine_profiles(
+        raw_wind_onshore_profile_paths, 'wind-onshore-profile'
     )
-    raw_solar_pv_profile_paths = os.listdir(
-        os.path.join(data_raw_path, 'Energy', 'SecondaryEnergy', 'Solar', 'PV')
+
+    raw_wind_offshore_profile_paths = os.path.join(
+        data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Offshore'
     )
-    print(raw_wind_onshore_profile_paths)
+
+    wind_offshore_profile_df = combine_profiles(
+        raw_wind_offshore_profile_paths, 'wind-offshore-profile'
+    )
+
+    raw_solar_pv_profile_paths = os.path.join(
+        data_raw_path, 'Energy', 'SecondaryEnergy', 'Solar', 'PV'
+    )
+
+    solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'solar-pv-profile')
+
+    volatile_df = pd.concat(
+        [wind_onshore_profile_df, wind_offshore_profile_df, solar_pv_profile_df], axis=1, sort=True
+    )
+
+    volatile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'volatile_profile.csv'))
 
 
 def create_link_file():
