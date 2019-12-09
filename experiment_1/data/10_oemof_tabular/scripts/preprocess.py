@@ -65,8 +65,8 @@ def create_bus_file():
     bus.to_csv(os.path.join(data_preprocessed_path, 'elements', 'bus.csv'), index=False)
 
 
-def create_dispatchable_file():
-    dispatchable = pd.DataFrame(
+def create_shortage_file():
+    shortage = pd.DataFrame(
         columns=[
             'name',
             'type',
@@ -79,25 +79,59 @@ def create_dispatchable_file():
             'output_parameters',
         ]
     )
+    shortage['name'] = ['-'.join(bus.split('-')[:2] + ['slack']) for bus in bus_list]
 
-    dispatchable['bus'] = bus_list
+    shortage['bus'] = bus_list
 
-    dispatchable['name'] = ['-'.join(bus.split('-')[:2] + ['slack']) for bus in bus_list]
+    shortage['type'] = 'dispatchable'
 
-    dispatchable['type'] = 'dispatchable'
+    shortage['carrier'] = 'slack'
 
-    dispatchable['carrier'] = 'slack'
+    shortage['tech'] = 'slack'
 
-    dispatchable['tech'] = 'slack'
+    shortage['profile'] = 1
 
-    dispatchable['marginal_cost'] = 5000
+    shortage['output_parameters'] = '{}'
 
-    dispatchable['profile'] = 1
+    shortage['marginal_cost'] = 5000
 
-    dispatchable['output_parameters'] = '{}'
+    shortage.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'shortage.csv'), index=False,
+    )
 
-    dispatchable.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'dispatchable.csv'), index=False,
+
+def create_curtailment_file():
+    curtailment = pd.DataFrame(
+        columns=[
+            'name',
+            'type',
+            'carrier',
+            'tech',
+            'capacity',
+            'bus',
+            'marginal_cost',
+            'profile',
+            'output_parameters',
+        ]
+    )
+    curtailment['name'] = ['-'.join(bus.split('-')[:2] + ['slack']) for bus in bus_list]
+
+    curtailment['bus'] = bus_list
+
+    curtailment['type'] = 'dispatchable'
+
+    curtailment['carrier'] = 'slack'
+
+    curtailment['tech'] = 'slack'
+
+    curtailment['profile'] = 1
+
+    curtailment['output_parameters'] = '{}'
+
+    curtailment['marginal_cost'] = 5000
+
+    curtailment.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'curtailment.csv'), index=False,
     )
 
 
@@ -141,7 +175,7 @@ def combine_profiles(raw_profile_path, column_name):
     profile_df = profile_df.set_index(datetimeindex, drop=True)
 
     profile_df.index.name = 'timeindex'
-
+    profile_df = profile_df.iloc[:5]
     return profile_df
 
 
@@ -311,7 +345,8 @@ def create_link_file():
 
 if __name__ == '__main__':
     create_bus_file()
-    create_dispatchable_file()
+    create_shortage_file()
+    create_curtailment_file()
     create_load_file()
     create_load_profiles()
     create_volatile_file()
