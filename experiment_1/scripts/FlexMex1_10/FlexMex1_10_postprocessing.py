@@ -146,11 +146,12 @@ for file in bus_results_files:
     # EnergyConversion_Curtailment_Electricity_RE
     energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
 
+    sum_in_gwh = 1e-3 * energy_conversion_curtailment_electricity_re.sum().values
     scalars = write_value_to_scalars(
         scalars,
         region,
         'EnergyConversion_Curtailment_Electricity_RE',
-        energy_conversion_curtailment_electricity_re.sum().values,
+        sum_in_gwh,
     )
 
     # EnergyConversion_SecondaryEnergy_RE
@@ -158,11 +159,12 @@ for file in bus_results_files:
         bus_results, energy_conversion_curtailment_electricity_re, region
     )
 
+    sum_in_gwh = 1e-3 * energy_conversion_secondary_energy_re.sum().values
     scalars = write_value_to_scalars(
         scalars,
         region,
         'EnergyConversion_SecondaryEnergy_RE',
-        energy_conversion_secondary_energy_re.sum().values,
+        sum_in_gwh,
     )
 
     # Transmission_Import_Electricity_Grid
