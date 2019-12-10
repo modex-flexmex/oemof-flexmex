@@ -50,7 +50,9 @@ def calc_curtailment(bus_results, region):
     return energy_conversion_curtailment_electricity_re
 
 
-def calc_energy_re(bus_results, energy_conversion_curtailment_electricity_re, region):
+def calc_energy_conversion_secondary_energy_re(
+    bus_results, energy_conversion_curtailment_electricity_re, region
+):
     r"""
     Calculates EnergyConversion_SecondaryEnergy_RE [GWh]
     """
@@ -96,6 +98,8 @@ def calc_transmission_import_electricity_grid(bus_results, region):
         )
     )
 
+    return transmission_import_electricity_grid
+
 
 def calc_fix_om():
     # EnergyConversion_FixOM_Electricity_Solar_PV [Eur/a]
@@ -125,10 +129,14 @@ for file in bus_results_files:
     energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
 
     # EnergyConversion_SecondaryEnergy_RE
-    calc_energy_re(bus_results, energy_conversion_curtailment_electricity_re, region)
+    energy_conversion_secondary_energy_re = calc_energy_conversion_secondary_energy_re(
+        bus_results, energy_conversion_curtailment_electricity_re, region
+    )
 
     # Transmission_Import_Electricity_Grid
-    calc_transmission_import_electricity_grid(bus_results, region)
+    transmission_import_electricity_grid = calc_transmission_import_electricity_grid(
+        bus_results, region
+    )
 
 
 def rearrange_link_flows(link_flow_results):
@@ -208,7 +216,7 @@ link_flow_results = pd.read_csv(
 link_flow_results = rearrange_link_flows(link_flow_results)
 
 link_net_flows = calc_net_flows(link_flow_results)
-print(link_net_flows)
+
 for column in link_net_flows:
     from_region = column.split('-')[0]
     to_region = column.split('-')[1]
