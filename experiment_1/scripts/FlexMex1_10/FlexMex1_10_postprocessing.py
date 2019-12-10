@@ -25,9 +25,9 @@ postprocessed_results_dir = os.path.join(abspath, '../..', 'postprocessed_result
 ofpp.create_postprocessed_results_subdirs(postprocessed_results_dir)
 
 # load template
-template_scalars = pd.read_csv(os.path.join(template_dir, 'Scalars.csv'))
+scalars = pd.read_csv(os.path.join(template_dir, 'Scalars.csv'))
 
-template_scalars = template_scalars.loc[template_scalars['UseCase'] == name]
+scalars = scalars.loc[scalars['UseCase'] == name]
 
 
 def calc_curtailment(bus_results, region):
@@ -120,6 +120,24 @@ def calc_price_shortage():
 
 # Postprocess
 bus_results_files = (file for file in os.listdir(results_dir) if re.search('el-bus.csv', file))
+
+
+def write_value_to_scalars(scalars, region, param_name, value):
+    df = scalars.copy()
+
+    position = (df['Region'] == region) & (df['Parameter'] == param_name)
+
+    if not position.any():
+        raise ValueError(
+            "There is no field for region '{}' and parameter '{}'.".format(region, param_name)
+        )
+
+    else:
+        df.loc[position, 'Value'] = value
+
+    return df
+
+
 for file in bus_results_files:
     region = file.split('-')[0]
 
@@ -128,15 +146,32 @@ for file in bus_results_files:
     # EnergyConversion_Curtailment_Electricity_RE
     energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
 
+    scalars = write_value_to_scalars(
+        scalars,
+        region,
+        'EnergyConversion_Curtailment_Electricity_RE',
+        energy_conversion_curtailment_electricity_re.sum().values,
+    )
+
     # EnergyConversion_SecondaryEnergy_RE
     energy_conversion_secondary_energy_re = calc_energy_conversion_secondary_energy_re(
         bus_results, energy_conversion_curtailment_electricity_re, region
+    )
+
+    scalars = write_value_to_scalars(
+        scalars,
+        region,
+        'EnergyConversion_SecondaryEnergy_RE',
+        energy_conversion_secondary_energy_re.sum().values,
     )
 
     # Transmission_Import_Electricity_Grid
     transmission_import_electricity_grid = calc_transmission_import_electricity_grid(
         bus_results, region
     )
+
+
+scalars.to_csv(os.path.join(postprocessed_results_dir, 'Scalars.csv'))
 
 
 def rearrange_link_flows(link_flow_results):
