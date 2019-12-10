@@ -3,6 +3,9 @@ import re
 
 import pandas as pd
 
+import oemoflex.postprocessing as ofpp
+
+
 year = 2050
 name = "FlexMex1_10"
 abspath = os.path.abspath(os.path.dirname(__file__))
@@ -19,29 +22,7 @@ template_dir = os.path.join(abspath, '../..', 'template_data')
 
 postprocessed_results_dir = os.path.join(abspath, '../..', 'postprocessed_results', name)
 
-postprocessed_results_subdir_list = [
-    'Boiler',
-    'CHP/BpCCGT',
-    'CHP/ExCCGT',
-    'ElectricBoiler',
-    'Fossil/Gasturbine',
-    'Fossil/Nuclear',
-    'Heatpump',
-    'Hydro/Reservoir'
-    'Hydro/RunOfRiver'
-    'RE/Curtailment',
-    'RE/Generation',
-    'Storage',
-    'Transmission/ImportExport',
-    'Transmission/Import',
-    'Transport'
-]
-
-for subdir in postprocessed_results_subdir_list:
-    path = os.path.join(postprocessed_results_dir, subdir)
-    if not os.path.exists(path):
-        os.makedirs(path)
-
+ofpp.create_postprocessed_results_subdirs(postprocessed_results_dir)
 
 # load template
 template_scalars = pd.read_csv(os.path.join(template_dir, 'Scalars.csv'))
