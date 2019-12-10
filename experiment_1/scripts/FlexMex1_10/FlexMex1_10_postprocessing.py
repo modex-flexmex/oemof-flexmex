@@ -173,9 +173,6 @@ for file in bus_results_files:
     )
 
 
-scalars.to_csv(os.path.join(postprocessed_results_dir, 'Scalars.csv'))
-
-
 def rearrange_link_flows(link_flow_results):
     idx = pd.IndexSlice
     filter_values = [
@@ -266,3 +263,15 @@ for column in link_net_flows:
         ),
         header=True,
     )
+
+for name, value in link_net_flows.sum().iteritems():
+    region = name.replace('-', '_')
+    value_in_gwh = 1e-3 * value
+    scalars = write_value_to_scalars(
+        scalars,
+        region,
+        'Transmission_ImportExport_Electricity_Grid',
+        value_in_gwh,
+    )
+
+scalars.to_csv(os.path.join(postprocessed_results_dir, 'Scalars.csv'))
