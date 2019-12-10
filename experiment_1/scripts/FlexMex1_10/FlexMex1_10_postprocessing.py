@@ -20,10 +20,21 @@ template_dir = os.path.join(abspath, '../..', 'template_data')
 postprocessed_results_dir = os.path.join(abspath, '../..', 'postprocessed_results', name)
 
 postprocessed_results_subdir_list = [
+    'Boiler',
+    'CHP/BpCCGT',
+    'CHP/ExCCGT',
+    'ElectricBoiler',
+    'Fossil/Gasturbine',
+    'Fossil/Nuclear',
+    'Heatpump',
+    'Hydro/Reservoir'
+    'Hydro/RunOfRiver'
     'RE/Curtailment',
     'RE/Generation',
+    'Storage',
     'Transmission/ImportExport',
     'Transmission/Import',
+    'Transport'
 ]
 
 for subdir in postprocessed_results_subdir_list:
