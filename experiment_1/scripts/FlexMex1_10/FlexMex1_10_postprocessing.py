@@ -24,10 +24,12 @@ postprocessed_results_dir = os.path.join(abspath, '../..', 'postprocessed_result
 
 ofpp.create_postprocessed_results_subdirs(postprocessed_results_dir)
 
-# load template
+# load templates
 scalars = pd.read_csv(os.path.join(template_dir, 'Scalars.csv'))
+timeseries = pd.read_csv(os.path.join(template_dir, 'TimeSeries.csv'))
 
 scalars = scalars.loc[scalars['UseCase'] == name]
+timeseries = timeseries.loc[timeseries['UseCase'] == name]
 
 
 def calc_curtailment(bus_results, region):
@@ -275,3 +277,4 @@ for name, value in link_net_flows.sum().iteritems():
     )
 
 scalars.to_csv(os.path.join(postprocessed_results_dir, 'Scalars.csv'))
+timeseries.to_csv(os.path.join(postprocessed_results_dir, 'TimeSeries.csv'))
