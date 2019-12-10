@@ -49,14 +49,8 @@ template_scalars = pd.read_csv(os.path.join(template_dir, 'Scalars.csv'))
 template_scalars = template_scalars.loc[template_scalars['UseCase'] == name]
 
 
-# load results
-bus_results_files = (file for file in os.listdir(results_dir) if re.search('el-bus.csv', file))
-for file in bus_results_files:
-    region = file.split('-')[0]
-
-    bus_results = pd.read_csv(os.path.join(results_dir, file))
-
-    # EnergyConversion_Curtailment_Electricity_RE
+def calc_curtailment(bus_results, region):
+    # EnergyConversion_Curtailment_Electricity_RE [GWh]
     energy_conversion_curtailment_electricity_re = bus_results.filter(regex='curtailment', axis=1)
 
     energy_conversion_curtailment_electricity_re.columns = [
@@ -72,7 +66,13 @@ for file in bus_results_files:
         )
     )
 
-    # EnergyConversion_SecondaryEnergy_RE
+    return energy_conversion_curtailment_electricity_re
+
+
+def calc_energy_re(bus_results, energy_conversion_curtailment_electricity_re, region):
+    r"""
+    Calculates EnergyConversion_SecondaryEnergy_RE [GWh]
+    """
     energy_conversion_secondary_energy_re = bus_results.filter(regex='el-wind|solarpv', axis=1)
 
     energy_conversion_secondary_energy_re = pd.DataFrame(
@@ -95,7 +95,13 @@ for file in bus_results_files:
         header=True,
     )
 
-    # Transmission_Import_Electricity_Grid
+    return energy_conversion_secondary_energy_re
+
+
+def calc_transmission_import_electricity_grid(bus_results, region):
+    r"""
+    Calculates EnergyConversion_SecondaryEnergy_RE [GWh]
+    """
     transmission_import_electricity_grid = bus_results.filter(regex='import', axis=1)
 
     transmission_import_electricity_grid.columns = ['Transmission_Import_Electricity_Grid']
@@ -108,6 +114,40 @@ for file in bus_results_files:
             '{}_oemof_{}_{}.csv'.format(name, region, year),
         )
     )
+
+
+def calc_fix_om():
+    # EnergyConversion_FixOM_Electricity_Solar_PV [Eur/a]
+    # EnergyConversion_FixOM_Electricity_Wind_Onshore [Eur/a]
+    pass
+
+
+def calc_var_om():
+    # EnergyConversion_VarOM_Electricity_Solar_PV [Eur/a]
+    # EnergyConversion_VarOM_Electricity_Wind_Onshore [Eur/a]
+    pass
+
+
+def calc_price_shortage():
+    # Energy_Price_Slack [Eur]
+    pass
+
+
+# Postprocess
+bus_results_files = (file for file in os.listdir(results_dir) if re.search('el-bus.csv', file))
+for file in bus_results_files:
+    region = file.split('-')[0]
+
+    bus_results = pd.read_csv(os.path.join(results_dir, file))
+
+    # EnergyConversion_Curtailment_Electricity_RE
+    energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
+
+    # EnergyConversion_SecondaryEnergy_RE
+    calc_energy_re(bus_results, energy_conversion_curtailment_electricity_re, region)
+
+    # Transmission_Import_Electricity_Grid
+    calc_transmission_import_electricity_grid(bus_results, region)
 
 
 def rearrange_link_flows(link_flow_results):
