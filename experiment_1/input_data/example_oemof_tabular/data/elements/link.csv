@@ -1,3 +1,0 @@
-name,type,capacity,capacity_cost,loss,from_bus,to_bus
-DE-FR,link,100,10,0.05,DE-el,FR-el
-FR-DE,link,100,0,0.05,FR-el,DE-el
