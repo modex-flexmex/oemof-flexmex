@@ -11,16 +11,16 @@ name = "FlexMex1_10"
 abspath = os.path.abspath(os.path.dirname(__file__))
 
 # path to directory with datapackage to load
-datapackage_dir = os.path.join(abspath, '../..', 'input_data', name)
+datapackage_dir = os.path.join(abspath, '..', '002_data_preprocessed', name)
 
 # create  path for results (we use the datapackage_dir to store results)
-results_dir = os.path.join(abspath, '../..', 'optimization_results', name)
+results_dir = os.path.join(abspath, '..', '003_results_optimization', name)
 if not os.path.exists(results_dir):
     os.makedirs(results_dir)
 
-template_dir = os.path.join(abspath, '../..', 'template_data')
+template_dir = os.path.join(abspath, '..', '004_results_data_template')
 
-postprocessed_results_dir = os.path.join(abspath, '../..', 'postprocessed_results', name)
+postprocessed_results_dir = os.path.join(abspath, '..', '005_results_postprocessed', name)
 
 ofpp.create_postprocessed_results_subdirs(postprocessed_results_dir)
 

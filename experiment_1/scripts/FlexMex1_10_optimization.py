@@ -14,7 +14,7 @@ name = "FlexMex1_10"
 abspath = os.path.abspath(os.path.dirname(__file__))
 
 # path to directory with datapackage to load
-datapackage_dir = os.path.join(abspath, '..', '001_data_raw', name)
+datapackage_dir = os.path.join(abspath, '..', '002_data_preprocessed', name)
 
 # create  path for results (we use the datapackage_dir to store results)
 results_path = os.path.join(abspath, '..', '003_results_optimization', name)
