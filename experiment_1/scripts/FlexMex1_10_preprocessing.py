@@ -2,13 +2,17 @@ import os
 
 import pandas as pd
 
+name = 'FlexMex1_10'
 
 # Set paths
 abspath = os.path.abspath(os.path.dirname(__file__))
 
-data_raw_path = os.path.join(abspath, '../..', '00_raw', 'Data', 'In', 'v0.01')
+data_raw_path = os.path.join(abspath, '..', '001_data_raw', 'Data', 'In', 'v0.01')
 
-data_preprocessed_path = os.path.join(abspath, '..', 'data')
+data_preprocessed_path = os.path.join(abspath, '..', '002_data_preprocessed', name, 'data')
+if not os.path.exists(data_preprocessed_path):
+    for subdir in ['elements', 'sequences']:
+        os.makedirs(os.path.join(data_preprocessed_path, subdir))
 
 scalars = pd.read_csv(os.path.join(data_raw_path, 'Scalars.csv'), header=0)
 
