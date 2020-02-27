@@ -2,15 +2,23 @@ import os
 
 import pandas as pd
 
+from oemoflex.helpers import get_experiment_paths
 
-# Set paths
-abspath = os.path.abspath(os.path.dirname(__file__))
 
-data_raw_path = os.path.join(abspath, '../..', '00_raw', 'Data', 'In', 'v0.01')
+name = 'FlexMex1_10'
 
-data_preprocessed_path = os.path.join(abspath, '..', 'data')
+# Get paths
+experiment_paths = get_experiment_paths(name, 'config.yml')
 
-scalars = pd.read_csv(os.path.join(data_raw_path, 'Scalars.csv'), header=0)
+data_raw_path = experiment_paths['data_raw']
+
+data_preprocessed_path = os.path.join(experiment_paths['data_preprocessed'], 'data')
+
+if not os.path.exists(data_preprocessed_path):
+    for subdir in ['elements', 'sequences']:
+        os.makedirs(os.path.join(data_preprocessed_path, subdir))
+
+scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
 
 bus_list = [
     'AT-el-bus',

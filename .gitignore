@@ -4,5 +4,8 @@ __pycache__/
 00_raw/
 data/
 datapackage.json
-optimization_results/
-postprocessed_results/
+001_data_raw/
+002_data_preprocessed/
+003_results_optimization/
+004_results_data_template/
+005_results_postprocessed/
