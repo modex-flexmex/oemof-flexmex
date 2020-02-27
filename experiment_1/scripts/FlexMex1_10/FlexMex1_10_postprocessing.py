@@ -119,13 +119,6 @@ def calc_price_shortage():
     pass
 
 
-# Postprocess
-bus_results_files = (
-    file for file in os.listdir(experiment_paths['results_optimization'])
-    if re.search('el-bus.csv', file)
-)
-
-
 def write_value_to_scalars(scalars, region, param_name, value):
     df = scalars.copy()
 
@@ -140,41 +133,6 @@ def write_value_to_scalars(scalars, region, param_name, value):
         df.loc[position, 'Value'] = value
 
     return df
-
-
-for file in bus_results_files:
-    region = file.split('-')[0]
-
-    bus_results = pd.read_csv(os.path.join(experiment_paths['results_optimization'], file))
-
-    # EnergyConversion_Curtailment_Electricity_RE
-    energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
-
-    sum_in_gwh = 1e-3 * energy_conversion_curtailment_electricity_re.sum().values
-    scalars = write_value_to_scalars(
-        scalars,
-        region,
-        'EnergyConversion_Curtailment_Electricity_RE',
-        sum_in_gwh,
-    )
-
-    # EnergyConversion_SecondaryEnergy_RE
-    energy_conversion_secondary_energy_re = calc_energy_conversion_secondary_energy_re(
-        bus_results, energy_conversion_curtailment_electricity_re, region
-    )
-
-    sum_in_gwh = 1e-3 * energy_conversion_secondary_energy_re.sum().values
-    scalars = write_value_to_scalars(
-        scalars,
-        region,
-        'EnergyConversion_SecondaryEnergy_RE',
-        sum_in_gwh,
-    )
-
-    # Transmission_Import_Electricity_Grid
-    transmission_import_electricity_grid = calc_transmission_import_electricity_grid(
-        bus_results, region
-    )
 
 
 def rearrange_link_flows(link_flow_results):
@@ -245,39 +203,84 @@ def calc_net_flows(link_flow_results):
     return link_net_flow
 
 
-link_flow_results_file = 'links-oemof.csv'
-
-link_flow_results = pd.read_csv(
-    os.path.join(experiment_paths['results_optimization'], link_flow_results_file),
-    header=[0, 1, 2], index_col=0
-)
-
-link_flow_results = rearrange_link_flows(link_flow_results)
-
-link_net_flows = calc_net_flows(link_flow_results)
-
-for column in link_net_flows:
-    from_region = column.split('-')[0]
-    to_region = column.split('-')[1]
-    link_flow_results.loc[:, column].to_csv(
-        os.path.join(
-            experiment_paths['results_postprocessed'],
-            'Transmission',
-            'ImportExport',
-            '{}_oemof_{}_{}_{}.csv'.format(name, from_region, to_region, year),
-        ),
-        header=True,
+def main(name=name, scalars=scalars):
+    # Postprocess
+    bus_results_files = (
+        file for file in os.listdir(experiment_paths['results_optimization'])
+        if re.search('el-bus.csv', file)
     )
 
-for name, value in link_net_flows.sum().iteritems():
-    region = name.replace('-', '_')
-    value_in_gwh = 1e-3 * value
-    scalars = write_value_to_scalars(
-        scalars,
-        region,
-        'Transmission_ImportExport_Electricity_Grid',
-        value_in_gwh,
+    for file in bus_results_files:
+        region = file.split('-')[0]
+
+        bus_results = pd.read_csv(os.path.join(experiment_paths['results_optimization'], file))
+
+        # EnergyConversion_Curtailment_Electricity_RE
+        energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
+
+        sum_in_gwh = 1e-3 * energy_conversion_curtailment_electricity_re.sum().values
+        scalars = write_value_to_scalars(
+            scalars,
+            region,
+            'EnergyConversion_Curtailment_Electricity_RE',
+            sum_in_gwh,
+        )
+
+        # EnergyConversion_SecondaryEnergy_RE
+        energy_conversion_secondary_energy_re = calc_energy_conversion_secondary_energy_re(
+            bus_results, energy_conversion_curtailment_electricity_re, region
+        )
+
+        sum_in_gwh = 1e-3 * energy_conversion_secondary_energy_re.sum().values
+        scalars = write_value_to_scalars(
+            scalars,
+            region,
+            'EnergyConversion_SecondaryEnergy_RE',
+            sum_in_gwh,
+        )
+
+        # # Transmission_Import_Electricity_Grid
+        # transmission_import_electricity_grid = calc_transmission_import_electricity_grid(
+        #     bus_results, region
+        # )
+
+    link_flow_results_file = 'links-oemof.csv'
+
+    link_flow_results = pd.read_csv(
+        os.path.join(experiment_paths['results_optimization'], link_flow_results_file),
+        header=[0, 1, 2], index_col=0
     )
 
-scalars.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'Scalars.csv'))
-timeseries.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'TimeSeries.csv'))
+    link_flow_results = rearrange_link_flows(link_flow_results)
+
+    link_net_flows = calc_net_flows(link_flow_results)
+
+    for column in link_net_flows:
+        from_region = column.split('-')[0]
+        to_region = column.split('-')[1]
+        link_flow_results.loc[:, column].to_csv(
+            os.path.join(
+                experiment_paths['results_postprocessed'],
+                'Transmission',
+                'ImportExport',
+                '{}_oemof_{}_{}_{}.csv'.format(name, from_region, to_region, year),
+            ),
+            header=True,
+        )
+
+    for name, value in link_net_flows.sum().iteritems():
+        region = name.replace('-', '_')
+        value_in_gwh = 1e-3 * value
+        scalars = write_value_to_scalars(
+            scalars,
+            region,
+            'Transmission_ImportExport_Electricity_Grid',
+            value_in_gwh,
+        )
+
+    scalars.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'Scalars.csv'))
+    timeseries.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'TimeSeries.csv'))
+
+
+if __name__ == '__main__':
+    main()

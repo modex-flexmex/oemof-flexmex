@@ -8,7 +8,11 @@ from oemoflex.helpers import get_experiment_paths
 name = 'FlexMex1_10'
 
 # Get paths
-experiment_paths = get_experiment_paths(name, 'config.yml')
+abspath = os.path.abspath(os.path.dirname(__file__))
+
+path_config = os.path.join(abspath, '../../config.yml')
+
+experiment_paths = get_experiment_paths(name, path_config)
 
 data_raw_path = experiment_paths['data_raw']
 
@@ -354,7 +358,7 @@ def create_link_file():
     )
 
 
-if __name__ == '__main__':
+def main():
     create_bus_file()
     create_shortage_file()
     create_curtailment_file()
@@ -363,3 +367,7 @@ if __name__ == '__main__':
     create_volatile_file()
     create_volatile_profiles()
     create_link_file()
+
+
+if __name__ == '__main__':
+    main()
