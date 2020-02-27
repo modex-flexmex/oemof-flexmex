@@ -4,29 +4,28 @@ import re
 import pandas as pd
 
 import oemoflex.postprocessing as ofpp
+from oemoflex.helpers import get_experiment_paths
 
+
+name = 'FlexMex1_10'
 
 year = 2050
-name = "FlexMex1_10"
+
 abspath = os.path.abspath(os.path.dirname(__file__))
 
-# path to directory with datapackage to load
-datapackage_dir = os.path.join(abspath, '..', '002_data_preprocessed', name)
+path_config = os.path.join(abspath, '../../config.yml')
+
+experiment_paths = get_experiment_paths(name, path_config)
 
 # create  path for results (we use the datapackage_dir to store results)
-results_dir = os.path.join(abspath, '..', '003_results_optimization', name)
-if not os.path.exists(results_dir):
-    os.makedirs(results_dir)
+if not os.path.exists(experiment_paths['results_optimization']):
+    os.makedirs(experiment_paths['results_optimization'])
 
-template_dir = os.path.join(abspath, '..', '004_results_data_template')
-
-postprocessed_results_dir = os.path.join(abspath, '..', '005_results_postprocessed', name)
-
-ofpp.create_postprocessed_results_subdirs(postprocessed_results_dir)
+ofpp.create_postprocessed_results_subdirs(experiment_paths['results_postprocessed'])
 
 # load templates
-scalars = pd.read_csv(os.path.join(template_dir, 'Scalars.csv'))
-timeseries = pd.read_csv(os.path.join(template_dir, 'TimeSeries.csv'))
+scalars = pd.read_csv(os.path.join(experiment_paths['results_template'], 'Scalars.csv'))
+timeseries = pd.read_csv(os.path.join(experiment_paths['results_template'], 'TimeSeries.csv'))
 
 scalars = scalars.loc[scalars['UseCase'] == name]
 timeseries = timeseries.loc[timeseries['UseCase'] == name]
@@ -42,7 +41,7 @@ def calc_curtailment(bus_results, region):
 
     energy_conversion_curtailment_electricity_re.to_csv(
         os.path.join(
-            postprocessed_results_dir,
+            experiment_paths['results_postprocessed'],
             'RE',
             'Curtailment',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -72,7 +71,7 @@ def calc_energy_conversion_secondary_energy_re(
 
     energy_conversion_secondary_energy_re.to_csv(
         os.path.join(
-            postprocessed_results_dir,
+            experiment_paths['results_postprocessed'],
             'RE',
             'Generation',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -93,7 +92,7 @@ def calc_transmission_import_electricity_grid(bus_results, region):
 
     transmission_import_electricity_grid.to_csv(
         os.path.join(
-            postprocessed_results_dir,
+            experiment_paths['results_postprocessed'],
             'Transmission',
             'Import',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -121,7 +120,10 @@ def calc_price_shortage():
 
 
 # Postprocess
-bus_results_files = (file for file in os.listdir(results_dir) if re.search('el-bus.csv', file))
+bus_results_files = (
+    file for file in os.listdir(experiment_paths['results_optimization'])
+    if re.search('el-bus.csv', file)
+)
 
 
 def write_value_to_scalars(scalars, region, param_name, value):
@@ -143,7 +145,7 @@ def write_value_to_scalars(scalars, region, param_name, value):
 for file in bus_results_files:
     region = file.split('-')[0]
 
-    bus_results = pd.read_csv(os.path.join(results_dir, file))
+    bus_results = pd.read_csv(os.path.join(experiment_paths['results_optimization'], file))
 
     # EnergyConversion_Curtailment_Electricity_RE
     energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
@@ -246,7 +248,8 @@ def calc_net_flows(link_flow_results):
 link_flow_results_file = 'links-oemof.csv'
 
 link_flow_results = pd.read_csv(
-    os.path.join(results_dir, link_flow_results_file), header=[0, 1, 2], index_col=0
+    os.path.join(experiment_paths['results_optimization'], link_flow_results_file),
+    header=[0, 1, 2], index_col=0
 )
 
 link_flow_results = rearrange_link_flows(link_flow_results)
@@ -258,7 +261,7 @@ for column in link_net_flows:
     to_region = column.split('-')[1]
     link_flow_results.loc[:, column].to_csv(
         os.path.join(
-            postprocessed_results_dir,
+            experiment_paths['results_postprocessed'],
             'Transmission',
             'ImportExport',
             '{}_oemof_{}_{}_{}.csv'.format(name, from_region, to_region, year),
@@ -276,5 +279,5 @@ for name, value in link_net_flows.sum().iteritems():
         value_in_gwh,
     )
 
-scalars.to_csv(os.path.join(postprocessed_results_dir, 'Scalars.csv'))
-timeseries.to_csv(os.path.join(postprocessed_results_dir, 'TimeSeries.csv'))
+scalars.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'Scalars.csv'))
+timeseries.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'TimeSeries.csv'))

@@ -9,21 +9,26 @@ from oemof.tabular import datapackage  # noqa
 from oemof.tabular.facades import TYPEMAP
 import oemof.tabular.tools.postprocessing as pp
 
-name = "FlexMex1_10"
+from oemoflex.helpers import get_experiment_paths
+
+
+name = 'FlexMex1_10'
 
 abspath = os.path.abspath(os.path.dirname(__file__))
 
-# path to directory with datapackage to load
-datapackage_dir = os.path.join(abspath, '..', '002_data_preprocessed', name)
+path_config = os.path.join(abspath, '../../config.yml')
+
+experiment_paths = get_experiment_paths(name, path_config)
 
 # create  path for results (we use the datapackage_dir to store results)
-results_path = os.path.join(abspath, '..', '003_results_optimization', name)
+results_path = experiment_paths['results_optimization']
 if not os.path.exists(results_path):
     os.makedirs(results_path)
 
 # create energy system object
 es = EnergySystem.from_datapackage(
-    os.path.join(datapackage_dir, "datapackage.json"), attributemap={}, typemap=TYPEMAP,
+    os.path.join(experiment_paths['data_preprocessed'], "datapackage.json"),
+    attributemap={}, typemap=TYPEMAP,
 )
 
 # create model from energy system (this is just oemof.solph)
