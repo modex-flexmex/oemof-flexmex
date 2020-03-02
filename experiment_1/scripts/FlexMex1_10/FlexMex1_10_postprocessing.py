@@ -6,7 +6,7 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 import oemoflex.postprocessing as ofpp
-from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
+from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal, delete_empty_subdirs
 
 
 name = 'FlexMex1_10'
@@ -297,6 +297,8 @@ def main(name=name, scalars=scalars):
 
     logging.info(f"New results in {new_results_path}"
                  f" match previous results in {previous_results_path}")
+
+    delete_empty_subdirs(experiment_paths['results_postprocessed'])
 
 
 if __name__ == '__main__':

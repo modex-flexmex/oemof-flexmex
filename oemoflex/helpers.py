@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
@@ -74,3 +75,21 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
             f"{filename_a} and {filename_b} do not have the same name."
 
         check_if_csv_files_equal(file_a, file_b)
+
+
+def delete_empty_subdirs(path):
+    r"""Deletes empty subdirectories in path"""
+    while True:
+        to_delete = []
+        for root, dirs, _ in os.walk(path):
+            for d in dirs:
+                full_path = os.path.join(root, d)
+                if not os.listdir(full_path):
+                    to_delete.append(full_path)
+
+        if to_delete:
+            for p in to_delete:
+                print(p)
+                shutil.rmtree(p)
+        else:
+            break
