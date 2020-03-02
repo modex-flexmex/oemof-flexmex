@@ -1,11 +1,12 @@
 """
+Example of energy system optimization using oemof.tabular
 """
 import os
 
 from oemof.solph import EnergySystem, Model
 
 # DONT REMOVE THIS LINE!
-from oemof.tabular import datapackage  # noqa
+from oemof.tabular import datapackage  # pylint: disable=W0611; # noqa
 from oemof.tabular.facades import TYPEMAP
 import oemof.tabular.tools.postprocessing as pp
 
