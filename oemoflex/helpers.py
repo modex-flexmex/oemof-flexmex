@@ -22,7 +22,7 @@ def get_experiment_paths(name, path_config):
     abspath = os.path.abspath(os.path.dirname(path_config))
 
     with open(path_config, 'r') as config_file:
-        config = yaml.load(config_file)
+        config = yaml.safe_load(config_file)
 
     experiment_paths = {k: os.path.join(abspath, v) for k, v in config.items()}
 
