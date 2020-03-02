@@ -6,7 +6,7 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 import oemoflex.postprocessing as ofpp
-from oemoflex.helpers import get_experiment_paths
+from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
 
 
 name = 'FlexMex1_10'
@@ -19,16 +19,16 @@ path_config = os.path.join(abspath, '../../config.yml')
 
 experiment_paths = get_experiment_paths(name, path_config)
 
-logpath = define_logging(
-    logpath=experiment_paths['results_postprocessed'],
-    logfile='oemoflex.log'
-)
-
 # create  path for results (we use the datapackage_dir to store results)
 if not os.path.exists(experiment_paths['results_optimization']):
     os.makedirs(experiment_paths['results_optimization'])
 
 ofpp.create_postprocessed_results_subdirs(experiment_paths['results_postprocessed'])
+
+logpath = define_logging(
+    logpath=experiment_paths['results_postprocessed'],
+    logfile='oemoflex.log'
+)
 
 # load templates
 scalars = pd.read_csv(os.path.join(experiment_paths['results_template'], 'Scalars.csv'))
@@ -288,6 +288,11 @@ def main(name=name, scalars=scalars):
 
     scalars.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'Scalars.csv'))
     timeseries.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'TimeSeries.csv'))
+
+    # Check against previous results
+    previous_results_path = experiment_paths['results_postprocessed'] + '_default'
+    new_results_path = experiment_paths['results_postprocessed']
+    check_if_csv_dirs_equal(new_results_path, previous_results_path)
 
 
 if __name__ == '__main__':

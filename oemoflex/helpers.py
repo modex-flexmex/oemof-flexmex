@@ -1,5 +1,7 @@
 import os
 
+import pandas as pd
+from pandas.util.testing import assert_frame_equal
 import yaml
 
 
@@ -36,3 +38,39 @@ def get_experiment_paths(name, path_config):
         experiment_paths['results_postprocessed'], name)
 
     return experiment_paths
+
+
+def get_all_file_paths(dir):
+    # pylint: disable=unused-variable
+    file_paths = []
+    for dir_path, dir_names, file_names in os.walk(dir):
+        for file_name in file_names:
+            file_paths.append(os.path.join(dir_path, file_name))
+
+    return file_paths
+
+
+def check_if_csv_files_equal(csv_file_a, csv_file_b):
+    df1 = pd.read_csv(csv_file_a)
+    df2 = pd.read_csv(csv_file_b)
+
+    assert_frame_equal(df1, df2)
+
+
+def check_if_csv_dirs_equal(dir_a, dir_b):
+    files_a = get_all_file_paths(dir_a)
+    files_b = get_all_file_paths(dir_b)
+    files_a = [file for file in files_a if file.split('.')[-1] != 'log']
+    files_b = [file for file in files_b if file.split('.')[-1] != 'log']
+
+    files_a.sort()
+    files_b.sort()
+
+    for file_a, file_b in zip(files_a, files_b):
+        filename_a = os.path.split(file_a)[-1]
+        filename_b = os.path.split(file_b)[-1]
+
+        assert filename_a == filename_b, \
+            f"{filename_a} and {filename_b} do not have the same name."
+
+        check_if_csv_files_equal(file_a, file_b)
