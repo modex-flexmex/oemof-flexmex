@@ -292,7 +292,11 @@ def main(name=name, scalars=scalars):
     # Check against previous results
     previous_results_path = experiment_paths['results_postprocessed'] + '_default'
     new_results_path = experiment_paths['results_postprocessed']
+
     check_if_csv_dirs_equal(new_results_path, previous_results_path)
+
+    logging.info(f"New results in {new_results_path}"
+                 f" match previous results in {previous_results_path}")
 
 
 if __name__ == '__main__':
