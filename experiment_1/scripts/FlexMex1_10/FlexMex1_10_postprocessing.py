@@ -1,8 +1,10 @@
+import logging
 import os
 import re
 
 import pandas as pd
 
+from oemof.tools.logger import define_logging
 import oemoflex.postprocessing as ofpp
 from oemoflex.helpers import get_experiment_paths
 
@@ -16,6 +18,11 @@ abspath = os.path.abspath(os.path.dirname(__file__))
 path_config = os.path.join(abspath, '../../config.yml')
 
 experiment_paths = get_experiment_paths(name, path_config)
+
+logpath = define_logging(
+    logpath=experiment_paths['results_postprocessed'],
+    logfile='oemoflex.log'
+)
 
 # create  path for results (we use the datapackage_dir to store results)
 if not os.path.exists(experiment_paths['results_optimization']):
@@ -205,6 +212,7 @@ def calc_net_flows(link_flow_results):
 
 def main(name=name, scalars=scalars):
     # Postprocess
+    logging.info("### Postprocessing")
     bus_results_files = (
         file for file in os.listdir(experiment_paths['results_optimization'])
         if re.search('el-bus.csv', file)

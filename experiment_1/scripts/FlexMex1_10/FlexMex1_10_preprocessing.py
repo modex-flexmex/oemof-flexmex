@@ -1,7 +1,9 @@
+import logging
 import os
 
 import pandas as pd
 
+from oemof.tools.logger import define_logging
 from oemoflex.helpers import get_experiment_paths
 
 
@@ -17,6 +19,11 @@ experiment_paths = get_experiment_paths(name, path_config)
 data_raw_path = experiment_paths['data_raw']
 
 data_preprocessed_path = os.path.join(experiment_paths['data_preprocessed'], 'data')
+
+logpath = define_logging(
+    logpath=experiment_paths['results_postprocessed'],
+    logfile='oemoflex.log'
+)
 
 if not os.path.exists(data_preprocessed_path):
     for subdir in ['elements', 'sequences']:
@@ -66,6 +73,8 @@ datetimeindex = pd.DatetimeIndex(start='2019-01-01', freq='H', periods=8760)
 
 
 def create_bus_file():
+    logging.info("Create bus file")
+
     bus = pd.DataFrame(columns=['name', 'type', 'balanced'])
 
     bus['name'] = bus_list
@@ -78,6 +87,8 @@ def create_bus_file():
 
 
 def create_shortage_file():
+    logging.info("Create shortage file")
+
     shortage = pd.DataFrame(
         columns=[
             'name',
@@ -113,6 +124,7 @@ def create_shortage_file():
 
 
 def create_curtailment_file():
+    logging.info("Creating curtailment file")
     curtailment = pd.DataFrame(
         columns=[
             'name',
@@ -148,6 +160,7 @@ def create_curtailment_file():
 
 
 def create_load_file():
+    logging.info("Creating load file")
     load = pd.DataFrame(columns=['name', 'amount', 'profile', 'type', 'bus'])
 
     load['name'] = ['-'.join(bus.split('-')[:2] + ['load']) for bus in bus_list]
@@ -172,7 +185,7 @@ def combine_profiles(raw_profile_path, column_name):
     for file in profile_file_list:
         region = file.split('_')[1]
 
-        print("Load profile for region {}".format(region))
+        logging.info("Preprocessing the load profile for region {}".format(region))
 
         raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file), index_col=0)
 
@@ -291,6 +304,7 @@ def create_volatile_file():
 
 
 def create_volatile_profiles():
+    logging.info("Creating volatile file")
     raw_wind_onshore_profile_paths = os.path.join(
         data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Onshore'
     )
@@ -321,6 +335,7 @@ def create_volatile_profiles():
 
 
 def create_link_file():
+    logging.info("Creating link file")
     link = pd.DataFrame(
         columns=['name', 'type', 'capacity', 'capacity_cost', 'loss', 'from_bus', 'to_bus']
     )
@@ -359,6 +374,7 @@ def create_link_file():
 
 
 def main():
+    logging.info("### Preprocessing")
     create_bus_file()
     create_shortage_file()
     create_curtailment_file()

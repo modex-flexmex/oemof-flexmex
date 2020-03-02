@@ -1,3 +1,5 @@
+import logging
+
 import FlexMex1_10_preprocessing
 import FlexMex1_10_infer
 import FlexMex1_10_optimization
@@ -5,6 +7,8 @@ import FlexMex1_10_postprocessing
 
 
 if __name__ == '__main__':
+    logging.info("## Runall")
+    logging.info("Start running the whole modelling pipeline")
 
     FlexMex1_10_preprocessing.main()
 
