@@ -247,10 +247,10 @@ def main(name=name, scalars=scalars):
             sum_in_gwh,
         )
 
-        # # Transmission_Import_Electricity_Grid
-        # transmission_import_electricity_grid = calc_transmission_import_electricity_grid(
-        #     bus_results, region
-        # )
+        # Transmission_Import_Electricity_Grid
+        calc_transmission_import_electricity_grid(
+            bus_results, region
+        )
 
     link_flow_results_file = 'links-oemof.csv'
 
