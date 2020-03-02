@@ -10,3 +10,4 @@ datapackage.json
 004_results_data_template/
 005_results_postprocessed/
 _archiv/
+*.zip
