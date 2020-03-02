@@ -69,7 +69,7 @@ link_list = [
     'FR-LU',
 ]
 
-datetimeindex = pd.DatetimeIndex(start='2019-01-01', freq='H', periods=8760)
+datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
 
 def create_bus_file():
