@@ -1,32 +1,38 @@
+import logging
 import os
 import re
 
 import pandas as pd
 
+from oemof.tools.logger import define_logging
 import oemoflex.postprocessing as ofpp
+from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal, delete_empty_subdirs
 
+
+name = 'FlexMex1_10'
 
 year = 2050
-name = "FlexMex1_10"
+
 abspath = os.path.abspath(os.path.dirname(__file__))
 
-# path to directory with datapackage to load
-datapackage_dir = os.path.join(abspath, '..', '002_data_preprocessed', name)
+path_config = os.path.join(abspath, '../../config.yml')
+
+experiment_paths = get_experiment_paths(name, path_config)
 
 # create  path for results (we use the datapackage_dir to store results)
-results_dir = os.path.join(abspath, '..', '003_results_optimization', name)
-if not os.path.exists(results_dir):
-    os.makedirs(results_dir)
+if not os.path.exists(experiment_paths['results_optimization']):
+    os.makedirs(experiment_paths['results_optimization'])
 
-template_dir = os.path.join(abspath, '..', '004_results_data_template')
+ofpp.create_postprocessed_results_subdirs(experiment_paths['results_postprocessed'])
 
-postprocessed_results_dir = os.path.join(abspath, '..', '005_results_postprocessed', name)
-
-ofpp.create_postprocessed_results_subdirs(postprocessed_results_dir)
+logpath = define_logging(
+    logpath=experiment_paths['results_postprocessed'],
+    logfile='oemoflex.log'
+)
 
 # load templates
-scalars = pd.read_csv(os.path.join(template_dir, 'Scalars.csv'))
-timeseries = pd.read_csv(os.path.join(template_dir, 'TimeSeries.csv'))
+scalars = pd.read_csv(os.path.join(experiment_paths['results_template'], 'Scalars.csv'))
+timeseries = pd.read_csv(os.path.join(experiment_paths['results_template'], 'TimeSeries.csv'))
 
 scalars = scalars.loc[scalars['UseCase'] == name]
 timeseries = timeseries.loc[timeseries['UseCase'] == name]
@@ -42,7 +48,7 @@ def calc_curtailment(bus_results, region):
 
     energy_conversion_curtailment_electricity_re.to_csv(
         os.path.join(
-            postprocessed_results_dir,
+            experiment_paths['results_postprocessed'],
             'RE',
             'Curtailment',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -72,7 +78,7 @@ def calc_energy_conversion_secondary_energy_re(
 
     energy_conversion_secondary_energy_re.to_csv(
         os.path.join(
-            postprocessed_results_dir,
+            experiment_paths['results_postprocessed'],
             'RE',
             'Generation',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -93,7 +99,7 @@ def calc_transmission_import_electricity_grid(bus_results, region):
 
     transmission_import_electricity_grid.to_csv(
         os.path.join(
-            postprocessed_results_dir,
+            experiment_paths['results_postprocessed'],
             'Transmission',
             'Import',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -120,10 +126,6 @@ def calc_price_shortage():
     pass
 
 
-# Postprocess
-bus_results_files = (file for file in os.listdir(results_dir) if re.search('el-bus.csv', file))
-
-
 def write_value_to_scalars(scalars, region, param_name, value):
     df = scalars.copy()
 
@@ -138,41 +140,6 @@ def write_value_to_scalars(scalars, region, param_name, value):
         df.loc[position, 'Value'] = value
 
     return df
-
-
-for file in bus_results_files:
-    region = file.split('-')[0]
-
-    bus_results = pd.read_csv(os.path.join(results_dir, file))
-
-    # EnergyConversion_Curtailment_Electricity_RE
-    energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
-
-    sum_in_gwh = 1e-3 * energy_conversion_curtailment_electricity_re.sum().values
-    scalars = write_value_to_scalars(
-        scalars,
-        region,
-        'EnergyConversion_Curtailment_Electricity_RE',
-        sum_in_gwh,
-    )
-
-    # EnergyConversion_SecondaryEnergy_RE
-    energy_conversion_secondary_energy_re = calc_energy_conversion_secondary_energy_re(
-        bus_results, energy_conversion_curtailment_electricity_re, region
-    )
-
-    sum_in_gwh = 1e-3 * energy_conversion_secondary_energy_re.sum().values
-    scalars = write_value_to_scalars(
-        scalars,
-        region,
-        'EnergyConversion_SecondaryEnergy_RE',
-        sum_in_gwh,
-    )
-
-    # Transmission_Import_Electricity_Grid
-    transmission_import_electricity_grid = calc_transmission_import_electricity_grid(
-        bus_results, region
-    )
 
 
 def rearrange_link_flows(link_flow_results):
@@ -243,38 +210,95 @@ def calc_net_flows(link_flow_results):
     return link_net_flow
 
 
-link_flow_results_file = 'links-oemof.csv'
-
-link_flow_results = pd.read_csv(
-    os.path.join(results_dir, link_flow_results_file), header=[0, 1, 2], index_col=0
-)
-
-link_flow_results = rearrange_link_flows(link_flow_results)
-
-link_net_flows = calc_net_flows(link_flow_results)
-
-for column in link_net_flows:
-    from_region = column.split('-')[0]
-    to_region = column.split('-')[1]
-    link_flow_results.loc[:, column].to_csv(
-        os.path.join(
-            postprocessed_results_dir,
-            'Transmission',
-            'ImportExport',
-            '{}_oemof_{}_{}_{}.csv'.format(name, from_region, to_region, year),
-        ),
-        header=True,
+def main(name=name, scalars=scalars):
+    # Postprocess
+    bus_results_files = (
+        file for file in os.listdir(experiment_paths['results_optimization'])
+        if re.search('el-bus.csv', file)
     )
 
-for name, value in link_net_flows.sum().iteritems():
-    region = name.replace('-', '_')
-    value_in_gwh = 1e-3 * value
-    scalars = write_value_to_scalars(
-        scalars,
-        region,
-        'Transmission_ImportExport_Electricity_Grid',
-        value_in_gwh,
+    for file in bus_results_files:
+        region = file.split('-')[0]
+
+        bus_results = pd.read_csv(os.path.join(experiment_paths['results_optimization'], file))
+
+        # EnergyConversion_Curtailment_Electricity_RE
+        energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
+
+        sum_in_gwh = 1e-3 * energy_conversion_curtailment_electricity_re.sum().values
+        scalars = write_value_to_scalars(
+            scalars,
+            region,
+            'EnergyConversion_Curtailment_Electricity_RE',
+            sum_in_gwh,
+        )
+
+        # EnergyConversion_SecondaryEnergy_RE
+        energy_conversion_secondary_energy_re = calc_energy_conversion_secondary_energy_re(
+            bus_results, energy_conversion_curtailment_electricity_re, region
+        )
+
+        sum_in_gwh = 1e-3 * energy_conversion_secondary_energy_re.sum().values
+        scalars = write_value_to_scalars(
+            scalars,
+            region,
+            'EnergyConversion_SecondaryEnergy_RE',
+            sum_in_gwh,
+        )
+
+        # Transmission_Import_Electricity_Grid
+        calc_transmission_import_electricity_grid(
+            bus_results, region
+        )
+
+    link_flow_results_file = 'links-oemof.csv'
+
+    link_flow_results = pd.read_csv(
+        os.path.join(experiment_paths['results_optimization'], link_flow_results_file),
+        header=[0, 1, 2], index_col=0
     )
 
-scalars.to_csv(os.path.join(postprocessed_results_dir, 'Scalars.csv'))
-timeseries.to_csv(os.path.join(postprocessed_results_dir, 'TimeSeries.csv'))
+    link_flow_results = rearrange_link_flows(link_flow_results)
+
+    link_net_flows = calc_net_flows(link_flow_results)
+
+    for column in link_net_flows:
+        from_region = column.split('-')[0]
+        to_region = column.split('-')[1]
+        link_flow_results.loc[:, column].to_csv(
+            os.path.join(
+                experiment_paths['results_postprocessed'],
+                'Transmission',
+                'ImportExport',
+                '{}_oemof_{}_{}_{}.csv'.format(name, from_region, to_region, year),
+            ),
+            header=True,
+        )
+
+    for name, value in link_net_flows.sum().iteritems():
+        region = name.replace('-', '_')
+        value_in_gwh = 1e-3 * value
+        scalars = write_value_to_scalars(
+            scalars,
+            region,
+            'Transmission_ImportExport_Electricity_Grid',
+            value_in_gwh,
+        )
+
+    scalars.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'Scalars.csv'))
+    timeseries.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'TimeSeries.csv'))
+
+    # Check against previous results
+    previous_results_path = experiment_paths['results_postprocessed'] + '_default'
+    new_results_path = experiment_paths['results_postprocessed']
+
+    check_if_csv_dirs_equal(new_results_path, previous_results_path)
+
+    logging.info(f"New results in {new_results_path}"
+                 f" match previous results in {previous_results_path}")
+
+    delete_empty_subdirs(experiment_paths['results_postprocessed'])
+
+
+if __name__ == '__main__':
+    main()
