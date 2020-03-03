@@ -5,7 +5,7 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.model_structure import (
-    bus_list, link_list, datetimeindex)
+    bus_list, link_list, datetimeindex, create_default_elements_files)
 from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
 
 
@@ -32,6 +32,8 @@ if not os.path.exists(data_preprocessed_path):
         os.makedirs(os.path.join(data_preprocessed_path, subdir))
 
 scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
+
+create_default_elements_files(os.path.join(data_preprocessed_path, 'elements'))
 
 
 def create_bus_file():
@@ -337,12 +339,12 @@ def create_volatile_profiles():
 
 
 def main():
-    create_bus_file()
-    create_shortage_file()
-    create_curtailment_file()
-    create_load_file()
-    create_volatile_file()
-    create_link_file()
+    # create_bus_file()
+    # create_shortage_file()
+    # create_curtailment_file()
+    # create_load_file()
+    # create_volatile_file()
+    # create_link_file()
 
     create_load_profiles()
     create_volatile_profiles()
