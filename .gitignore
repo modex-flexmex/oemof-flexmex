@@ -9,5 +9,6 @@ datapackage.json
 003_results_optimization/
 004_results_data_template/
 005_results_postprocessed/
+006_results_comparison/
 _archiv/
 *.zip
