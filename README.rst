@@ -5,6 +5,8 @@ oemo-flex
 Oemo-Flex (Open Energy Model for FlexMex) is an oemof model built for model comparison within
 the Modex project FlexMex.
 
+.. contents::
+
 
 Getting started
 ===============
@@ -17,7 +19,7 @@ Install oemo-flex and its dependencies by setting up a virtual environment and f
 
 
 Experiment 1
-============
+____________
 
 
 Experiment 1 consists of a list of UseCases. To run a UseCase, type:
