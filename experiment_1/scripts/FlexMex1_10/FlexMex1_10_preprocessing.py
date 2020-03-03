@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 from oemof.tools.logger import define_logging
-from oemoflex.helpers import get_experiment_paths
+from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
 
 
 name = 'FlexMex1_10'
@@ -179,39 +179,43 @@ def create_load_file():
     load.to_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'), index=False)
 
 
-def combine_profiles(raw_profile_path, column_name):
-    profile_file_list = sorted(os.listdir(raw_profile_path))
+def create_link_file():
+    logging.info("Creating link file")
+    link = pd.DataFrame(
+        columns=['name', 'type', 'capacity', 'capacity_cost', 'loss', 'from_bus', 'to_bus']
+    )
+    transmission_loss_per_100km = scalars.loc[
+        scalars['Parameter'] == 'Transmission_Losses_Electricity_Grid'
+    ]
 
-    profile_list = []
-    for file in profile_file_list:
-        region = file.split('_')[1]
+    transmission_length = scalars.loc[
+        scalars['Parameter'] == 'Transmission_Length_Electricity_Grid'
+    ]
 
-        logging.info("Preprocessing the load profile for region {}".format(region))
-        # TODO: This is not only used for load profiles
+    transmission_capacity = scalars.loc[
+        scalars['Parameter'] == 'Transmission_Capacity_Electricity_Grid'
+    ]
 
-        raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file), index_col=0)
+    link['name'] = link_list
 
-        load_profile = raw_load_profile.iloc[:, 0]
+    link['type'] = 'link'
 
-        load_profile.name = region + '-' + column_name
+    link['capacity'] = transmission_capacity['Value'].values
 
-        profile_list.append(load_profile)
+    link['loss'] = (
+        transmission_length['Value'].values
+        * 0.01
+        * transmission_loss_per_100km['Value'].values
+        / transmission_capacity['Value'].values
+    )
 
-    profile_df = pd.concat(profile_list, axis=1, sort=True)
+    link['from_bus'] = [link.split('-')[0] + '-el-bus' for link in link_list]
 
-    profile_df = profile_df.set_index(datetimeindex, drop=True)
+    link['to_bus'] = [link.split('-')[1] + '-el-bus' for link in link_list]
 
-    profile_df.index.name = 'timeindex'
-
-    return profile_df
-
-
-def create_load_profiles():
-    raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
-
-    load_profile_df = combine_profiles(raw_load_profile_path, 'el-load-profile')
-
-    load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
+    link.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'link.csv'), index=False,
+    )
 
 
 def create_volatile_file():
@@ -305,6 +309,41 @@ def create_volatile_file():
     )
 
 
+def combine_profiles(raw_profile_path, column_name):
+    profile_file_list = sorted(os.listdir(raw_profile_path))
+
+    profile_list = []
+    for file in profile_file_list:
+        region = file.split('_')[1]
+
+        logging.info("Preprocessing the load profile for region {}".format(region))
+        # TODO: This is not only used for load profiles
+
+        raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file), index_col=0)
+
+        load_profile = raw_load_profile.iloc[:, 0]
+
+        load_profile.name = region + '-' + column_name
+
+        profile_list.append(load_profile)
+
+    profile_df = pd.concat(profile_list, axis=1, sort=True)
+
+    profile_df = profile_df.set_index(datetimeindex, drop=True)
+
+    profile_df.index.name = 'timeindex'
+
+    return profile_df
+
+
+def create_load_profiles():
+    raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
+
+    load_profile_df = combine_profiles(raw_load_profile_path, 'el-load-profile')
+
+    load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
+
+
 def create_volatile_profiles():
     logging.info("Creating volatile file")
     raw_wind_onshore_profile_paths = os.path.join(
@@ -336,54 +375,21 @@ def create_volatile_profiles():
     volatile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'volatile_profile.csv'))
 
 
-def create_link_file():
-    logging.info("Creating link file")
-    link = pd.DataFrame(
-        columns=['name', 'type', 'capacity', 'capacity_cost', 'loss', 'from_bus', 'to_bus']
-    )
-    transmission_loss_per_100km = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Losses_Electricity_Grid'
-    ]
-
-    transmission_length = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Length_Electricity_Grid'
-    ]
-
-    transmission_capacity = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Capacity_Electricity_Grid'
-    ]
-
-    link['name'] = link_list
-
-    link['type'] = 'link'
-
-    link['capacity'] = transmission_capacity['Value'].values
-
-    link['loss'] = (
-        transmission_length['Value'].values
-        * 0.01
-        * transmission_loss_per_100km['Value'].values
-        / transmission_capacity['Value'].values
-    )
-
-    link['from_bus'] = [link.split('-')[0] + '-el-bus' for link in link_list]
-
-    link['to_bus'] = [link.split('-')[1] + '-el-bus' for link in link_list]
-
-    link.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'link.csv'), index=False,
-    )
-
-
 def main():
     create_bus_file()
     create_shortage_file()
     create_curtailment_file()
     create_load_file()
-    create_load_profiles()
     create_volatile_file()
-    create_volatile_profiles()
     create_link_file()
+
+    create_load_profiles()
+    create_volatile_profiles()
+
+    previous_path = experiment_paths['data_preprocessed'] + '_default'
+    new_path = experiment_paths['data_preprocessed']
+
+    check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
 
 
 if __name__ == '__main__':
