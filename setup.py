@@ -22,7 +22,4 @@ setup(
         'oemof.tabular',
         'pyyaml'
     ],
-    extras_require={
-        'cartopy': ['cartopy'],
-    }
 )
