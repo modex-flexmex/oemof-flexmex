@@ -1,6 +1,6 @@
 attribute,type,unit,default,description
-name,str,n/a,n/a,Name of the bus
+name,str,n/a,el-load,Name of the bus
 type,str,n/a,link,Type
-bus,str,n/a,n/a
+bus,str,n/a,n/a,
 amount,float,MWh/a,n/a,
 profile,str,n/a,n/a,

@@ -1,5 +1,5 @@
 attribute,type,unit,default,description
-name,str,n/a,n/a,Name of the bus
+name,str,n/a,el-shortage,Name of the bus
 type,str,n/a,dispatchable,Type
 carrier,str,n/a,shortage,
 tech,str,n/a,shortage,

@@ -61,6 +61,15 @@ datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 module_path = os.path.dirname(os.path.abspath(__file__))
 
 
+def get_name(component, component_data):
+    name = [country + '-' + component_data['name'] for country in country_list]
+
+    if component == 'link':
+        name = link_list
+
+    return name
+
+
 def create_default_elements_files(
     dir,
     components_file='components.csv',
@@ -97,9 +106,7 @@ def create_default_elements_files(
             c_attr['attribute']: c_attr['default'] for _, c_attr in component_attrs.iterrows()
         }
 
-        component_data['name'] = country_list
-        if component == 'link':
-            component_data['name'] = link_list
+        component_data['name'] = get_name(component, component_data)
 
         df = pd.DataFrame(component_data).set_index('name')
 

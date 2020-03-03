@@ -1,11 +1,11 @@
 attribute,type,unit,default,description
-name,str,n/a,n/a,Name of the bus
+name,str,n/a,dummy,Name of the bus
 type,str,n/a,volatile,Type
 carrier,str,n/a,,
 tech,str,n/a,shortage,
 bus,str,n/a,n/a,
-capacity,
-capacity_cost,
-marginal_cost,
-profile,
-output_parameters
+capacity,,,,
+capacity_cost,,,,
+marginal_cost,,,,
+profile,,,,
+output_parameters,,,,
