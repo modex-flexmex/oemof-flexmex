@@ -212,7 +212,6 @@ def calc_net_flows(link_flow_results):
 
 def main(name=name, scalars=scalars):
     # Postprocess
-    logging.info("### Postprocessing")
     bus_results_files = (
         file for file in os.listdir(experiment_paths['results_optimization'])
         if re.search('el-bus.csv', file)

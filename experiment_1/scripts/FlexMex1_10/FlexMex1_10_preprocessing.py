@@ -31,6 +31,7 @@ if not os.path.exists(data_preprocessed_path):
 
 scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
 
+# TODO: Move bus_list, link_list and datetimeindex to separate file(s)
 bus_list = [
     'AT-el-bus',
     'BE-el-bus',
@@ -186,6 +187,7 @@ def combine_profiles(raw_profile_path, column_name):
         region = file.split('_')[1]
 
         logging.info("Preprocessing the load profile for region {}".format(region))
+        # TODO: This is not only used for load profiles
 
         raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file), index_col=0)
 
@@ -374,7 +376,6 @@ def create_link_file():
 
 
 def main():
-    logging.info("### Preprocessing")
     create_bus_file()
     create_shortage_file()
     create_curtailment_file()

@@ -26,7 +26,6 @@ logpath = define_logging(
 
 def main():
     r"""Infer the metadata of the datapackage"""
-    logging.info("### Infer")
     logging.info("Inferring the metadata of the datapackage")
     building.infer_metadata(
         package_name='oemof-tabular-dispatch-example',

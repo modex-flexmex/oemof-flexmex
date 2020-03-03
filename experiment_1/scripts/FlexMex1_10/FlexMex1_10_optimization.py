@@ -38,7 +38,6 @@ def main():
     Takes the specified datapackage, creates an energysystem and solves the
     optimization problem.
     """
-    logging.info("### Optimization")
     # create energy system object
     logging.info("Creating EnergySystem from datapackage")
     es = EnergySystem.from_datapackage(
