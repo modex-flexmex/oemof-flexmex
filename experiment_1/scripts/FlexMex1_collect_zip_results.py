@@ -39,3 +39,5 @@ for path in os.listdir(experiment_paths['results_postprocessed']):
                 zipf.write(file_to_write, relative_path)
 
 zipf.close()
+
+print(f"Wrote zip file to {zip_archive}")
