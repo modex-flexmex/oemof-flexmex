@@ -4,6 +4,8 @@ import os
 import pandas as pd
 
 from oemof.tools.logger import define_logging
+from oemoflex.model_structure import (
+    bus_list, link_list, datetimeindex)
 from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
 
 
@@ -30,47 +32,6 @@ if not os.path.exists(data_preprocessed_path):
         os.makedirs(os.path.join(data_preprocessed_path, subdir))
 
 scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
-
-# TODO: Move bus_list, link_list and datetimeindex to separate file(s)
-bus_list = [
-    'AT-el-bus',
-    'BE-el-bus',
-    'CH-el-bus',
-    'CZ-el-bus',
-    'DE-el-bus',
-    'DK-el-bus',
-    'FR-el-bus',
-    'IT-el-bus',
-    'LU-el-bus',
-    'NL-el-bus',
-    'PL-el-bus',
-]
-
-link_list = [
-    'AT-CH',
-    'AT-CZ',
-    'AT-IT',
-    'BE-FR',
-    'BE-LU',
-    'BE-NL',
-    'CH-FR',
-    'CH-IT',
-    'CZ-PL',
-    'DE-AT',
-    'DE-BE',
-    'DE-CH',
-    'DE-CZ',
-    'DE-DK',
-    'DE-FR',
-    'DE-LU',
-    'DE-NL',
-    'DE-PL',
-    'DK-NL',
-    'FR-IT',
-    'FR-LU',
-]
-
-datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
 
 def create_bus_file():

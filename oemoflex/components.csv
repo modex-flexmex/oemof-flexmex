@@ -1,0 +1,7 @@
+name,list_name,description
+bus,bus_list,
+curtailment,curtailment_list,
+link,link_list,
+load,load_list,
+shortage,shortage_list,
+volatile,volatile_list,

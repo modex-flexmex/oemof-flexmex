@@ -1,0 +1,10 @@
+attribute,type,unit,default,description
+name,str,n/a,n/a,Name of the bus
+type,str,n/a,dispatchable,Type
+carrier,str,n/a,shortage,
+tech,str,n/a,shortage,
+bus,str,n/a,n/a,
+capacity,float,GW,,
+marginal_cost,float,Eur/MWh,n/a,
+profile,str,n/a,n/a,
+output_parameters,dict,n/a,{},
