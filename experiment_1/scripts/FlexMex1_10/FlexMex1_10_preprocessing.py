@@ -5,7 +5,7 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.model_structure import (
-    bus_list, link_list, datetimeindex, create_default_elements_files)
+    bus_list, datetimeindex, create_default_elements_files)
 from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
 
 
@@ -50,35 +50,10 @@ def create_bus_file():
     bus.to_csv(os.path.join(data_preprocessed_path, 'elements', 'bus.csv'), index=False)
 
 
-def create_shortage_file():
+def update_shortage_file():
     logging.info("Create shortage file")
 
-    shortage = pd.DataFrame(
-        columns=[
-            'name',
-            'type',
-            'carrier',
-            'tech',
-            'capacity',
-            'bus',
-            'marginal_cost',
-            'profile',
-            'output_parameters',
-        ]
-    )
-    shortage['name'] = ['-'.join(bus.split('-')[:2] + ['shortage']) for bus in bus_list]
-
-    shortage['bus'] = bus_list
-
-    shortage['type'] = 'dispatchable'
-
-    shortage['carrier'] = 'shortage'
-
-    shortage['tech'] = 'shortage'
-
-    shortage['profile'] = 1
-
-    shortage['output_parameters'] = '{}'
+    shortage = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'shortage.csv'))
 
     shortage['marginal_cost'] = 5000
 
@@ -87,47 +62,10 @@ def create_shortage_file():
     )
 
 
-def create_curtailment_file():
-    logging.info("Creating curtailment file")
-    curtailment = pd.DataFrame(
-        columns=[
-            'name',
-            'type',
-            'carrier',
-            'tech',
-            'capacity',
-            'bus',
-            'marginal_cost',
-            'profile',
-            'output_parameters',
-        ]
-    )
-    curtailment['name'] = ['-'.join(bus.split('-')[:2] + ['curtailment']) for bus in bus_list]
-
-    curtailment['bus'] = bus_list
-
-    curtailment['type'] = 'excess'
-
-    curtailment['carrier'] = 'curtailment'
-
-    curtailment['tech'] = 'curtailment'
-
-    curtailment['profile'] = 1
-
-    curtailment['output_parameters'] = '{}'
-
-    curtailment['marginal_cost'] = 0
-
-    curtailment.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'curtailment.csv'), index=False,
-    )
-
-
-def create_load_file():
+def update_load_file():
     logging.info("Creating load file")
-    load = pd.DataFrame(columns=['name', 'amount', 'profile', 'type', 'bus'])
 
-    load['name'] = ['-'.join(bus.split('-')[:2] + ['load']) for bus in bus_list]
+    load = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'))
 
     scalars_load = scalars.loc[scalars['Parameter'] == 'Energy_FinalEnergy_Electricity']
 
@@ -135,18 +73,14 @@ def create_load_file():
 
     load['profile'] = ['{}-el-load-profile'.format(bus.split('-')[0]) for bus in bus_list]
 
-    load['type'] = 'load'
-
-    load['bus'] = bus_list
-
     load.to_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'), index=False)
 
 
-def create_link_file():
+def update_link_file():
     logging.info("Creating link file")
-    link = pd.DataFrame(
-        columns=['name', 'type', 'capacity', 'capacity_cost', 'loss', 'from_bus', 'to_bus']
-    )
+
+    link = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'link.csv'))
+
     transmission_loss_per_100km = scalars.loc[
         scalars['Parameter'] == 'Transmission_Losses_Electricity_Grid'
     ]
@@ -159,10 +93,6 @@ def create_link_file():
         scalars['Parameter'] == 'Transmission_Capacity_Electricity_Grid'
     ]
 
-    link['name'] = link_list
-
-    link['type'] = 'link'
-
     link['capacity'] = transmission_capacity['Value'].values
 
     link['loss'] = (
@@ -171,10 +101,6 @@ def create_link_file():
         * transmission_loss_per_100km['Value'].values
         / transmission_capacity['Value'].values
     )
-
-    link['from_bus'] = [link.split('-')[0] + '-el-bus' for link in link_list]
-
-    link['to_bus'] = [link.split('-')[1] + '-el-bus' for link in link_list]
 
     link.to_csv(
         os.path.join(data_preprocessed_path, 'elements', 'link.csv'), index=False,
@@ -339,12 +265,10 @@ def create_volatile_profiles():
 
 
 def main():
-    # create_bus_file()
-    # create_shortage_file()
-    # create_curtailment_file()
-    # create_load_file()
-    # create_volatile_file()
-    # create_link_file()
+    update_shortage_file()
+    update_load_file()
+    create_volatile_file()  # TODO: Needs carrier, tech. Needs capacity, profile
+    update_link_file()
 
     create_load_profiles()
     create_volatile_profiles()

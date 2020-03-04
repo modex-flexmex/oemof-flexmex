@@ -62,12 +62,36 @@ module_path = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_name(component, component_data):
-    name = [country + '-' + component_data['name'] for country in country_list]
-
     if component == 'link':
         name = link_list
 
-    return name
+        return name
+    else:
+        name = [country + '-' + component_data['name'] for country in country_list]
+
+        return name
+
+
+def specify_bus_connection(compo_data):
+    comp_data = compo_data.copy()
+
+    if 'bus' in comp_data:
+        comp_data['bus'] = [country + '-' + comp_data['bus'] for country in country_list]
+
+        return comp_data
+
+    if all(attr in comp_data for attr in ['from_bus', 'to_bus']):
+
+        comp_data['from_bus'] = [
+            link.split('-')[0] + '-' + comp_data['from_bus'] for link in link_list
+        ]
+
+        comp_data['to_bus'] = [link.split('-')[1] + '-' + comp_data['to_bus'] for link in link_list]
+
+        return comp_data
+
+    else:
+        return comp_data
 
 
 def create_default_elements_files(
@@ -107,6 +131,8 @@ def create_default_elements_files(
         }
 
         component_data['name'] = get_name(component, component_data)
+
+        component_data = specify_bus_connection(component_data)
 
         df = pd.DataFrame(component_data).set_index('name')
 
