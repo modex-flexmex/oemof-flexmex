@@ -36,22 +36,8 @@ scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'),
 create_default_elements_files(os.path.join(data_preprocessed_path, 'elements'))
 
 
-def create_bus_file():
-    logging.info("Create bus file")
-
-    bus = pd.DataFrame(columns=['name', 'type', 'balanced'])
-
-    bus['name'] = bus_list
-
-    bus['type'] = 'bus'
-
-    bus['balanced'] = 'true'
-
-    bus.to_csv(os.path.join(data_preprocessed_path, 'elements', 'bus.csv'), index=False)
-
-
 def update_shortage_file():
-    logging.info("Create shortage file")
+    logging.info("Updating shortage file")
 
     shortage = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'shortage.csv'))
 
@@ -63,7 +49,7 @@ def update_shortage_file():
 
 
 def update_load_file():
-    logging.info("Creating load file")
+    logging.info("Updating load file")
 
     load = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'))
 
@@ -77,7 +63,7 @@ def update_load_file():
 
 
 def update_link_file():
-    logging.info("Creating link file")
+    logging.info("Updating link file")
 
     link = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'link.csv'))
 
