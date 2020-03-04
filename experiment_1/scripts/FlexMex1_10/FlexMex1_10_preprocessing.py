@@ -93,24 +93,8 @@ def update_link_file():
     )
 
 
-def create_volatile_file():
-    volatile = pd.DataFrame(
-        columns=[
-            'name',
-            'type',
-            'carrier',
-            'tech',
-            'capacity',
-            'capacity_cost',
-            'bus',
-            'marginal_cost',
-            'profile',
-            'output_parameters',
-        ]
-    )
-
-    # wind onshore
-    wind_onshore = volatile.copy()
+def update_wind_onshore():
+    wind_onshore = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'))
 
     scalars_wind_onshore = scalars.loc[
         scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Wind_Onshore'
@@ -130,8 +114,15 @@ def create_volatile_file():
         '-'.join(bus.split('-')[:2] + ['wind-onshore-profile']) for bus in bus_list
     ]
 
-    # wind offshore
-    wind_offshore = volatile.copy()
+    wind_onshore.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'), index=False,
+    )
+
+
+def update_wind_offshore():
+    wind_offshore = pd.read_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
+    )
 
     scalars_wind_offshore = scalars.loc[
         scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Wind_Offshore'
@@ -151,9 +142,13 @@ def create_volatile_file():
         '-'.join(bus.split('-')[:2] + ['wind-offshore-profile']) for bus in bus_list
     ]
 
-    # solarpv
-    # name,carrier,tech,capacity,capacity_cost,bus,marginal_cost,profile,output_parameters
-    solarpv = volatile.copy()
+    wind_offshore.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv'), index=False,
+    )
+
+
+def update_solar_pv():
+    solarpv = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'pv.csv'))
 
     scalars_solarpv = scalars.loc[
         scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Solar_PV'
@@ -170,6 +165,20 @@ def create_volatile_file():
     solarpv['bus'] = bus_list
 
     solarpv['profile'] = ['-'.join(bus.split('-')[:2] + ['solar-pv-profile']) for bus in bus_list]
+
+    solarpv.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'pv.csv'), index=False,
+    )
+
+
+def combine_volatile_file():
+    wind_onshore = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'))
+
+    wind_offshore = pd.read_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
+    )
+
+    solarpv = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'pv.csv'))
 
     volatile = pd.concat([wind_onshore, wind_offshore, solarpv], axis=0)
 
@@ -253,7 +262,10 @@ def create_volatile_profiles():
 def main():
     update_shortage_file()
     update_load_file()
-    create_volatile_file()  # TODO: Needs carrier, tech. Needs capacity, profile
+    update_wind_onshore()
+    update_wind_offshore()
+    update_solar_pv()
+    combine_volatile_file()  # TODO: Needs carrier, tech. Needs capacity, profile
     update_link_file()
 
     create_load_profiles()

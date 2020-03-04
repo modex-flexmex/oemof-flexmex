@@ -1,0 +1,11 @@
+attribute,type,unit,default,description
+name,str,n/a,wind-offshore,Name of the bus
+type,str,n/a,volatile,Type
+carrier,str,wind,,
+tech,str,n/a,onshore,
+bus,str,n/a,el-bus,
+capacity,,,,
+capacity_cost,,,,
+marginal_cost,float,Eur/kWh,0,
+profile,,,,
+output_parameters,dict,n/a,{},

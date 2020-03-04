@@ -1,0 +1,11 @@
+attribute,type,unit,default,description
+name,str,n/a,solar-pv,Name of the bus
+type,str,n/a,volatile,Type
+carrier,str,solar,,
+tech,str,n/a,pv,
+bus,str,n/a,el-bus,
+capacity,,,,
+capacity_cost,,,,
+marginal_cost,float,Eur/kWh,0,
+profile,,,,
+output_parameters,dict,n/a,{},
