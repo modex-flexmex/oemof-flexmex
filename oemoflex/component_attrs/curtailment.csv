@@ -1,10 +1,10 @@
 attribute,type,unit,default,description
 name,str,n/a,el-curtailment,Name of the bus
-type,str,n/a,sink,Type
-carrier,str,n/a,excess,
+type,str,n/a,excess,Type
+carrier,str,n/a,curtailment,
 tech,str,n/a,curtailment,
 bus,str,n/a,n/a,
-capacity,float,GW,n/a,
-marginal_cost,float,Eur/MWh,0,
-profile,str,n/a,n/a,
+capacity,float,MW,n/a,
+marginal_cost,float,Eur/kWh,0,
+profile,str,n/a,1,
 output_parameters,dict,n/a,{},
