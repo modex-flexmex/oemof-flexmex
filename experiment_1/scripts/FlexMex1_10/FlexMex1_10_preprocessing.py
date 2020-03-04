@@ -252,11 +252,13 @@ def create_volatile_profiles():
 
     solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'el-solar-pv-profile')
 
-    volatile_df = pd.concat(
-        [wind_onshore_profile_df, wind_offshore_profile_df, solar_pv_profile_df], axis=1, sort=True
+    wind_onshore_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'wind-onshore_profile.csv')
     )
-
-    volatile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'volatile_profile.csv'))
+    wind_offshore_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'wind-offshore_profile.csv')
+    )
+    solar_pv_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'pv_profile.csv'))
 
 
 def main():
@@ -265,7 +267,6 @@ def main():
     update_wind_onshore()
     update_wind_offshore()
     update_solar_pv()
-    combine_volatile_file()  # TODO: Needs carrier, tech. Needs capacity, profile
     update_link_file()
 
     create_load_profiles()
