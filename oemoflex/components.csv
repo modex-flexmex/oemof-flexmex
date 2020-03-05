@@ -1,0 +1,9 @@
+name,list_name,description
+bus,bus_list,
+curtailment,curtailment_list,
+link,link_list,
+load,load_list,
+shortage,shortage_list,
+wind-onshore,wind-onshore_list,
+wind-offshore,offshore_list,
+pv,pv_list,

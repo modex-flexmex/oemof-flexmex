@@ -4,7 +4,9 @@ import os
 import pandas as pd
 
 from oemof.tools.logger import define_logging
-from oemoflex.helpers import get_experiment_paths
+from oemoflex.model_structure import (
+    bus_list, datetimeindex, create_default_elements_files)
+from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
 
 
 name = 'FlexMex1_10'
@@ -31,91 +33,13 @@ if not os.path.exists(data_preprocessed_path):
 
 scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
 
-# TODO: Move bus_list, link_list and datetimeindex to separate file(s)
-bus_list = [
-    'AT-el-bus',
-    'BE-el-bus',
-    'CH-el-bus',
-    'CZ-el-bus',
-    'DE-el-bus',
-    'DK-el-bus',
-    'FR-el-bus',
-    'IT-el-bus',
-    'LU-el-bus',
-    'NL-el-bus',
-    'PL-el-bus',
-]
-
-link_list = [
-    'AT-CH',
-    'AT-CZ',
-    'AT-IT',
-    'BE-FR',
-    'BE-LU',
-    'BE-NL',
-    'CH-FR',
-    'CH-IT',
-    'CZ-PL',
-    'DE-AT',
-    'DE-BE',
-    'DE-CH',
-    'DE-CZ',
-    'DE-DK',
-    'DE-FR',
-    'DE-LU',
-    'DE-NL',
-    'DE-PL',
-    'DK-NL',
-    'FR-IT',
-    'FR-LU',
-]
-
-datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
+create_default_elements_files(os.path.join(data_preprocessed_path, 'elements'))
 
 
-def create_bus_file():
-    logging.info("Create bus file")
+def update_shortage_file():
+    logging.info("Updating shortage file")
 
-    bus = pd.DataFrame(columns=['name', 'type', 'balanced'])
-
-    bus['name'] = bus_list
-
-    bus['type'] = 'bus'
-
-    bus['balanced'] = 'true'
-
-    bus.to_csv(os.path.join(data_preprocessed_path, 'elements', 'bus.csv'), index=False)
-
-
-def create_shortage_file():
-    logging.info("Create shortage file")
-
-    shortage = pd.DataFrame(
-        columns=[
-            'name',
-            'type',
-            'carrier',
-            'tech',
-            'capacity',
-            'bus',
-            'marginal_cost',
-            'profile',
-            'output_parameters',
-        ]
-    )
-    shortage['name'] = ['-'.join(bus.split('-')[:2] + ['shortage']) for bus in bus_list]
-
-    shortage['bus'] = bus_list
-
-    shortage['type'] = 'dispatchable'
-
-    shortage['carrier'] = 'shortage'
-
-    shortage['tech'] = 'shortage'
-
-    shortage['profile'] = 1
-
-    shortage['output_parameters'] = '{}'
+    shortage = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'shortage.csv'))
 
     shortage['marginal_cost'] = 5000
 
@@ -124,47 +48,10 @@ def create_shortage_file():
     )
 
 
-def create_curtailment_file():
-    logging.info("Creating curtailment file")
-    curtailment = pd.DataFrame(
-        columns=[
-            'name',
-            'type',
-            'carrier',
-            'tech',
-            'capacity',
-            'bus',
-            'marginal_cost',
-            'profile',
-            'output_parameters',
-        ]
-    )
-    curtailment['name'] = ['-'.join(bus.split('-')[:2] + ['curtailment']) for bus in bus_list]
+def update_load_file():
+    logging.info("Updating load file")
 
-    curtailment['bus'] = bus_list
-
-    curtailment['type'] = 'excess'
-
-    curtailment['carrier'] = 'curtailment'
-
-    curtailment['tech'] = 'curtailment'
-
-    curtailment['profile'] = 1
-
-    curtailment['output_parameters'] = '{}'
-
-    curtailment['marginal_cost'] = 0
-
-    curtailment.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'curtailment.csv'), index=False,
-    )
-
-
-def create_load_file():
-    logging.info("Creating load file")
-    load = pd.DataFrame(columns=['name', 'amount', 'profile', 'type', 'bus'])
-
-    load['name'] = ['-'.join(bus.split('-')[:2] + ['load']) for bus in bus_list]
+    load = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'))
 
     scalars_load = scalars.loc[scalars['Parameter'] == 'Energy_FinalEnergy_Electricity']
 
@@ -172,66 +59,42 @@ def create_load_file():
 
     load['profile'] = ['{}-el-load-profile'.format(bus.split('-')[0]) for bus in bus_list]
 
-    load['type'] = 'load'
-
-    load['bus'] = bus_list
-
     load.to_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'), index=False)
 
 
-def combine_profiles(raw_profile_path, column_name):
-    profile_file_list = sorted(os.listdir(raw_profile_path))
+def update_link_file():
+    logging.info("Updating link file")
 
-    profile_list = []
-    for file in profile_file_list:
-        region = file.split('_')[1]
+    link = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'link.csv'))
 
-        logging.info("Preprocessing the load profile for region {}".format(region))
-        # TODO: This is not only used for load profiles
+    transmission_loss_per_100km = scalars.loc[
+        scalars['Parameter'] == 'Transmission_Losses_Electricity_Grid'
+    ]
 
-        raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file), index_col=0)
+    transmission_length = scalars.loc[
+        scalars['Parameter'] == 'Transmission_Length_Electricity_Grid'
+    ]
 
-        load_profile = raw_load_profile.iloc[:, 0]
+    transmission_capacity = scalars.loc[
+        scalars['Parameter'] == 'Transmission_Capacity_Electricity_Grid'
+    ]
 
-        load_profile.name = region + '-' + column_name
+    link['capacity'] = transmission_capacity['Value'].values
 
-        profile_list.append(load_profile)
-
-    profile_df = pd.concat(profile_list, axis=1, sort=True)
-
-    profile_df = profile_df.set_index(datetimeindex, drop=True)
-
-    profile_df.index.name = 'timeindex'
-
-    return profile_df
-
-
-def create_load_profiles():
-    raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
-
-    load_profile_df = combine_profiles(raw_load_profile_path, 'el-load-profile')
-
-    load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
-
-
-def create_volatile_file():
-    volatile = pd.DataFrame(
-        columns=[
-            'name',
-            'type',
-            'carrier',
-            'tech',
-            'capacity',
-            'capacity_cost',
-            'bus',
-            'marginal_cost',
-            'profile',
-            'output_parameters',
-        ]
+    link['loss'] = (
+        transmission_length['Value'].values
+        * 0.01
+        * transmission_loss_per_100km['Value'].values
+        / transmission_capacity['Value'].values
     )
 
-    # wind onshore
-    wind_onshore = volatile.copy()
+    link.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'link.csv'), index=False,
+    )
+
+
+def update_wind_onshore():
+    wind_onshore = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'))
 
     scalars_wind_onshore = scalars.loc[
         scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Wind_Onshore'
@@ -251,8 +114,15 @@ def create_volatile_file():
         '-'.join(bus.split('-')[:2] + ['wind-onshore-profile']) for bus in bus_list
     ]
 
-    # wind offshore
-    wind_offshore = volatile.copy()
+    wind_onshore.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'), index=False,
+    )
+
+
+def update_wind_offshore():
+    wind_offshore = pd.read_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
+    )
 
     scalars_wind_offshore = scalars.loc[
         scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Wind_Offshore'
@@ -272,9 +142,13 @@ def create_volatile_file():
         '-'.join(bus.split('-')[:2] + ['wind-offshore-profile']) for bus in bus_list
     ]
 
-    # solarpv
-    # name,carrier,tech,capacity,capacity_cost,bus,marginal_cost,profile,output_parameters
-    solarpv = volatile.copy()
+    wind_offshore.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv'), index=False,
+    )
+
+
+def update_solar_pv():
+    solarpv = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'pv.csv'))
 
     scalars_solarpv = scalars.loc[
         scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Solar_PV'
@@ -292,6 +166,20 @@ def create_volatile_file():
 
     solarpv['profile'] = ['-'.join(bus.split('-')[:2] + ['solar-pv-profile']) for bus in bus_list]
 
+    solarpv.to_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'pv.csv'), index=False,
+    )
+
+
+def combine_volatile_file():
+    wind_onshore = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'))
+
+    wind_offshore = pd.read_csv(
+        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
+    )
+
+    solarpv = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'pv.csv'))
+
     volatile = pd.concat([wind_onshore, wind_offshore, solarpv], axis=0)
 
     volatile['type'] = 'volatile'
@@ -305,8 +193,41 @@ def create_volatile_file():
     )
 
 
-def create_volatile_profiles():
-    logging.info("Creating volatile file")
+def combine_profiles(raw_profile_path, column_name):
+    profile_file_list = sorted(os.listdir(raw_profile_path))
+
+    profile_list = []
+    for file in profile_file_list:
+        region = file.split('_')[1]
+
+        raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file), index_col=0)
+
+        load_profile = raw_load_profile.iloc[:, 0]
+
+        load_profile.name = region + '-' + column_name
+
+        profile_list.append(load_profile)
+
+    profile_df = pd.concat(profile_list, axis=1, sort=True)
+
+    profile_df = profile_df.set_index(datetimeindex, drop=True)
+
+    profile_df.index.name = 'timeindex'
+
+    return profile_df
+
+
+def create_load_profiles():
+    logging.info("Creating load profiles")
+    raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
+
+    load_profile_df = combine_profiles(raw_load_profile_path, 'el-load-profile')
+
+    load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
+
+
+def create_wind_onshore_profiles():
+    logging.info("Creating wind-onshore profiles")
     raw_wind_onshore_profile_paths = os.path.join(
         data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Onshore'
     )
@@ -314,6 +235,14 @@ def create_volatile_profiles():
     wind_onshore_profile_df = combine_profiles(
         raw_wind_onshore_profile_paths, 'el-wind-onshore-profile'
     )
+
+    wind_onshore_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'wind-onshore_profile.csv')
+    )
+
+
+def create_wind_offshore_profiles():
+    logging.info("Creating wind-offshore profiles")
 
     raw_wind_offshore_profile_paths = os.path.join(
         data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Offshore'
@@ -323,67 +252,42 @@ def create_volatile_profiles():
         raw_wind_offshore_profile_paths, 'el-wind-offshore-profile'
     )
 
+    wind_offshore_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'wind-offshore_profile.csv')
+    )
+
+
+def create_solar_pv_profiles():
+    logging.info("Creating solar pv profiles")
+
     raw_solar_pv_profile_paths = os.path.join(
         data_raw_path, 'Energy', 'SecondaryEnergy', 'Solar', 'PV'
     )
 
     solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'el-solar-pv-profile')
 
-    volatile_df = pd.concat(
-        [wind_onshore_profile_df, wind_offshore_profile_df, solar_pv_profile_df], axis=1, sort=True
-    )
-
-    volatile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'volatile_profile.csv'))
-
-
-def create_link_file():
-    logging.info("Creating link file")
-    link = pd.DataFrame(
-        columns=['name', 'type', 'capacity', 'capacity_cost', 'loss', 'from_bus', 'to_bus']
-    )
-    transmission_loss_per_100km = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Losses_Electricity_Grid'
-    ]
-
-    transmission_length = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Length_Electricity_Grid'
-    ]
-
-    transmission_capacity = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Capacity_Electricity_Grid'
-    ]
-
-    link['name'] = link_list
-
-    link['type'] = 'link'
-
-    link['capacity'] = transmission_capacity['Value'].values
-
-    link['loss'] = (
-        transmission_length['Value'].values
-        * 0.01
-        * transmission_loss_per_100km['Value'].values
-        / transmission_capacity['Value'].values
-    )
-
-    link['from_bus'] = [link.split('-')[0] + '-el-bus' for link in link_list]
-
-    link['to_bus'] = [link.split('-')[1] + '-el-bus' for link in link_list]
-
-    link.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'link.csv'), index=False,
-    )
+    solar_pv_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'pv_profile.csv'))
 
 
 def main():
-    create_bus_file()
-    create_shortage_file()
-    create_curtailment_file()
-    create_load_file()
+    # update elements
+    update_shortage_file()
+    update_load_file()
+    update_wind_onshore()
+    update_wind_offshore()
+    update_solar_pv()
+    update_link_file()
+
+    # create sequences
     create_load_profiles()
-    create_volatile_file()
-    create_volatile_profiles()
-    create_link_file()
+    create_wind_onshore_profiles()
+    create_wind_offshore_profiles()
+    create_solar_pv_profiles()
+
+    # compare with previous data
+    previous_path = experiment_paths['data_preprocessed'] + '_default'
+    new_path = experiment_paths['data_preprocessed']
+    check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
 
 
 if __name__ == '__main__':

@@ -30,8 +30,21 @@ def main():
     building.infer_metadata(
         package_name='oemof-tabular-dispatch-example',
         foreign_keys={
-            'bus': ['volatile', 'shortage', 'curtailment', 'storage', 'load'],
-            'profile': ['load', 'volatile'],
+            'bus': [
+                'wind-onshore',
+                'wind-offshore',
+                'pv',
+                'shortage',
+                'curtailment',
+                'storage',
+                'load',
+            ],
+            'profile': [
+                'wind-onshore',
+                'wind-offshore',
+                'pv',
+                'load',
+            ],
             'from_to_bus': ['link'],
         },
         path=experiment_paths['data_preprocessed']
