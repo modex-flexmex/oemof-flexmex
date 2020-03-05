@@ -66,10 +66,10 @@ def get_name(component, component_data):
         name = link_list
 
         return name
-    else:
-        name = [country + '-' + component_data['name'] for country in country_list]
 
-        return name
+    name = [country + '-' + component_data['name'] for country in country_list]
+
+    return name
 
 
 def specify_bus_connection(compo_data):
@@ -90,14 +90,13 @@ def specify_bus_connection(compo_data):
 
         return comp_data
 
-    else:
-        return comp_data
+    return comp_data
 
 
 def create_default_elements_files(
-    dir,
-    components_file='components.csv',
-    component_attrs_dir='component_attrs'
+        dir,
+        components_file='components.csv',
+        component_attrs_dir='component_attrs'
 ):
     r"""
 
