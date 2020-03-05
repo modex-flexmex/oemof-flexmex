@@ -200,9 +200,6 @@ def combine_profiles(raw_profile_path, column_name):
     for file in profile_file_list:
         region = file.split('_')[1]
 
-        logging.info("Preprocessing the load profile for region {}".format(region))
-        # TODO: This is not only used for load profiles
-
         raw_load_profile = pd.read_csv(os.path.join(raw_profile_path, file), index_col=0)
 
         load_profile = raw_load_profile.iloc[:, 0]
@@ -273,6 +270,7 @@ def create_solar_pv_profiles():
 
 
 def main():
+    # update elements
     update_shortage_file()
     update_load_file()
     update_wind_onshore()
@@ -280,14 +278,15 @@ def main():
     update_solar_pv()
     update_link_file()
 
+    # create sequences
     create_load_profiles()
     create_wind_onshore_profiles()
     create_wind_offshore_profiles()
     create_solar_pv_profiles()
 
+    # compare with previous data
     previous_path = experiment_paths['data_preprocessed'] + '_default'
     new_path = experiment_paths['data_preprocessed']
-
     check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
 
 
