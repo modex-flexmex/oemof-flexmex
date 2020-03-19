@@ -78,7 +78,7 @@ def check_if_csv_dirs_equal(dir_a, dir_b, ignore='log'):
         check_if_csv_files_equal(file_a, file_b)
 
 
-def get_dir_diff(dir_a, dir_b, ignore_list=['*.log']):
+def get_dir_diff(dir_a, dir_b, ignore_list=None):
     r"""
     Diff's two directories recursively and returns stdout or stderr
 
@@ -93,10 +93,14 @@ def get_dir_diff(dir_a, dir_b, ignore_list=['*.log']):
     the STDOUT string of the 'diff' system call
     """
 
+    if ignore_list is None:
+        ignore_list = ['*.log']
+
     # Concatenate patterns to a list of diff args of the form "-x PATTERN"
     exclusions = []
     for pattern in ignore_list:
-        # Different from a terminal call it doesn't work with quotes here: -x "*.log" OR -x '*.log' won't work!
+        # Different from a terminal call, it doesn't work with quotes here:
+        # -x "*.log" OR -x '*.log' won't work!
         exclusions.append("-x")
         exclusions.append("{}".format(pattern))
 
@@ -114,7 +118,7 @@ def get_dir_diff(dir_a, dir_b, ignore_list=['*.log']):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=working_directory,
-        check=True
+        check=False
     )
 
     return diff_process.stdout.decode('UTF-8')

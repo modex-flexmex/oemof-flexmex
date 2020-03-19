@@ -287,8 +287,11 @@ def main():
     # compare with previous data
     previous_path = experiment_paths['data_preprocessed'] + '_default'
     new_path = experiment_paths['data_preprocessed']
-    diff_output = get_dir_diff(new_path, previous_path, ignore_list=['*.log', '*.json']);
-    logging.info("Diff-checking the preprocessed data against '_default' directory:\n{}".format(diff_output))
+    diff_output = get_dir_diff(new_path, previous_path, ignore_list=['*.log', '*.json'])
+    logging.info(
+        "Diff-checking the preprocessed data against '_default' directory:\n{}"
+            .format(diff_output)
+    )
     # check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
 
 
