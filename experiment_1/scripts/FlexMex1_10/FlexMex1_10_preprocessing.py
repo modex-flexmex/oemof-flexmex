@@ -6,7 +6,7 @@ import pandas as pd
 from oemof.tools.logger import define_logging
 from oemoflex.model_structure import (
     bus_list, datetimeindex, create_default_elements_files)
-from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
+from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal, get_dir_diff
 
 
 name = 'FlexMex1_10'
@@ -287,8 +287,8 @@ def main():
     # compare with previous data
     previous_path = experiment_paths['data_preprocessed'] + '_default'
     new_path = experiment_paths['data_preprocessed']
-    check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
-
+    logging.info("Diff-checking the preprocessed data against '_default' directory:\n" + get_dir_diff(new_path, previous_path, ignore=['*.log', '*.json']))
+    #check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
 
 if __name__ == '__main__':
     main()

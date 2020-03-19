@@ -4,6 +4,7 @@ import shutil
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 import yaml
+import subprocess
 
 
 def get_experiment_paths(name, path_config):
@@ -76,6 +77,24 @@ def check_if_csv_dirs_equal(dir_a, dir_b, ignore='log'):
 
         check_if_csv_files_equal(file_a, file_b)
 
+def get_dir_diff(dir_a, dir_b, ignore='*.log'):
+    r"""
+    Diff two directories recursively
+
+    Parameters
+    ----------
+    dir_a   Directory left-hand side
+    dir_b   Directory right-hand side
+    ignore  TODO
+
+    Returns
+    -------
+    the STDOUT string of the 'diff' system call
+    """
+    # Call diff with recursively (-r) and with brief output (-b)
+    diff_process = subprocess.run(["diff", "-rq", dir_a, dir_b], capture_output=True)
+    return diff_process.stdout.decode('UTF-8')
+    # ignore
 
 def delete_empty_subdirs(path):
     r"""Deletes empty subdirectories in path"""
