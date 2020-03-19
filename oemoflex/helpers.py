@@ -1,10 +1,10 @@
 import os
 import shutil
 
+import subprocess
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 import yaml
-import subprocess
 
 
 def get_experiment_paths(name, path_config):
@@ -77,6 +77,7 @@ def check_if_csv_dirs_equal(dir_a, dir_b, ignore='log'):
 
         check_if_csv_files_equal(file_a, file_b)
 
+
 def get_dir_diff(dir_a, dir_b, ignore_list=['*.log']):
     r"""
     Diff's two directories recursively and returns stdout or stderr
@@ -106,8 +107,15 @@ def get_dir_diff(dir_a, dir_b, ignore_list=['*.log']):
     rel_dir_a = os.path.relpath(dir_a, working_directory)
     rel_dir_b = os.path.relpath(dir_b, working_directory)
 
-    # Call 'diff' recursively (-r), with brief output (-b), ignore exclusion patterns (-x), with relative path names, instead of capture_output=True combine STDOUT and STDERR into one
-    diff_process = subprocess.run(["diff", "-rq", *exclusions, rel_dir_a, rel_dir_b], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_directory)
+    # Call 'diff' recursively (-r), with brief output (-b), ignore exclusion patterns (-x),
+    # with relative path names, instead of capture_output=True combine STDOUT and STDERR into one
+    diff_process = subprocess.run(
+        ["diff", "-rq", *exclusions, rel_dir_a, rel_dir_b],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=working_directory,
+        check=True
+    )
 
     return diff_process.stdout.decode('UTF-8')
 
