@@ -77,24 +77,40 @@ def check_if_csv_dirs_equal(dir_a, dir_b, ignore='log'):
 
         check_if_csv_files_equal(file_a, file_b)
 
-def get_dir_diff(dir_a, dir_b, ignore='*.log'):
+def get_dir_diff(dir_a, dir_b, ignore_list=['*.log']):
     r"""
-    Diff two directories recursively
+    Diff's two directories recursively and returns stdout or stderr
 
     Parameters
     ----------
     dir_a   Directory left-hand side
     dir_b   Directory right-hand side
-    ignore  TODO
+    ignore_list  list of patterns to ignore in file names, default: .log
 
     Returns
     -------
     the STDOUT string of the 'diff' system call
     """
-    # Call diff with recursively (-r) and with brief output (-b)
-    diff_process = subprocess.run(["diff", "-rq", dir_a, dir_b], capture_output=True)
+
+    # Concatenate patterns to a list of diff args of the form "-x PATTERN"
+    exclusions = []
+    for pattern in ignore_list:
+        # Different from a terminal call it doesn't work with quotes here: -x "*.log" OR -x '*.log' won't work!
+        exclusions.append("-x")
+        exclusions.append("{}".format(pattern))
+
+    # Set working directory to the common path for the diff output to be trimmed to what is relevant
+    working_directory = os.path.commonpath([dir_a, dir_b])
+
+    # Trim directory path names accordingly to the relative paths
+    rel_dir_a = os.path.relpath(dir_a, working_directory)
+    rel_dir_b = os.path.relpath(dir_b, working_directory)
+
+    # Call 'diff' recursively (-r), with brief output (-b), ignore exclusion patterns (-x), with relative path names, instead of capture_output=True combine STDOUT and STDERR into one
+    diff_process = subprocess.run(["diff", "-rq", *exclusions, rel_dir_a, rel_dir_b], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_directory)
+
     return diff_process.stdout.decode('UTF-8')
-    # ignore
+
 
 def delete_empty_subdirs(path):
     r"""Deletes empty subdirectories in path"""
