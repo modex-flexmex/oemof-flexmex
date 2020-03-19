@@ -13,6 +13,6 @@ if __name__ == '__main__':
 
     FlexMex1_10_infer.main()
 
-    # FlexMex1_10_optimization.main()
+    FlexMex1_10_optimization.main()
 
-    # FlexMex1_10_postprocessing.main()
+    FlexMex1_10_postprocessing.main()
