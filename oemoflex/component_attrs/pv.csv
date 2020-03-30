@@ -1,7 +1,7 @@
 attribute,type,unit,default,description
 name,str,n/a,solar-pv,Name of the bus
 type,str,n/a,volatile,Type
-carrier,str,solar,,
+carrier,str,n/a,solar,
 tech,str,n/a,pv,
 bus,str,n/a,el-bus,
 capacity,,,,

@@ -125,10 +125,6 @@ def update_wind_onshore(data_preprocessed_path):
 
     wind_onshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-onshore']) for bus in bus_list]
 
-    wind_onshore['carrier'] = 'wind'
-
-    wind_onshore['tech'] = 'onshore'
-
     wind_onshore['capacity'] = scalars_wind_onshore
 
     wind_onshore['bus'] = bus_list
@@ -149,10 +145,6 @@ def update_wind_offshore(data_preprocessed_path):
 
     wind_offshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-offshore']) for bus in bus_list]
 
-    wind_offshore['carrier'] = 'wind'
-
-    wind_offshore['tech'] = 'offshore'
-
     wind_offshore['capacity'] = scalars_wind_offshore
 
     wind_offshore['bus'] = bus_list
@@ -172,10 +164,6 @@ def update_solar_pv(data_preprocessed_path):
     scalars_solarpv = get_parameter_values('EnergyConversion_Capacity_Electricity_Solar_PV')
 
     solarpv['name'] = ['-'.join(bus.split('-')[:2] + ['solarpv']) for bus in bus_list]
-
-    solarpv['carrier'] = 'solar'
-
-    solarpv['tech'] = 'pv'
 
     solarpv['capacity'] = scalars_solarpv
 

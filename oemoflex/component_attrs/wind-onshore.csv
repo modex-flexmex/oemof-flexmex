@@ -1,7 +1,7 @@
 attribute,type,unit,default,description
 name,str,n/a,wind-onshore,Name of the bus
 type,str,n/a,volatile,Type
-carrier,str,wind,,
+carrier,str,n/a,wind,
 tech,str,n/a,onshore,
 bus,str,n/a,el-bus,
 capacity,,,,
