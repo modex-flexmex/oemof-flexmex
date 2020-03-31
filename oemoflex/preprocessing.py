@@ -1,3 +1,4 @@
+import logging
 import os
 
 import pandas as pd
@@ -99,12 +100,18 @@ def create_default_elements_files(
         component_attrs_dir='component_attrs'
 ):
     r"""
+    Prepares oemoef.tabluar input CSV files:
+    * includes headers according to definitions in CSVs in directory 'component_attrs_dir'
+    * pre-define all oemof elements (along CSV rows) without actual dimensions/values
 
     Parameters
     ----------
-    dir
-    components_file
-    component_attrs_dir
+    dir : str (dir path)
+        target directory where to put the prepared CSVs
+    components_file : str (file path)
+        CSV where to read the components from
+    component_attrs_dir : str (dir path)
+        CSV where to read the components' attributes from
 
     Returns
     -------
@@ -112,6 +119,7 @@ def create_default_elements_files(
     """
     components_file = os.path.join(module_path, components_file)
 
+    # TODO Better put this as another field into the components.csv as well?
     component_attrs_dir = os.path.join(module_path, component_attrs_dir)
 
     components = pd.read_csv(components_file)
@@ -129,18 +137,25 @@ def create_default_elements_files(
             c_attr['attribute']: c_attr['default'] for _, c_attr in component_attrs.iterrows()
         }
 
+        if component == 'link':
+            component_data['region'] = link_list
+        else:
+            component_data['region'] = country_list
+
         component_data['name'] = get_name(component, component_data)
 
         component_data = specify_bus_connection(component_data)
 
-        df = pd.DataFrame(component_data).set_index('name')
+        df = pd.DataFrame(component_data).set_index('region')
 
+        # Write to target directory
         df.to_csv(os.path.join(dir, component + '.csv'))
 
 
 def get_parameter_values(scalars_df, parameter_name):
     r"""
     Selects rows from common input file "Scalars.csv" by column=='parameter_name'
+    and maintains the relation 'Region' -> 'Value' at external assignment
 
     Parameters
     ----------
@@ -152,14 +167,10 @@ def get_parameter_values(scalars_df, parameter_name):
 
     Returns
     -------
-    The parameter's values (column 'Value') as numpy.ndarray
+    The parameter's values (column 'Value') as a DataFrame, indexed by 'Region'
     """
-    # Select corresponding rows from the common input file "Scalars.csv"
-    # TODO Assure that both data sets perfectly fit, i.e. element 'AT-el-load'
-    #  gets the value of AT in 'Scalars.csv' (only assumed at the moment!)
-    parameter_df = scalars_df.loc[scalars_df['Parameter'] == parameter_name]
 
-    return parameter_df['Value'].values
+    return scalars_df.loc[scalars_df['Parameter'] == parameter_name].set_index('Region')['Value']
 
 
 def update_shortage_file(data_preprocessed_path):
@@ -168,7 +179,7 @@ def update_shortage_file(data_preprocessed_path):
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'shortage.csv')
 
     # Read prepared CSV file
-    shortage = pd.read_csv(shortage_file)
+    shortage = pd.read_csv(shortage_file, index_col='region')
 
     # Fill column 'marginal_cost' with a fixed value for ALL the elements
     shortage['marginal_cost'] = 5000
@@ -183,7 +194,7 @@ def update_load_file(data_preprocessed_path, scalars):
     load_file = os.path.join(data_preprocessed_path, 'elements', 'load.csv')
 
     # Read prepared CSV file
-    load = pd.read_csv(load_file)
+    load = pd.read_csv(load_file, index_col='region')
 
     # Fill column for ALL the elements
     load['amount'] = get_parameter_values(scalars, 'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
@@ -200,7 +211,7 @@ def update_link_file(data_preprocessed_path, scalars):
 
     link_file = os.path.join(data_preprocessed_path, 'elements', 'link.csv')
 
-    link = pd.read_csv(link_file)
+    link = pd.read_csv(link_file, index_col='region')
 
     transmission_loss_per_100km = get_parameter_values(scalars, 'Transmission_Losses_Electricity_Grid')
 
@@ -223,7 +234,7 @@ def update_link_file(data_preprocessed_path, scalars):
 def update_wind_onshore(data_preprocessed_path, scalars):
     wind_onshore_file = os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv')
 
-    wind_onshore = pd.read_csv(wind_onshore_file)
+    wind_onshore = pd.read_csv(wind_onshore_file, index_col='region')
 
     scalars_wind_onshore = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Wind_Onshore')
 
@@ -243,7 +254,7 @@ def update_wind_onshore(data_preprocessed_path, scalars):
 def update_wind_offshore(data_preprocessed_path, scalars):
     wind_offshore_file = os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
 
-    wind_offshore = pd.read_csv(wind_offshore_file)
+    wind_offshore = pd.read_csv(wind_offshore_file, index_col='region')
 
     scalars_wind_offshore = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Wind_Offshore')
 
@@ -263,7 +274,7 @@ def update_wind_offshore(data_preprocessed_path, scalars):
 def update_solar_pv(data_preprocessed_path, scalars):
     solar_pv_file = os.path.join(data_preprocessed_path, 'elements', 'pv.csv')
 
-    solarpv = pd.read_csv(solar_pv_file)
+    solarpv = pd.read_csv(solar_pv_file, index_col='region')
 
     scalars_solarpv = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Solar_PV')
 

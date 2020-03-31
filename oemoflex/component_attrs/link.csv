@@ -1,4 +1,5 @@
 attribute,type,unit,default,description
+region,str,n/a,n/a,Country code
 name,str,n/a,el-link,Name of the bus
 type,str,n/a,link,Type
 from_bus,str,n/a,el-bus,

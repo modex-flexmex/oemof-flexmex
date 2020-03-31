@@ -1,4 +1,5 @@
 attribute,type,unit,default,description
+region,str,n/a,n/a,Country code
 name,str,n/a,solar-pv,Name of the bus
 type,str,n/a,volatile,Type
 carrier,str,n/a,solar,

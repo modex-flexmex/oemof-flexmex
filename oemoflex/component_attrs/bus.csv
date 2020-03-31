@@ -1,4 +1,5 @@
 attribute,type,unit,default,description
+region,str,n/a,n/a,Country code
 name,str,n/a,el-bus,Name of the bus
 type,str,n/a,bus,Type
 balanced,bool,n/a,True,Tells if bus is balanced
