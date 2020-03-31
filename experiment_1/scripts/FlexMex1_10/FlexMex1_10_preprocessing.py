@@ -37,12 +37,15 @@ scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'),
 create_default_elements_files(os.path.join(data_preprocessed_path, 'elements'))
 
 
-def get_parameter_values(parameter_name):
+def get_parameter_values(scalars_df, parameter_name):
     r"""
     Selects rows from common input file "Scalars.csv" by column=='parameter_name'
 
     Parameters
     ----------
+    scalars_df : DataFrame
+    DataFrame of "Scalars.csv"
+
     parameter_name : str
     Specifies the rows to select by the name in column "Parameter"
 
@@ -53,9 +56,9 @@ def get_parameter_values(parameter_name):
     # Select corresponding rows from the common input file "Scalars.csv"
     # TODO Assure that both data sets perfectly fit, i.e. element 'AT-el-load'
     #  gets the value of AT in 'Scalars.csv' (only assumed at the moment!)
-    parameter_dataframe = scalars.loc[scalars['Parameter'] == parameter_name]
+    parameter_df = scalars_df.loc[scalars_df['Parameter'] == parameter_name]
 
-    return parameter_dataframe['Value'].values
+    return parameter_df['Value'].values
 
 
 def update_shortage_file(data_preprocessed_path):
@@ -73,7 +76,7 @@ def update_shortage_file(data_preprocessed_path):
     shortage.to_csv(shortage_file, index=False)
 
 
-def update_load_file(data_preprocessed_path):
+def update_load_file(data_preprocessed_path, scalars):
     logging.info("Updating load file")
 
     load_file = os.path.join(data_preprocessed_path, 'elements', 'load.csv')
@@ -82,7 +85,7 @@ def update_load_file(data_preprocessed_path):
     load = pd.read_csv(load_file)
 
     # Fill column for ALL the elements
-    load['amount'] = get_parameter_values('Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
+    load['amount'] = get_parameter_values(scalars, 'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
 
     # Put in a reference to the corresponding time series
     load['profile'] = ['{}-el-load-profile'.format(bus.split('-')[0]) for bus in bus_list]
@@ -91,18 +94,18 @@ def update_load_file(data_preprocessed_path):
     load.to_csv(load_file, index=False)
 
 
-def update_link_file(data_preprocessed_path):
+def update_link_file(data_preprocessed_path, scalars):
     logging.info("Updating link file")
 
     link_file = os.path.join(data_preprocessed_path, 'elements', 'link.csv')
 
     link = pd.read_csv(link_file)
 
-    transmission_loss_per_100km = get_parameter_values('Transmission_Losses_Electricity_Grid')
+    transmission_loss_per_100km = get_parameter_values(scalars, 'Transmission_Losses_Electricity_Grid')
 
-    transmission_length = get_parameter_values('Transmission_Length_Electricity_Grid')
+    transmission_length = get_parameter_values(scalars, 'Transmission_Length_Electricity_Grid')
 
-    transmission_capacity = get_parameter_values('Transmission_Capacity_Electricity_Grid')
+    transmission_capacity = get_parameter_values(scalars, 'Transmission_Capacity_Electricity_Grid')
 
     link['capacity'] = transmission_capacity
 
@@ -116,12 +119,12 @@ def update_link_file(data_preprocessed_path):
     link.to_csv(link_file, index=False)
 
 
-def update_wind_onshore(data_preprocessed_path):
+def update_wind_onshore(data_preprocessed_path, scalars):
     wind_onshore_file = os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv')
 
     wind_onshore = pd.read_csv(wind_onshore_file)
 
-    scalars_wind_onshore = get_parameter_values('EnergyConversion_Capacity_Electricity_Wind_Onshore')
+    scalars_wind_onshore = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Wind_Onshore')
 
     wind_onshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-onshore']) for bus in bus_list]
 
@@ -136,12 +139,12 @@ def update_wind_onshore(data_preprocessed_path):
     wind_onshore.to_csv(wind_onshore_file, index=False)
 
 
-def update_wind_offshore(data_preprocessed_path):
+def update_wind_offshore(data_preprocessed_path, scalars):
     wind_offshore_file = os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
 
     wind_offshore = pd.read_csv(wind_offshore_file)
 
-    scalars_wind_offshore = get_parameter_values('EnergyConversion_Capacity_Electricity_Wind_Offshore')
+    scalars_wind_offshore = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Wind_Offshore')
 
     wind_offshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-offshore']) for bus in bus_list]
 
@@ -156,12 +159,12 @@ def update_wind_offshore(data_preprocessed_path):
     wind_offshore.to_csv(wind_offshore_file, index=False)
 
 
-def update_solar_pv(data_preprocessed_path):
+def update_solar_pv(data_preprocessed_path, scalars):
     solar_pv_file = os.path.join(data_preprocessed_path, 'elements', 'pv.csv')
 
     solarpv = pd.read_csv(solar_pv_file)
 
-    scalars_solarpv = get_parameter_values('EnergyConversion_Capacity_Electricity_Solar_PV')
+    scalars_solarpv = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Solar_PV')
 
     solarpv['name'] = ['-'.join(bus.split('-')[:2] + ['solarpv']) for bus in bus_list]
 
@@ -275,11 +278,11 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
 def main():
     # update elements
     update_shortage_file(data_preprocessed_path)
-    update_load_file(data_preprocessed_path)
-    update_wind_onshore(data_preprocessed_path)
-    update_wind_offshore(data_preprocessed_path)
-    update_solar_pv(data_preprocessed_path)
-    update_link_file(data_preprocessed_path)
+    update_load_file(data_preprocessed_path, scalars)
+    update_wind_onshore(data_preprocessed_path, scalars)
+    update_wind_offshore(data_preprocessed_path, scalars)
+    update_solar_pv(data_preprocessed_path, scalars)
+    update_link_file(data_preprocessed_path, scalars)
 
     # create sequences
     create_load_profiles(data_raw_path, data_preprocessed_path)
