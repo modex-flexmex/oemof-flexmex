@@ -152,6 +152,12 @@ def main():
     create_wind_offshore_profiles(data_raw_path, data_preprocessed_path)
     create_solar_pv_profiles(data_raw_path, data_preprocessed_path)
 
+    # For consistency reasons in the output files: also drop indices for non-processed csv files
+    for element in ['bus', 'curtailment']:
+        path = os.path.join(data_preprocessed_path, 'elements', element +'.csv')
+        # Read with keys, write without
+        pd.read_csv(path, index_col='region').to_csv(path, index=False)
+
     # compare with previous data
     previous_path = experiment_paths['data_preprocessed'] + '_default'
     new_path = experiment_paths['data_preprocessed']
