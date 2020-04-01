@@ -81,6 +81,7 @@ def specify_bus_connection(compo_data):
 
         return comp_data
 
+    # if 'from_bus' in comp_data and 'to_bus' in comp_data:
     if all(attr in comp_data for attr in ['from_bus', 'to_bus']):
 
         comp_data['from_bus'] = [
@@ -138,7 +139,8 @@ def create_default_elements_files(
         }
 
         if component == 'link':
-            component_data['region'] = link_list
+            # Generate region column of the form "AT_DE"
+            component_data['region'] = [code.replace('-', '_') for code in link_list]
         else:
             component_data['region'] = country_list
 
@@ -213,7 +215,10 @@ def update_link_file(data_preprocessed_path, scalars):
 
     link = pd.read_csv(link_file, index_col='region')
 
-    transmission_loss_per_100km = get_parameter_values(scalars, 'Transmission_Losses_Electricity_Grid')
+    # Scalars.csv has only one line of 'Transmission_Losses_Electricity_Grid' for all Regions.
+    # 'Region' value of that line is 'ALL'. So mapping by index doesn't work anymore.
+    # Use its plain value instead.
+    transmission_loss_per_100km = get_parameter_values(scalars, 'Transmission_Losses_Electricity_Grid').values
 
     transmission_length = get_parameter_values(scalars, 'Transmission_Length_Electricity_Grid')
 
@@ -221,6 +226,7 @@ def update_link_file(data_preprocessed_path, scalars):
 
     link['capacity'] = transmission_capacity
 
+    # Calculation with pandas series
     link['loss'] = (
         transmission_length
         * 0.01
