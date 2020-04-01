@@ -115,10 +115,6 @@ def create_default_elements_files(
             # Generate region column of the form "AT_DE"
             component_data['region'] = [code.replace('-', '_') for code in link_list]
 
-            # Reserve 'name' column because there is no suffix to use here
-            # line could be dropped by defining a suffix such as '-link'
-            component_data['name'] = [code for code in link_list]
-
             # for the two bus attributes reserve the colums with a part of the country code
             component_data['from_bus'] = [code.split('-')[0] for code in link_list]
             component_data['to_bus'] = [code.split('-')[1] for code in link_list]
