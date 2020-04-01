@@ -4,9 +4,9 @@ name,str,n/a,,-el-solarpv,Name of the bus
 type,str,n/a,volatile,,Type
 carrier,str,n/a,solar,,
 tech,str,n/a,pv,,
-bus,str,n/a,,el-bus,
+bus,str,n/a,,-el-bus,
 capacity,,,,,
 capacity_cost,,,,,
 marginal_cost,float,Eur/kWh,0,,
-profile,,,,,
+profile,,,,-el-solar-pv-profile,
 output_parameters,dict,n/a,{},,

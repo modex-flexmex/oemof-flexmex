@@ -192,9 +192,6 @@ def update_load_file(data_preprocessed_path, scalars):
     # Fill column for ALL the elements
     load['amount'] = get_parameter_values(scalars, 'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
 
-    # Put in a reference to the corresponding time series
-    load['profile'] = ['{}-el-load-profile'.format(bus.split('-')[0]) for bus in bus_list]
-
     # Write back to the CSV file
     load.to_csv(load_file, index=False)
 
@@ -235,15 +232,7 @@ def update_wind_onshore(data_preprocessed_path, scalars):
 
     scalars_wind_onshore = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Wind_Onshore')
 
-    wind_onshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-onshore']) for bus in bus_list]
-
     wind_onshore['capacity'] = scalars_wind_onshore
-
-    wind_onshore['bus'] = bus_list
-
-    wind_onshore['profile'] = [
-        '-'.join(bus.split('-')[:2] + ['wind-onshore-profile']) for bus in bus_list
-    ]
 
     wind_onshore.to_csv(wind_onshore_file, index=False)
 
@@ -255,15 +244,7 @@ def update_wind_offshore(data_preprocessed_path, scalars):
 
     scalars_wind_offshore = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Wind_Offshore')
 
-    wind_offshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-offshore']) for bus in bus_list]
-
     wind_offshore['capacity'] = scalars_wind_offshore
-
-    wind_offshore['bus'] = bus_list
-
-    wind_offshore['profile'] = [
-        '-'.join(bus.split('-')[:2] + ['wind-offshore-profile']) for bus in bus_list
-    ]
 
     wind_offshore.to_csv(wind_offshore_file, index=False)
 
@@ -275,12 +256,6 @@ def update_solar_pv(data_preprocessed_path, scalars):
 
     scalars_solarpv = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Solar_PV')
 
-    solarpv['name'] = ['-'.join(bus.split('-')[:2] + ['solarpv']) for bus in bus_list]
-
     solarpv['capacity'] = scalars_solarpv
-
-    solarpv['bus'] = bus_list
-
-    solarpv['profile'] = ['-'.join(bus.split('-')[:2] + ['solar-pv-profile']) for bus in bus_list]
 
     solarpv.to_csv(solar_pv_file, index=False)

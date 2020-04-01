@@ -4,4 +4,4 @@ name,str,n/a,,-el-load,Name of the bus
 type,str,n/a,load,,Type
 bus,str,n/a,,-el-bus,
 amount,float,GWh/a,n/a,,
-profile,str,n/a,n/a,,
+profile,str,n/a,n/a,-el-load-profile,
