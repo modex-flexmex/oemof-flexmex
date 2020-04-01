@@ -61,40 +61,6 @@ datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
 module_path = os.path.dirname(os.path.abspath(__file__))
 
-
-def get_name(component, component_data):
-    if component == 'link':
-        name = link_list
-
-        return name
-
-    name = [country + '-' + component_data['name'] for country in country_list]
-
-    return name
-
-
-def specify_bus_connection(compo_data):
-    comp_data = compo_data.copy()
-
-    if 'bus' in comp_data:
-        comp_data['bus'] = [country + '-' + comp_data['bus'] for country in country_list]
-
-        return comp_data
-
-    # if 'from_bus' in comp_data and 'to_bus' in comp_data:
-    if all(attr in comp_data for attr in ['from_bus', 'to_bus']):
-
-        comp_data['from_bus'] = [
-            link.split('-')[0] + '-' + comp_data['from_bus'] for link in link_list
-        ]
-
-        comp_data['to_bus'] = [link.split('-')[1] + '-' + comp_data['to_bus'] for link in link_list]
-
-        return comp_data
-
-    return comp_data
-
-
 def create_default_elements_files(
         dir,
         components_file='components.csv',
@@ -134,19 +100,44 @@ def create_default_elements_files(
         except FileNotFoundError:
             print(f"There is no file with the name {component}")
 
+        # Set up the skeleton of the output dataframe consisting of attribute names as
+        # column titles and default values
         component_data = {
             c_attr['attribute']: c_attr['default'] for _, c_attr in component_attrs.iterrows()
         }
 
+        component_suffix = {
+            c_attr['attribute']: c_attr['suffix'] for _, c_attr in component_attrs.iterrows()
+        }
+
+        # Fill 'region' with country code list
         if component == 'link':
             # Generate region column of the form "AT_DE"
             component_data['region'] = [code.replace('-', '_') for code in link_list]
+
+            # Reserve 'name' column because there is no suffix to use here
+            # line could be dropped by defining a suffix such as '-link'
+            component_data['name'] = [code for code in link_list]
+
+            # for the two bus attributes reserve the colums with a part of the country code
+            component_data['from_bus'] = [code.split('-')[0] for code in link_list]
+            component_data['to_bus'] = [code.split('-')[1] for code in link_list]
+
         else:
             component_data['region'] = country_list
 
-        component_data['name'] = get_name(component, component_data)
+        # Fill other columns with their respective suffixes if available
+        for attr_name, suffix in component_suffix.items():
 
-        component_data = specify_bus_connection(component_data)
+            # If a suffix has to be applied
+            if not pd.isna(suffix):
+
+                # for 'link' element use the pre-defined name part instead of the region
+                if attr_name == 'from_bus' or attr_name == 'to_bus':
+                    component_data[attr_name] = [link + suffix for link in component_data[attr_name]]
+
+                else:
+                    component_data[attr_name] = [code + suffix for code in component_data['region']]
 
         df = pd.DataFrame(component_data).set_index('region')
 
