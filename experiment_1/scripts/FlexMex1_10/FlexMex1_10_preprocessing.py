@@ -4,9 +4,10 @@ import os
 import pandas as pd
 
 from oemof.tools.logger import define_logging
-from oemoflex.model_structure import (
-    bus_list, datetimeindex, create_default_elements_files)
-from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
+from oemoflex.preprocessing import (
+    datetimeindex, create_default_elements_files, update_shortage_file, update_load_file,
+    update_link_file, update_wind_onshore, update_wind_offshore, update_solar_pv)
+from oemoflex.helpers import get_experiment_paths, get_dir_diff
 
 
 name = 'FlexMex1_10'
@@ -33,145 +34,12 @@ if not os.path.exists(data_preprocessed_path):
 
 scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
 
+# Prepare oemof.tabular input CSV files
 create_default_elements_files(os.path.join(data_preprocessed_path, 'elements'))
 
 
-def update_shortage_file():
-    logging.info("Updating shortage file")
-
-    shortage = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'shortage.csv'))
-
-    shortage['marginal_cost'] = 5000
-
-    shortage.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'shortage.csv'), index=False,
-    )
-
-
-def update_load_file():
-    logging.info("Updating load file")
-
-    load = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'))
-
-    scalars_load = scalars.loc[scalars['Parameter'] == 'Energy_FinalEnergy_Electricity']
-
-    load['amount'] = scalars_load['Value'].values * 1e6  # TWh to MWh
-
-    load['profile'] = ['{}-el-load-profile'.format(bus.split('-')[0]) for bus in bus_list]
-
-    load.to_csv(os.path.join(data_preprocessed_path, 'elements', 'load.csv'), index=False)
-
-
-def update_link_file():
-    logging.info("Updating link file")
-
-    link = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'link.csv'))
-
-    transmission_loss_per_100km = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Losses_Electricity_Grid'
-    ]
-
-    transmission_length = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Length_Electricity_Grid'
-    ]
-
-    transmission_capacity = scalars.loc[
-        scalars['Parameter'] == 'Transmission_Capacity_Electricity_Grid'
-    ]
-
-    link['capacity'] = transmission_capacity['Value'].values
-
-    link['loss'] = (
-        transmission_length['Value'].values
-        * 0.01
-        * transmission_loss_per_100km['Value'].values
-        / transmission_capacity['Value'].values
-    )
-
-    link.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'link.csv'), index=False,
-    )
-
-
-def update_wind_onshore():
-    wind_onshore = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'))
-
-    scalars_wind_onshore = scalars.loc[
-        scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Wind_Onshore'
-    ]
-
-    wind_onshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-onshore']) for bus in bus_list]
-
-    wind_onshore['carrier'] = 'wind'
-
-    wind_onshore['tech'] = 'onshore'
-
-    wind_onshore['capacity'] = scalars_wind_onshore['Value'].values
-
-    wind_onshore['bus'] = bus_list
-
-    wind_onshore['profile'] = [
-        '-'.join(bus.split('-')[:2] + ['wind-onshore-profile']) for bus in bus_list
-    ]
-
-    wind_onshore.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'), index=False,
-    )
-
-
-def update_wind_offshore():
-    wind_offshore = pd.read_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
-    )
-
-    scalars_wind_offshore = scalars.loc[
-        scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Wind_Offshore'
-    ]
-
-    wind_offshore['name'] = ['-'.join(bus.split('-')[:2] + ['wind-offshore']) for bus in bus_list]
-
-    wind_offshore['carrier'] = 'wind'
-
-    wind_offshore['tech'] = 'offshore'
-
-    wind_offshore['capacity'] = scalars_wind_offshore['Value'].values
-
-    wind_offshore['bus'] = bus_list
-
-    wind_offshore['profile'] = [
-        '-'.join(bus.split('-')[:2] + ['wind-offshore-profile']) for bus in bus_list
-    ]
-
-    wind_offshore.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv'), index=False,
-    )
-
-
-def update_solar_pv():
-    solarpv = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'pv.csv'))
-
-    scalars_solarpv = scalars.loc[
-        scalars['Parameter'] == 'EnergyConversion_Capacity_Electricity_Solar_PV'
-    ]
-
-    solarpv['name'] = ['-'.join(bus.split('-')[:2] + ['solarpv']) for bus in bus_list]
-
-    solarpv['carrier'] = 'solar'
-
-    solarpv['tech'] = 'pv'
-
-    solarpv['capacity'] = scalars_solarpv['Value'].values
-
-    solarpv['bus'] = bus_list
-
-    solarpv['profile'] = ['-'.join(bus.split('-')[:2] + ['solar-pv-profile']) for bus in bus_list]
-
-    solarpv.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'pv.csv'), index=False,
-    )
-
-
-def combine_volatile_file():
+# not used
+def combine_volatile_file(data_preprocessed_path):
     wind_onshore = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'))
 
     wind_offshore = pd.read_csv(
@@ -217,7 +85,7 @@ def combine_profiles(raw_profile_path, column_name):
     return profile_df
 
 
-def create_load_profiles():
+def create_load_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating load profiles")
     raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
 
@@ -226,7 +94,7 @@ def create_load_profiles():
     load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
 
 
-def create_wind_onshore_profiles():
+def create_wind_onshore_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating wind-onshore profiles")
     raw_wind_onshore_profile_paths = os.path.join(
         data_raw_path, 'Energy', 'SecondaryEnergy', 'Wind', 'Onshore'
@@ -241,7 +109,7 @@ def create_wind_onshore_profiles():
     )
 
 
-def create_wind_offshore_profiles():
+def create_wind_offshore_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating wind-offshore profiles")
 
     raw_wind_offshore_profile_paths = os.path.join(
@@ -257,7 +125,7 @@ def create_wind_offshore_profiles():
     )
 
 
-def create_solar_pv_profiles():
+def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating solar pv profiles")
 
     raw_solar_pv_profile_paths = os.path.join(
@@ -271,23 +139,34 @@ def create_solar_pv_profiles():
 
 def main():
     # update elements
-    update_shortage_file()
-    update_load_file()
-    update_wind_onshore()
-    update_wind_offshore()
-    update_solar_pv()
-    update_link_file()
+    update_shortage_file(data_preprocessed_path)
+    update_load_file(data_preprocessed_path, scalars)
+    update_wind_onshore(data_preprocessed_path, scalars)
+    update_wind_offshore(data_preprocessed_path, scalars)
+    update_solar_pv(data_preprocessed_path, scalars)
+    update_link_file(data_preprocessed_path, scalars)
 
     # create sequences
-    create_load_profiles()
-    create_wind_onshore_profiles()
-    create_wind_offshore_profiles()
-    create_solar_pv_profiles()
+    create_load_profiles(data_raw_path, data_preprocessed_path)
+    create_wind_onshore_profiles(data_raw_path, data_preprocessed_path)
+    create_wind_offshore_profiles(data_raw_path, data_preprocessed_path)
+    create_solar_pv_profiles(data_raw_path, data_preprocessed_path)
+
+    # For consistency reasons in the output files: also drop indices for non-processed csv files
+    for element in ['bus', 'curtailment']:
+        path = os.path.join(data_preprocessed_path, 'elements', element +'.csv')
+        # Read with keys, write without
+        pd.read_csv(path, index_col='region').to_csv(path, index=False)
 
     # compare with previous data
     previous_path = experiment_paths['data_preprocessed'] + '_default'
     new_path = experiment_paths['data_preprocessed']
-    check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
+    diff_output = get_dir_diff(new_path, previous_path, ignore_list=['*.log', '*.json'])
+    logging.info(
+        "Diff-checking the preprocessed data against '_default' directory:\n{}"
+            .format(diff_output)
+    )
+    # check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
 
 
 if __name__ == '__main__':
