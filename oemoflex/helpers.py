@@ -58,11 +58,11 @@ def check_if_csv_files_equal(csv_file_a, csv_file_b):
     assert_frame_equal(df1, df2)
 
 
-def check_if_csv_dirs_equal(dir_a, dir_b, ignore='log'):
+def check_if_csv_dirs_equal(dir_a, dir_b):
     files_a = get_all_file_paths(dir_a)
     files_b = get_all_file_paths(dir_b)
-    files_a = [file for file in files_a if file.split('.')[-1] not in ignore]
-    files_b = [file for file in files_b if file.split('.')[-1] not in ignore]
+    files_a = [file for file in files_a if file.split('.')[-1] == 'csv']
+    files_b = [file for file in files_b if file.split('.')[-1] == 'csv']
 
     files_a.sort()
     files_b.sort()
