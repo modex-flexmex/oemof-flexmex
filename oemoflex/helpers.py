@@ -42,6 +42,19 @@ def get_experiment_paths(name, path_config):
 
 
 def get_all_file_paths(dir):
+    r"""
+    Finds all paths of files in a directory.
+
+    Parameters
+    ----------
+    dir : str
+        Directory
+
+    Returns
+    -------
+    file_paths : list
+        list of str
+    """
     # pylint: disable=unused-variable
     file_paths = []
     for dir_path, dir_names, file_names in os.walk(dir):
@@ -52,6 +65,15 @@ def get_all_file_paths(dir):
 
 
 def check_if_csv_files_equal(csv_file_a, csv_file_b):
+    r"""
+    Compares two csv files.
+
+    Parameters
+    ----------
+    csv_file_a
+    csv_file_b
+
+    """
     df1 = pd.read_csv(csv_file_a)
     df2 = pd.read_csv(csv_file_b)
 
@@ -59,6 +81,25 @@ def check_if_csv_files_equal(csv_file_a, csv_file_b):
 
 
 def check_if_csv_dirs_equal(dir_a, dir_b):
+    r"""
+    Compares the csv files in two directories and asserts that
+    they are equal.
+
+    The function asserts that:
+
+    1. The number of csv files found in the directories are the same.
+    2. The filenames are the same.
+    3. The file contents are the same.
+
+    Parameters
+    ----------
+    dir_a : str
+        Path to first directory containing csv files
+
+    dir_b : str
+        Path to second directory containing csv files
+
+    """
     files_a = get_all_file_paths(dir_a)
     files_b = get_all_file_paths(dir_b)
     files_a = [file for file in files_a if file.split('.')[-1] == 'csv']
