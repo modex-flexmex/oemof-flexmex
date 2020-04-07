@@ -178,7 +178,7 @@ def update_shortage_file(data_preprocessed_path):
     shortage['marginal_cost'] = 5000
 
     # Write back to the CSV file
-    shortage.to_csv(shortage_file, index=False)
+    shortage.to_csv(shortage_file)
 
 
 def update_load_file(data_preprocessed_path, scalars):
@@ -193,7 +193,7 @@ def update_load_file(data_preprocessed_path, scalars):
     load['amount'] = get_parameter_values(scalars, 'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
 
     # Write back to the CSV file
-    load.to_csv(load_file, index=False)
+    load.to_csv(load_file)
 
 
 def update_link_file(data_preprocessed_path, scalars):
@@ -222,7 +222,7 @@ def update_link_file(data_preprocessed_path, scalars):
         / transmission_capacity
     )
 
-    link.to_csv(link_file, index=False)
+    link.to_csv(link_file)
 
 
 def update_wind_onshore(data_preprocessed_path, scalars):
@@ -234,7 +234,7 @@ def update_wind_onshore(data_preprocessed_path, scalars):
 
     wind_onshore['capacity'] = scalars_wind_onshore
 
-    wind_onshore.to_csv(wind_onshore_file, index=False)
+    wind_onshore.to_csv(wind_onshore_file)
 
 
 def update_wind_offshore(data_preprocessed_path, scalars):
@@ -246,7 +246,7 @@ def update_wind_offshore(data_preprocessed_path, scalars):
 
     wind_offshore['capacity'] = scalars_wind_offshore
 
-    wind_offshore.to_csv(wind_offshore_file, index=False)
+    wind_offshore.to_csv(wind_offshore_file)
 
 
 def update_solar_pv(data_preprocessed_path, scalars):
@@ -258,4 +258,4 @@ def update_solar_pv(data_preprocessed_path, scalars):
 
     solarpv['capacity'] = scalars_solarpv
 
-    solarpv.to_csv(solar_pv_file, index=False)
+    solarpv.to_csv(solar_pv_file)
