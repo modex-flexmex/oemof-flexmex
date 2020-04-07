@@ -61,7 +61,7 @@ datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
 module_path = os.path.dirname(os.path.abspath(__file__))
 
-def create_default_elements_files(
+def create_default_elements(
         dir,
         components_file='components.csv',
         component_attrs_dir='component_attrs'
@@ -166,7 +166,7 @@ def get_parameter_values(scalars_df, parameter_name):
     return scalars_df.loc[scalars_df['Parameter'] == parameter_name].set_index('Region')['Value']
 
 
-def update_shortage_file(data_preprocessed_path):
+def update_shortage(data_preprocessed_path):
     logging.info("Updating shortage file")
 
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'shortage.csv')
@@ -181,7 +181,7 @@ def update_shortage_file(data_preprocessed_path):
     shortage.to_csv(shortage_file)
 
 
-def update_load_file(data_preprocessed_path, scalars):
+def update_load(data_preprocessed_path, scalars):
     logging.info("Updating load file")
 
     load_file = os.path.join(data_preprocessed_path, 'elements', 'load.csv')
@@ -196,7 +196,7 @@ def update_load_file(data_preprocessed_path, scalars):
     load.to_csv(load_file)
 
 
-def update_link_file(data_preprocessed_path, scalars):
+def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
 
     link_file = os.path.join(data_preprocessed_path, 'elements', 'link.csv')

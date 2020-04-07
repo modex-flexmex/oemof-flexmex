@@ -5,8 +5,8 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    datetimeindex, create_default_elements_files, update_shortage_file, update_load_file,
-    update_link_file, update_wind_onshore, update_wind_offshore, update_solar_pv)
+    datetimeindex, create_default_elements, update_shortage, update_load,
+    update_link, update_wind_onshore, update_wind_offshore, update_solar_pv)
 from oemoflex.helpers import get_experiment_paths, get_dir_diff
 
 
@@ -114,15 +114,15 @@ def main():
     scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
 
     # Prepare oemof.tabular input CSV files
-    create_default_elements_files(os.path.join(data_preprocessed_path, 'elements'))
+    create_default_elements(os.path.join(data_preprocessed_path, 'elements'))
 
     # update elements
-    update_shortage_file(data_preprocessed_path)
-    update_load_file(data_preprocessed_path, scalars)
+    update_shortage(data_preprocessed_path)
+    update_load(data_preprocessed_path, scalars)
     update_wind_onshore(data_preprocessed_path, scalars)
     update_wind_offshore(data_preprocessed_path, scalars)
     update_solar_pv(data_preprocessed_path, scalars)
-    update_link_file(data_preprocessed_path, scalars)
+    update_link(data_preprocessed_path, scalars)
 
     # create sequences
     create_load_profiles(data_raw_path, data_preprocessed_path)
