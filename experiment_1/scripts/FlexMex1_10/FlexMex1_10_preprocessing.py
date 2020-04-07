@@ -32,28 +32,6 @@ if not os.path.exists(data_preprocessed_path):
     for subdir in ['elements', 'sequences']:
         os.makedirs(os.path.join(data_preprocessed_path, subdir))
 
-# not used
-def combine_volatile_file(data_preprocessed_path):
-    wind_onshore = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'))
-
-    wind_offshore = pd.read_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
-    )
-
-    solarpv = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'pv.csv'))
-
-    volatile = pd.concat([wind_onshore, wind_offshore, solarpv], axis=0)
-
-    volatile['type'] = 'volatile'
-
-    volatile['marginal_cost'] = 0
-
-    volatile['output_parameters'] = '{}'
-
-    volatile.to_csv(
-        os.path.join(data_preprocessed_path, 'elements', 'volatile.csv'), index=False,
-    )
-
 
 def combine_profiles(raw_profile_path, column_name):
     profile_file_list = sorted(os.listdir(raw_profile_path))
