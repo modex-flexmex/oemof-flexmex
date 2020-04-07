@@ -118,7 +118,10 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
         f" The diff is: {diff}"
 
     for file_a, file_b in zip(files_a, files_b):
-        check_if_csv_files_equal(file_a, file_b)
+        try:
+            check_if_csv_files_equal(file_a, file_b)
+        except AssertionError as e:
+            raise AssertionError(f"Files {file_a} and {file_b} differ.\n{e}")
 
 
 def delete_empty_subdirs(path):
