@@ -87,9 +87,8 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
 
     The function asserts that:
 
-    1. The number of csv files found in the directories are the same.
-    2. The filenames are the same.
-    3. The file contents are the same.
+    1. The file names of csv files found in the directories are the same.
+    2. The file contents are the same.
 
     Parameters
     ----------
@@ -102,23 +101,23 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
     """
     files_a = get_all_file_paths(dir_a)
     files_b = get_all_file_paths(dir_b)
+
     files_a = [file for file in files_a if file.split('.')[-1] == 'csv']
     files_b = [file for file in files_b if file.split('.')[-1] == 'csv']
 
     files_a.sort()
     files_b.sort()
 
-    assert len(files_a) == len(files_b),\
-        f"Lists of filenames do not have the same length." \
-        f" {len(files_a)} files in dir_a, {len(files_b)} in dir_b."
+    f_names_a = [os.path.split(f)[-1] for f in files_a]
+    f_names_b = [os.path.split(f)[-1] for f in files_b]
+
+    diff = set(f_names_a).symmetric_difference(set(f_names_b))
+
+    assert not diff,\
+        f"Lists of filenames are not the same." \
+        f" The diff is: {diff}"
 
     for file_a, file_b in zip(files_a, files_b):
-        filename_a = os.path.split(file_a)[-1]
-        filename_b = os.path.split(file_b)[-1]
-
-        assert filename_a == filename_b, \
-            f"{filename_a} and {filename_b} do not have the same name."
-
         check_if_csv_files_equal(file_a, file_b)
 
 
