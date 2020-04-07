@@ -109,7 +109,7 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
     files_b.sort()
 
     assert len(files_a) == len(files_b),\
-        f"Lists of filenames do not the same length." \
+        f"Lists of filenames do not have the same length." \
         f" {len(files_a)} files in dir_a, {len(files_b)} in dir_b."
 
     for file_a, file_b in zip(files_a, files_b):
