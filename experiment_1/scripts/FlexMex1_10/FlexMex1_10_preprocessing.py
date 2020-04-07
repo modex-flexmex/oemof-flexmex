@@ -32,12 +32,6 @@ if not os.path.exists(data_preprocessed_path):
     for subdir in ['elements', 'sequences']:
         os.makedirs(os.path.join(data_preprocessed_path, subdir))
 
-scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
-
-# Prepare oemof.tabular input CSV files
-create_default_elements_files(os.path.join(data_preprocessed_path, 'elements'))
-
-
 # not used
 def combine_volatile_file(data_preprocessed_path):
     wind_onshore = pd.read_csv(os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv'))
@@ -138,6 +132,12 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
 
 
 def main():
+    # Load common input parameters
+    scalars = pd.read_csv(os.path.join(experiment_paths['data_raw'], 'Scalars.csv'), header=0)
+
+    # Prepare oemof.tabular input CSV files
+    create_default_elements_files(os.path.join(data_preprocessed_path, 'elements'))
+
     # update elements
     update_shortage_file(data_preprocessed_path)
     update_load_file(data_preprocessed_path, scalars)
