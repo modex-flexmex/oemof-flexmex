@@ -61,6 +61,7 @@ datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
 module_path = os.path.dirname(os.path.abspath(__file__))
 
+
 def create_default_elements(
         dir,
         components_file='components.csv',
@@ -117,7 +118,7 @@ def create_default_elements(
 
             # Reserve 'name' column because there is no suffix to use here
             # line could be dropped by defining a suffix such as '-link'
-            component_data['name'] = [code for code in link_list]
+            component_data['name'] = link_list
 
             # for the two bus attributes reserve the colums with a part of the country code
             component_data['from_bus'] = [code.split('-')[0] for code in link_list]
@@ -133,8 +134,9 @@ def create_default_elements(
             if not pd.isna(suffix):
 
                 # for 'link' element use the pre-defined name part instead of the region
-                if attr_name == 'from_bus' or attr_name == 'to_bus':
-                    component_data[attr_name] = [link + suffix for link in component_data[attr_name]]
+                if attr_name in ['from_bus', 'to_bus']:
+                    component_data[attr_name] = [link + suffix
+                                                 for link in component_data[attr_name]]
 
                 else:
                     component_data[attr_name] = [code + suffix for code in component_data['region']]
@@ -190,7 +192,8 @@ def update_load(data_preprocessed_path, scalars):
     load = pd.read_csv(load_file, index_col='region')
 
     # Fill column for ALL the elements
-    load['amount'] = get_parameter_values(scalars, 'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
+    load['amount'] = get_parameter_values(scalars,
+                                          'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
 
     # Write back to the CSV file
     load.to_csv(load_file)
@@ -206,11 +209,17 @@ def update_link(data_preprocessed_path, scalars):
     # Scalars.csv has only one line of 'Transmission_Losses_Electricity_Grid' for all Regions.
     # 'Region' value of that line is 'ALL'. So mapping by index doesn't work anymore.
     # Use its plain value instead.
-    transmission_loss_per_100km = get_parameter_values(scalars, 'Transmission_Losses_Electricity_Grid').values
+    transmission_loss_per_100km = get_parameter_values(
+                                        scalars,
+                                        'Transmission_Losses_Electricity_Grid').values
 
-    transmission_length = get_parameter_values(scalars, 'Transmission_Length_Electricity_Grid')
+    transmission_length = get_parameter_values(
+                                        scalars,
+                                        'Transmission_Length_Electricity_Grid')
 
-    transmission_capacity = get_parameter_values(scalars, 'Transmission_Capacity_Electricity_Grid')
+    transmission_capacity = get_parameter_values(
+                                        scalars,
+                                        'Transmission_Capacity_Electricity_Grid')
 
     link['capacity'] = transmission_capacity
 
@@ -230,9 +239,9 @@ def update_wind_onshore(data_preprocessed_path, scalars):
 
     wind_onshore = pd.read_csv(wind_onshore_file, index_col='region')
 
-    scalars_wind_onshore = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Wind_Onshore')
-
-    wind_onshore['capacity'] = scalars_wind_onshore
+    wind_onshore['capacity'] = get_parameter_values(
+                                        scalars,
+                                        'EnergyConversion_Capacity_Electricity_Wind_Onshore')
 
     wind_onshore.to_csv(wind_onshore_file)
 
@@ -242,9 +251,9 @@ def update_wind_offshore(data_preprocessed_path, scalars):
 
     wind_offshore = pd.read_csv(wind_offshore_file, index_col='region')
 
-    scalars_wind_offshore = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Wind_Offshore')
-
-    wind_offshore['capacity'] = scalars_wind_offshore
+    wind_offshore['capacity'] = get_parameter_values(
+                                        scalars,
+                                        'EnergyConversion_Capacity_Electricity_Wind_Offshore')
 
     wind_offshore.to_csv(wind_offshore_file)
 
@@ -254,8 +263,8 @@ def update_solar_pv(data_preprocessed_path, scalars):
 
     solarpv = pd.read_csv(solar_pv_file, index_col='region')
 
-    scalars_solarpv = get_parameter_values(scalars, 'EnergyConversion_Capacity_Electricity_Solar_PV')
-
-    solarpv['capacity'] = scalars_solarpv
+    solarpv['capacity'] = get_parameter_values(
+                                        scalars,
+                                        'EnergyConversion_Capacity_Electricity_Solar_PV')
 
     solarpv.to_csv(solar_pv_file)
