@@ -3,21 +3,6 @@ import os
 
 import pandas as pd
 
-
-bus_list = [
-    'AT-el-bus',
-    'BE-el-bus',
-    'CH-el-bus',
-    'CZ-el-bus',
-    'DE-el-bus',
-    'DK-el-bus',
-    'FR-el-bus',
-    'IT-el-bus',
-    'LU-el-bus',
-    'NL-el-bus',
-    'PL-el-bus',
-]
-
 country_list = [
     'AT',
     'BE',
