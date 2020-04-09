@@ -183,7 +183,7 @@ def update_load(data_preprocessed_path, scalars):
     # Fill column for ALL the elements
     load['amount'] = get_parameter_values(
         scalars,
-        'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
+        'Energy_FinalEnergy_Electricity') * 1e3  # GWh to MWh
 
     # Write back to the CSV file
     load.to_csv(load_file)
