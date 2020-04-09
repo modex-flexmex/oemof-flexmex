@@ -147,12 +147,25 @@ def get_parameter_values(scalars_df, parameter_name):
 
     Returns
     -------
-    The parameter's values (column 'Value') as a DataFrame, indexed by 'Region'
+    The parameter's values (column 'Value') as a 'Region'-indexed Series or
+    as a single value (float)
     """
 
-    isParameterName = scalars_df['Parameter'] == parameter_name
-    isScenarioName = scalars_df['Scenario'].isin(['FlexMex1', 'ALL'])
-    return scalars_df.loc[isParameterName & isScenarioName, :].set_index('Region')['Value']
+    is_parameter_name = scalars_df['Parameter'] == parameter_name
+    is_scenario_name = scalars_df['Scenario'].isin(['FlexMex1', 'ALL'])
+
+    query_result = scalars_df.loc[is_parameter_name & is_scenario_name, :]
+
+    # The query result DataFrame can either be multi-row or single-row
+    if len(query_result['Region']) == 1 and query_result['Region'].item() == 'ALL':
+
+        # Result is single-row. The parameter takes one value, that is, one line for all 'Regions'.
+        # No merging required. Index doesn't make sense. Return plain value (short for .values[0])
+        return query_result['Value'].item()
+
+    # Result is multi-row. Each 'Region' has its own value.
+    # Return the 'Value' column as an 'Region'-indexed Series to merge correctly.
+    return query_result.set_index('Region')['Value']
 
 
 def update_shortage(data_preprocessed_path, scalars):
@@ -166,7 +179,7 @@ def update_shortage(data_preprocessed_path, scalars):
     # Fill column 'marginal_cost' with a fixed value for ALL the elements
     shortage['marginal_cost'] = get_parameter_values(
         scalars,
-        'Energy_SlackCost_Electricity').values[0] * 1e-3  # Eur/GWh to Eur/MWh
+        'Energy_SlackCost_Electricity') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to the CSV file
     shortage.to_csv(shortage_file)
@@ -201,7 +214,7 @@ def update_link(data_preprocessed_path, scalars):
     # Use its plain value instead.
     transmission_loss_per_100km = get_parameter_values(
         scalars,
-        'Transmission_Losses_Electricity_Grid').values
+        'Transmission_Losses_Electricity_Grid')
 
     transmission_length = get_parameter_values(
         scalars,
