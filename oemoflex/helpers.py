@@ -1,6 +1,7 @@
 import os
 import shutil
 
+import subprocess
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 import yaml
@@ -75,6 +76,52 @@ def check_if_csv_dirs_equal(dir_a, dir_b, ignore='log'):
             f"{filename_a} and {filename_b} do not have the same name."
 
         check_if_csv_files_equal(file_a, file_b)
+
+
+def get_dir_diff(dir_a, dir_b, ignore_list=None):
+    r"""
+    Diff's two directories recursively and returns stdout or stderr
+
+    Parameters
+    ----------
+    dir_a   Directory left-hand side
+    dir_b   Directory right-hand side
+    ignore_list  list of patterns to ignore in file names, default: .log
+
+    Returns
+    -------
+    the STDOUT string of the 'diff' system call
+    """
+
+    if ignore_list is None:
+        ignore_list = ['*.log']
+
+    # Concatenate patterns to a list of diff args of the form "-x PATTERN"
+    exclusions = []
+    for pattern in ignore_list:
+        # Different from a terminal call, it doesn't work with quotes here:
+        # -x "*.log" OR -x '*.log' won't work!
+        exclusions.append("-x")
+        exclusions.append("{}".format(pattern))
+
+    # Set working directory to the common path for the diff output to be trimmed to what is relevant
+    working_directory = os.path.commonpath([dir_a, dir_b])
+
+    # Trim directory path names accordingly to the relative paths
+    rel_dir_a = os.path.relpath(dir_a, working_directory)
+    rel_dir_b = os.path.relpath(dir_b, working_directory)
+
+    # Call 'diff' recursively (-r), with brief output (-b), ignore exclusion patterns (-x),
+    # with relative path names, instead of capture_output=True combine STDOUT and STDERR into one
+    diff_process = subprocess.run(
+        ["diff", "-rq", *exclusions, rel_dir_a, rel_dir_b],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=working_directory,
+        check=False
+    )
+
+    return diff_process.stdout.decode('UTF-8')
 
 
 def delete_empty_subdirs(path):
