@@ -121,7 +121,8 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
         try:
             check_if_csv_files_equal(file_a, file_b)
         except AssertionError as e:
-            raise AssertionError(f"Files {file_a} and {file_b} differ.\n{e}")
+            f_name = os.path.split(file_a)[-1]
+            raise AssertionError(f"Files '{f_name}' in dir_a and dir_b have differences.\n{e}")
 
 
 def delete_empty_subdirs(path):
