@@ -150,7 +150,9 @@ def get_parameter_values(scalars_df, parameter_name):
     The parameter's values (column 'Value') as a DataFrame, indexed by 'Region'
     """
 
-    return scalars_df.loc[scalars_df['Parameter'] == parameter_name].set_index('Region')['Value']
+    isParameterName = scalars_df['Parameter'] == parameter_name
+    isScenarioName = scalars_df['Scenario'].isin(['FlexMex1', 'ALL'])
+    return scalars_df.loc[isParameterName & isScenarioName, :].set_index('Region')['Value']
 
 
 def update_shortage(data_preprocessed_path):
