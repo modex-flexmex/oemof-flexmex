@@ -155,7 +155,7 @@ def get_parameter_values(scalars_df, parameter_name):
     return scalars_df.loc[isParameterName & isScenarioName, :].set_index('Region')['Value']
 
 
-def update_shortage(data_preprocessed_path):
+def update_shortage(data_preprocessed_path, scalars):
     logging.info("Updating shortage file")
 
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'shortage.csv')
@@ -164,7 +164,9 @@ def update_shortage(data_preprocessed_path):
     shortage = pd.read_csv(shortage_file, index_col='region')
 
     # Fill column 'marginal_cost' with a fixed value for ALL the elements
-    shortage['marginal_cost'] = 5000
+    shortage['marginal_cost'] = get_parameter_values(
+        scalars,
+        'Energy_SlackCost_Electricity').values[0] * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to the CSV file
     shortage.to_csv(shortage_file)

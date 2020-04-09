@@ -42,7 +42,7 @@ def main():
     create_default_elements(os.path.join(data_preprocessed_path, 'elements'))
 
     # update elements
-    update_shortage(data_preprocessed_path)
+    update_shortage(data_preprocessed_path, scalars)
     update_load(data_preprocessed_path, scalars)
     update_wind_onshore(data_preprocessed_path, scalars)
     update_wind_offshore(data_preprocessed_path, scalars)
