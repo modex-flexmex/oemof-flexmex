@@ -177,8 +177,9 @@ def update_load(data_preprocessed_path, scalars):
     load = pd.read_csv(load_file, index_col='region')
 
     # Fill column for ALL the elements
-    load['amount'] = get_parameter_values(scalars,
-                                          'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
+    load['amount'] = get_parameter_values(
+        scalars,
+        'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
 
     # Write back to the CSV file
     load.to_csv(load_file)
@@ -195,16 +196,16 @@ def update_link(data_preprocessed_path, scalars):
     # 'Region' value of that line is 'ALL'. So mapping by index doesn't work anymore.
     # Use its plain value instead.
     transmission_loss_per_100km = get_parameter_values(
-                                        scalars,
-                                        'Transmission_Losses_Electricity_Grid').values
+        scalars,
+        'Transmission_Losses_Electricity_Grid').values
 
     transmission_length = get_parameter_values(
-                                        scalars,
-                                        'Transmission_Length_Electricity_Grid')
+        scalars,
+        'Transmission_Length_Electricity_Grid')
 
     transmission_capacity = get_parameter_values(
-                                        scalars,
-                                        'Transmission_Capacity_Electricity_Grid')
+        scalars,
+        'Transmission_Capacity_Electricity_Grid')
 
     link['capacity'] = transmission_capacity
 
@@ -225,8 +226,8 @@ def update_wind_onshore(data_preprocessed_path, scalars):
     wind_onshore = pd.read_csv(wind_onshore_file, index_col='region')
 
     wind_onshore['capacity'] = get_parameter_values(
-                                        scalars,
-                                        'EnergyConversion_Capacity_Electricity_Wind_Onshore')
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Wind_Onshore')
 
     wind_onshore.to_csv(wind_onshore_file)
 
@@ -237,8 +238,8 @@ def update_wind_offshore(data_preprocessed_path, scalars):
     wind_offshore = pd.read_csv(wind_offshore_file, index_col='region')
 
     wind_offshore['capacity'] = get_parameter_values(
-                                        scalars,
-                                        'EnergyConversion_Capacity_Electricity_Wind_Offshore')
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Wind_Offshore')
 
     wind_offshore.to_csv(wind_offshore_file)
 
@@ -249,8 +250,8 @@ def update_solar_pv(data_preprocessed_path, scalars):
     solarpv = pd.read_csv(solar_pv_file, index_col='region')
 
     solarpv['capacity'] = get_parameter_values(
-                                        scalars,
-                                        'EnergyConversion_Capacity_Electricity_Solar_PV')
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Solar_PV')
 
     solarpv.to_csv(solar_pv_file)
 
