@@ -7,7 +7,7 @@ from pandas.util.testing import assert_frame_equal
 import yaml
 
 
-def get_experiment_paths(name, path_config):
+def get_experiment_paths(name, basepath):
     r"""
 
     Parameters
@@ -19,16 +19,17 @@ def get_experiment_paths(name, path_config):
 
     Returns
     -------
-    experiment_paths : dict
+    experiment_paths : addict.Dict
         Dictionary containing the experiment's path structure
 
     """
-    abspath = os.path.abspath(os.path.dirname(path_config))
+    module_path = os.path.abspath(os.path.dirname(__file__))
+    path_config = os.path.join(module_path, 'experiment_paths.yml')
 
     with open(path_config, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
-    experiment_paths = {k: os.path.join(abspath, v) for k, v in config.items()}
+    experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
 
     experiment_paths['data_preprocessed'] = os.path.join(
         experiment_paths['data_preprocessed'], name)
@@ -38,6 +39,32 @@ def get_experiment_paths(name, path_config):
 
     experiment_paths['results_postprocessed'] = os.path.join(
         experiment_paths['results_postprocessed'], name)
+
+    return experiment_paths
+
+
+def setup_experiment_paths(name, basepath):
+    r"""
+    Gets the experiment paths for a given experiment and
+    a basepath. If they do not exist, they are created.
+
+    Parameters
+    ----------
+    name : str
+        Name of the use case.
+
+    basepath : path
+        basepath of the experiment paths.
+
+    Returns
+    -------
+    experiment_paths : dict
+        Dictionary listing all experiment paths
+    """
+    experiment_paths = get_experiment_paths(name, basepath)
+    for path in experiment_paths.values():
+        if not os.path.exists(path):
+            os.makedirs(path)
 
     return experiment_paths
 
