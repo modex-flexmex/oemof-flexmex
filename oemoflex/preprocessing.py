@@ -50,7 +50,8 @@ module_path = os.path.dirname(os.path.abspath(__file__))
 def create_default_elements(
         dir,
         components_file='components.csv',
-        component_attrs_dir='component_attrs'
+        component_attrs_dir='component_attrs',
+        select_components=None,
 ):
     r"""
     Prepares oemoef.tabluar input CSV files:
@@ -75,9 +76,16 @@ def create_default_elements(
     # TODO Better put this as another field into the components.csv as well?
     component_attrs_dir = os.path.join(module_path, component_attrs_dir)
 
-    components = pd.read_csv(components_file)
+    components = pd.read_csv(components_file).name.values
 
-    for component in components.name.values:
+    if select_components is not None:
+        no_default = set(select_components).difference(set(components))
+
+        assert not no_default, f"Selected components {no_default} are not in components."
+
+        components = [c for c in components if c in select_components]
+
+    for component in components:
         component_attrs_file = os.path.join(component_attrs_dir, component + '.csv')
 
         try:
