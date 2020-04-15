@@ -287,7 +287,7 @@ def main():
     # compare with previous data
     previous_path = experiment_paths['data_preprocessed'] + '_default'
     new_path = experiment_paths['data_preprocessed']
-    check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
+    check_if_csv_dirs_equal(new_path, previous_path)
 
 
 if __name__ == '__main__':
