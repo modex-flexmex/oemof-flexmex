@@ -1,12 +1,12 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,dummy,,Name of the bus
+name,str,n/a,dummy,,Name
 type,str,n/a,volatile,,Type
-carrier,str,n/a,,,
-tech,str,n/a,shortage,,
-bus,str,n/a,,-el-bus,
+carrier,str,n/a,,,Energy carrier
+tech,str,n/a,shortage,,Technology
+bus,str,n/a,,-el-bus,The bus this component is connected to
 capacity,,,,,
-capacity_cost,,,,,
+capacity_cost,,,,,Annualized costs of capacity expansion
 marginal_cost,float,Eur/MWh,0,,
 profile,,,,,
 output_parameters,dict,n/a,{},,

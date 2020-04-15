@@ -1,10 +1,10 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-el-shortage,Name of the bus
+name,str,n/a,,-el-shortage,Name
 type,str,n/a,dispatchable,,Type
-carrier,str,n/a,shortage,,
-tech,str,n/a,shortage,,
-bus,str,n/a,,-el-bus,
+carrier,str,n/a,shortage,,Energy carrier
+tech,str,n/a,shortage,,Technology
+bus,str,n/a,,-el-bus,The bus this component is connected to
 capacity,float,MW,,,
 marginal_cost,float,Eur/MWh,n/a,,
 profile,str,n/a,1,,
