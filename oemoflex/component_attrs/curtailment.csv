@@ -7,5 +7,4 @@ tech,str,n/a,curtailment,,Technology
 bus,str,n/a,,-el-bus,The bus this component is connected to
 capacity,float,MW,n/a,,Installed capacity
 marginal_cost,float,Eur/MWh,0,,Marginal cost
-profile,str,n/a,1,,Name of the profile
 output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow
