@@ -16,10 +16,6 @@ year = 2050
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 exp_paths = setup_experiment_paths(name, basepath)
 
-# create  path for results (we use the datapackage_dir to store results)
-if not os.path.exists(exp_paths.results_optimization):
-    os.makedirs(exp_paths.results_optimization)
-
 create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
 logpath = define_logging(
