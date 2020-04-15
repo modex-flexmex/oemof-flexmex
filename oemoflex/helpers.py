@@ -111,7 +111,7 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
     f_names_a = [os.path.split(f)[-1] for f in files_a]
     f_names_b = [os.path.split(f)[-1] for f in files_b]
 
-    diff = set(f_names_a).symmetric_difference(set(f_names_b))
+    diff = list(set(f_names_a).symmetric_difference(set(f_names_b)))
 
     assert not diff,\
         f"Lists of filenames are not the same." \
@@ -120,9 +120,17 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
     for file_a, file_b in zip(files_a, files_b):
         try:
             check_if_csv_files_equal(file_a, file_b)
-        except AssertionError as e:
-            f_name = os.path.split(file_a)[-1]
-            raise AssertionError(f"Files '{f_name}' in dir_a and dir_b have differences.\n{e}")
+        except AssertionError:
+            diff.append([file_a, file_b])
+
+    if diff:
+        error_message = ''
+        for pair in diff:
+            short_name_a, short_name_b = (os.path.join(*f.split(os.sep)[-4:]) for f in pair)
+            line = ' - ' + short_name_a + ' and ' + short_name_b + '\n'
+            error_message += line
+
+        raise AssertionError(f" The contents of these file are different:\n{error_message}")
 
 
 def delete_empty_subdirs(path):
