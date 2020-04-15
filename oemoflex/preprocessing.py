@@ -259,6 +259,8 @@ def update_solar_pv(data_preprocessed_path, scalars):
 def combine_profiles(raw_profile_path, column_name):
     profile_file_list = sorted(os.listdir(raw_profile_path))
 
+    profile_file_list = [file for file in profile_file_list if file.endswith('csv')]
+
     profile_list = []
     for file in profile_file_list:
         region = file.split('_')[1]
