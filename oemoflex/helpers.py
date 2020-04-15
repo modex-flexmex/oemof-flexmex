@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from addict import Dict
 import subprocess
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
@@ -39,6 +40,8 @@ def get_experiment_paths(name, basepath):
 
     experiment_paths['results_postprocessed'] = os.path.join(
         experiment_paths['results_postprocessed'], name)
+
+    experiment_paths = Dict(experiment_paths)
 
     return experiment_paths
 
