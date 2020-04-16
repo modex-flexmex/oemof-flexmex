@@ -14,11 +14,13 @@ python:
 install:
   - pip install -e .
   - pip install -r tests/test_requirements.txt
+  - pip install pytest-cov
 
 # commands to run tests 
 script:
   - flake8
   - pylint */*.py
+  - pytest --cov=oemoflex
 #jobs:
 #  include:
 #    - stage: "Tests"                # naming the Tests stage
