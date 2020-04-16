@@ -161,11 +161,13 @@ def get_parameter_values(scalars_df, parameter_name):
 
         # Result is single-row. The parameter takes one value, that is, one line for all 'Regions'.
         # No merging required. Index doesn't make sense. Return plain value (short for .values[0])
-        return query_result['Value'].item()
+        parameter_value = query_result['Value'].item()
+        return parameter_value
 
     # Result is multi-row. Each 'Region' has its own value.
     # Return the 'Value' column as an 'Region'-indexed Series to merge correctly.
-    return query_result.set_index('Region')['Value']
+    parameter_value = query_result.set_index('Region')['Value']
+    return parameter_value
 
 
 def update_shortage(data_preprocessed_path, scalars):
