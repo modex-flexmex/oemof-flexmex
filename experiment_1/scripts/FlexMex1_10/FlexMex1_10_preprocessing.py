@@ -1,4 +1,3 @@
-import logging
 import os
 
 import pandas as pd
@@ -8,7 +7,7 @@ from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load,
     update_link, update_wind_onshore, update_wind_offshore, update_solar_pv, create_load_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
-from oemoflex.helpers import get_experiment_paths, get_dir_diff
+from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
 
 
 name = 'FlexMex1_10'
