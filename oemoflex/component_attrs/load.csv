@@ -1,7 +1,7 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-el-load,Name of the bus
+name,str,n/a,,-el-load,Name
 type,str,n/a,load,,Type
-bus,str,n/a,,-el-bus,
-amount,float,GWh/a,n/a,,
-profile,str,n/a,n/a,-el-load-profile,
+bus,str,n/a,,-el-bus,The bus this component is connected to
+amount,float,GWh/a,n/a,,Total load over one year
+profile,str,n/a,n/a,-el-load-profile,Name of the profile
