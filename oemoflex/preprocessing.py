@@ -147,8 +147,10 @@ def get_parameter_values(scalars_df, parameter_name):
 
     Returns
     -------
-    The parameter's values (column 'Value') as a 'Region'-indexed Series or
-    as a single value (float)
+```suggestion
+    parameter_values : float / pd.Series
+        The parameter's values (column 'Value') as a single value (float) 
+        or as a 'Region'-indexed Series     
     """
 
     is_parameter_name = scalars_df['Parameter'] == parameter_name
