@@ -1,10 +1,11 @@
-attribute,type,unit,default,description
-name,str,n/a,el-shortage,Name of the bus
-type,str,n/a,dispatchable,Type
-carrier,str,n/a,shortage,
-tech,str,n/a,shortage,
-bus,str,n/a,el-bus,
-capacity,float,MW,,
-marginal_cost,float,Eur/kWh,n/a,
-profile,str,n/a,1,
-output_parameters,dict,n/a,{},
+attribute,type,unit,default,suffix,description
+region,str,n/a,n/a,,Country code
+name,str,n/a,,-el-shortage,Name of the bus
+type,str,n/a,dispatchable,,Type
+carrier,str,n/a,shortage,,
+tech,str,n/a,shortage,,
+bus,str,n/a,,-el-bus,
+capacity,float,MW,,,
+marginal_cost,float,Eur/kWh,n/a,,
+profile,str,n/a,1,,
+output_parameters,dict,n/a,{},,
