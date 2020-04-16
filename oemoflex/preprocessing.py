@@ -62,10 +62,15 @@ def create_default_elements(
     ----------
     dir : str (dir path)
         target directory where to put the prepared CSVs
+
     components_file : str (file path)
         CSV where to read the components from
+
     component_attrs_dir : str (dir path)
         CSV where to read the components' attributes from
+
+    select_components : list
+        List of default elements to create
 
     Returns
     -------
