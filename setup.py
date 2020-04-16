@@ -20,6 +20,7 @@ setup(
         'pandas',
         'oemof',
         'oemof.tabular',
-        'pyyaml'
+        'pyyaml',
+        'addict',
     ],
 )
