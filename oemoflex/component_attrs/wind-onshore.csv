@@ -5,8 +5,8 @@ type,str,n/a,volatile,,Type
 carrier,str,n/a,wind,,Energy carrier
 tech,str,n/a,onshore,,Technology
 bus,str,n/a,,-el-bus,The bus this component is connected to
-capacity,,,,,Installed capacity
-capacity_cost,,,,,Annualized costs of capacity expansion
+capacity,float,MW,n/a,,Installed capacity
+capacity_cost,float,Eur/MW,n/a,,Annualized costs of capacity expansion
 marginal_cost,float,Eur/MWh,0,,Marginal cost
-profile,,,,-el-wind-onshore-profile,Name of the profile
+profile,str,,,-el-wind-onshore-profile,Name of the profile
 output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow
