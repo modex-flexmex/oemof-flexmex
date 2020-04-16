@@ -1,12 +1,12 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-el-solarpv,Name of the bus
+name,str,n/a,,-el-solarpv,Name
 type,str,n/a,volatile,,Type
-carrier,str,n/a,solar,,
-tech,str,n/a,pv,,
-bus,str,n/a,,-el-bus,
-capacity,,,,,
-capacity_cost,,,,,
-marginal_cost,float,Eur/kWh,0,,
-profile,,,,-el-solar-pv-profile,
-output_parameters,dict,n/a,{},,
+carrier,str,n/a,solar,,Energy carrier
+tech,str,n/a,pv,,Technology
+bus,str,n/a,,-el-bus,The bus this component is connected to
+capacity,float,MW,n/a,,Installed capacity
+capacity_cost,float,Eur/MW,n/a,,Annualized costs of capacity expansion
+marginal_cost,float,Eur/MWh,0,,Marginal cost
+profile,str,,,-el-solar-pv-profile,Name of the profile
+output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow

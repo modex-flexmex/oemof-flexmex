@@ -1,5 +1,5 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-el-bus,Name of the bus
+name,str,n/a,,-el-bus,Name
 type,str,n/a,bus,,Type
-balanced,bool,n/a,True,,Tells if bus is balanced
+balanced,bool,n/a,True,,Tells if flows into and out of bus sum to zero
