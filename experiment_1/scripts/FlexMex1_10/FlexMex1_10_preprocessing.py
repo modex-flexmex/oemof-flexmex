@@ -41,6 +41,9 @@ def main():
         na_values=['not considered', 'no value']
     )
 
+    # Filter out only scenario-related input parameters
+    scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']),:]
+
     # Prepare oemof.tabular input CSV files
     create_default_elements(os.path.join(data_preprocessed_path, 'elements'))
 

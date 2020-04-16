@@ -147,16 +147,14 @@ def get_parameter_values(scalars_df, parameter_name):
 
     Returns
     -------
-```suggestion
     parameter_values : float / pd.Series
         The parameter's values (column 'Value') as a single value (float) 
-        or as a 'Region'-indexed Series     
+        or as a 'Region'-indexed Series
     """
 
     is_parameter_name = scalars_df['Parameter'] == parameter_name
-    is_scenario_name = scalars_df['Scenario'].isin(['FlexMex1', 'ALL'])
 
-    query_result = scalars_df.loc[is_parameter_name & is_scenario_name, :]
+    query_result = scalars_df.loc[is_parameter_name, :]
 
     # The query result DataFrame can either be multi-row or single-row
     if len(query_result['Region']) == 1 and query_result['Region'].item() == 'ALL':
