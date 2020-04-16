@@ -7,7 +7,7 @@ from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load,
     update_link, update_wind_onshore, update_wind_offshore, update_solar_pv, create_load_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
-from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
+from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
 name = 'FlexMex1_10'
@@ -19,7 +19,7 @@ exp_paths = setup_experiment_paths(name, basepath)
 exp_paths.data_preprocessed = os.path.join(exp_paths.data_preprocessed, 'data')
 
 logpath = define_logging(
-    logpath=exp_paths['results_postprocessed'],
+    logpath=exp_paths.results_postprocessed,
     logfile='oemoflex.log'
 )
 
@@ -50,8 +50,8 @@ def main():
     create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
 
     # compare with previous data
-    previous_path = experiment_paths['data_preprocessed'] + '_default'
-    new_path = experiment_paths['data_preprocessed']
+    previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
+    new_path = exp_paths.data_preprocessed
     check_if_csv_dirs_equal(new_path, previous_path)
 
 
