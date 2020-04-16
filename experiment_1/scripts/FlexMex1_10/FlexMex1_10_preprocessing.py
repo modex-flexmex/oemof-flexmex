@@ -1,4 +1,3 @@
-import logging
 import os
 
 import pandas as pd
@@ -8,7 +7,7 @@ from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load,
     update_link, update_wind_onshore, update_wind_offshore, update_solar_pv, create_load_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
-from oemoflex.helpers import get_experiment_paths, get_dir_diff
+from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
 
 
 name = 'FlexMex1_10'
@@ -58,12 +57,7 @@ def main():
     # compare with previous data
     previous_path = experiment_paths['data_preprocessed'] + '_default'
     new_path = experiment_paths['data_preprocessed']
-    diff_output = get_dir_diff(new_path, previous_path, ignore_list=['*.log', '*.json'])
-    logging.info(
-        "Diff-checking the preprocessed data against '_default' directory:\n{}"
-        .format(diff_output)
-    )
-    # check_if_csv_dirs_equal(new_path, previous_path, ignore=['log', 'json'])
+    check_if_csv_dirs_equal(new_path, previous_path)
 
 
 if __name__ == '__main__':
