@@ -7,19 +7,16 @@ import os
 
 from oemof.tools.logger import define_logging
 from oemof.tabular.datapackage import building
-from oemoflex.helpers import get_experiment_paths
+from oemoflex.helpers import setup_experiment_paths
 
 
 name = 'FlexMex1_10'
 
-abspath = os.path.abspath(os.path.dirname(__file__))
-
-path_config = os.path.join(abspath, '../../config.yml')
-
-experiment_paths = get_experiment_paths(name, path_config)
+basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+exp_paths = setup_experiment_paths(name, basepath)
 
 logpath = define_logging(
-    logpath=experiment_paths['results_postprocessed'],
+    logpath=exp_paths.results_postprocessed,
     logfile='oemoflex.log'
 )
 
@@ -47,7 +44,7 @@ def main():
             ],
             'from_to_bus': ['link'],
         },
-        path=experiment_paths['data_preprocessed']
+        path=exp_paths.data_preprocessed
     )
 
 

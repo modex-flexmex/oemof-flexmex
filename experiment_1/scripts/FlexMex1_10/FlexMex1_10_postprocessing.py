@@ -5,34 +5,27 @@ import re
 import pandas as pd
 
 from oemof.tools.logger import define_logging
-import oemoflex.postprocessing as ofpp
-from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal, delete_empty_subdirs
+from oemoflex.postprocessing import create_postprocessed_results_subdirs
+from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal, delete_empty_subdirs
 
 
 name = 'FlexMex1_10'
 
 year = 2050
 
-abspath = os.path.abspath(os.path.dirname(__file__))
+basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+exp_paths = setup_experiment_paths(name, basepath)
 
-path_config = os.path.join(abspath, '../../config.yml')
-
-experiment_paths = get_experiment_paths(name, path_config)
-
-# create  path for results (we use the datapackage_dir to store results)
-if not os.path.exists(experiment_paths['results_optimization']):
-    os.makedirs(experiment_paths['results_optimization'])
-
-ofpp.create_postprocessed_results_subdirs(experiment_paths['results_postprocessed'])
+create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
 logpath = define_logging(
-    logpath=experiment_paths['results_postprocessed'],
+    logpath=exp_paths.results_postprocessed,
     logfile='oemoflex.log'
 )
 
 # load templates
-scalars = pd.read_csv(os.path.join(experiment_paths['results_template'], 'Scalars.csv'))
-timeseries = pd.read_csv(os.path.join(experiment_paths['results_template'], 'TimeSeries.csv'))
+scalars = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
+timeseries = pd.read_csv(os.path.join(exp_paths.results_template, 'TimeSeries.csv'))
 
 scalars = scalars.loc[scalars['UseCase'] == name]
 timeseries = timeseries.loc[timeseries['UseCase'] == name]
@@ -48,7 +41,7 @@ def calc_curtailment(bus_results, region):
 
     energy_conversion_curtailment_electricity_re.to_csv(
         os.path.join(
-            experiment_paths['results_postprocessed'],
+            exp_paths.results_postprocessed,
             'RE',
             'Curtailment',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -78,7 +71,7 @@ def calc_energy_conversion_secondary_energy_re(
 
     energy_conversion_secondary_energy_re.to_csv(
         os.path.join(
-            experiment_paths['results_postprocessed'],
+            exp_paths.results_postprocessed,
             'RE',
             'Generation',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -99,7 +92,7 @@ def calc_transmission_import_electricity_grid(bus_results, region):
 
     transmission_import_electricity_grid.to_csv(
         os.path.join(
-            experiment_paths['results_postprocessed'],
+            exp_paths.results_postprocessed,
             'Transmission',
             'Import',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
@@ -213,14 +206,14 @@ def calc_net_flows(link_flow_results):
 def main(name=name, scalars=scalars):
     # Postprocess
     bus_results_files = (
-        file for file in os.listdir(experiment_paths['results_optimization'])
+        file for file in os.listdir(exp_paths.results_optimization)
         if re.search('el-bus.csv', file)
     )
 
     for file in bus_results_files:
         region = file.split('-')[0]
 
-        bus_results = pd.read_csv(os.path.join(experiment_paths['results_optimization'], file))
+        bus_results = pd.read_csv(os.path.join(exp_paths.results_optimization, file))
 
         # EnergyConversion_Curtailment_Electricity_RE
         energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
@@ -254,7 +247,7 @@ def main(name=name, scalars=scalars):
     link_flow_results_file = 'links-oemof.csv'
 
     link_flow_results = pd.read_csv(
-        os.path.join(experiment_paths['results_optimization'], link_flow_results_file),
+        os.path.join(exp_paths.results_optimization, link_flow_results_file),
         header=[0, 1, 2], index_col=0
     )
 
@@ -267,7 +260,7 @@ def main(name=name, scalars=scalars):
         to_region = column.split('-')[1]
         link_flow_results.loc[:, column].to_csv(
             os.path.join(
-                experiment_paths['results_postprocessed'],
+                exp_paths.results_postprocessed,
                 'Transmission',
                 'ImportExport',
                 '{}_oemof_{}_{}_{}.csv'.format(name, from_region, to_region, year),
@@ -285,19 +278,19 @@ def main(name=name, scalars=scalars):
             value_in_gwh,
         )
 
-    scalars.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'Scalars.csv'))
-    timeseries.to_csv(os.path.join(experiment_paths['results_postprocessed'], 'TimeSeries.csv'))
+    scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
+    timeseries.to_csv(os.path.join(exp_paths.results_postprocessed, 'TimeSeries.csv'))
 
     # Check against previous results
-    previous_results_path = experiment_paths['results_postprocessed'] + '_default'
-    new_results_path = experiment_paths['results_postprocessed']
+    previous_results_path = exp_paths.results_postprocessed + '_default'
+    new_results_path = exp_paths.results_postprocessed
 
     check_if_csv_dirs_equal(new_results_path, previous_results_path)
 
     logging.info(f"New results in {new_results_path}"
                  f" match previous results in {previous_results_path}")
 
-    delete_empty_subdirs(experiment_paths['results_postprocessed'])
+    delete_empty_subdirs(exp_paths.results_postprocessed)
 
 
 if __name__ == '__main__':

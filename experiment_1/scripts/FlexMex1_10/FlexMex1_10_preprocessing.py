@@ -7,36 +7,31 @@ from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load,
     update_link, update_wind_onshore, update_wind_offshore, update_solar_pv, create_load_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
-from oemoflex.helpers import get_experiment_paths, check_if_csv_dirs_equal
+from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
 name = 'FlexMex1_10'
 
 # Get paths
-abspath = os.path.abspath(os.path.dirname(__file__))
+basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+exp_paths = setup_experiment_paths(name, basepath)
 
-path_config = os.path.join(abspath, '../../config.yml')
-
-experiment_paths = get_experiment_paths(name, path_config)
-
-data_raw_path = experiment_paths['data_raw']
-
-data_preprocessed_path = os.path.join(experiment_paths['data_preprocessed'], 'data')
+exp_paths.data_preprocessed = os.path.join(exp_paths.data_preprocessed, 'data')
 
 logpath = define_logging(
-    logpath=experiment_paths['results_postprocessed'],
+    logpath=exp_paths.results_postprocessed,
     logfile='oemoflex.log'
 )
 
-if not os.path.exists(data_preprocessed_path):
+if not os.path.exists(exp_paths.data_preprocessed):
     for subdir in ['elements', 'sequences']:
-        os.makedirs(os.path.join(data_preprocessed_path, subdir))
+        os.makedirs(os.path.join(exp_paths.data_preprocessed, subdir))
 
 
 def main():
     # Load common input parameters
     scalars = pd.read_csv(
-        os.path.join(experiment_paths['data_raw'], 'Scalars.csv'),
+        os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
         header=0,
         na_values=['not considered', 'no value']
     )
@@ -45,25 +40,25 @@ def main():
     scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']),:]
 
     # Prepare oemof.tabular input CSV files
-    create_default_elements(os.path.join(data_preprocessed_path, 'elements'))
+    create_default_elements(os.path.join(exp_paths.data_preprocessed, 'elements'))
 
     # update elements
-    update_shortage(data_preprocessed_path, scalars)
-    update_load(data_preprocessed_path, scalars)
-    update_wind_onshore(data_preprocessed_path, scalars)
-    update_wind_offshore(data_preprocessed_path, scalars)
-    update_solar_pv(data_preprocessed_path, scalars)
-    update_link(data_preprocessed_path, scalars)
+    update_shortage(exp_paths.data_preprocessed, scalars)
+    update_load(exp_paths.data_preprocessed, scalars)
+    update_wind_onshore(exp_paths.data_preprocessed, scalars)
+    update_wind_offshore(exp_paths.data_preprocessed, scalars)
+    update_solar_pv(exp_paths.data_preprocessed, scalars)
+    update_link(exp_paths.data_preprocessed, scalars)
 
     # create sequences
-    create_load_profiles(data_raw_path, data_preprocessed_path)
-    create_wind_onshore_profiles(data_raw_path, data_preprocessed_path)
-    create_wind_offshore_profiles(data_raw_path, data_preprocessed_path)
-    create_solar_pv_profiles(data_raw_path, data_preprocessed_path)
+    create_load_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
+    create_wind_onshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
+    create_wind_offshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
+    create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
 
     # compare with previous data
-    previous_path = experiment_paths['data_preprocessed'] + '_default'
-    new_path = experiment_paths['data_preprocessed']
+    previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
+    new_path = exp_paths.data_preprocessed
     check_if_csv_dirs_equal(new_path, previous_path)
 
 
