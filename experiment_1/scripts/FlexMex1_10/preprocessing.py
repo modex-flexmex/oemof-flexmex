@@ -57,7 +57,9 @@ def main():
     create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
 
     # compare with previous data
-    previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default_v0.03', 'data')
+    previous_path = os.path.join(
+        os.path.split(exp_paths.data_preprocessed)[0] + '_default_v0.03', 'data'
+    )
     new_path = exp_paths.data_preprocessed
     check_if_csv_dirs_equal(new_path, previous_path)
 
