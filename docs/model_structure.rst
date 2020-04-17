@@ -14,26 +14,7 @@ oemoflex is a model of the integrated European energy system, featuring many fle
 Data format
 ===========
 
-Elements
---------
-
-The filenames are of the form carrier-type-tech.csv (e.g. :file:`electricity-bus.csv`,
-:file:`heat-bus-central.csv`, :file:`chp-heat-backpressure.csv`).
-
-* **region** Region of a component. Modelled regions are defined here (TODO: Add link to region
-  definition)
-* **name** Unique name (:py:attr:`'carrier-type-tech-region'`, eg. :py:attr:`'heat-bus-central-LU'`,
-  :py:attr:`'heat-heatpump-airsource-AT'`)
-* **type** Type of oemof.tabular.facade
-* **carrier** Energy sector according to carrier (e.g. electricity, heat, natural_gas,
-  methane, hard_coal).
-* **tech** Specification of the technology
-
-Sequences
----------
-
-The filenames are of the form type-carrier-tech_profile (e.g.
-:file:`electricity-pv-solar_profile.csv`, :file:`electricity-wind-onshore_profile.csv`).
+TODO
 
 Available components
 ====================
