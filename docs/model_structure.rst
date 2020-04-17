@@ -20,8 +20,7 @@ the optimisation.
 Elements
 --------
 
-The filenames are of the form carrier-type-tech.csv (e.g. :file:`electricity-bus.csv`,
-:file:`heat-bus-central.csv`, :file:`chp-heat-backpressure.csv`).
+The filenames are of the form type.csv (e.g. :file:`bus.csv`, :file:`backpressure.csv`).
 
 * **region** Region of a component. Modelled regions are defined here (TODO: Add link to region
   definition)
@@ -35,8 +34,8 @@ The filenames are of the form carrier-type-tech.csv (e.g. :file:`electricity-bus
 Sequences
 ---------
 
-The filenames are of the form type-carrier-tech_profile (e.g.
-:file:`electricity-pv-solar_profile.csv`, :file:`electricity-wind-onshore_profile.csv`).
+The filenames are of the form type_profile (e.g.
+:file:`volatile_profile.csv`, :file:`load_profile.csv`).
 
 Available components
 ====================
