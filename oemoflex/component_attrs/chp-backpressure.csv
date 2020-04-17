@@ -1,0 +1,13 @@
+attribute,type,unit,default,suffix,description
+region,str,n/a,n/a,,Country code
+name,str,n/a,,-el-shortage,Name
+type,str,n/a,dispatchable,,Type
+fuel_bus
+electricity_bus,str,n/a,,-el-bus,The bus this component is connected to
+heat_bus,str,n/a,,-el-bus,The bus this component is connected to
+capacity,float,MW_el,n/a,,Installed electric capacity in full extraction mode
+electric_efficiency,,,,,Electrical efficiency of the chp unit
+thermal_efficiency,,,,Thermal efficiency of the chp unit
+condensing_efficiency,,,,Electrical efficiency if turbine operates in full extraction mode
+carrier_cost,Eur/MWh,,,Cost per unit of used fuel
+marginal_cost,float,Eur/MWh_el,n/a,,Marginal cost per unit of produced electrical output

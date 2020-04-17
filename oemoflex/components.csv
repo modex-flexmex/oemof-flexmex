@@ -7,3 +7,7 @@ pv,pv_list,
 shortage,shortage_list,
 wind-offshore,offshore_list,
 wind-onshore,wind-onshore_list,
+chp-backpressure,chp-backpressure_list
+chp-extractionturbine,chp-extractionturbine_list
+boiler,boiler_list
+power-to-heat,power-to-heat_list
