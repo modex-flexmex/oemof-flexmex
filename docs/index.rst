@@ -14,6 +14,13 @@ Welcome to oemoflex's documentation!
 
 .. toctree::
    :maxdepth: 2
+   :caption: User's guide
+
+   model_structure
+   model_pipeline
+
+.. toctree::
+   :maxdepth: 2
    :caption: Reference
 
    whats_new
