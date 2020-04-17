@@ -282,7 +282,7 @@ def main(name=name, scalars=scalars):
     timeseries.to_csv(os.path.join(exp_paths.results_postprocessed, 'TimeSeries.csv'))
 
     # Check against previous results
-    previous_results_path = exp_paths.results_postprocessed + '_default'
+    previous_results_path = exp_paths.results_postprocessed + '_default_v0.03'
     new_results_path = exp_paths.results_postprocessed
 
     check_if_csv_dirs_equal(new_results_path, previous_results_path)
