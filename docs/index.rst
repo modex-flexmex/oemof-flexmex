@@ -16,8 +16,8 @@ Welcome to oemoflex's documentation!
    :maxdepth: 2
    :caption: User's guide
 
-   model_structure
    model_pipeline
+   model_structure
 
 .. toctree::
    :maxdepth: 2

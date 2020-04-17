@@ -14,6 +14,9 @@ oemoflex is a model of the integrated European energy system, featuring many fle
 Data format
 ===========
 
+The preprocessing brings the raw data into the data defined data format that serves as input for
+the optimisation.
+
 Elements
 --------
 
