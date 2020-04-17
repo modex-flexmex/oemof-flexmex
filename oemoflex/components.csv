@@ -7,3 +7,6 @@ pv,pv_list,
 shortage,shortage_list,
 wind-offshore,offshore_list,
 wind-onshore,wind-onshore_list,
+heatpump,heatpump_list
+heatstorage,heatstorage_list
+gasturbine,gasturbine_list
