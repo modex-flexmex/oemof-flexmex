@@ -11,26 +11,18 @@ from oemof.tabular import datapackage  # noqa
 from oemof.tabular.facades import TYPEMAP
 import oemof.tabular.tools.postprocessing as pp
 
-from oemoflex.helpers import get_experiment_paths
+from oemoflex.helpers import setup_experiment_paths
 
 
 name = 'FlexMex1_10'
 
-abspath = os.path.abspath(os.path.dirname(__file__))
-
-path_config = os.path.join(abspath, '../../config.yml')
-
-experiment_paths = get_experiment_paths(name, path_config)
+basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+exp_paths = setup_experiment_paths(name, basepath)
 
 logpath = define_logging(
-    logpath=experiment_paths['results_postprocessed'],
+    logpath=exp_paths.results_postprocessed,
     logfile='oemoflex.log'
 )
-
-# create  path for results (we use the datapackage_dir to store results)
-results_path = experiment_paths['results_optimization']
-if not os.path.exists(results_path):
-    os.makedirs(results_path)
 
 
 def main():
@@ -41,7 +33,7 @@ def main():
     # create energy system object
     logging.info("Creating EnergySystem from datapackage")
     es = EnergySystem.from_datapackage(
-        os.path.join(experiment_paths['data_preprocessed'], "datapackage.json"),
+        os.path.join(exp_paths.data_preprocessed, "datapackage.json"),
         attributemap={}, typemap=TYPEMAP,
     )
 
@@ -53,7 +45,7 @@ def main():
     # m.receive_duals()
 
     # save lp file together with optimization results
-    lp_file_dir = os.path.join(results_path, '{}.lp'.format(name))
+    lp_file_dir = os.path.join(exp_paths.results_optimization, '{}.lp'.format(name))
     logging.info(f"Saving the lp-file to {lp_file_dir}")
     m.write(lp_file_dir, io_options={'symbolic_solver_labels': True})
 
@@ -67,8 +59,8 @@ def main():
 
     # now we use the write results method to write the results in oemof-tabular
     # format
-    logging.info(f'Writing the results to {results_path}')
-    pp.write_results(m, results_path, raw=True)
+    logging.info(f'Writing the results to {exp_paths.results_optimization}')
+    pp.write_results(m, exp_paths.results_optimization, raw=True)
 
 
 if __name__ == '__main__':
