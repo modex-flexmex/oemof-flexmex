@@ -153,20 +153,37 @@ def get_parameter_values(scalars_df, parameter_name):
     Parameters
     ----------
     scalars_df : DataFrame
-    DataFrame of "Scalars.csv"
+        DataFrame of "Scalars.csv"
 
     parameter_name : str
-    Specifies the rows to select by the name in column "Parameter"
+        Specifies the rows to select by the name in column "Parameter"
 
     Returns
     -------
-    The parameter's values (column 'Value') as a DataFrame, indexed by 'Region'
+    parameter_values : float / pd.Series
+        The parameter's values (column 'Value') as a single value (float)
+        or as a 'Region'-indexed Series
     """
 
-    return scalars_df.loc[scalars_df['Parameter'] == parameter_name].set_index('Region')['Value']
+    is_parameter_name = scalars_df['Parameter'] == parameter_name
+
+    query_result = scalars_df.loc[is_parameter_name, :]
+
+    # The query result DataFrame can either be multi-row or single-row
+    if len(query_result['Region']) == 1 and query_result['Region'].item() == 'ALL':
+
+        # Result is single-row. The parameter takes one value, that is, one line for all 'Regions'.
+        # No merging required. Index doesn't make sense. Return plain value (short for .values[0])
+        parameter_value = query_result['Value'].item()
+        return parameter_value
+
+    # Result is multi-row. Each 'Region' has its own value.
+    # Return the 'Value' column as an 'Region'-indexed Series to merge correctly.
+    parameter_value = query_result.set_index('Region')['Value']
+    return parameter_value
 
 
-def update_shortage(data_preprocessed_path):
+def update_shortage(data_preprocessed_path, scalars):
     logging.info("Updating shortage file")
 
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'shortage.csv')
@@ -175,7 +192,9 @@ def update_shortage(data_preprocessed_path):
     shortage = pd.read_csv(shortage_file, index_col='region')
 
     # Fill column 'marginal_cost' with a fixed value for ALL the elements
-    shortage['marginal_cost'] = 5000
+    shortage['marginal_cost'] = get_parameter_values(
+        scalars,
+        'Energy_SlackCost_Electricity') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to the CSV file
     shortage.to_csv(shortage_file)
@@ -192,7 +211,7 @@ def update_load(data_preprocessed_path, scalars):
     # Fill column for ALL the elements
     load['amount'] = get_parameter_values(
         scalars,
-        'Energy_FinalEnergy_Electricity') * 1e6  # TWh to MWh
+        'Energy_FinalEnergy_Electricity') * 1e3  # GWh to MWh
 
     # Write back to the CSV file
     load.to_csv(load_file)
@@ -210,7 +229,7 @@ def update_link(data_preprocessed_path, scalars):
     # Use its plain value instead.
     transmission_loss_per_100km = get_parameter_values(
         scalars,
-        'Transmission_Losses_Electricity_Grid').values
+        'Transmission_Losses_Electricity_Grid')
 
     transmission_length = get_parameter_values(
         scalars,
