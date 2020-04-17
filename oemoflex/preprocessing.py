@@ -153,15 +153,15 @@ def get_parameter_values(scalars_df, parameter_name):
     Parameters
     ----------
     scalars_df : DataFrame
-    DataFrame of "Scalars.csv"
+        DataFrame of "Scalars.csv"
 
     parameter_name : str
-    Specifies the rows to select by the name in column "Parameter"
+        Specifies the rows to select by the name in column "Parameter"
 
     Returns
     -------
     parameter_values : float / pd.Series
-        The parameter's values (column 'Value') as a single value (float) 
+        The parameter's values (column 'Value') as a single value (float)
         or as a 'Region'-indexed Series
     """
 
