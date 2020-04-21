@@ -2,7 +2,7 @@ attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
 name,str,n/a,,-electricity-curtailment,Name
 type,str,n/a,excess,,Type
-carrier,str,n/a,curtailment,,Energy carrier
+carrier,str,n/a,electricity,,Energy carrier
 tech,str,n/a,curtailment,,Technology
 bus,str,n/a,,-electricity,The bus this component is connected to
 capacity,float,MW,n/a,,Installed capacity
