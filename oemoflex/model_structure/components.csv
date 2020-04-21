@@ -1,7 +1,7 @@
 filename,carrier,type,tech,description
-electricity-load-demand.csv,electricity,load,demand,Electricity demand
-electricity-link-transmission.csv,electricity,link,transmission,Electrical transmission between regions
-electricity-source-shortage.csv,electricity,source,shortage,Shortage backup to keep model solvable
-solar-volatile-pv.csv,solar,volatile,pv,Solar pv capacities
-wind-volatile-offshore.csv,wind,volatile,offshore,Offshore wind capacities
-wind-volatile-onshore.csv,wind,volatile,onshore,Onshore wind capacities
+electricity-demand.csv,electricity,load,demand,Electricity demand
+electricity-transmission.csv,electricity,link,transmission,Electrical transmission between regions
+electricity-shortage.csv,electricity,source,shortage,Shortage backup to keep model solvable
+solar-pv.csv,solar,volatile,pv,Solar pv capacities
+wind-offshore.csv,wind,volatile,offshore,Offshore wind capacities
+wind-onshore.csv,wind,volatile,onshore,Onshore wind capacities
