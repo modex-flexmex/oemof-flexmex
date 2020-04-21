@@ -40,7 +40,18 @@ def main():
     scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']), :]
 
     # Prepare oemof.tabular input CSV files
-    create_default_elements(os.path.join(exp_paths.data_preprocessed, 'elements'))
+    create_default_elements(
+        os.path.join(exp_paths.data_preprocessed, 'elements'),
+        select_components=[
+            'bus',
+            'shortage',
+            'curtailment',
+            'load',
+            'wind-offshore',
+            'wind-onshore',
+            'pv'
+        ]
+    )
 
     # update elements
     update_shortage(exp_paths.data_preprocessed, scalars)
@@ -48,7 +59,6 @@ def main():
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
-    update_link(exp_paths.data_preprocessed, scalars)
 
     # create sequences
     create_load_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
