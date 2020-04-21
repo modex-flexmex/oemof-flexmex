@@ -7,3 +7,6 @@ pv,pv_list,
 shortage,shortage_list,
 wind-offshore,offshore_list,
 wind-onshore,wind-onshore_list,
+ch4,ch4_list
+coal,coal_list
+nuclear,nuclear_list
