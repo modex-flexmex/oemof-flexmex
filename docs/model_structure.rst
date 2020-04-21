@@ -22,7 +22,7 @@ Elements
 
 All buses are defined in :file:`bus.csv`.
 
-The filenames for the components are of the form carrier-type-tech.csv (e.g. :file:`electricity-load-demand.csv`, :file:`gas-backpressure-chp.csv`).
+The filenames for the components are of the form carrier-tech.csv (e.g. :file:`electricity-demand.csv`, :file:`gas-bpchp.csv`).
 
 * **region** Region of a component. Modelled regions are defined here (TODO: Add link to region
   definition)
@@ -37,7 +37,7 @@ Sequences
 ---------
 
 The filenames are of the form type_profile (e.g.
-:file:`wind-volatile-offshore_profile.csv`, :file:`electricity-load-demand_profile.csv`).
+:file:`wind-offshore_profile.csv`, :file:`electricity-demand_profile.csv`).
 
 Available components
 ====================
