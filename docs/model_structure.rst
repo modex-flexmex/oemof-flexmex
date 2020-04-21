@@ -20,14 +20,16 @@ the optimisation.
 Elements
 --------
 
-The filenames are of the form type.csv (e.g. :file:`bus.csv`, :file:`backpressure.csv`).
+All buses are defined in :file:`bus.csv`.
+
+The filenames for the components are of the form carrier-type-tech.csv (e.g. :file:`electricity-load-demand.csv`, :file:`gas-backpressure-chp.csv`).
 
 * **region** Region of a component. Modelled regions are defined here (TODO: Add link to region
   definition)
-* **name** Unique name (:py:attr:`'carrier-type-tech-region'`, eg. :py:attr:`'heat-bus-central-LU'`,
-  :py:attr:`'heat-heatpump-airsource-AT'`)
+* **name** Unique name (:py:attr:`'region-carrier-type-tech'`, eg. :py:attr:`'LU-gas-backpressure-chp'`,
+  :py:attr:`'AT-electricity-heatpump-airsource'`)
 * **type** Type of oemof.tabular.facade
-* **carrier** Energy sector according to carrier (e.g. electricity, heat, natural_gas,
+* **carrier** Energy sector according to carrier (e.g. electricity, heat, gas,
   methane, hard_coal).
 * **tech** Specification of the technology
 
@@ -35,7 +37,7 @@ Sequences
 ---------
 
 The filenames are of the form type_profile (e.g.
-:file:`volatile_profile.csv`, :file:`load_profile.csv`).
+:file:`wind-volatile-offshore_profile.csv`, :file:`electricity-load-demand_profile.csv`).
 
 Available components
 ====================
