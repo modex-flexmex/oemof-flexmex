@@ -1,0 +1,8 @@
+name,type,carrier,tech,description
+electricity-load-load-region,load,
+electricity-link-transmission-region,link,
+electricity-load-region,load,
+electricity-source-shortage-region,source,
+electricity-volatile-pv-region,volatile,
+electricity-volatile-wind_offshore-region,volatile
+electricity-volatile-wind_onshore-region,volatile
