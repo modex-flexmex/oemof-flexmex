@@ -94,7 +94,7 @@ def calc_transmission_import_electricity_grid(bus_results, region):
         os.path.join(
             exp_paths.results_postprocessed,
             'Transmission',
-            'Import',
+            'ImportExport',
             '{}_oemof_{}_{}.csv'.format(name, region, year),
         )
     )
