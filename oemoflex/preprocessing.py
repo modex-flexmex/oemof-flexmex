@@ -357,7 +357,7 @@ def create_load_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating load profiles")
     raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
 
-    load_profile_df = combine_profiles(raw_load_profile_path, 'electricity-load-profile')
+    load_profile_df = combine_profiles(raw_load_profile_path, 'electricity-demand-profile')
 
     load_profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'electricity-demand_profile.csv')
