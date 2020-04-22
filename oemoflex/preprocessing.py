@@ -3,48 +3,17 @@ import os
 
 import pandas as pd
 
-regions_list = [
-    'AT',
-    'BE',
-    'CH',
-    'CZ',
-    'DE',
-    'DK',
-    'FR',
-    'IT',
-    'LU',
-    'NL',
-    'PL',
-]
-
-link_list = [
-    'AT-CH',
-    'AT-CZ',
-    'AT-IT',
-    'BE-FR',
-    'BE-LU',
-    'BE-NL',
-    'CH-FR',
-    'CH-IT',
-    'CZ-PL',
-    'DE-AT',
-    'DE-BE',
-    'DE-CH',
-    'DE-CZ',
-    'DE-DK',
-    'DE-FR',
-    'DE-LU',
-    'DE-NL',
-    'DE-PL',
-    'DK-NL',
-    'FR-IT',
-    'FR-LU',
-
-]
+module_path = os.path.dirname(os.path.abspath(__file__))
 
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
-module_path = os.path.dirname(os.path.abspath(__file__))
+regions_list = list(
+    pd.read_csv(os.path.join(module_path, 'model_structure', 'regions.csv'), squeeze=True)
+)
+
+link_list = list(
+    pd.read_csv(os.path.join(module_path, 'model_structure', 'links.csv'), squeeze=True)
+)
 
 
 def create_default_elements(
