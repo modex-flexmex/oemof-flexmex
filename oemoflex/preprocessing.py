@@ -49,6 +49,7 @@ module_path = os.path.dirname(os.path.abspath(__file__))
 
 def create_default_elements(
         dir,
+        busses_file=os.path.join(module_path, 'model_structure', 'busses.csv'),
         components_file=os.path.join(module_path, 'model_structure', 'components.csv'),
         component_attrs_dir=os.path.join(module_path, 'model_structure', 'component_attrs'),
         select_components=None,
@@ -89,6 +90,10 @@ def create_default_elements(
         assert not no_default, f"Selected components {no_default} are not in components."
 
         components = [c for c in components if c in select_components]
+
+    bus_df = create_bus_element(busses_file)
+
+    bus_df.to_csv(os.path.join(dir, 'bus.csv'))
 
     for component in components:
         component_attrs_file = os.path.join(component_attrs_dir, component + '.csv')
@@ -143,6 +148,40 @@ def create_default_elements(
 
         # Write to target directory
         df.to_csv(os.path.join(dir, component + '.csv'))
+
+
+def create_bus_element(busses_file):
+    r"""
+
+    Parameters
+    ----------
+    busses_file : path
+        Path to busses file.
+
+    Returns
+    -------
+    bus_df : pd.DataFrame
+        Bus element DataFrame
+    """
+    busses = pd.read_csv(busses_file, squeeze=True)
+
+    regions = []
+    carriers = []
+
+    for region in country_list:
+        for carrier in busses['carrier']:
+            regions.append(region)
+            carriers.append(region + '-' + carrier)
+
+    bus_df = pd.DataFrame({
+        'region': regions,
+        'name': carriers,
+        'type': 'bus',
+    })
+
+    bus_df = bus_df.set_index('region')
+
+    return bus_df
 
 
 def get_parameter_values(scalars_df, parameter_name):
