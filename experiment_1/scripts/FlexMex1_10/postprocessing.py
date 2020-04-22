@@ -207,7 +207,7 @@ def main(name=name, scalars=scalars):
     # Postprocess
     bus_results_files = (
         file for file in os.listdir(exp_paths.results_optimization)
-        if re.search('el-bus.csv', file)
+        if re.search('electricity.csv', file)
     )
 
     for file in bus_results_files:
