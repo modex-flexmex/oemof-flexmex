@@ -26,12 +26,11 @@ The filenames for the components are of the form carrier-tech.csv (e.g. :file:`e
 
 * **region** Region of a component. Modelled regions are defined here (TODO: Add link to region
   definition)
-* **name** Unique name (:py:attr:`'region-carrier-type-tech'`, eg. :py:attr:`'LU-gas-backpressure-chp'`,
-  :py:attr:`'AT-electricity-heatpump-airsource'`)
+* **name** Unique name (:py:attr:`'region-carrier-tech'`, eg. :py:attr:`'LU-gas-bpchp'`,
+  :py:attr:`'AT-electricity-airsourcehp'`)
 * **type** Type of oemof.tabular.facade
-* **carrier** Energy sector according to carrier (e.g. electricity, heat, gas,
-  methane, hard_coal).
-* **tech** Specification of the technology
+* **carrier** Energy sector according to carrier (e.g. solar, wind, biomass, coal, lignite, uranium, oil, gas, methane, hydro, waste, electricity, heat).
+* **tech** Specification of the technology (e.g. st, ocgt, ccgt, pv, onshore, offshore, ror, phs, extchp, bpchp, battery)
 
 Sequences
 ---------
