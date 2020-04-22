@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 
-country_list = [
+regions_list = [
     'AT',
     'BE',
     'CH',
@@ -128,7 +128,7 @@ def create_default_elements(
             component_data['to_bus'] = [code.split('-')[1] for code in link_list]
 
         else:
-            component_data['region'] = country_list
+            component_data['region'] = regions_list
 
         # Fill other columns with their respective suffixes if available
         for attr_name, suffix in component_suffix.items():
@@ -168,7 +168,7 @@ def create_bus_element(busses_file):
     regions = []
     carriers = []
 
-    for region in country_list:
+    for region in regions_list:
         for carrier in busses['carrier']:
             regions.append(region)
             carriers.append(region + '-' + carrier)
