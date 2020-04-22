@@ -49,8 +49,8 @@ module_path = os.path.dirname(os.path.abspath(__file__))
 
 def create_default_elements(
         dir,
-        components_file='components.csv',
-        component_attrs_dir='component_attrs',
+        components_file=os.path.join(module_path, 'model_structure', 'components.csv'),
+        component_attrs_dir=os.path.join(module_path, 'model_structure', 'component_attrs'),
         select_components=None,
 ):
     r"""
