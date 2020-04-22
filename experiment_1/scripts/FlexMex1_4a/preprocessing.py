@@ -36,14 +36,13 @@ def main():
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
         select_components=[
-            'bus',
-            'shortage',
-            'curtailment',
-            'load',
+            'electricity-shortage',
+            'electricity-curtailment',
+            'electricity-demand',
             'wind-offshore',
             'wind-onshore',
-            'pv',
-            'chp-backpressure',
+            'solar-pv',
+            'gas-bpchp',
         ]
 
     )
