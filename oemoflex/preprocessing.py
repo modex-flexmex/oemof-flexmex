@@ -3,6 +3,8 @@ import os
 
 import pandas as pd
 
+from oemof.tools.economics import annuity
+
 country_list = [
     'AT',
     'BE',
@@ -286,6 +288,59 @@ def update_solar_pv(data_preprocessed_path, scalars):
         'EnergyConversion_Capacity_Electricity_Solar_PV')
 
     solarpv.to_csv(solar_pv_file)
+
+
+def update_nuclear(data_preprocessed_path, scalars):
+    nuclear_file = os.path.join(data_preprocessed_path, 'elements', 'nuclear.csv')
+
+    nuclear = pd.read_csv(nuclear_file, index_col='region')
+
+    # Operation parameters
+    capacity = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Nuclear_ST')
+
+    operation_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_VarOM_Electricity_Nuclear_ST') * 1e-3 # Eur/GWh -> Eur/MWh
+
+    eta = get_parameter_values(
+        scalars,
+        'EnergyConversion_EtaNet_Electricity_Nuclear_ST')
+
+    carrier_price = get_parameter_values(
+        scalars,
+        'Energy_Price_Uranium') * 1e-3 # Eur/GWh -> Eur/MWh
+
+    production_cost = carrier_price / eta
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Electricity_Nuclear_ST')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Electricity_Nuclear_ST') * 1e-2 # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Electricity_Nuclear_ST')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2 # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    nuclear['capacity'] = capacity
+
+    nuclear['capacity_cost'] = annualized_cost + fix_cost * capex
+
+    nuclear['marginal_cost'] = operation_cost + production_cost
+
+    nuclear.to_csv(nuclear_file)
 
 
 def combine_profiles(raw_profile_path, column_name):
