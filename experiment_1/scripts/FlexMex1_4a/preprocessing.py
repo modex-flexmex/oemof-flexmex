@@ -30,7 +30,14 @@ if not os.path.exists(exp_paths.data_preprocessed):
 
 def main():
     # Load common input parameters
-    scalars = pd.read_csv(os.path.join(exp_paths['data_raw'], 'Scalars.csv'), header=0)
+    scalars = pd.read_csv(
+        os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+        header=0,
+        na_values=['not considered', 'no value'],
+    )
+
+    # Filter out only scenario-related input parameters
+    scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']), :]
 
     # Prepare oemof.tabular input CSV files
     create_default_elements(
