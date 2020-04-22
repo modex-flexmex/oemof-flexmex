@@ -110,7 +110,7 @@ def create_default_elements(
         }
 
         # Fill 'region' with country code list
-        if component == 'link':
+        if component_data['type'] == 'link':
             # Generate region column of the form "AT_DE"
             component_data['region'] = [code.replace('-', '_') for code in link_list]
 
