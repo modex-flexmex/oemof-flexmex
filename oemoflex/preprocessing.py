@@ -97,7 +97,7 @@ def create_default_elements(
             component_attrs = pd.read_csv(component_attrs_file)
 
         except FileNotFoundError:
-            print(f"There is no file with the name {component}")
+            raise FileNotFoundError(f"There is no file {component_attrs_file}")
 
         # Set up the skeleton of the output dataframe consisting of attribute names as
         # column titles and default values
