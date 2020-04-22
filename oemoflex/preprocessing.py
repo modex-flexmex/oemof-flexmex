@@ -186,7 +186,7 @@ def get_parameter_values(scalars_df, parameter_name):
 def update_shortage(data_preprocessed_path, scalars):
     logging.info("Updating shortage file")
 
-    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'shortage.csv')
+    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-shortage.csv')
 
     # Read prepared CSV file
     shortage = pd.read_csv(shortage_file, index_col='region')
@@ -203,7 +203,7 @@ def update_shortage(data_preprocessed_path, scalars):
 def update_load(data_preprocessed_path, scalars):
     logging.info("Updating load file")
 
-    load_file = os.path.join(data_preprocessed_path, 'elements', 'load.csv')
+    load_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-demand.csv')
 
     # Read prepared CSV file
     load = pd.read_csv(load_file, index_col='region')
@@ -220,7 +220,7 @@ def update_load(data_preprocessed_path, scalars):
 def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
 
-    link_file = os.path.join(data_preprocessed_path, 'elements', 'link.csv')
+    link_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-transmission.csv')
 
     link = pd.read_csv(link_file, index_col='region')
 
@@ -277,7 +277,7 @@ def update_wind_offshore(data_preprocessed_path, scalars):
 
 
 def update_solar_pv(data_preprocessed_path, scalars):
-    solar_pv_file = os.path.join(data_preprocessed_path, 'elements', 'pv.csv')
+    solar_pv_file = os.path.join(data_preprocessed_path, 'elements', 'solar-pv.csv')
 
     solarpv = pd.read_csv(solar_pv_file, index_col='region')
 
@@ -318,9 +318,11 @@ def create_load_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating load profiles")
     raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
 
-    load_profile_df = combine_profiles(raw_load_profile_path, 'el-load-profile')
+    load_profile_df = combine_profiles(raw_load_profile_path, 'electricity-load-profile')
 
-    load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
+    load_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'electricity-demand_profile.csv')
+    )
 
 
 def create_wind_onshore_profiles(data_raw_path, data_preprocessed_path):
@@ -330,7 +332,7 @@ def create_wind_onshore_profiles(data_raw_path, data_preprocessed_path):
     )
 
     wind_onshore_profile_df = combine_profiles(
-        raw_wind_onshore_profile_paths, 'el-wind-onshore-profile'
+        raw_wind_onshore_profile_paths, 'wind-onshore-profile'
     )
 
     wind_onshore_profile_df.to_csv(
@@ -346,7 +348,7 @@ def create_wind_offshore_profiles(data_raw_path, data_preprocessed_path):
     )
 
     wind_offshore_profile_df = combine_profiles(
-        raw_wind_offshore_profile_paths, 'el-wind-offshore-profile'
+        raw_wind_offshore_profile_paths, 'wind-offshore-profile'
     )
 
     wind_offshore_profile_df.to_csv(
@@ -361,6 +363,8 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
         data_raw_path, 'Energy', 'SecondaryEnergy', 'Solar', 'PV'
     )
 
-    solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'el-solar-pv-profile')
+    solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'solar-pv-profile')
 
-    solar_pv_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'pv_profile.csv'))
+    solar_pv_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'solar-pv_profile.csv')
+    )
