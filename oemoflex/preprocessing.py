@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 
-country_list = [
+regions_list = [
     'AT',
     'BE',
     'CH',
@@ -49,8 +49,9 @@ module_path = os.path.dirname(os.path.abspath(__file__))
 
 def create_default_elements(
         dir,
-        components_file='components.csv',
-        component_attrs_dir='component_attrs',
+        busses_file=os.path.join(module_path, 'model_structure', 'busses.csv'),
+        components_file=os.path.join(module_path, 'model_structure', 'components.csv'),
+        component_attrs_dir=os.path.join(module_path, 'model_structure', 'component_attrs'),
         select_components=None,
 ):
     r"""
@@ -90,6 +91,10 @@ def create_default_elements(
 
         components = [c for c in components if c in select_components]
 
+    bus_df = create_bus_element(busses_file)
+
+    bus_df.to_csv(os.path.join(dir, 'bus.csv'))
+
     for component in components:
         component_attrs_file = os.path.join(component_attrs_dir, component + '.csv')
 
@@ -97,7 +102,7 @@ def create_default_elements(
             component_attrs = pd.read_csv(component_attrs_file)
 
         except FileNotFoundError:
-            print(f"There is no file with the name {component}")
+            raise FileNotFoundError(f"There is no file {component_attrs_file}")
 
         # Set up the skeleton of the output dataframe consisting of attribute names as
         # column titles and default values
@@ -110,7 +115,7 @@ def create_default_elements(
         }
 
         # Fill 'region' with country code list
-        if component == 'link':
+        if component_data['type'] == 'link':
             # Generate region column of the form "AT_DE"
             component_data['region'] = [code.replace('-', '_') for code in link_list]
 
@@ -123,7 +128,7 @@ def create_default_elements(
             component_data['to_bus'] = [code.split('-')[1] for code in link_list]
 
         else:
-            component_data['region'] = country_list
+            component_data['region'] = regions_list
 
         # Fill other columns with their respective suffixes if available
         for attr_name, suffix in component_suffix.items():
@@ -143,6 +148,40 @@ def create_default_elements(
 
         # Write to target directory
         df.to_csv(os.path.join(dir, component + '.csv'))
+
+
+def create_bus_element(busses_file):
+    r"""
+
+    Parameters
+    ----------
+    busses_file : path
+        Path to busses file.
+
+    Returns
+    -------
+    bus_df : pd.DataFrame
+        Bus element DataFrame
+    """
+    busses = pd.read_csv(busses_file, squeeze=True)
+
+    regions = []
+    carriers = []
+
+    for region in regions_list:
+        for carrier in busses['carrier']:
+            regions.append(region)
+            carriers.append(region + '-' + carrier)
+
+    bus_df = pd.DataFrame({
+        'region': regions,
+        'name': carriers,
+        'type': 'bus',
+    })
+
+    bus_df = bus_df.set_index('region')
+
+    return bus_df
 
 
 def get_parameter_values(scalars_df, parameter_name):
@@ -186,7 +225,7 @@ def get_parameter_values(scalars_df, parameter_name):
 def update_shortage(data_preprocessed_path, scalars):
     logging.info("Updating shortage file")
 
-    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'shortage.csv')
+    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-shortage.csv')
 
     # Read prepared CSV file
     shortage = pd.read_csv(shortage_file, index_col='region')
@@ -203,7 +242,7 @@ def update_shortage(data_preprocessed_path, scalars):
 def update_load(data_preprocessed_path, scalars):
     logging.info("Updating load file")
 
-    load_file = os.path.join(data_preprocessed_path, 'elements', 'load.csv')
+    load_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-demand.csv')
 
     # Read prepared CSV file
     load = pd.read_csv(load_file, index_col='region')
@@ -220,7 +259,7 @@ def update_load(data_preprocessed_path, scalars):
 def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
 
-    link_file = os.path.join(data_preprocessed_path, 'elements', 'link.csv')
+    link_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-transmission.csv')
 
     link = pd.read_csv(link_file, index_col='region')
 
@@ -277,7 +316,7 @@ def update_wind_offshore(data_preprocessed_path, scalars):
 
 
 def update_solar_pv(data_preprocessed_path, scalars):
-    solar_pv_file = os.path.join(data_preprocessed_path, 'elements', 'pv.csv')
+    solar_pv_file = os.path.join(data_preprocessed_path, 'elements', 'solar-pv.csv')
 
     solarpv = pd.read_csv(solar_pv_file, index_col='region')
 
@@ -318,9 +357,11 @@ def create_load_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating load profiles")
     raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
 
-    load_profile_df = combine_profiles(raw_load_profile_path, 'el-load-profile')
+    load_profile_df = combine_profiles(raw_load_profile_path, 'electricity-load-profile')
 
-    load_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'load_profile.csv'))
+    load_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'electricity-demand_profile.csv')
+    )
 
 
 def create_wind_onshore_profiles(data_raw_path, data_preprocessed_path):
@@ -330,7 +371,7 @@ def create_wind_onshore_profiles(data_raw_path, data_preprocessed_path):
     )
 
     wind_onshore_profile_df = combine_profiles(
-        raw_wind_onshore_profile_paths, 'el-wind-onshore-profile'
+        raw_wind_onshore_profile_paths, 'wind-onshore-profile'
     )
 
     wind_onshore_profile_df.to_csv(
@@ -346,7 +387,7 @@ def create_wind_offshore_profiles(data_raw_path, data_preprocessed_path):
     )
 
     wind_offshore_profile_df = combine_profiles(
-        raw_wind_offshore_profile_paths, 'el-wind-offshore-profile'
+        raw_wind_offshore_profile_paths, 'wind-offshore-profile'
     )
 
     wind_offshore_profile_df.to_csv(
@@ -361,6 +402,8 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
         data_raw_path, 'Energy', 'SecondaryEnergy', 'Solar', 'PV'
     )
 
-    solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'el-solar-pv-profile')
+    solar_pv_profile_df = combine_profiles(raw_solar_pv_profile_paths, 'solar-pv-profile')
 
-    solar_pv_profile_df.to_csv(os.path.join(data_preprocessed_path, 'sequences', 'pv_profile.csv'))
+    solar_pv_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'solar-pv_profile.csv')
+    )
