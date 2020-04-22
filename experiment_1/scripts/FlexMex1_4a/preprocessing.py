@@ -55,7 +55,7 @@ def main():
     )
 
     # update elements
-    update_shortage(exp_paths.data_preprocessed)
+    update_shortage(exp_paths.data_preprocessed, scalars)
     update_load(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
