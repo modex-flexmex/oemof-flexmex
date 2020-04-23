@@ -35,7 +35,6 @@ def main():
                 'electricity-curtailment',
                 'electricity-demand',
                 'heat-demand',
-                'gas-bpchp',
             ],
             'profile': [
                 'wind-onshore',
@@ -44,7 +43,9 @@ def main():
                 'electricity-demand',
                 'heat-demand',
             ],
-            'from_to_bus': [],
+            'from_to_bus': [
+                'gas-bpchp',
+            ],
         },
         path=exp_paths.data_preprocessed
     )
