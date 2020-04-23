@@ -67,53 +67,7 @@ def create_default_elements(
     for component in components:
         component_attrs_file = os.path.join(component_attrs_dir, component + '.csv')
 
-        try:
-            component_attrs = pd.read_csv(component_attrs_file)
-
-        except FileNotFoundError:
-            raise FileNotFoundError(f"There is no file {component_attrs_file}")
-
-        # Set up the skeleton of the output dataframe consisting of attribute names as
-        # column titles and default values
-        component_data = {
-            c_attr['attribute']: c_attr['default'] for _, c_attr in component_attrs.iterrows()
-        }
-
-        component_suffix = {
-            c_attr['attribute']: c_attr['suffix'] for _, c_attr in component_attrs.iterrows()
-        }
-
-        # Fill 'region' with country code list
-        if component_data['type'] == 'link':
-            # Generate region column of the form "AT_DE"
-            component_data['region'] = [code.replace('-', '_') for code in link_list]
-
-            # Reserve 'name' column because there is no suffix to use here
-            # line could be dropped by defining a suffix such as '-link'
-            component_data['name'] = link_list
-
-            # for the two bus attributes reserve the colums with a part of the country code
-            component_data['from_bus'] = [code.split('-')[0] for code in link_list]
-            component_data['to_bus'] = [code.split('-')[1] for code in link_list]
-
-        else:
-            component_data['region'] = regions_list
-
-        # Fill other columns with their respective suffixes if available
-        for attr_name, suffix in component_suffix.items():
-
-            # If a suffix has to be applied
-            if not pd.isna(suffix):
-
-                # for 'link' element use the pre-defined name part instead of the region
-                if attr_name in ['from_bus', 'to_bus']:
-                    component_data[attr_name] = [link + suffix
-                                                 for link in component_data[attr_name]]
-
-                else:
-                    component_data[attr_name] = [code + suffix for code in component_data['region']]
-
-        df = pd.DataFrame(component_data).set_index('region')
+        df = create_component_element(component_attrs_file)
 
         # Write to target directory
         df.to_csv(os.path.join(dir, component + '.csv'))
@@ -151,6 +105,59 @@ def create_bus_element(busses_file):
     bus_df = bus_df.set_index('region')
 
     return bus_df
+
+
+def create_component_element(component_attrs_file):
+    try:
+        component_attrs = pd.read_csv(component_attrs_file)
+
+    except FileNotFoundError:
+        raise FileNotFoundError(f"There is no file {component_attrs_file}")
+
+    # Set up the skeleton of the output dataframe consisting of attribute names as
+    # column titles and default values
+    component_data = {
+        c_attr['attribute']: c_attr['default'] for _, c_attr in component_attrs.iterrows()
+    }
+
+    component_suffix = {
+        c_attr['attribute']: c_attr['suffix'] for _, c_attr in component_attrs.iterrows()
+    }
+
+    # Fill 'region' with country code list
+    if component_data['type'] == 'link':
+        # Generate region column of the form "AT_DE"
+        component_data['region'] = [code.replace('-', '_') for code in link_list]
+
+        # Reserve 'name' column because there is no suffix to use here
+        # line could be dropped by defining a suffix such as '-link'
+        component_data['name'] = link_list
+
+    else:
+        component_data['region'] = regions_list
+
+    if component_data['type'] in ['link', 'conversion']:
+        # for the two bus attributes reserve the colums with a part of the country code
+        component_data['from_bus'] = [code.split('-')[0] for code in link_list]
+        component_data['to_bus'] = [code.split('-')[1] for code in link_list]
+
+    # Fill other columns with their respective suffixes if available
+    for attr_name, suffix in component_suffix.items():
+
+        # If a suffix has to be applied
+        if not pd.isna(suffix):
+
+            # for 'link' element use the pre-defined name part instead of the region
+            if attr_name in ['from_bus', 'to_bus']:
+                component_data[attr_name] = [link + suffix
+                                             for link in component_data[attr_name]]
+
+            else:
+                component_data[attr_name] = [code + suffix for code in component_data['region']]
+
+    df = pd.DataFrame(component_data).set_index('region')
+
+    return df
 
 
 def get_parameter_values(scalars_df, parameter_name):
