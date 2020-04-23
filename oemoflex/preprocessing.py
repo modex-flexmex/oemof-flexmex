@@ -54,9 +54,10 @@ def create_default_elements(
     components = pd.read_csv(components_file).name.values
 
     if select_components is not None:
-        no_default = set(select_components).difference(set(components))
+        undefined_components = set(select_components).difference(set(components))
 
-        assert not no_default, f"Selected components {no_default} are not in components."
+        assert not undefined_components,\
+            f"Selected components {undefined_components} are not in components."
 
         components = [c for c in components if c in select_components]
 
