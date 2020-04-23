@@ -43,7 +43,7 @@ def main():
                 'electricity-demand',
                 'heat-demand',
             ],
-            'from_to_bus': [
+            'chp': [
                 'gas-bpchp',
             ],
         },
