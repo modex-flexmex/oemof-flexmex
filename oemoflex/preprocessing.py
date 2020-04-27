@@ -110,53 +110,43 @@ def create_bus_element(busses_file):
 
 def create_component_element(component_attrs_file):
     try:
-        component_attrs = pd.read_csv(component_attrs_file)
+        component_attrs = pd.read_csv(component_attrs_file, index_col=0)
 
     except FileNotFoundError:
         raise FileNotFoundError(f"There is no file {component_attrs_file}")
 
-    # Set up the skeleton of the output dataframe consisting of attribute names as
-    # column titles and default values
-    component_data = {
-        c_attr['attribute']: c_attr['default'] for _, c_attr in component_attrs.iterrows()
-    }
+    # Collect default values and suffices for the component
+    defaults = component_attrs.loc[component_attrs['default'].notna(), 'default'].to_dict()
 
-    component_suffix = {
-        c_attr['attribute']: c_attr['suffix'] for _, c_attr in component_attrs.iterrows()
-    }
+    suffices = component_attrs.loc[component_attrs['suffix'].notna(), 'suffix'].to_dict()
 
-    # Fill 'region' with country code list
-    if component_data['type'] == 'link':
-        # Generate region column of the form "AT_DE"
-        component_data['region'] = [code.replace('-', '_') for code in link_list]
+    comp_data = {key: None for key in component_attrs.index}
 
-        # Reserve 'name' column because there is no suffix to use here
-        # line could be dropped by defining a suffix such as '-link'
-        component_data['name'] = link_list
+    # Create dict for component data
+    if defaults['type'] == 'link':
+        comp_data['region'] = [link.replace('-', '_') for link in link_list]
+        comp_data['name'] = link_list
+        comp_data['from_bus'] = [link.split('-')[0] + suffices['from_bus'] for link in link_list]
+        comp_data['to_bus'] = [link.split('-')[1] + suffices['to_bus'] for link in link_list]
+
+    elif defaults['type'] == 'conversion':
+        comp_data['region'] = regions_list
+        comp_data['name'] = [region + suffices['name'] for region in regions_list]
+        comp_data['from_bus'] = [region.split('-')[0] for region in regions_list]
+        comp_data['to_bus'] = [region.split('-')[1] for region in regions_list]
 
     else:
-        component_data['region'] = regions_list
+        comp_data['region'] = regions_list
+        comp_data['name'] = [region + suffices['name'] for region in regions_list]
+        comp_data['bus'] = [region + suffices['bus'] for region in regions_list]
 
-    if component_data['type'] in ['link', 'conversion']:
-        # for the two bus attributes reserve the colums with a part of the country code
-        component_data['from_bus'] = [code.split('-')[0] for code in link_list]
-        component_data['to_bus'] = [code.split('-')[1] for code in link_list]
+        if 'profile' in suffices:
+            comp_data['profile'] = [region + suffices['profile'] for region in regions_list]
 
-    # Fill other columns with their respective suffixes if available
-    for attr_name, suffix in component_suffix.items():
+    for key, value in defaults.items():
+        comp_data[key] = value
 
-        # If a suffix has to be applied
-        if not pd.isna(suffix):
-
-            # for 'link' element use the pre-defined name part instead of the region
-            if attr_name in ['from_bus', 'to_bus']:
-                component_data[attr_name] = [link + suffix
-                                             for link in component_data[attr_name]]
-
-            else:
-                component_data[attr_name] = [code + suffix for code in component_data['region']]
-
-    df = pd.DataFrame(component_data).set_index('region')
+    df = pd.DataFrame(comp_data).set_index('region')
 
     return df
 
