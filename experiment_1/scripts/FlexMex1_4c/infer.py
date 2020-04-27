@@ -10,7 +10,7 @@ from oemof.tabular.datapackage import building
 from oemoflex.helpers import setup_experiment_paths
 
 
-name = 'FlexMex1_4a'
+name = 'FlexMex1_4c'
 
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 exp_paths = setup_experiment_paths(name, basepath)
@@ -45,11 +45,9 @@ def main():
             ],
             'from_to_bus': [
                 'gas-boiler',
-                'electricity-pth',
             ],
             'chp': [
                 'gas-bpchp',
-                'gas-extchp',
             ],
         },
         path=exp_paths.data_preprocessed

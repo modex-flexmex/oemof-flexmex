@@ -5,14 +5,14 @@ import pandas as pd
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load,
-    update_bpchp, update_extchp, update_boiler, update_pth,
+    update_bpchp, update_boiler,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     create_electricity_demand_profiles, create_heat_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
-name = 'FlexMex1_4a'
+name = 'FlexMex1_4c'
 
 # Get paths
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -53,9 +53,7 @@ def main():
             'wind-onshore',
             'solar-pv',
             'gas-bpchp',
-            'gas-extchp',
             'gas-boiler',
-            'electricity-pth',
         ]
 
     )
@@ -64,9 +62,7 @@ def main():
     update_shortage(exp_paths.data_preprocessed, scalars)
     update_load(exp_paths.data_preprocessed, scalars)
     update_bpchp(exp_paths.data_preprocessed, scalars)
-    update_extchp(exp_paths.data_preprocessed, scalars)
     update_boiler(exp_paths.data_preprocessed, scalars)
-    update_pth(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
