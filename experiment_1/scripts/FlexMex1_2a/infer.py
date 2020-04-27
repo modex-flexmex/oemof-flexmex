@@ -35,14 +35,14 @@ def main():
                 'curtailment',
                 'storage',
                 'load',
+                'nuclear'
             ],
             'profile': [
                 'wind-onshore',
                 'wind-offshore',
                 'pv',
-                'load',
-            ],
-            'from_to_bus': ['link'],
+                'load'
+            ]
         },
         path=exp_paths.data_preprocessed
     )
