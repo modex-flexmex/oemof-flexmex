@@ -8,7 +8,7 @@ fuel_bus,str,,,-gas,The bus that supports the fuel for the CHP
 electricity_bus,str,n/a,,-electricity,The bus for electricity output
 heat_bus,str,n/a,,-heat,The bus for heat output
 capacity,float,MW_el,n/a,,Installed electric capacity in full extraction mode
-electric_efficiency,,,,,Electrical efficiency of the chp unit
-thermal_efficiency,,,,,Thermal efficiency of the chp unit
-carrier_cost,Eur/MWh,,,,Cost per unit of used fuel
+electric_efficiency,float,,n/a,,Electrical efficiency of the chp unit
+thermal_efficiency,float,,n/a,,Thermal efficiency of the chp unit
+carrier_cost,float,Eur/MWh,n/a,,Cost per unit of used fuel
 marginal_cost,float,Eur/MWh_el,n/a,,Marginal cost per unit of produced electrical output
