@@ -109,6 +109,21 @@ def create_bus_element(busses_file):
 
 
 def create_component_element(component_attrs_file):
+    r"""
+    Loads file for component attribute specs and returns a pd.DataFrame with the right regions,
+    links, names, references to profiles and default values.
+
+    Parameters
+    ----------
+    component_attrs_file : path
+        Path to file with component attribute specifications.
+
+    Returns
+    -------
+    component_df : pd.DataFrame
+        DataFrame for the given component with default values filled.
+
+    """
     try:
         component_attrs = pd.read_csv(component_attrs_file, index_col=0)
 
@@ -146,9 +161,9 @@ def create_component_element(component_attrs_file):
     for key, value in defaults.items():
         comp_data[key] = value
 
-    df = pd.DataFrame(comp_data).set_index('region')
+    component_df = pd.DataFrame(comp_data).set_index('region')
 
-    return df
+    return component_df
 
 
 def get_parameter_values(scalars_df, parameter_name):
