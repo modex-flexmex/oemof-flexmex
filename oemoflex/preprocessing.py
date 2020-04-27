@@ -258,15 +258,18 @@ def update_bpchp(data_preprocessed_path, scalars):
     df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT')
 
-    df['electric_efficiency'] = get_parameter_values(
-        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT') \
-        * get_parameter_values(
-            scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
+    electricity_per_heat = get_parameter_values(
+        scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
 
+    # eta_el = eta_total / (1 + 1 / electricity_per_heat)
+    df['electric_efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
+    ) / (1 + 1/electricity_per_heat)
+
+    # eta_th = eta_total / (1 + electricity_per_heat)
     df['thermal_efficiency'] = get_parameter_values(
-        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT')\
-        * get_parameter_values(
-            scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
+    ) / (1 + electricity_per_heat)
 
     df['carrier_cost'] = get_parameter_values(
         scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
