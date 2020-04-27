@@ -14,7 +14,7 @@ import oemof.tabular.tools.postprocessing as pp
 from oemoflex.helpers import setup_experiment_paths
 
 
-name = 'FlexMex1_4a'
+name = 'FlexMex1_4b'
 
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 exp_paths = setup_experiment_paths(name, basepath)
