@@ -292,14 +292,28 @@ def update_extchp(data_preprocessed_path, scalars):
     df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT')
 
-    df['electric_efficiency'] = get_parameter_values(
-        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT')
+    electricity_per_heat = get_parameter_values(
+        scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_ExCCGT')
 
-    df['thermal_efficiency'] = get_parameter_values(
-        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT')
+    # eta_el = eta_total / (1 + 1 / electricity_per_heat)
+    electric_efficiency = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
+    ) / (1 + 1/electricity_per_heat)
 
+    df['electric_efficiency'] = electric_efficiency
+
+    # eta_th = eta_total / (1 + electricity_per_heat)
+    thermal_efficiency = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
+    ) / (1 + electricity_per_heat)
+
+    df['thermal_efficiency'] = thermal_efficiency
+
+    # eta_condensing = beta * eta_th + eta_el
     df['condensing_efficiency'] = get_parameter_values(
-        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT')
+        scalars, 'EnergyConversion_PowerLossIndex_ElectricityHeat_CH4_ExCCGT')\
+        * thermal_efficiency\
+        + electric_efficiency
 
     df['carrier_cost'] = get_parameter_values(
         scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
