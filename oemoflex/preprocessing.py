@@ -147,8 +147,8 @@ def create_component_element(component_attrs_file):
     elif defaults['type'] == 'conversion':
         comp_data['region'] = regions_list
         comp_data['name'] = [region + suffices['name'] for region in regions_list]
-        comp_data['from_bus'] = [region.split('-')[0] for region in regions_list]
-        comp_data['to_bus'] = [region.split('-')[1] for region in regions_list]
+        comp_data['from_bus'] = [region + suffices['from_bus'] for region in regions_list]
+        comp_data['to_bus'] = [region + suffices['to_bus'] for region in regions_list]
 
     else:
         comp_data['region'] = regions_list
