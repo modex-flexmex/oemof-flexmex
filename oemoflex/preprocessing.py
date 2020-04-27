@@ -466,14 +466,25 @@ def combine_profiles(raw_profile_path, column_name):
     return profile_df
 
 
-def create_load_profiles(data_raw_path, data_preprocessed_path):
-    logging.info("Creating load profiles")
+def create_electricity_demand_profiles(data_raw_path, data_preprocessed_path):
+    logging.info("Creating electricity demand profiles")
     raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
 
     load_profile_df = combine_profiles(raw_load_profile_path, 'electricity-demand-profile')
 
     load_profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'electricity-demand_profile.csv')
+    )
+
+
+def create_heat_demand_profiles(data_raw_path, data_preprocessed_path):
+    logging.info("Creating heat demand profiles")
+    raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Heat')
+
+    load_profile_df = combine_profiles(raw_load_profile_path, 'heat-demand-profile')
+
+    load_profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'heat-demand_profile.csv')
     )
 
 
