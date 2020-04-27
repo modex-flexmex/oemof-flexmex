@@ -305,7 +305,7 @@ def update_extchp(data_preprocessed_path, scalars):
         scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
 
     df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT')
+        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT') * 1e3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
