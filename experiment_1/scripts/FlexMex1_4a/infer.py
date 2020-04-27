@@ -43,8 +43,13 @@ def main():
                 'electricity-demand',
                 'heat-demand',
             ],
+            'from_to_bus': [
+                'gas-boiler',
+                'electricity-pth',
+            ],
             'chp': [
                 'gas-bpchp',
+                'gas-extchp',
             ],
         },
         path=exp_paths.data_preprocessed
