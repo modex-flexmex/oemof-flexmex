@@ -306,7 +306,7 @@ def update_nuclear(data_preprocessed_path, scalars):
 
     eta = get_parameter_values(
         scalars,
-        'EnergyConversion_EtaNet_Electricity_Nuclear_ST')
+        'EnergyConversion_EtaNet_Electricity_Nuclear_ST') * 1e-2 # percent -> 0...1
 
     carrier_price = get_parameter_values(
         scalars,
