@@ -4,9 +4,10 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements, update_shortage, update_load,
-    update_link, update_wind_onshore, update_wind_offshore, update_solar_pv, create_load_profiles,
-    create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
+    create_default_elements, update_shortage, update_load, update_wind_onshore,
+    update_wind_offshore, update_solar_pv, update_nuclear,
+    create_load_profiles, create_wind_onshore_profiles, create_wind_offshore_profiles,
+    create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
@@ -49,7 +50,8 @@ def main():
             'load',
             'wind-offshore',
             'wind-onshore',
-            'pv'
+            'pv',
+            'nuclear'
         ]
     )
 
@@ -59,6 +61,7 @@ def main():
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
+    update_nuclear(exp_paths.data_preprocessed, scalars)
 
     # create sequences
     create_load_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
