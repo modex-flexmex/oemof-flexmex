@@ -150,6 +150,15 @@ def create_component_element(component_attrs_file):
         comp_data['from_bus'] = [region.split('-')[0] for region in regions_list]
         comp_data['to_bus'] = [region.split('-')[1] for region in regions_list]
 
+    elif defaults['type'] in ['backpressure', 'extraction']:
+        comp_data['region'] = regions_list
+        comp_data['name'] = [region + suffices['name'] for region in regions_list]
+        comp_data['fuel_bus'] = [region + suffices['fuel_bus'] for region in regions_list]
+        comp_data['heat_bus'] = [region + suffices['heat_bus'] for region in regions_list]
+        comp_data['electricity_bus'] = [
+            region + suffices['electricity_bus'] for region in regions_list
+        ]
+
     else:
         comp_data['region'] = regions_list
         comp_data['name'] = [region + suffices['name'] for region in regions_list]
