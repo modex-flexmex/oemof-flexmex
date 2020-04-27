@@ -3,48 +3,17 @@ import os
 
 import pandas as pd
 
-regions_list = [
-    'AT',
-    'BE',
-    'CH',
-    'CZ',
-    'DE',
-    'DK',
-    'FR',
-    'IT',
-    'LU',
-    'NL',
-    'PL',
-]
-
-link_list = [
-    'AT-CH',
-    'AT-CZ',
-    'AT-IT',
-    'BE-FR',
-    'BE-LU',
-    'BE-NL',
-    'CH-FR',
-    'CH-IT',
-    'CZ-PL',
-    'DE-AT',
-    'DE-BE',
-    'DE-CH',
-    'DE-CZ',
-    'DE-DK',
-    'DE-FR',
-    'DE-LU',
-    'DE-NL',
-    'DE-PL',
-    'DK-NL',
-    'FR-IT',
-    'FR-LU',
-
-]
+module_path = os.path.dirname(os.path.abspath(__file__))
 
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
-module_path = os.path.dirname(os.path.abspath(__file__))
+regions_list = list(
+    pd.read_csv(os.path.join(module_path, 'model_structure', 'regions.csv'), squeeze=True)
+)
+
+link_list = list(
+    pd.read_csv(os.path.join(module_path, 'model_structure', 'links.csv'), squeeze=True)
+)
 
 
 def create_default_elements(
@@ -85,9 +54,10 @@ def create_default_elements(
     components = pd.read_csv(components_file).name.values
 
     if select_components is not None:
-        no_default = set(select_components).difference(set(components))
+        undefined_components = set(select_components).difference(set(components))
 
-        assert not no_default, f"Selected components {no_default} are not in components."
+        assert not undefined_components,\
+            f"Selected components {undefined_components} are not in components."
 
         components = [c for c in components if c in select_components]
 
@@ -98,53 +68,7 @@ def create_default_elements(
     for component in components:
         component_attrs_file = os.path.join(component_attrs_dir, component + '.csv')
 
-        try:
-            component_attrs = pd.read_csv(component_attrs_file)
-
-        except FileNotFoundError:
-            raise FileNotFoundError(f"There is no file {component_attrs_file}")
-
-        # Set up the skeleton of the output dataframe consisting of attribute names as
-        # column titles and default values
-        component_data = {
-            c_attr['attribute']: c_attr['default'] for _, c_attr in component_attrs.iterrows()
-        }
-
-        component_suffix = {
-            c_attr['attribute']: c_attr['suffix'] for _, c_attr in component_attrs.iterrows()
-        }
-
-        # Fill 'region' with country code list
-        if component_data['type'] == 'link':
-            # Generate region column of the form "AT_DE"
-            component_data['region'] = [code.replace('-', '_') for code in link_list]
-
-            # Reserve 'name' column because there is no suffix to use here
-            # line could be dropped by defining a suffix such as '-link'
-            component_data['name'] = link_list
-
-            # for the two bus attributes reserve the colums with a part of the country code
-            component_data['from_bus'] = [code.split('-')[0] for code in link_list]
-            component_data['to_bus'] = [code.split('-')[1] for code in link_list]
-
-        else:
-            component_data['region'] = regions_list
-
-        # Fill other columns with their respective suffixes if available
-        for attr_name, suffix in component_suffix.items():
-
-            # If a suffix has to be applied
-            if not pd.isna(suffix):
-
-                # for 'link' element use the pre-defined name part instead of the region
-                if attr_name in ['from_bus', 'to_bus']:
-                    component_data[attr_name] = [link + suffix
-                                                 for link in component_data[attr_name]]
-
-                else:
-                    component_data[attr_name] = [code + suffix for code in component_data['region']]
-
-        df = pd.DataFrame(component_data).set_index('region')
+        df = create_component_element(component_attrs_file)
 
         # Write to target directory
         df.to_csv(os.path.join(dir, component + '.csv'))
@@ -182,6 +106,64 @@ def create_bus_element(busses_file):
     bus_df = bus_df.set_index('region')
 
     return bus_df
+
+
+def create_component_element(component_attrs_file):
+    r"""
+    Loads file for component attribute specs and returns a pd.DataFrame with the right regions,
+    links, names, references to profiles and default values.
+
+    Parameters
+    ----------
+    component_attrs_file : path
+        Path to file with component attribute specifications.
+
+    Returns
+    -------
+    component_df : pd.DataFrame
+        DataFrame for the given component with default values filled.
+
+    """
+    try:
+        component_attrs = pd.read_csv(component_attrs_file, index_col=0)
+
+    except FileNotFoundError:
+        raise FileNotFoundError(f"There is no file {component_attrs_file}")
+
+    # Collect default values and suffices for the component
+    defaults = component_attrs.loc[component_attrs['default'].notna(), 'default'].to_dict()
+
+    suffices = component_attrs.loc[component_attrs['suffix'].notna(), 'suffix'].to_dict()
+
+    comp_data = {key: None for key in component_attrs.index}
+
+    # Create dict for component data
+    if defaults['type'] == 'link':
+        comp_data['region'] = [link.replace('-', '_') for link in link_list]
+        comp_data['name'] = link_list
+        comp_data['from_bus'] = [link.split('-')[0] + suffices['from_bus'] for link in link_list]
+        comp_data['to_bus'] = [link.split('-')[1] + suffices['to_bus'] for link in link_list]
+
+    elif defaults['type'] == 'conversion':
+        comp_data['region'] = regions_list
+        comp_data['name'] = [region + suffices['name'] for region in regions_list]
+        comp_data['from_bus'] = [region.split('-')[0] for region in regions_list]
+        comp_data['to_bus'] = [region.split('-')[1] for region in regions_list]
+
+    else:
+        comp_data['region'] = regions_list
+        comp_data['name'] = [region + suffices['name'] for region in regions_list]
+        comp_data['bus'] = [region + suffices['bus'] for region in regions_list]
+
+        if 'profile' in suffices:
+            comp_data['profile'] = [region + suffices['profile'] for region in regions_list]
+
+    for key, value in defaults.items():
+        comp_data[key] = value
+
+    component_df = pd.DataFrame(comp_data).set_index('region')
+
+    return component_df
 
 
 def get_parameter_values(scalars_df, parameter_name):
@@ -357,7 +339,7 @@ def create_load_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating load profiles")
     raw_load_profile_path = os.path.join(data_raw_path, 'Energy', 'FinalEnergy', 'Electricity')
 
-    load_profile_df = combine_profiles(raw_load_profile_path, 'electricity-load-profile')
+    load_profile_df = combine_profiles(raw_load_profile_path, 'electricity-demand-profile')
 
     load_profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'electricity-demand_profile.csv')
