@@ -247,6 +247,111 @@ def update_load(data_preprocessed_path, scalars):
     load.to_csv(load_file)
 
 
+def update_bpchp(data_preprocessed_path, scalars):
+    logging.info("Updating gas-bpchp file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-bpchp.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT')
+
+    df['electric_efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT') \
+        * get_parameter_values(
+            scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
+
+    df['thermal_efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT')\
+        * get_parameter_values(
+            scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
+
+    df['carrier_cost'] = get_parameter_values(
+        scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_BpCCGT') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_extchp(data_preprocessed_path, scalars):
+    logging.info("Updating gas-extchp file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-extchp.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT')
+
+    df['electric_efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT')
+
+    df['thermal_efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT')
+
+    df['condensing_efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT')
+
+    df['carrier_cost'] = get_parameter_values(
+        scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT')
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_boiler(data_preprocessed_path, scalars):
+    logging.info("Updating gas-boiler file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-boiler.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Large')
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_Eta_Heat_CH4_Large') * 0.01  # Percent to decimals
+
+    df['carrier_cost'] = get_parameter_values(
+        scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Heat_CH4_Large') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_pth(data_preprocessed_path, scalars):
+    logging.info("Updating electricity-pth file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-pth.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Heat_Electricity_Large')
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_Eta_Heat_Electricity_Large') * 0.01  # Percent to decimals
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Heat_Electricity_Large') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
 def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
 
