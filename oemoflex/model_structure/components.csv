@@ -6,5 +6,5 @@ solar-pv,solar,volatile,pv,Solar pv capacities
 wind-offshore,wind,volatile,offshore,Offshore wind capacities
 wind-onshore,wind,volatile,onshore,Onshore wind capacities
 electricity-curtailment,electricity,sink,curtailment,Curtailment of non-dispatchable electricity
-ch4,ch4_list,
-nuclear,nuclear_list,
+ch4,ch4,dispatchable,gt,Natural gas driven gas turbine capacities
+nuclear,uranium,dispatchable,nuclear-st,Nuclear power plant capacities (steam turbine)
