@@ -35,7 +35,8 @@ def main():
                 'curtailment',
                 'storage',
                 'load',
-                'nuclear'
+                'nuclear',
+                'ch4'
             ],
             'profile': [
                 'wind-onshore',
