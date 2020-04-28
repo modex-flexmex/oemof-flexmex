@@ -44,7 +44,6 @@ def main():
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
         select_components=[
-            'electricity',
             'electricity-shortage',
             'electricity-curtailment',
             'electricity-demand',
