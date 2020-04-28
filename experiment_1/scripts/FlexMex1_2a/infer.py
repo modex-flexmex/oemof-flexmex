@@ -30,19 +30,18 @@ def main():
             'bus': [
                 'wind-onshore',
                 'wind-offshore',
-                'pv',
-                'shortage',
-                'curtailment',
-                'storage',
-                'load',
+                'solar-pv',
+                'electricity-shortage',
+                'electricity-curtailment',
+                'electricity-demand',
                 'nuclear',
                 'ch4'
             ],
             'profile': [
                 'wind-onshore',
                 'wind-offshore',
-                'pv',
-                'load'
+                'solar-pv',
+                'electricity-demand',
             ]
         },
         path=exp_paths.data_preprocessed
