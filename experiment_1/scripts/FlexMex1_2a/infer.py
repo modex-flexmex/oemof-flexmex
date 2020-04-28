@@ -34,8 +34,8 @@ def main():
                 'electricity-shortage',
                 'electricity-curtailment',
                 'electricity-demand',
-                'nuclear',
-                'ch4'
+                'uranium-nuclear-st',
+                'ch4-gt'
             ],
             'profile': [
                 'wind-onshore',

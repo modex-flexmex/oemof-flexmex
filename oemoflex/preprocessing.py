@@ -311,8 +311,8 @@ def update_solar_pv(data_preprocessed_path, scalars):
     solarpv.to_csv(solar_pv_file)
 
 
-def update_nuclear(data_preprocessed_path, scalars):
-    nuclear_file = os.path.join(data_preprocessed_path, 'elements', 'nuclear.csv')
+def update_nuclear_st(data_preprocessed_path, scalars):
+    nuclear_file = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
 
     nuclear = pd.read_csv(nuclear_file, index_col='region')
 
@@ -364,8 +364,8 @@ def update_nuclear(data_preprocessed_path, scalars):
     nuclear.to_csv(nuclear_file)
 
 
-def update_ch4(data_preprocessed_path, scalars):
-    ch4_file = os.path.join(data_preprocessed_path, 'elements', 'ch4.csv')
+def update_ch4_gt(data_preprocessed_path, scalars):
+    ch4_file = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
 
     ch4 = pd.read_csv(ch4_file, index_col='region')
 

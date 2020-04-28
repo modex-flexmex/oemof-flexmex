@@ -1,6 +1,6 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-el-nuclear,Name
+name,str,n/a,,-uranium-nuclear-st,Name
 type,str,n/a,dispatchable,,Type
 carrier,str,n/a,uranium,,Energy carrier
 tech,str,n/a,nuclear,,Technology
