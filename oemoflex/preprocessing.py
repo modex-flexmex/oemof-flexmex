@@ -3,6 +3,8 @@ import os
 
 import pandas as pd
 
+from oemof.tools.economics import annuity
+
 module_path = os.path.dirname(os.path.abspath(__file__))
 
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
