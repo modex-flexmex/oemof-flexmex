@@ -1,0 +1,10 @@
+name,carrier,type,tech,description
+electricity-demand,electricity,load,demand,Electricity demand
+electricity-shortage,electricity,source,shortage,Shortage backup to keep model solvable
+electricity-transmission,electricity,link,transmission,Electrical transmission between regions
+solar-pv,solar,volatile,pv,Solar pv capacities
+wind-offshore,wind,volatile,offshore,Offshore wind capacities
+wind-onshore,wind,volatile,onshore,Onshore wind capacities
+electricity-curtailment,electricity,sink,curtailment,Curtailment of non-dispatchable electricity
+ch4,ch4_list,
+nuclear,nuclear_list,
