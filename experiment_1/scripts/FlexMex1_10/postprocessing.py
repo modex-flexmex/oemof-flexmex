@@ -245,6 +245,8 @@ def main(name=name, scalars=scalars):
 
     scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
 
+    delete_empty_subdirs(exp_paths.results_postprocessed)
+
     # Check against previous results
     previous_results_path = exp_paths.results_postprocessed + '_default_v0.03'
     new_results_path = exp_paths.results_postprocessed
@@ -253,8 +255,6 @@ def main(name=name, scalars=scalars):
 
     logging.info(f"New results in {new_results_path}"
                  f" match previous results in {previous_results_path}")
-
-    delete_empty_subdirs(exp_paths.results_postprocessed)
 
 
 if __name__ == '__main__':
