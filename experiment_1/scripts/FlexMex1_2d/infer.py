@@ -28,20 +28,20 @@ def main():
         package_name='oemof-tabular-dispatch-example',
         foreign_keys={
             'bus': [
-                'wind-onshore',
-                'wind-offshore',
-                'solar-pv',
-                'electricity-shortage',
+                'ch4-gt',
                 'electricity-curtailment',
                 'electricity-demand',
+                'electricity-shortage',
+                'solar-pv',
                 'uranium-nuclear-st',
-                'ch4-gt'
+                'wind-offshore',
+                'wind-onshore'
             ],
             'profile': [
-                'wind-onshore',
-                'wind-offshore',
-                'solar-pv',
                 'electricity-demand',
+                'solar-pv',
+                'wind-offshore',
+                'wind-onshore'
             ]
         },
         path=exp_paths.data_preprocessed
