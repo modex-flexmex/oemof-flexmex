@@ -32,7 +32,6 @@ def main():
                 'electricity-curtailment',
                 'electricity-demand',
                 'electricity-shortage',
-                'electricity-transmission',
                 'solar-pv',
                 'uranium-nuclear-st',
                 'wind-offshore',
@@ -43,7 +42,8 @@ def main():
                 'solar-pv',
                 'wind-offshore',
                 'wind-onshore'
-            ]
+            ],
+            'from_to_bus': ['electricity-transmission']
         },
         path=exp_paths.data_preprocessed
     )
