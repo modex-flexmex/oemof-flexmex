@@ -25,10 +25,8 @@ logpath = define_logging(
 
 # load templates
 scalars = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
-timeseries = pd.read_csv(os.path.join(exp_paths.results_template, 'TimeSeries.csv'))
 
 scalars = scalars.loc[scalars['UseCase'] == name]
-timeseries = timeseries.loc[timeseries['UseCase'] == name]
 
 
 def calc_curtailment(bus_results, region):
@@ -245,7 +243,6 @@ def main(name=name, scalars=scalars):
         )
 
     scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
-    timeseries.to_csv(os.path.join(exp_paths.results_postprocessed, 'TimeSeries.csv'))
 
     # Check against previous results
     previous_results_path = exp_paths.results_postprocessed + '_default_v0.03'
