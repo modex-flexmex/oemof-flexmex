@@ -28,7 +28,6 @@ def main():
         package_name='oemof-tabular-dispatch-example',
         foreign_keys={
             'bus': [
-                'ch4-gt',
                 'electricity-curtailment',
                 'electricity-demand',
                 'electricity-shortage',

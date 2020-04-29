@@ -44,7 +44,6 @@ def main():
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
         select_components=[
-            'ch4-gt',
             'electricity-curtailment',
             'electricity-demand',
             'electricity-shortage',
@@ -57,7 +56,6 @@ def main():
     )
 
     # update elements
-    update_ch4_gt(exp_paths.data_preprocessed, scalars)
     update_link(exp_paths.data_preprocessed, scalars)
     update_load(exp_paths.data_preprocessed, scalars)
     update_nuclear_st(exp_paths.data_preprocessed, scalars)
