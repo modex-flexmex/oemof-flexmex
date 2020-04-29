@@ -6,3 +6,8 @@ solar-pv,solar,volatile,pv,Solar pv capacities
 wind-offshore,wind,volatile,offshore,Offshore wind capacities
 wind-onshore,wind,volatile,onshore,Onshore wind capacities
 electricity-curtailment,electricity,sink,curtailment,Curtailment of non-dispatchable electricity
+gas-bpchp,gas,backpressure,bpchp,Backpressure turbine CHP
+gas-boiler,gas,conversion,boiler,Peak load boiler
+gas-extchp,gas,extraction,extchp,Extraction turbine CHP
+electricity-pth,electricity,conversion,pth,Resistive heater (Power-to-Heat)
+heat-demand,heat,load,demand,Heat demand
