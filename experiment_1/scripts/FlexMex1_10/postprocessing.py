@@ -53,7 +53,7 @@ def calc_energy_conversion_secondary_energy_re(
     bus_results, energy_conversion_curtailment_electricity_re, region
 ):
     r"""
-    Calculates EnergyConversion_SecondaryEnergy_RE [GWh]
+    Calculates EnergyConversion_SecondaryEnergy_Electricity_RE [GWh]
     """
     energy_conversion_secondary_energy_re = bus_results.filter(regex='el-wind|solarpv', axis=1)
 
@@ -61,10 +61,11 @@ def calc_energy_conversion_secondary_energy_re(
         energy_conversion_secondary_energy_re.sum(axis=1)
     )
 
-    energy_conversion_secondary_energy_re.columns = ['EnergyConversion_SecondaryEnergy_RE']
+    energy_conversion_secondary_energy_re.columns = [
+        'EnergyConversion_SecondaryEnergy_Electricity_RE']
 
     energy_conversion_secondary_energy_re[
-        'EnergyConversion_SecondaryEnergy_RE'
+        'EnergyConversion_SecondaryEnergy_Electricity_RE'
     ] -= energy_conversion_curtailment_electricity_re['EnergyConversion_Curtailment_Electricity_RE']
 
     energy_conversion_secondary_energy_re.to_csv(
@@ -82,7 +83,7 @@ def calc_energy_conversion_secondary_energy_re(
 
 def calc_transmission_import_electricity_grid(bus_results, region):
     r"""
-    Calculates EnergyConversion_SecondaryEnergy_RE [GWh]
+    Calculates EnergyConversion_SecondaryEnergy_Electricity_RE [GWh]
     """
     transmission_import_electricity_grid = bus_results.filter(regex='import', axis=1)
 
@@ -224,7 +225,7 @@ def main(name=name, scalars=scalars):
             sum_in_gwh,
         )
 
-        # EnergyConversion_SecondaryEnergy_RE
+        # EnergyConversion_SecondaryEnergy_Electricity_RE
         energy_conversion_secondary_energy_re = calc_energy_conversion_secondary_energy_re(
             bus_results, energy_conversion_curtailment_electricity_re, region
         )
@@ -233,7 +234,7 @@ def main(name=name, scalars=scalars):
         scalars = write_value_to_scalars(
             scalars,
             region,
-            'EnergyConversion_SecondaryEnergy_RE',
+            'EnergyConversion_SecondaryEnergy_Electricity_RE',
             sum_in_gwh,
         )
 
