@@ -135,74 +135,6 @@ def write_value_to_scalars(scalars, region, param_name, value):
     return df
 
 
-def rearrange_link_flows(link_flow_results):
-    idx = pd.IndexSlice
-    filter_values = [
-        level_value
-        for level_value in link_flow_results.columns.get_level_values(1)
-        if re.search('bus', level_value)
-    ]
-
-    link_flow_results = link_flow_results.loc[:, idx[:, filter_values, :]]
-
-    link_flow_results.columns = link_flow_results.columns.tolist()
-
-    revert_columns = {}
-    for item in link_flow_results.columns:
-        if item[0].split('-')[0] == item[1].split('-')[0]:
-            new_item = list(item)
-            new_item[0] = new_item[0].split('-')
-            new_item[0].reverse()
-            new_item[0] = '-'.join(new_item[0])
-            new_item = tuple(new_item)
-            revert_columns[item] = new_item
-
-    link_flow_results = link_flow_results.rename(columns=revert_columns)
-    link_flow_results.columns = [column[0] for column in link_flow_results.columns]
-
-    return link_flow_results
-
-
-def calc_net_flows(link_flow_results):
-    link_list = [
-        'AT-CH',
-        'AT-CZ',
-        'AT-IT',
-        'BE-FR',
-        'BE-LU',
-        'BE-NL',
-        'CH-FR',
-        'CH-IT',
-        'CZ-PL',
-        'DE-AT',
-        'DE-BE',
-        'DE-CH',
-        'DE-CZ',
-        'DE-DK',
-        'DE-FR',
-        'DE-LU',
-        'DE-NL',
-        'DE-PL',
-        'DK-NL',
-        'FR-IT',
-        'FR-LU',
-    ]
-
-    link_net_flow = pd.DataFrame()
-    for item in link_list:
-        reverse_item = item.split('-')
-
-        reverse_item.reverse()
-
-        reverse_item = '-'.join(reverse_item)
-
-        link_net_flow[item] = (
-            link_flow_results.loc[:, item] - link_flow_results.loc[:, reverse_item]
-        )
-
-    return link_net_flow
-
-
 def main(name=name, scalars=scalars):
     # Postprocess
     bus_results_files = (
@@ -216,6 +148,7 @@ def main(name=name, scalars=scalars):
         bus_results = pd.read_csv(os.path.join(exp_paths.results_optimization, file))
 
         # EnergyConversion_Curtailment_Electricity_RE
+        # Read timeseries and write timeseries into file RE/Curtailment/FlexMex##_oemof_##_2050.csv
         energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
 
         sum_in_gwh = 1e-3 * energy_conversion_curtailment_electricity_re.sum().values
@@ -242,40 +175,6 @@ def main(name=name, scalars=scalars):
         # Transmission_Import_Electricity_Grid
         calc_transmission_import_electricity_grid(
             bus_results, region
-        )
-
-    link_flow_results_file = 'links-oemof.csv'
-
-    link_flow_results = pd.read_csv(
-        os.path.join(exp_paths.results_optimization, link_flow_results_file),
-        header=[0, 1, 2], index_col=0
-    )
-
-    link_flow_results = rearrange_link_flows(link_flow_results)
-
-    link_net_flows = calc_net_flows(link_flow_results)
-
-    for column in link_net_flows:
-        from_region = column.split('-')[0]
-        to_region = column.split('-')[1]
-        link_flow_results.loc[:, column].to_csv(
-            os.path.join(
-                exp_paths.results_postprocessed,
-                'Transmission',
-                'ImportExport',
-                '{}_oemof_{}_{}_{}.csv'.format(name, from_region, to_region, year),
-            ),
-            header=True,
-        )
-
-    for name, value in link_net_flows.sum().iteritems():
-        region = name.replace('-', '_')
-        value_in_gwh = 1e-3 * value
-        scalars = write_value_to_scalars(
-            scalars,
-            region,
-            'Transmission_ImportExport_Electricity_Grid',
-            value_in_gwh,
         )
 
     scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
