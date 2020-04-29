@@ -11,3 +11,6 @@ gas-boiler,gas,conversion,boiler,Peak load boiler
 gas-extchp,gas,extraction,extchp,Extraction turbine CHP
 electricity-pth,electricity,conversion,pth,Resistive heater (Power-to-Heat)
 heat-demand,heat,load,demand,Heat demand
+ch4-gt,ch4,dispatchable,gt,Natural gas driven gas turbine capacities
+uranium-nuclear-st,uranium,dispatchable,nuclear-st,Nuclear power plant capacities (steam turbine)
+
