@@ -32,6 +32,7 @@ def main():
                 'electricity-curtailment',
                 'electricity-demand',
                 'electricity-shortage',
+                'electricity-transmission',
                 'solar-pv',
                 'uranium-nuclear-st',
                 'wind-offshore',

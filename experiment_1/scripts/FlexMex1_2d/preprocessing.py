@@ -5,7 +5,7 @@ import pandas as pd
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load, update_wind_onshore,
-    update_wind_offshore, update_solar_pv, update_nuclear_st, update_ch4_gt,
+    update_wind_offshore, update_solar_pv, update_nuclear_st, update_ch4_gt, update_link,
     create_electricity_demand_profiles, create_wind_onshore_profiles, create_wind_offshore_profiles,
     create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
@@ -48,6 +48,7 @@ def main():
             'electricity-curtailment',
             'electricity-demand',
             'electricity-shortage',
+            'electricity-transmission',
             'solar-pv',
             'uranium-nuclear-st',
             'wind-offshore',
@@ -57,6 +58,7 @@ def main():
 
     # update elements
     update_ch4_gt(exp_paths.data_preprocessed, scalars)
+    update_link(exp_paths.data_preprocessed, scalars)
     update_load(exp_paths.data_preprocessed, scalars)
     update_nuclear_st(exp_paths.data_preprocessed, scalars)
     update_shortage(exp_paths.data_preprocessed, scalars)
