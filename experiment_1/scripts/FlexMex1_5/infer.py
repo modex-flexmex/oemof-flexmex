@@ -44,8 +44,7 @@ def main():
                 'solar-pv',
                 'electricity-demand',
             ],
-            'from_to_bus': ['electricity-transmission'],
-            # TODO: 'electricity-heatpump',
+            'from_to_bus': ['electricity-heatpump'],
         },
         path=exp_paths.data_preprocessed
     )
