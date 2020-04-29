@@ -23,14 +23,6 @@ logpath = define_logging(
     logfile='oemoflex.log'
 )
 
-# load templates
-scalars = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
-timeseries = pd.read_csv(os.path.join(exp_paths.results_template, 'TimeSeries.csv'))
-
-scalars = scalars.loc[scalars['UseCase'] == name]
-timeseries = timeseries.loc[timeseries['UseCase'] == name]
-
-
 def calc_curtailment(bus_results, region):
     # EnergyConversion_Curtailment_Electricity_RE [GWh]
     energy_conversion_curtailment_electricity_re = bus_results.filter(regex='curtailment', axis=1)
@@ -135,7 +127,14 @@ def write_value_to_scalars(scalars, region, param_name, value):
     return df
 
 
-def main(name=name, scalars=scalars):
+def main():
+    # load templates
+    scalars = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
+    timeseries = pd.read_csv(os.path.join(exp_paths.results_template, 'TimeSeries.csv'))
+
+    scalars = scalars.loc[scalars['UseCase'] == name]
+    timeseries = timeseries.loc[timeseries['UseCase'] == name]
+
     # Postprocess
     bus_results_files = (
         file for file in os.listdir(exp_paths.results_optimization)
