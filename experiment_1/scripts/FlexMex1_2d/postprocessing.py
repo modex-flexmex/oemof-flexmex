@@ -9,7 +9,7 @@ from oemoflex.postprocessing import create_postprocessed_results_subdirs
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal, delete_empty_subdirs
 
 
-name = 'FlexMex1_2a'
+name = 'FlexMex1_2d'
 
 year = 2050
 
