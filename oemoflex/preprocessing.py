@@ -151,6 +151,9 @@ def create_component_element(component_attrs_file):
         comp_data['from_bus'] = [region + suffices['from_bus'] for region in regions_list]
         comp_data['to_bus'] = [region + suffices['to_bus'] for region in regions_list]
 
+        if 'efficiency' in suffices:
+            comp_data['efficiency'] = [region + suffices['efficiency'] for region in regions_list]
+
     elif defaults['type'] in ['backpressure', 'extraction']:
         comp_data['region'] = regions_list
         comp_data['name'] = [region + suffices['name'] for region in regions_list]
@@ -610,5 +613,5 @@ def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
     profile_df = combine_profiles(raw_profile_paths, 'cop-profile')
 
     profile_df.to_csv(
-        os.path.join(data_preprocessed_path, 'sequences', 'electricity-heatpump_profile.csv')
+        os.path.join(data_preprocessed_path, 'sequences', 'efficiency_profile.csv')
     )

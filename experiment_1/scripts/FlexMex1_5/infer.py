@@ -45,6 +45,7 @@ def main():
                 'electricity-demand',
             ],
             'from_to_bus': ['electricity-heatpump'],
+            'efficiency': ['electricity-heatpump'],
         },
         path=exp_paths.data_preprocessed
     )
