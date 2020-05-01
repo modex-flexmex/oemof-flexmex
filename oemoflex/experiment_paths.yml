@@ -1,10 +1,10 @@
-data_raw: 001_data_raw/Data/In/v0.02
+data_raw: 001_data_raw/Data/In/v0.04
 
 data_preprocessed: 002_data_preprocessed
 
 results_optimization: 003_results_optimization
 
-results_template: 004_results_data_template
+results_template: 004_results_data_template/v0.04/Template
 
 results_postprocessed: 005_results_postprocessed
 

@@ -7,6 +7,10 @@ wind-offshore,wind,volatile,offshore,Offshore wind capacities
 wind-onshore,wind,volatile,onshore,Onshore wind capacities
 electricity-curtailment,electricity,sink,curtailment,Curtailment of non-dispatchable electricity
 heat-demand,heat,load,demand,Heat demand
+gas-bpchp,gas,backpressure,bpchp,Backpressure turbine CHP
+gas-boiler,gas,conversion,boiler,Peak load boiler
+gas-extchp,gas,extraction,extchp,Extraction turbine CHP
+electricity-pth,electricity,conversion,pth,Resistive heater (Power-to-Heat)
 electricity-heatpump,electricity,conversion,heatpump,Airsource compression heatpump
 gas-turbine,gas,dispatchable,turbine,Open cycle gas turbine
 heat-storage,heat,storage,storage,Large scale sensible heat storage
