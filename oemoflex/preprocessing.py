@@ -3,8 +3,6 @@ import os
 
 import pandas as pd
 
-from oemof.tools.economics import annuity
-
 
 module_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -380,13 +378,9 @@ def update_electricity_heatpump(data_preprocessed_path, scalars):
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
 
-    df['expandable'] = True
-
-    df['capacity_cost'] = annuity(
-        get_parameter_values(scalars, 'EnergyConversion_Capex_Heat_ElectricityHeat_Small'),
-        get_parameter_values(scalars, 'EnergyConversion_LifeTime_Heat_ElectricityHeat_Small'),
-        get_parameter_values(scalars, 'EnergyConversion_InterestRate_ALL')
-        * 0.01)  # Percent to decimals
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Small'
+    )
 
     df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Small') * 1e3  # Eur/GWh to Eur/MWh
@@ -403,19 +397,10 @@ def update_heat_storage(data_preprocessed_path, scalars):
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
 
-    df['expandable'] = 'True'
+    df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
 
-    df['capacity_cost'] = annuity(
-        get_parameter_values(scalars, 'Storage_Capex_Heat_SmallCharge'),
-        get_parameter_values(scalars, 'Storage_LifeTime_Heat_Small'),
-        get_parameter_values(scalars, 'EnergyConversion_InterestRate_ALL')
-        * 0.01)  # Percent to decimals
-
-    df['storage_capacity_cost'] = annuity(
-        get_parameter_values(scalars, 'Storage_Capex_Heat_SmallStorage'),
-        get_parameter_values(scalars, 'Storage_LifeTime_Heat_Small'),
-        get_parameter_values(scalars, 'EnergyConversion_InterestRate_ALL')
-        * 0.01)  # Percent to decimals
+    df['storage_capacity'] = get_parameter_values(
+        scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
 
     df['losses'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
