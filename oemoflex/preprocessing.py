@@ -3,6 +3,9 @@ import os
 
 import pandas as pd
 
+from oemof.tools.economics import annuity
+
+
 module_path = os.path.dirname(os.path.abspath(__file__))
 
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
@@ -369,6 +372,85 @@ def update_pth(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
+def update_electricity_heatpump(data_preprocessed_path, scalars):
+    logging.info("Updating electricity-heatpump file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['expandable'] = True
+
+    df['capacity_cost'] = annuity(
+        get_parameter_values(scalars, 'EnergyConversion_Capex_Heat_ElectricityHeat_Small'),
+        get_parameter_values(scalars, 'EnergyConversion_LifeTime_Heat_ElectricityHeat_Small'),
+        get_parameter_values(scalars, 'EnergyConversion_InterestRate_ALL')
+        * 0.01)  # Percent to decimals
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Small') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_heat_storage(data_preprocessed_path, scalars):
+    logging.info("Updating heat-storage file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['expandable'] = 'True'
+
+    df['capacity_cost'] = annuity(
+        get_parameter_values(scalars, 'Storage_Capex_Heat_SmallCharge'),
+        get_parameter_values(scalars, 'Storage_LifeTime_Heat_Small'),
+        get_parameter_values(scalars, 'EnergyConversion_InterestRate_ALL')
+        * 0.01)  # Percent to decimals
+
+    df['storage_capacity_cost'] = annuity(
+        get_parameter_values(scalars, 'Storage_Capex_Heat_SmallStorage'),
+        get_parameter_values(scalars, 'Storage_LifeTime_Heat_Small'),
+        get_parameter_values(scalars, 'EnergyConversion_InterestRate_ALL')
+        * 0.01)  # Percent to decimals
+
+    df['losses'] = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'Storage_Eta_Heat_SmallCharge') * 0.01  # Percent to decimals
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'Storage_VarOM_Heat_Small') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_gas_turbine(data_preprocessed_path, scalars):
+    logging.info("Updating gas-turbine file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-turbine.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Electricity_CH4_GT')
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNet_Electricity_CH4_GT') * 0.01  # Percent to decimals
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Electricity_CH4_GT') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
 def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
 
@@ -530,4 +612,18 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
 
     solar_pv_profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'solar-pv_profile.csv')
+    )
+
+
+def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
+    logging.info("Creating electricity heatpump profiles")
+
+    raw_profile_paths = os.path.join(
+        data_raw_path, 'OtherProfiles', 'COP'
+    )
+
+    profile_df = combine_profiles(raw_profile_paths, 'cop-profile')
+
+    profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'electricity-heatpump_profile.csv')
     )
