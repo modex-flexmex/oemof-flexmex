@@ -44,10 +44,10 @@ def main():
     # if you want dual variables / shadow prices uncomment line below
     # m.receive_duals()
 
-    # save lp file together with optimization results
-    lp_file_dir = os.path.join(exp_paths.results_optimization, '{}.lp'.format(name))
-    logging.info(f"Saving the lp-file to {lp_file_dir}")
-    m.write(lp_file_dir, io_options={'symbolic_solver_labels': True})
+    # # save lp file together with optimization results
+    # lp_file_dir = os.path.join(exp_paths.results_optimization, '{}.lp'.format(name))
+    # logging.info(f"Saving the lp-file to {lp_file_dir}")
+    # m.write(lp_file_dir, io_options={'symbolic_solver_labels': True})
 
     # select solver 'gurobi', 'cplex', 'glpk' etc
     solver = 'cbc'
