@@ -94,3 +94,50 @@ def get_capacities(m):
     capacities = pd.concat([endogenous, exogenous])
 
     return capacities
+
+
+def get_sequences_by_tech(results):
+    r"""
+    Creates a dictionary with carrier-tech as keys with the sequences of the components
+    from optimization results.
+
+    Parameters
+    ----------
+    results : dict
+        Dictionary containing oemof.solph.Model results.
+
+    Returns
+    -------
+    sequences_by_tech : dict
+        Dictionary containing sequences with carrier-tech as keys.
+    """
+    sequences = {key: value['sequences'] for key, value in results.items()}
+
+    sequences_by_tech = {}
+    for key, df in sequences.items():
+        if isinstance(key[0], Bus):
+            carrier_tech = key[1].carrier + '-' + key[1].tech
+            if carrier_tech not in sequences_by_tech:
+                sequences_by_tech[carrier_tech] = []
+
+            df.columns = pd.MultiIndex.from_tuples([(key[1].label, 'in_flow')])
+            sequences_by_tech[carrier_tech].append(df)
+
+        if isinstance(key[1], Bus):
+            carrier_tech = key[0].carrier + '-' + key[0].tech
+            if carrier_tech not in sequences_by_tech:
+                sequences_by_tech[carrier_tech] = []
+
+            df.columns = pd.MultiIndex.from_tuples([(key[0].label, 'out_flow')])
+            sequences_by_tech[carrier_tech].append(df)
+
+        if key[1] is None:
+            carrier_tech = key[0].carrier + '-' + key[0].tech
+            if carrier_tech not in sequences_by_tech:
+                sequences_by_tech[carrier_tech] = []
+            df.columns = pd.MultiIndex.from_tuples([(key[0].label, 'storage_content')])
+            sequences_by_tech[carrier_tech].append(df)
+
+    sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
+
+    return sequences_by_tech
