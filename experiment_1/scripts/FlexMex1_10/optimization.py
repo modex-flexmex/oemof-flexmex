@@ -9,9 +9,7 @@ from oemof.solph import EnergySystem, Model
 # DONT REMOVE THIS LINE!
 from oemof.tabular import datapackage  # noqa
 from oemof.tabular.facades import TYPEMAP
-import oemof.tabular.tools.postprocessing as pp
 
-from oemoflex.postprocessing import get_capacities
 from oemoflex.helpers import setup_experiment_paths
 
 
@@ -56,18 +54,12 @@ def main():
     m.solve(solver=solver)
 
     # get the results from the the solved model(still oemof.solph)
-    m.results = m.results()
+    es.results = m.results()
 
     # now we use the write results method to write the results in oemof-tabular
     # format
     logging.info(f'Writing the results to {exp_paths.results_optimization}')
-    component_results = pp.component_results(es, m.results, select='sequences')
-
-    for type, data in component_results.items():
-        data.to_csv(os.path.join(exp_paths.results_optimization, type + '.csv'))
-
-    capacities = get_capacities(m)
-    capacities.to_csv(os.path.join(exp_paths.results_optimization, 'capacities.csv'))
+    es.dump(exp_paths.results_optimization)
 
 
 if __name__ == '__main__':
