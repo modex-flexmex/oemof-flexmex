@@ -35,16 +35,16 @@ def create_postprocessed_results_subdirs(postprocessed_results_dir):
             os.makedirs(path)
 
 
-def get_capacities(m):
+def get_capacities(es):
     r"""
     Calculates the capacities of all components.
 
-    Extracted from oemof.tabular.tools.postprocessing.write_results()
+    Adapted from oemof.tabular.tools.postprocessing.write_results()
 
     Parameters
     ----------
-    m : oemof.solph.Model
-        Model containing the results.
+    es : oemof.solph.EnergySystem
+        EnergySystem containing the results.
 
     Returns
     -------
@@ -52,7 +52,7 @@ def get_capacities(m):
         DataFrame containing the capacities.
     """
     try:
-        all = pp.bus_results(m.es, m.results, select="scalars", concat=True)
+        all = pp.bus_results(es, es.results, select="scalars", concat=True)
         all.name = "value"
         endogenous = all.reset_index()
         endogenous["tech"] = [
@@ -70,7 +70,7 @@ def get_capacities(m):
         endogenous = pd.DataFrame()
 
     d = dict()
-    for node in m.es.nodes:
+    for node in es.nodes:
         if not isinstance(node, (Bus, Sink, facades.Shortage)):
             if getattr(node, "capacity", None) is not None:
                 if isinstance(node, facades.TYPEMAP["link"]):
