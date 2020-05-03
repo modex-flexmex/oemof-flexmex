@@ -121,7 +121,6 @@ def get_sequences_by_tech(results):
                 sequences_by_tech[carrier_tech] = []
 
             df.columns = pd.MultiIndex.from_tuples([(key[1].label, 'in_flow')])
-            sequences_by_tech[carrier_tech].append(df)
 
         if isinstance(key[1], Bus):
             carrier_tech = key[0].carrier + '-' + key[0].tech
@@ -129,15 +128,34 @@ def get_sequences_by_tech(results):
                 sequences_by_tech[carrier_tech] = []
 
             df.columns = pd.MultiIndex.from_tuples([(key[0].label, 'out_flow')])
-            sequences_by_tech[carrier_tech].append(df)
 
         if key[1] is None:
             carrier_tech = key[0].carrier + '-' + key[0].tech
             if carrier_tech not in sequences_by_tech:
                 sequences_by_tech[carrier_tech] = []
             df.columns = pd.MultiIndex.from_tuples([(key[0].label, 'storage_content')])
-            sequences_by_tech[carrier_tech].append(df)
+
+        df.columns.names = ['name', 'var_name']
+        sequences_by_tech[carrier_tech].append(df)
 
     sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
 
     return sequences_by_tech
+
+
+def get_summed_sequences(sequences_by_tech, prep_elements):
+    basic_columns = ['region', 'name', 'type', 'tech', 'bus']
+    summed_sequences = []
+    for tech_carrier, sequence in sequences_by_tech.items():
+        if prep_elements[tech_carrier]['type'][0] == 'link':
+            pass  # TODO
+        else:
+            df = prep_elements[tech_carrier][basic_columns]
+            sum = sequence.sum()
+            sum = pd.DataFrame(sum.unstack(1))
+            df = pd.merge(df, sum, on='name')
+            summed_sequences.append(df)
+
+    summed_sequences = pd.concat(summed_sequences)
+
+    return summed_sequences
