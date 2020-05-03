@@ -116,25 +116,52 @@ def get_sequences_by_tech(results):
     sequences_by_tech = {}
     for key, df in sequences.items():
         if isinstance(key[0], Bus):
-            carrier_tech = key[1].carrier + '-' + key[1].tech
-            if carrier_tech not in sequences_by_tech:
-                sequences_by_tech[carrier_tech] = []
+            component = key[1]
+            bus = key[0]
 
-            df.columns = pd.MultiIndex.from_tuples([(key[1].label, 'in_flow')])
+            if isinstance(component, facades.Link):
+                if bus == component.from_bus:
+                    var_name = 'flow_gross_forward'
+                elif bus == component.to_bus:
+                    var_name = 'flow_gross_backward'
+
+            elif isinstance(component, facades.ExtractionTurbine)\
+                    or isinstance(component, facades.BackpressureTurbine):
+                if bus == component.electricity_bus:
+                    var_name = 'flow_electricity'
+
+                elif bus == component.heat_bus:
+                    var_name = 'flow_heat'
+
+            else:
+                var_name = 'in_flow'
 
         if isinstance(key[1], Bus):
-            carrier_tech = key[0].carrier + '-' + key[0].tech
-            if carrier_tech not in sequences_by_tech:
-                sequences_by_tech[carrier_tech] = []
+            bus = key[1]
+            component = key[0]
 
-            df.columns = pd.MultiIndex.from_tuples([(key[0].label, 'out_flow')])
+            if isinstance(component, facades.Link):
+                if bus == component.to_bus:
+                    var_name = 'flow_net_forward'
+                elif bus == component.from_bus:
+                    var_name = 'flow_net_backward'
+
+            elif isinstance(component, facades.ExtractionTurbine)\
+                    or isinstance(component, facades.BackpressureTurbine):
+                var_name = 'flow_electricity'
+
+            else:
+                var_name = 'out_flow'
 
         if key[1] is None:
-            carrier_tech = key[0].carrier + '-' + key[0].tech
-            if carrier_tech not in sequences_by_tech:
-                sequences_by_tech[carrier_tech] = []
-            df.columns = pd.MultiIndex.from_tuples([(key[0].label, 'storage_content')])
+            component = key[0]
+            var_name = 'storage_content'
 
+        carrier_tech = component.carrier + '-' + component.tech
+        if carrier_tech not in sequences_by_tech:
+            sequences_by_tech[carrier_tech] = []
+
+        df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
         df.columns.names = ['name', 'var_name']
         sequences_by_tech[carrier_tech].append(df)
 
@@ -144,19 +171,36 @@ def get_sequences_by_tech(results):
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):
-    basic_columns = ['region', 'name', 'type', 'tech', 'bus']
+    basic_columns = ['region', 'name', 'type', 'tech']
     summed_sequences = []
     for tech_carrier, sequence in sequences_by_tech.items():
-        if prep_elements[tech_carrier]['type'][0] == 'link':
-            pass  # TODO
-        else:
-            df = prep_elements[tech_carrier][basic_columns]
-            sum = sequence.sum()
-            sum.name = 'var_value'
-            sum = sum.reset_index()
-            df = pd.merge(df, sum, on='name')
-            summed_sequences.append(df)
+        df = prep_elements[tech_carrier][basic_columns]
+        sum = sequence.sum()
+        sum.name = 'var_value'
+        sum = sum.reset_index()
+        df = pd.merge(df, sum, on='name')
+        summed_sequences.append(df)
 
-    summed_sequences = pd.concat(summed_sequences)
+    summed_sequences = pd.concat(summed_sequences, sort=True)
 
     return summed_sequences
+
+
+def get_transmission_losses(oemoflex_scalars, prep_elements):
+    pass
+
+
+def get_storage_losses(oemoflex_scalars, prep_elements):
+    pass
+
+
+def get_emissions(oemoflex_scalars, prep_elements):
+    pass
+
+
+def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, dir):
+    pass
+
+
+def get_varom_cost(oemoflex_scalars, prep_elements):
+    pass
