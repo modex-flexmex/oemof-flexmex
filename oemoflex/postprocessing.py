@@ -127,11 +127,7 @@ def get_sequences_by_tech(results):
 
             elif isinstance(component, facades.ExtractionTurbine)\
                     or isinstance(component, facades.BackpressureTurbine):
-                if bus == component.electricity_bus:
-                    var_name = 'flow_electricity'
-
-                elif bus == component.heat_bus:
-                    var_name = 'flow_heat'
+                var_name = 'flow_fuel'
 
             else:
                 var_name = 'in_flow'
@@ -148,7 +144,11 @@ def get_sequences_by_tech(results):
 
             elif isinstance(component, facades.ExtractionTurbine)\
                     or isinstance(component, facades.BackpressureTurbine):
-                var_name = 'flow_electricity'
+                if bus == component.electricity_bus:
+                    var_name = 'flow_electricity'
+
+                elif bus == component.heat_bus:
+                    var_name = 'flow_heat'
 
             else:
                 var_name = 'out_flow'
