@@ -152,7 +152,8 @@ def get_summed_sequences(sequences_by_tech, prep_elements):
         else:
             df = prep_elements[tech_carrier][basic_columns]
             sum = sequence.sum()
-            sum = pd.DataFrame(sum.unstack(1))
+            sum.name = 'var_value'
+            sum = sum.reset_index()
             df = pd.merge(df, sum, on='name')
             summed_sequences.append(df)
 
