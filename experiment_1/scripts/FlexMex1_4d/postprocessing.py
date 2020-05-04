@@ -14,7 +14,7 @@ from oemoflex.helpers import \
     setup_experiment_paths, load_elements
 
 
-name = 'FlexMex1_4a'
+name = 'FlexMex1_4d'
 
 year = 2050
 
