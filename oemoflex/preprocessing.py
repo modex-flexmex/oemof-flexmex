@@ -87,20 +87,24 @@ def create_bus_element(busses_file):
     bus_df : pd.DataFrame
         Bus element DataFrame
     """
-    busses = pd.read_csv(busses_file, squeeze=True)
+    busses = pd.read_csv(busses_file, index_col='carrier')
 
     regions = []
     carriers = []
+    balanced = []
 
     for region in regions_list:
-        for carrier in busses['carrier']:
+        for carrier, row in busses.iterrows():
+            print(row['balanced'])
             regions.append(region)
             carriers.append(region + '-' + carrier)
+            balanced.append(row['balanced'])
 
     bus_df = pd.DataFrame({
         'region': regions,
         'name': carriers,
         'type': 'bus',
+        'balanced': balanced
     })
 
     bus_df = bus_df.set_index('region')
