@@ -287,10 +287,10 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
     return varom_cost
 
 
-def get_fuel_cost(oemoflex_scalars, prep_elements):
-    fuel_cost = []
+def get_carrier_cost(oemoflex_scalars, prep_elements):
+    carrier_cost = []
     for component, prep_el in prep_elements.items():
-        if 'fuel_cost' in prep_el.columns:
+        if 'carrier_cost' in prep_el.columns:
             df = prep_el[basic_columns]
 
             if component == 'b':
@@ -304,16 +304,16 @@ def get_fuel_cost(oemoflex_scalars, prep_elements):
             df['var_value'] = df['var_value'] * prep_el['marginal_cost']
             df['var_name'] = 'cost_fuel'
 
-            fuel_cost.append(df)
+            carrier_cost.append(df)
 
-    if fuel_cost:
-        fuel_cost = pd.concat(fuel_cost, sort=True)
+    if carrier_cost:
+        carrier_cost = pd.concat(carrier_cost, sort=True)
     else:
-        fuel_cost = pd.DataFrame(fuel_cost)
+        carrier_cost = pd.DataFrame(carrier_cost)
 
-    fuel_cost['var_unit'] = 'Eur'
+        carrier_cost['var_unit'] = 'Eur'
 
-    return fuel_cost
+    return carrier_cost
 
 
 def get_capacity_cost():

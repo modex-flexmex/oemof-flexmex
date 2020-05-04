@@ -8,7 +8,7 @@ from oemoflex.postprocessing import \
     get_capacities, format_capacities,\
     get_summed_sequences, get_re_generation,\
     get_transmission_losses, get_storage_losses, get_emissions, \
-    get_varom_cost, get_fuel_cost, get_total_system_cost, \
+    get_varom_cost, get_carrier_cost, get_total_system_cost, \
     map_to_flexmex_results
 from oemoflex.helpers import \
     setup_experiment_paths, load_elements
@@ -80,8 +80,8 @@ emissions = get_emissions()
 
 # costs
 varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
-fuel_cost = get_fuel_cost(oemoflex_scalars, prep_elements)
-oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, fuel_cost])
+carrier_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
+oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, carrier_cost])
 
 total_system_cost = get_total_system_cost(oemoflex_scalars)
 oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
