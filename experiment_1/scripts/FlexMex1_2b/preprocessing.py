@@ -39,7 +39,16 @@ def main():
     )
 
     # Filter out only scenario-related input parameters
-    scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']), :]
+    scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'FlexMex1UC2', 'ALL']), :]
+
+    # There are two values for "Energy_SlackCost_Electricity"
+    # one for 'FlexMex1' and one for 'FlexMex1UC2'
+    # Drop the second one, only keep "Energy_SlackCost_Electricity" for use case 2b
+    rows_to_drop = scalars.loc[
+          (scalars['Parameter'] == 'Energy_SlackCost_Electricity')
+          & (scalars['Scenario'] == 'FlexMex1'), :].index
+
+    scalars = scalars.drop(rows_to_drop)
 
     # Prepare oemof.tabular input CSV files
     create_default_elements(
