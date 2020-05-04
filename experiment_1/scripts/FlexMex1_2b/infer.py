@@ -34,6 +34,7 @@ def main():
                 'electricity-shortage',
                 'electricity-curtailment',
                 'electricity-demand',
+                'electricity-h2-cavern'
             ],
             'profile': [
                 'wind-onshore',

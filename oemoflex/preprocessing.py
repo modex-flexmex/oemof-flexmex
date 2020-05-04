@@ -3,6 +3,8 @@ import os
 
 import pandas as pd
 
+from oemof.tools.economics import annuity
+
 module_path = os.path.dirname(os.path.abspath(__file__))
 
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
@@ -439,6 +441,99 @@ def update_solar_pv(data_preprocessed_path, scalars):
 
     solarpv.to_csv(solar_pv_file)
 
+def update_h2_cavern_simple(data_preprocessed_path, scalars):
+    r"""
+    Simplified parameterization of a electricity H2 storage.
+
+    Storage, discharging and charging device are lumped together.
+
+    Parameters
+    ----------
+    data_preprocessed_path
+    scalars
+
+    Returns
+    -------
+
+    """
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-h2-cavern.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    # Operation parameters
+
+    # not in FleMex 2b!
+    # capacity_charge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernCharge')
+    #
+    # capacity_discharge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernDischarge')
+    #
+    # storage_capacity = get_parameter_values(
+    #     scalars, 'Storage_Capacity_H2_CavernStorage') * 1e3  # GWh to MWh
+
+    self_discharge = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Electricity_H2_Cavern') * 1e-2  # percent -> 0...1
+
+    operation_cost = get_parameter_values(
+        scalars, 'Storage_VarOM_H2_Cavern') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    eta_charge = get_parameter_values(
+        scalars, 'Storage_Eta_H2_CavernCharge') * 1e-2  # percent -> 0...1
+
+    eta_discharge = get_parameter_values(
+        scalars, 'Storage_Eta_H2_CavernDischarge') * 1e-2  # percent -> 0...1
+
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernCharge')
+
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernDischarge')
+
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernStorage')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_H2_Cavern') * 1e-2  # percent -> 0...1
+
+    # ignored:
+    # Storage_LifeTime_H2_CavernCharge
+    # Storage_LifeTime_H2_CavernDischarge
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_H2_CavernStorage')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    capex_total = capex_charge + capex_discharge + capex_storage
+
+    annualized_cost = annuity(
+        capex=capex_total,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    df['capacity'] = 0  # only for FlexMex 2b!
+
+    df['storage_capacity'] = 0  # only for FlexMex 2b!
+
+    # not processed yet!
+    df['losses'] = self_discharge
+
+    df['efficiency'] = (eta_charge + eta_discharge) / 2
+
+    df['capacity_cost'] = annualized_cost + fix_cost * capex_total
+
+    df['marginal_cost'] = operation_cost
+
+    # Write back to csv file
+    df.to_csv(file_path)
 
 def combine_profiles(raw_profile_path, column_name):
     profile_file_list = sorted(os.listdir(raw_profile_path))

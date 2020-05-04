@@ -6,6 +6,7 @@ from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
+    update_h2_cavern_simple,
     create_electricity_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
@@ -47,6 +48,7 @@ def main():
             'electricity-shortage',
             'electricity-curtailment',
             'electricity-demand',
+            'electricity-h2-cavern',
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
@@ -60,6 +62,7 @@ def main():
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
+    update_h2_cavern_simple(exp_paths.data_preprocessed, scalars)
 
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)

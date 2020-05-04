@@ -3,7 +3,7 @@ import logging
 import preprocessing
 import infer
 import optimization
-import postprocessing
+# import postprocessing
 
 
 if __name__ == '__main__':
@@ -15,4 +15,4 @@ if __name__ == '__main__':
 
     optimization.main()
 
-    postprocessing.main()
+    # postprocessing.main()
