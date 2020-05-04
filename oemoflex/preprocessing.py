@@ -503,6 +503,7 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
     # ignored:
     # Storage_LifeTime_H2_CavernCharge
     # Storage_LifeTime_H2_CavernDischarge
+
     lifetime = get_parameter_values(
         scalars,
         'Storage_LifeTime_H2_CavernStorage')
@@ -511,10 +512,13 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
         scalars,
         'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
 
-    capex_total = capex_charge + capex_discharge + capex_storage
+    annualized_cost_charge = annuity(
+        capex=capex_charge + capex_discharge,
+        n=lifetime,
+        wacc=interest)
 
-    annualized_cost = annuity(
-        capex=capex_total,
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
         n=lifetime,
         wacc=interest)
 
@@ -528,7 +532,9 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
 
     df['efficiency'] = (eta_charge + eta_discharge) / 2
 
-    df['capacity_cost'] = annualized_cost + fix_cost * capex_total
+    df['capacity_cost'] = annualized_cost_charge + fix_cost * (capex_charge + capex_discharge)
+
+    df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
 
     df['marginal_cost'] = operation_cost
 
