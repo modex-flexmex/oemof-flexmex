@@ -277,8 +277,10 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
     for component, prep_el in prep_elements.items():
         if 'marginal_cost' in prep_el.columns:
             df = prep_el[basic_columns]
-            if component == 'electricity-curtailment':
+            if prep_el['type'][0] == 'excess':
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
+            elif prep_el['type'][0] in ['backpressure', 'extraction']:
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_electricity']
             else:
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_out']
             df = pd.merge(
@@ -301,8 +303,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
     for component, prep_el in prep_elements.items():
         if 'carrier_cost' in prep_el.columns:
             df = prep_el[basic_columns]
-
-            if component == 'b':
+            if prep_el['type'][0] in ['backpressure', 'extraction']:
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_fuel']
             else:
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
@@ -311,7 +312,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
                 on=basic_columns
             )
             df['var_value'] = df['var_value'] * prep_el['marginal_cost']
-            df['var_name'] = 'cost_fuel'
+            df['var_name'] = 'carrier_cost'
 
             carrier_cost.append(df)
 
