@@ -28,6 +28,7 @@ def main():
         package_name='oemof-tabular-dispatch-example',
         foreign_keys={
             'bus': [
+                'heat-shortage',
                 'wind-onshore',
                 'wind-offshore',
                 'solar-pv',

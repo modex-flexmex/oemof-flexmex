@@ -35,6 +35,7 @@ def main():
                 'electricity-curtailment',
                 'electricity-demand',
                 'heat-demand',
+                'heat-shortage',
             ],
             'profile': [
                 'wind-onshore',

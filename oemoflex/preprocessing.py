@@ -230,8 +230,8 @@ def update_shortage(data_preprocessed_path, scalars):
     shortage.to_csv(shortage_file)
 
 
-def update_load(data_preprocessed_path, scalars):
-    logging.info("Updating load file")
+def update_electricity_demand(data_preprocessed_path, scalars):
+    logging.info("Updating electricity-demand file")
 
     load_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-demand.csv')
 
@@ -242,6 +242,23 @@ def update_load(data_preprocessed_path, scalars):
     load['amount'] = get_parameter_values(
         scalars,
         'Energy_FinalEnergy_Electricity') * 1e3  # GWh to MWh
+
+    # Write back to the CSV file
+    load.to_csv(load_file)
+
+
+def update_heat_demand(data_preprocessed_path, scalars):
+    logging.info("Updating heat-demand file")
+
+    load_file = os.path.join(data_preprocessed_path, 'elements', 'heat-demand.csv')
+
+    # Read prepared CSV file
+    load = pd.read_csv(load_file, index_col='region')
+
+    # Fill column for ALL the elements
+    load['amount'] = get_parameter_values(
+        scalars,
+        'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
 
     # Write back to the CSV file
     load.to_csv(load_file)
