@@ -240,8 +240,7 @@ def get_emissions():
     pass
 
 
-def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping):
-    usecase = 'FlexMex1_10'
+def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, usecase):
     flexmex_scalars = flexmex_scalars_template.copy()
 
     oemoflex_scalars.loc[oemoflex_scalars['var_unit'] == 'MWh', 'var_value'] *= 1e-3  # MWh to GWh

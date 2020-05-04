@@ -94,7 +94,7 @@ oemoflex_scalars['year'] = 2050
 oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
 # map to FlexMex data format
 flexmex_scalar_results = map_to_flexmex_results(
-    oemoflex_scalars, flexmex_scalars_template, mapping
+    oemoflex_scalars, flexmex_scalars_template, mapping, name
 )
 
 flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
