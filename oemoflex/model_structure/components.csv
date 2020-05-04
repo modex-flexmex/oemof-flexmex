@@ -11,3 +11,4 @@ gas-boiler,gas,conversion,boiler,Peak load boiler
 gas-extchp,gas,extraction,extchp,Extraction turbine CHP
 electricity-pth,electricity,conversion,pth,Resistive heater (Power-to-Heat)
 heat-demand,heat,load,demand,Heat demand
+electricity-h2-cavern,electricity,storage,cavern,Large scale H2 storage
