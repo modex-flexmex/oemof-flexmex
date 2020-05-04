@@ -241,23 +241,33 @@ def get_emissions():
 
 
 def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, usecase):
+    mapping = mapping.set_index('Parameter')
     flexmex_scalars = flexmex_scalars_template.copy()
-
+    oemoflex_scalars = oemoflex_scalars.set_index(['region', 'carrier', 'tech', 'var_name'])
     oemoflex_scalars.loc[oemoflex_scalars['var_unit'] == 'MWh', 'var_value'] *= 1e-3  # MWh to GWh
 
-    for _, row in mapping.loc[mapping['UseCase'] == usecase].iterrows():
-        values = oemoflex_scalars.loc[
-            (oemoflex_scalars['carrier'] == row['carrier']) &
-            (oemoflex_scalars['tech'] == row['tech']) &
-            (oemoflex_scalars['var_name'] == row['var_name']), ['region', 'var_value']]
+    for i, row in flexmex_scalars.loc[flexmex_scalars['UseCase'] == usecase].iterrows():
+        try:
+            select = mapping.loc[row['Parameter'], :]
+        except KeyError:
+            continue
 
-        values = values.set_index('region')['var_value']
+        try:
+            value = oemoflex_scalars.loc[
+                (row['Region'],
+                 select['carrier'],
+                 select['tech'],
+                 select['var_name']), 'var_value'].item()
 
-        for region, value in values.iteritems():
-            flexmex_scalars.loc[
-                (flexmex_scalars['UseCase'] == usecase) &
-                (flexmex_scalars['Parameter'] == row['Parameter']) &
-                (flexmex_scalars['Region'] == region), 'Value'] = value
+        except KeyError:
+            print(f"Key "
+                  f"{(row['Region'], select['carrier'], select['tech'], select['var_name'])}"
+                  f" not found")
+
+            continue
+
+        if isinstance(value, float):
+            flexmex_scalars.loc[i, 'Value'] = np.around(value)
 
     return flexmex_scalars
 
@@ -327,7 +337,9 @@ def get_total_system_cost(oemoflex_scalars):
     total_system_cost = pd.DataFrame(columns=oemoflex_scalars.columns)
     total_system_cost.loc[0, 'var_name'] = 'total_system_cost'
     total_system_cost.loc[0, 'var_value'] = df['var_value'].sum()
-
+    total_system_cost['carrier'] = 'ALL'
+    total_system_cost['tech'] = 'ALL'
+    total_system_cost['region'] = 'ALL'
     total_system_cost['var_unit'] = 'Eur'
 
     return total_system_cost
