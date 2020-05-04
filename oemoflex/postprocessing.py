@@ -228,9 +228,13 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping):
             (oemoflex_scalars['tech'] == row['tech']) &
             (oemoflex_scalars['var_name'] == row['var_name']), ['region', 'var_value']]
 
-        flexmex_scalars.loc[
-            (flexmex_scalars['UseCase'] == usecase) &
-            (flexmex_scalars['Parameter'] == row['Parameter']), 'var_value'] = values
+        values = values.set_index('region')['var_value']
+
+        for region, value in values.iteritems():
+            flexmex_scalars.loc[
+                (flexmex_scalars['UseCase'] == usecase) &
+                (flexmex_scalars['Parameter'] == row['Parameter']) &
+                (flexmex_scalars['Region'] == region), 'Value'] = value
 
     return flexmex_scalars
 
