@@ -147,7 +147,7 @@ def get_sequences_by_tech(results):
                 var_name = 'flow_fuel'
 
             else:
-                var_name = 'in_flow'
+                var_name = 'flow_in'
 
         if isinstance(key[1], Bus):
             bus = key[1]
@@ -168,7 +168,7 @@ def get_sequences_by_tech(results):
                     var_name = 'flow_heat'
 
             else:
-                var_name = 'out_flow'
+                var_name = 'flow_out'
 
         if key[1] is None:
             component = key[0]
@@ -219,8 +219,20 @@ def get_emissions(oemoflex_scalars, prep_elements):
 
 
 def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping):
+    usecase = 'FlexMex1_10'
+    flexmex_scalars = flexmex_scalars_template.copy()
 
-    pass
+    for n, row in mapping.loc[mapping['UseCase'] == usecase].iterrows():
+        values = oemoflex_scalars.loc[
+            (oemoflex_scalars['carrier'] == row['carrier']) &
+            (oemoflex_scalars['tech'] == row['tech']) &
+            (oemoflex_scalars['var_name'] == row['var_name']), ['region', 'var_value']]
+
+        flexmex_scalars.loc[
+            (flexmex_scalars['UseCase'] == usecase) &
+            (flexmex_scalars['Parameter'] == row['Parameter']), 'var_value'] = values
+
+    return flexmex_scalars
 
 
 def get_varom_cost(oemoflex_scalars, prep_elements):
@@ -229,9 +241,9 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
         if 'marginal_cost' in prep_el.columns:
             df = prep_el[basic_columns]
             if component == 'electricity-curtailment':
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'in_flow']
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
             else:
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'out_flow']
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_out']
             df = pd.merge(
                 df, flow,
                 on=basic_columns
@@ -253,9 +265,9 @@ def get_fuel_cost(oemoflex_scalars, prep_elements):
             df = prep_el[basic_columns]
 
             if component == 'b':
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'fuel_flow']
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_fuel']
             else:
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'in_flow']
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
             df = pd.merge(
                 df, flow,
                 on=basic_columns

@@ -28,7 +28,6 @@ flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 
 flexmex_scalars_template = flexmex_scalars_template.loc[flexmex_scalars_template['UseCase'] == name]
 
 # load mapping
-# TODO
 mapping = pd.read_csv(os.path.join(exp_paths.results_template, 'mapping.csv'))
 
 # Load preprocessed elements
@@ -92,5 +91,7 @@ oemoflex_scalars['year'] = 2050
 flexmex_scalar_results = map_to_flexmex_results(
     oemoflex_scalars, flexmex_scalars_template, mapping
 )
+
+flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
 
 # save_flexmex_timeseries(sequences_by_tech)
