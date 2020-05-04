@@ -4,10 +4,12 @@ import pandas as pd
 
 from oemof.solph import EnergySystem
 from oemoflex.postprocessing import \
-    create_postprocessed_results_subdirs, get_sequences_by_tech, get_capacities, \
+    create_postprocessed_results_subdirs, get_sequences_by_tech,\
+    get_capacities, format_capacities,\
     get_summed_sequences,\
-    get_transmission_losses, get_storage_losses, get_emissions,\
-    map_to_flexmex_results, get_varom_cost
+    get_transmission_losses, get_storage_losses, get_emissions, \
+    get_varom_cost, get_fuel_cost, get_total_system_cost, \
+    map_to_flexmex_results
 from oemoflex.helpers import \
     setup_experiment_paths, load_elements
 
@@ -27,6 +29,7 @@ flexmex_scalars_template = flexmex_scalars_template.loc[flexmex_scalars_template
 
 # load mapping
 # TODO
+mapping = pd.read_csv(os.path.join(exp_paths.results_template, 'mapping.csv'))
 
 # Load preprocessed elements
 prep_elements = load_elements(os.path.join(exp_paths.data_preprocessed, 'data', 'elements'))
@@ -37,8 +40,6 @@ es.restore(exp_paths.results_optimization)
 
 # format results sequences
 sequences_by_tech = get_sequences_by_tech(es.results)
-sequences_by_tech['electricity-transmission'].to_csv('~/Desktop/electricity-transmission.csv')
-sequences_by_tech['solar-pv'].to_csv('~/Desktop/solar-pv.csv')
 
 oemoflex_scalars = pd.DataFrame(
     columns=[
@@ -58,7 +59,6 @@ oemoflex_scalars = pd.DataFrame(
 
 # then sum the flows
 summed_sequences = get_summed_sequences(sequences_by_tech, prep_elements)
-summed_sequences.to_csv('~/Desktop/summed_sequences.csv')
 oemoflex_scalars = pd.concat([oemoflex_scalars, summed_sequences], sort=True)
 
 # losses (storage, transmission)
@@ -68,17 +68,20 @@ oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_los
 
 # get capacities
 capacities = get_capacities(es)
-# oemoflex_scalars = pd.concat([oemoflex_scalars, capacities])
+formatted_capacities = format_capacities(oemoflex_scalars, capacities)
+oemoflex_scalars = pd.concat([oemoflex_scalars, formatted_capacities])
 
 # emissions
 emissions = get_emissions(oemoflex_scalars, prep_elements)
-oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
+# oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
 
 # costs
-varom_costs = get_varom_cost(oemoflex_scalars, prep_elements)
-# fuel_cost = get_fuel_cost(oemoflex_scalars, prep_elements)
-# fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements)
-# total_cost = get_total_system_cost(oemoflex_scalars, prep_elements)
+varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
+fuel_cost = get_fuel_cost(oemoflex_scalars, prep_elements)
+oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, fuel_cost])
+
+total_system_cost = get_total_system_cost(oemoflex_scalars, prep_elements)
+oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
 
 # set experiment info
 oemoflex_scalars['usecase'] = name
@@ -86,6 +89,8 @@ oemoflex_scalars['model'] = 'oemof'
 oemoflex_scalars['year'] = 2050
 
 # map to FlexMex data format
-map_to_flexmex_results(
-    oemoflex_scalars, flexmex_scalars_template, exp_paths.results_postprocessed
+flexmex_scalar_results = map_to_flexmex_results(
+    oemoflex_scalars, flexmex_scalars_template, mapping
 )
+
+# save_flexmex_timeseries(sequences_by_tech)

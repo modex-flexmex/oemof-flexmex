@@ -7,6 +7,7 @@ from oemof.solph import Bus, Sink
 from oemof.tabular import facades
 import oemof.tabular.tools.postprocessing as pp
 
+basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
 POSTPROC_RES_SUBDIR_LIST = [
     'Boiler',
@@ -52,6 +53,7 @@ def get_capacities(es):
         DataFrame containing the capacities.
     """
     try:
+        # TODO: Adapt this for investment
         all = pp.bus_results(es, es.results, select="scalars", concat=True)
         all.name = "value"
         endogenous = all.reset_index()
@@ -77,23 +79,38 @@ def get_capacities(es):
                     pass
                 else:
                     key = (
-                        node,
-                        [n for n in node.outputs.keys()][0],
-                        "capacity",
-                        node.tech,  # tech & carrier are oemof-tabular specific
+                        node.region,
+                        node.label,
+                        # [n for n in node.outputs.keys()][0],
+                        node.type,
                         node.carrier,
+                        node.tech,  # tech & carrier are oemof-tabular specific
+                        'capacity'
                     )  # for oemof logic
-                    d[key] = {"value": node.capacity}
+                    d[key] = {'var_value': node.capacity}
     exogenous = pd.DataFrame.from_dict(d).T  # .dropna()
 
     if not exogenous.empty:
         exogenous.index = exogenous.index.set_names(
-            ["from", "to", "type", "tech", "carrier"]
+            ['region', 'name', 'type', 'carrier', 'tech', 'var_name']
         )
 
     capacities = pd.concat([endogenous, exogenous])
 
     return capacities
+
+
+def format_capacities(oemoflex_scalars, capacities):
+    df = pd.DataFrame(columns=oemoflex_scalars.columns)
+    df.loc[:, 'name'] = capacities.reset_index().loc[:, 'name']
+    df.loc[:, 'tech'] = capacities.reset_index().loc[:, 'tech']
+    df.loc[:, 'carrier'] = capacities.reset_index().loc[:, 'carrier']
+    df.loc[:, 'var_name'] = capacities.reset_index().loc[:, 'var_name']
+    df.loc[:, 'var_value'] = capacities.reset_index().loc[:, 'var_value']
+    df.loc[:, 'type'] = capacities.reset_index().loc[:, 'type']
+    df.loc[:, 'region'] = capacities.reset_index().loc[:, 'region']
+
+    return df
 
 
 def get_sequences_by_tech(results):
@@ -171,7 +188,6 @@ def get_sequences_by_tech(results):
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):
-    basic_columns = ['region', 'name', 'type', 'tech']
     summed_sequences = []
     for tech_carrier, sequence in sequences_by_tech.items():
         df = prep_elements[tech_carrier][basic_columns]
@@ -187,20 +203,87 @@ def get_summed_sequences(sequences_by_tech, prep_elements):
 
 
 def get_transmission_losses(oemoflex_scalars, prep_elements):
+    # oemoflex_scalars['var_name'] ==
+    #  'flow_gross_forward' - oemoflex_scalars['var_name'] == 'flow_net_forward'
     pass
 
 
 def get_storage_losses(oemoflex_scalars, prep_elements):
+    # oemoflex_scalars['var_name'] == 'flow_in' - oemoflex_scalars['var_name'] == 'flow_out'
     pass
 
 
 def get_emissions(oemoflex_scalars, prep_elements):
+    # TODO: Not included yet
     pass
 
 
-def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, dir):
+def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping):
+
     pass
 
 
 def get_varom_cost(oemoflex_scalars, prep_elements):
+    varom_cost = []
+    for component, prep_el in prep_elements.items():
+        if 'marginal_cost' in prep_el.columns:
+            df = prep_el[basic_columns]
+            if component == 'electricity-curtailment':
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'in_flow']
+            else:
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'out_flow']
+            df = pd.merge(
+                df, flow,
+                on=basic_columns
+            )
+            df['var_value'] = df['var_value'] * prep_el['marginal_cost']
+            df['var_name'] = 'cost_varom'
+
+            varom_cost.append(df)
+
+    varom_cost = pd.concat(varom_cost, sort=True)
+
+    return varom_cost
+
+
+def get_fuel_cost(oemoflex_scalars, prep_elements):
+    fuel_cost = []
+    for component, prep_el in prep_elements.items():
+        if 'fuel_cost' in prep_el.columns:
+            df = prep_el[basic_columns]
+
+            if component == 'b':
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'fuel_flow']
+            else:
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'in_flow']
+            df = pd.merge(
+                df, flow,
+                on=basic_columns
+            )
+            df['var_value'] = df['var_value'] * prep_el['marginal_cost']
+            df['var_name'] = 'cost_fuel'
+
+            fuel_cost.append(df)
+
+    if fuel_cost:
+        fuel_cost = pd.concat(fuel_cost, sort=True)
+    else:
+        fuel_cost = pd.DataFrame(fuel_cost)
+
+    return fuel_cost
+
+
+def get_capacity_cost(oemoflex_scalars, prep_elements):
+    # TODO: Problem there is no distinction btw fixom and invest cost!
+    # capacities * prep_elements[capacity_cost]
     pass
+
+
+def get_total_system_cost(oemoflex_scalars, prep_elements):
+    cost_list = ['cost_varom', 'cost_fuel', 'cost_capacity']
+    df = oemoflex_scalars.loc[oemoflex_scalars['var_name'].isin(cost_list)]
+    total_system_cost = pd.DataFrame(columns=oemoflex_scalars.columns)
+    total_system_cost.loc[0, 'var_name'] = 'total_system_cost'
+    total_system_cost.loc[0, 'var_value'] = df['var_value'].sum()
+
+    return total_system_cost
