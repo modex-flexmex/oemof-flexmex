@@ -65,9 +65,9 @@ re_generation = get_re_generation(oemoflex_scalars)
 oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation], sort=True)
 
 # losses (storage, transmission)
-transmission_losses = get_transmission_losses(oemoflex_scalars, prep_elements)
-storage_losses = get_storage_losses(oemoflex_scalars, prep_elements)
-oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses])
+transmission_losses = get_transmission_losses()
+storage_losses = get_storage_losses()
+# oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses])
 
 # get capacities
 capacities = get_capacities(es)
@@ -75,7 +75,7 @@ formatted_capacities = format_capacities(oemoflex_scalars, capacities)
 oemoflex_scalars = pd.concat([oemoflex_scalars, formatted_capacities])
 
 # emissions
-emissions = get_emissions(oemoflex_scalars, prep_elements)
+emissions = get_emissions()
 # oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
 
 # costs
@@ -83,7 +83,7 @@ varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
 fuel_cost = get_fuel_cost(oemoflex_scalars, prep_elements)
 oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, fuel_cost])
 
-total_system_cost = get_total_system_cost(oemoflex_scalars, prep_elements)
+total_system_cost = get_total_system_cost(oemoflex_scalars)
 oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
 
 # set experiment info

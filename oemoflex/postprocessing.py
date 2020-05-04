@@ -142,8 +142,7 @@ def get_sequences_by_tech(results):
                 elif bus == component.to_bus:
                     var_name = 'flow_gross_backward'
 
-            elif isinstance(component, facades.ExtractionTurbine)\
-                    or isinstance(component, facades.BackpressureTurbine):
+            elif isinstance(component, (facades.ExtractionTurbine, facades.BackpressureTurbine)):
                 var_name = 'flow_fuel'
 
             else:
@@ -159,8 +158,7 @@ def get_sequences_by_tech(results):
                 elif bus == component.from_bus:
                     var_name = 'flow_net_backward'
 
-            elif isinstance(component, facades.ExtractionTurbine)\
-                    or isinstance(component, facades.BackpressureTurbine):
+            elif isinstance(component, (facades.ExtractionTurbine, facades.BackpressureTurbine)):
                 if bus == component.electricity_bus:
                     var_name = 'flow_electricity'
 
@@ -222,18 +220,18 @@ def get_re_generation(oemoflex_scalars):
     return re_generation
 
 
-def get_transmission_losses(oemoflex_scalars, prep_elements):
+def get_transmission_losses():
     # oemoflex_scalars['var_name'] ==
     #  'flow_gross_forward' - oemoflex_scalars['var_name'] == 'flow_net_forward'
     pass
 
 
-def get_storage_losses(oemoflex_scalars, prep_elements):
+def get_storage_losses():
     # oemoflex_scalars['var_name'] == 'flow_in' - oemoflex_scalars['var_name'] == 'flow_out'
     pass
 
 
-def get_emissions(oemoflex_scalars, prep_elements):
+def get_emissions():
     # TODO: Not included yet
     pass
 
@@ -242,7 +240,7 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping):
     usecase = 'FlexMex1_10'
     flexmex_scalars = flexmex_scalars_template.copy()
 
-    for n, row in mapping.loc[mapping['UseCase'] == usecase].iterrows():
+    for _, row in mapping.loc[mapping['UseCase'] == usecase].iterrows():
         values = oemoflex_scalars.loc[
             (oemoflex_scalars['carrier'] == row['carrier']) &
             (oemoflex_scalars['tech'] == row['tech']) &
@@ -309,13 +307,13 @@ def get_fuel_cost(oemoflex_scalars, prep_elements):
     return fuel_cost
 
 
-def get_capacity_cost(oemoflex_scalars, prep_elements):
+def get_capacity_cost():
     # TODO: Problem there is no distinction btw fixom and invest cost!
     # capacities * prep_elements[capacity_cost]
     pass
 
 
-def get_total_system_cost(oemoflex_scalars, prep_elements):
+def get_total_system_cost(oemoflex_scalars):
     cost_list = ['cost_varom', 'cost_fuel', 'cost_capacity']
     df = oemoflex_scalars.loc[oemoflex_scalars['var_name'].isin(cost_list)]
     total_system_cost = pd.DataFrame(columns=oemoflex_scalars.columns)
