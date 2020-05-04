@@ -202,6 +202,26 @@ def get_summed_sequences(sequences_by_tech, prep_elements):
     return summed_sequences
 
 
+def get_re_generation(oemoflex_scalars):
+    renewable_carriers = ['solar', 'wind']
+    re_generation = pd.DataFrame(columns=oemoflex_scalars.columns)
+
+    re_flow = oemoflex_scalars.loc[(oemoflex_scalars['carrier'].isin(renewable_carriers)) &
+                                   (oemoflex_scalars['var_name'] == 'flow_out')]
+
+    sum = re_flow.groupby('region').sum()
+
+    re_generation['region'] = sum.index
+    re_generation['carrier'] = 're'
+    re_generation['type'] = 'none'
+    re_generation['tech'] = 'none'
+    re_generation['var_name'] = 're_generation'
+    re_generation = re_generation.drop('var_value', 1)
+    re_generation = pd.merge(re_generation, sum['var_value'], on='region')
+
+    return re_generation
+
+
 def get_transmission_losses(oemoflex_scalars, prep_elements):
     # oemoflex_scalars['var_name'] ==
     #  'flow_gross_forward' - oemoflex_scalars['var_name'] == 'flow_net_forward'

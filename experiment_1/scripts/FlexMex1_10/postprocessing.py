@@ -6,7 +6,7 @@ from oemof.solph import EnergySystem
 from oemoflex.postprocessing import \
     create_postprocessed_results_subdirs, get_sequences_by_tech,\
     get_capacities, format_capacities,\
-    get_summed_sequences,\
+    get_summed_sequences, get_re_generation,\
     get_transmission_losses, get_storage_losses, get_emissions, \
     get_varom_cost, get_fuel_cost, get_total_system_cost, \
     map_to_flexmex_results
@@ -59,6 +59,10 @@ oemoflex_scalars = pd.DataFrame(
 # then sum the flows
 summed_sequences = get_summed_sequences(sequences_by_tech, prep_elements)
 oemoflex_scalars = pd.concat([oemoflex_scalars, summed_sequences], sort=True)
+
+# get re_generation
+re_generation = get_re_generation(oemoflex_scalars)
+oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation], sort=True)
 
 # losses (storage, transmission)
 transmission_losses = get_transmission_losses(oemoflex_scalars, prep_elements)
