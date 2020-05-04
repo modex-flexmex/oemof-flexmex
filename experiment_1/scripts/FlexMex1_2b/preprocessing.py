@@ -5,14 +5,13 @@ import pandas as pd
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load,
-    update_extchp, update_boiler,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    create_electricity_demand_profiles, create_heat_demand_profiles,
+    create_electricity_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
-name = 'FlexMex1_4d'
+name = 'FlexMex1_2b'
 
 # Get paths
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -48,12 +47,9 @@ def main():
             'electricity-shortage',
             'electricity-curtailment',
             'electricity-demand',
-            'heat-demand',
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
-            'gas-extchp',
-            'gas-boiler',
         ]
 
     )
@@ -61,15 +57,12 @@ def main():
     # update elements
     update_shortage(exp_paths.data_preprocessed, scalars)
     update_load(exp_paths.data_preprocessed, scalars)
-    update_extchp(exp_paths.data_preprocessed, scalars)
-    update_boiler(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
 
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_heat_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_wind_onshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_wind_offshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
