@@ -265,9 +265,9 @@ def update_heat_demand(data_preprocessed_path, scalars):
 
 
 def update_bpchp(data_preprocessed_path, scalars):
-    logging.info("Updating gas-bpchp file")
+    logging.info("Updating ch4-bpchp file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-bpchp.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-bpchp.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
@@ -299,9 +299,9 @@ def update_bpchp(data_preprocessed_path, scalars):
 
 
 def update_extchp(data_preprocessed_path, scalars):
-    logging.info("Updating gas-extchp file")
+    logging.info("Updating ch4-extchp file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-extchp.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-extchp.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
@@ -343,9 +343,9 @@ def update_extchp(data_preprocessed_path, scalars):
 
 
 def update_boiler(data_preprocessed_path, scalars):
-    logging.info("Updating gas-boiler file")
+    logging.info("Updating ch4-boiler file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-boiler.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')

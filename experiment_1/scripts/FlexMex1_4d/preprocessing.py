@@ -53,8 +53,8 @@ def main():
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
-            'gas-extchp',
-            'gas-boiler',
+            'ch4-extchp',
+            'ch4-boiler',
         ]
 
     )

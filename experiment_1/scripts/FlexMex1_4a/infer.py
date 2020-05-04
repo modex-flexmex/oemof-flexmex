@@ -45,7 +45,7 @@ def main():
                 'heat-demand',
             ],
             'chp': [
-                'gas-bpchp',
+                'ch4-bpchp',
             ],
         },
         path=exp_paths.data_preprocessed

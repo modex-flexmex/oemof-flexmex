@@ -45,10 +45,10 @@ def main():
                 'heat-demand',
             ],
             'from_to_bus': [
-                'gas-boiler',
+                'ch4-boiler',
             ],
             'chp': [
-                'gas-extchp',
+                'ch4-extchp',
             ],
         },
         path=exp_paths.data_preprocessed
