@@ -110,6 +110,8 @@ def format_capacities(oemoflex_scalars, capacities):
     df.loc[:, 'type'] = capacities.reset_index().loc[:, 'type']
     df.loc[:, 'region'] = capacities.reset_index().loc[:, 'region']
 
+    df['var_unit'] = 'MW'
+
     return df
 
 
@@ -196,6 +198,7 @@ def get_summed_sequences(sequences_by_tech, prep_elements):
         summed_sequences.append(df)
 
     summed_sequences = pd.concat(summed_sequences, sort=True)
+    summed_sequences['var_unit'] = 'MWh'
 
     return summed_sequences
 
@@ -216,6 +219,7 @@ def get_re_generation(oemoflex_scalars):
     re_generation['var_name'] = 're_generation'
     re_generation = re_generation.drop('var_value', 1)
     re_generation = pd.merge(re_generation, sum['var_value'], on='region')
+    re_generation['var_unit'] = 'MWh'
 
     return re_generation
 
@@ -239,6 +243,8 @@ def get_emissions():
 def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping):
     usecase = 'FlexMex1_10'
     flexmex_scalars = flexmex_scalars_template.copy()
+
+    oemoflex_scalars.loc[oemoflex_scalars['var_unit'] == 'MWh', 'var_value'] *= 1e-3  # MWh to GWh
 
     for _, row in mapping.loc[mapping['UseCase'] == usecase].iterrows():
         values = oemoflex_scalars.loc[
@@ -276,6 +282,7 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
             varom_cost.append(df)
 
     varom_cost = pd.concat(varom_cost, sort=True)
+    varom_cost['var_unit'] = 'Eur'
 
     return varom_cost
 
@@ -304,6 +311,8 @@ def get_fuel_cost(oemoflex_scalars, prep_elements):
     else:
         fuel_cost = pd.DataFrame(fuel_cost)
 
+    fuel_cost['var_unit'] = 'Eur'
+
     return fuel_cost
 
 
@@ -319,5 +328,7 @@ def get_total_system_cost(oemoflex_scalars):
     total_system_cost = pd.DataFrame(columns=oemoflex_scalars.columns)
     total_system_cost.loc[0, 'var_name'] = 'total_system_cost'
     total_system_cost.loc[0, 'var_value'] = df['var_value'].sum()
+
+    total_system_cost['var_unit'] = 'Eur'
 
     return total_system_cost
