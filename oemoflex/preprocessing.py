@@ -293,10 +293,10 @@ def update_bpchp(data_preprocessed_path, scalars):
     ) / (1 + electricity_per_heat)
 
     df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
 
     df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_BpCCGT') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_BpCCGT') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
@@ -337,10 +337,10 @@ def update_extchp(data_preprocessed_path, scalars):
         + electric_efficiency
 
     df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
 
     df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
