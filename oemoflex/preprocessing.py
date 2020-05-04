@@ -441,6 +441,7 @@ def update_solar_pv(data_preprocessed_path, scalars):
 
     solarpv.to_csv(solar_pv_file)
 
+
 def update_h2_cavern_simple(data_preprocessed_path, scalars):
     r"""
     Simplified parameterization of a electricity H2 storage.
@@ -494,7 +495,7 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
 
     capex_storage = get_parameter_values(
         scalars,
-        'Storage_Capex_H2_CavernStorage')
+        'Storage_Capex_H2_CavernStorage') * 1e-3  # Eur/GWh -> Eur/MWh
 
     fix_cost = get_parameter_values(
         scalars,
@@ -527,8 +528,7 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
 
     df['storage_capacity'] = 0  # only for FlexMex 2b!
 
-    # not processed yet!
-    df['losses'] = self_discharge
+    df['loss_rate'] = self_discharge
 
     df['efficiency'] = (eta_charge + eta_discharge) / 2
 
