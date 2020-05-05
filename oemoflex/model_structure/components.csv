@@ -12,3 +12,4 @@ gas-extchp,gas,extraction,extchp,Extraction turbine CHP
 electricity-pth,electricity,conversion,pth,Resistive heater (Power-to-Heat)
 heat-demand,heat,load,demand,Heat demand
 electricity-h2-cavern,electricity,storage,cavern,Large scale H2 storage
+electricity-liion-battery,electricity,storage,liion-battery,Li-ion battery storage

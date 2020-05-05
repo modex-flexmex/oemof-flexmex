@@ -541,6 +541,105 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
     # Write back to csv file
     df.to_csv(file_path)
 
+
+def update_liion_battery(data_preprocessed_path, scalars):
+    r"""
+    Simplified parameterization of a Li-ion battery storage.
+
+    Parameters
+    ----------
+    data_preprocessed_path
+    scalars
+
+    Returns
+    -------
+
+    """
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-liion-battery.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    # Operation parameters
+
+    # not in FleMex 2b!
+    # capacity_charge = get_parameter_values(scalars, 'Storage_Capacity_Electricity_LiIonBatteryCharge')
+    #
+    # capacity_discharge = get_parameter_values(scalars, 'Storage_Capacity_Electricity_LiIonBatteryDischarge')
+    #
+    # storage_capacity = get_parameter_values(
+    #     scalars, 'Storage_Capacity_Electricity_LiIonBatteryStorage') * 1e3  # GWh to MWh
+
+    self_discharge = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
+
+    operation_cost = get_parameter_values(
+        scalars, 'Storage_VarOM_Electricity_LiIonBattery') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    eta_charge = get_parameter_values(
+        scalars, 'Storage_Eta_Electricity_LiIonBatteryCharge') * 1e-2  # percent -> 0...1
+
+    eta_discharge = get_parameter_values(
+        scalars, 'Storage_Eta_Electricity_LiIonBatteryDischarge') * 1e-2  # percent -> 0...1
+
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryCharge')
+
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryDischarge')
+
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryStorage') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
+
+    # ignored:
+    # Storage_LifeTime_Electricity_LiIonBatteryCharge
+    # Storage_LifeTime_Electricity_LiIonBatteryDischarge
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_Electricity_LiIonBatteryStorage')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge + capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    df['capacity'] = 0  # only for FlexMex 2b!
+
+    df['storage_capacity'] = 0  # only for FlexMex 2b!
+
+    df['loss_rate'] = self_discharge
+
+    df['efficiency'] = (eta_charge + eta_discharge) / 2
+
+    df['capacity_cost'] = annualized_cost_charge + fix_cost * (capex_charge + capex_discharge)
+
+    df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    df['marginal_cost'] = operation_cost
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
 def combine_profiles(raw_profile_path, column_name):
     profile_file_list = sorted(os.listdir(raw_profile_path))
 
