@@ -7,6 +7,7 @@ dirs = [
     'FlexMex1_4b',
     'FlexMex1_4c',
     'FlexMex1_4d',
+    'FlexMex1_5',
     'FlexMex1_10',
 ]
 
