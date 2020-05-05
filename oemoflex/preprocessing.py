@@ -3,6 +3,7 @@ import os
 
 import pandas as pd
 
+
 module_path = os.path.dirname(os.path.abspath(__file__))
 
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
@@ -153,6 +154,9 @@ def create_component_element(component_attrs_file):
         comp_data['from_bus'] = [region + suffices['from_bus'] for region in regions_list]
         comp_data['to_bus'] = [region + suffices['to_bus'] for region in regions_list]
 
+        if 'efficiency' in suffices:
+            comp_data['efficiency'] = [region + suffices['efficiency'] for region in regions_list]
+
     elif defaults['type'] in ['backpressure', 'extraction']:
         comp_data['region'] = regions_list
         comp_data['name'] = [region + suffices['name'] for region in regions_list]
@@ -216,8 +220,8 @@ def get_parameter_values(scalars_df, parameter_name):
     return parameter_value
 
 
-def update_shortage(data_preprocessed_path, scalars):
-    logging.info("Updating shortage file")
+def update_electricity_shortage(data_preprocessed_path, scalars):
+    logging.info("Updating electricity shortage file")
 
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-shortage.csv')
 
@@ -228,6 +232,23 @@ def update_shortage(data_preprocessed_path, scalars):
     shortage['marginal_cost'] = get_parameter_values(
         scalars,
         'Energy_SlackCost_Electricity') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Write back to the CSV file
+    shortage.to_csv(shortage_file)
+
+
+def update_heat_shortage(data_preprocessed_path, scalars):
+    logging.info("Updating heat shortage file")
+
+    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'heat-shortage.csv')
+
+    # Read prepared CSV file
+    shortage = pd.read_csv(shortage_file, index_col='region')
+
+    # Fill column 'marginal_cost' with a fixed value for ALL the elements
+    shortage['marginal_cost'] = get_parameter_values(
+        scalars,
+        'Energy_SlackCost_Heat') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to the CSV file
     shortage.to_csv(shortage_file)
@@ -388,6 +409,72 @@ def update_pth(data_preprocessed_path, scalars):
 
     df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_Electricity_Large') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_electricity_heatpump(data_preprocessed_path, scalars):
+    logging.info("Updating electricity-heatpump file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Small'
+    )
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Small') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_heat_storage(data_preprocessed_path, scalars):
+    logging.info("Updating heat-storage file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
+
+    df['storage_capacity'] = get_parameter_values(
+        scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
+
+    df['losses'] = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'Storage_Eta_Heat_SmallCharge') * 0.01  # Percent to decimals
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'Storage_VarOM_Heat_Small') * 1e3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_ch4_gt(data_preprocessed_path, scalars):
+    logging.info("Updating ch4-gt file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Electricity_CH4_GT')
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_EtaNet_Electricity_CH4_GT') * 0.01  # Percent to decimals
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Electricity_CH4_GT') * 1e3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
@@ -554,4 +641,18 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
 
     solar_pv_profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'solar-pv_profile.csv')
+    )
+
+
+def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
+    logging.info("Creating electricity heatpump profiles")
+
+    raw_profile_paths = os.path.join(
+        data_raw_path, 'OtherProfiles', 'COP'
+    )
+
+    profile_df = combine_profiles(raw_profile_paths, 'cop-profile')
+
+    profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'efficiency_profile.csv')
     )
