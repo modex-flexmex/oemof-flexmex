@@ -42,7 +42,12 @@ def main():
     )
 
     # Filter out only scenario-related input parameters
+    scalars = scalars.set_index(['Region', 'Parameter'])
+    overwrite_scalars = scalars.loc[scalars['Scenario'] == 'FlexMex1UC5_7_8', :]
     scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']), :]
+
+    scalars.update(overwrite_scalars)
+    scalars = scalars.reset_index()
 
     # Prepare oemof.tabular input CSV files
     create_default_elements(
