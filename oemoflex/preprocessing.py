@@ -442,10 +442,10 @@ def update_heat_storage(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
-def update_gas_turbine(data_preprocessed_path, scalars):
-    logging.info("Updating gas-turbine file")
+def update_ch4_turbine(data_preprocessed_path, scalars):
+    logging.info("Updating ch4-turbine file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-turbine.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-turbine.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')

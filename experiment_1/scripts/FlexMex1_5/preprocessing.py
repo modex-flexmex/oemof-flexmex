@@ -6,7 +6,7 @@ from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_shortage, update_load,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    update_electricity_heatpump, update_heat_storage, update_gas_turbine,
+    update_electricity_heatpump, update_heat_storage, update_ch4_turbine,
     create_electricity_demand_profiles, create_heat_demand_profiles,
     create_electricity_heatpump_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
@@ -55,7 +55,7 @@ def main():
             'solar-pv',
             'electricity-heatpump',
             'heat-storage',
-            'gas-turbine',
+            'ch4-turbine',
         ]
     )
 
@@ -67,7 +67,7 @@ def main():
     update_solar_pv(exp_paths.data_preprocessed, scalars)
     update_electricity_heatpump(exp_paths.data_preprocessed, scalars)
     update_heat_storage(exp_paths.data_preprocessed, scalars)
-    update_gas_turbine(exp_paths.data_preprocessed, scalars)
+    update_ch4_turbine(exp_paths.data_preprocessed, scalars)
 
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)

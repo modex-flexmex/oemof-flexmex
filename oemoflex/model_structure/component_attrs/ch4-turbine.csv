@@ -1,8 +1,8 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-gas-turbine,Name
+name,str,n/a,,-ch4-turbine,Name
 type,str,n/a,dispatchable,,Type
-carrier,str,n/a,gas,,Energy carrier
+carrier,str,n/a,ch4,,Energy carrier
 tech,str,n/a,turbine,,Technology
 bus,str,n/a,,-electricity,The bus this component is connected to
 capacity,float,MW,n/a,,Installed capacity
