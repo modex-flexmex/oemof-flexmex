@@ -325,7 +325,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
     else:
         carrier_cost = pd.DataFrame(carrier_cost)
 
-        carrier_cost['var_unit'] = 'Eur'
+    carrier_cost['var_unit'] = 'Eur'
 
     return carrier_cost
 
