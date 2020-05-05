@@ -90,9 +90,9 @@ def main():
     # set experiment info
     oemoflex_scalars['usecase'] = name
     oemoflex_scalars['model'] = 'oemof'
-    oemoflex_scalars['year'] = 2050
+    oemoflex_scalars['year'] = year
 
-    oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
+    oemoflex_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'))
     # map to FlexMex data format
     flexmex_scalar_results = map_to_flexmex_results(
         oemoflex_scalars, flexmex_scalars_template, mapping, name
