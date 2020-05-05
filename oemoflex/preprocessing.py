@@ -355,7 +355,8 @@ def update_nuclear_st(data_preprocessed_path, scalars):
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    nuclear['capacity'] = capacity
+    # nuclear['capacity'] = capacity
+    nuclear['capacity'] = 0  # FlexMex 2a only!
 
     nuclear['capacity_cost'] = annualized_cost + fix_cost * capex
 
@@ -408,7 +409,8 @@ def update_ch4_gt(data_preprocessed_path, scalars):
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    ch4['capacity'] = capacity
+    # ch4['capacity'] = capacity
+    ch4['capacity'] = 0  # FlexMex 2a only!
 
     ch4['capacity_cost'] = annualized_cost + fix_cost * capex
 
