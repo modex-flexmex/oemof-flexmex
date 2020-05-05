@@ -32,6 +32,7 @@ def main():
                 'wind-offshore',
                 'solar-pv',
                 'electricity-shortage',
+                'heat-shortage',
                 'electricity-curtailment',
                 'electricity-demand',
                 'heat-demand',
