@@ -13,5 +13,5 @@ ch4-extchp,ch4,extraction,extchp,Extraction turbine CHP
 electricity-pth,electricity,conversion,pth,Resistive heater (Power-to-Heat)
 heat-demand,heat,load,demand,Heat demand
 electricity-heatpump,electricity,conversion,heatpump,Airsource compression heatpump
-ch4-turbine,gas,dispatchable,turbine,Open cycle gas turbine
+ch4-gt,gas,dispatchable,gt,Open cycle gas turbine
 heat-storage,heat,storage,storage,Large scale sensible heat storage

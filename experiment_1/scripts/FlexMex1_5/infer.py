@@ -36,7 +36,7 @@ def main():
                 'electricity-demand',
                 'heat-demand',
                 'heat-storage',
-                'ch4-turbine',
+                'ch4-gt',
             ],
             'profile': [
                 'wind-onshore',

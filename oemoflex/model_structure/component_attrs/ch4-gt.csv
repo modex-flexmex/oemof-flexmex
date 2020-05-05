@@ -1,9 +1,9 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-ch4-turbine,Name
+name,str,n/a,,-ch4-gt,Name
 type,str,n/a,dispatchable,,Type
 carrier,str,n/a,ch4,,Energy carrier
-tech,str,n/a,turbine,,Technology
+tech,str,n/a,gt,,Technology
 bus,str,n/a,,-electricity,The bus this component is connected to
 capacity,float,MW,n/a,,Installed capacity
 marginal_cost,float,Eur/MWh,n/a,,Marginal cost
