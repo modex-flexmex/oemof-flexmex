@@ -479,7 +479,7 @@ def update_ch4_gt(data_preprocessed_path, scalars):
         * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
     df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_Electricity_CH4_GT') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'EnergyConversion_VarOM_Electricity_CH4_GT') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
