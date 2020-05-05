@@ -544,7 +544,13 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
 
 def update_liion_battery(data_preprocessed_path, scalars):
     r"""
-    Simplified parameterization of a Li-ion battery storage.
+    Parameterization of a Li-ion battery storage.
+
+    Mapping and calculation could be easier since symmetric parametrization of a battery fits
+    perfectly to oemof facade's Storage object. For consistency reasons, however, we use H2_cavern
+    update function as a template and keep as much as possible similar (values in Scalars.csv will
+    make sure that it is symmetric again) making future abstraction into one update function
+    easier.
 
     Parameters
     ----------
@@ -563,9 +569,11 @@ def update_liion_battery(data_preprocessed_path, scalars):
     # Operation parameters
 
     # not in FleMex 2b!
-    # capacity_charge = get_parameter_values(scalars, 'Storage_Capacity_Electricity_LiIonBatteryCharge')
+    # capacity_charge = get_parameter_values(
+    #     scalars, 'Storage_Capacity_Electricity_LiIonBatteryCharge')
     #
-    # capacity_discharge = get_parameter_values(scalars, 'Storage_Capacity_Electricity_LiIonBatteryDischarge')
+    # capacity_discharge = get_parameter_values(
+    #     scalars, 'Storage_Capacity_Electricity_LiIonBatteryDischarge')
     #
     # storage_capacity = get_parameter_values(
     #     scalars, 'Storage_Capacity_Electricity_LiIonBatteryStorage') * 1e3  # GWh to MWh
