@@ -14,7 +14,7 @@ from oemoflex.helpers import \
     setup_experiment_paths, load_elements
 
 
-name = 'FlexMex1_10'
+name = 'FlexMex1_4b'
 
 year = 2050
 
@@ -80,8 +80,8 @@ emissions = get_emissions()
 
 # costs
 varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
-fuel_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
-oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, fuel_cost])
+carrier_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
+oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, carrier_cost])
 
 total_system_cost = get_total_system_cost(oemoflex_scalars)
 oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)

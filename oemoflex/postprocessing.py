@@ -240,36 +240,47 @@ def get_emissions():
     pass
 
 
-def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping):
-    usecase = 'FlexMex1_10'
+def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, usecase):
+    mapping = mapping.set_index('Parameter')
     flexmex_scalars = flexmex_scalars_template.copy()
-
+    oemoflex_scalars = oemoflex_scalars.set_index(['region', 'carrier', 'tech', 'var_name'])
     oemoflex_scalars.loc[oemoflex_scalars['var_unit'] == 'MWh', 'var_value'] *= 1e-3  # MWh to GWh
 
-    for _, row in mapping.loc[mapping['UseCase'] == usecase].iterrows():
-        values = oemoflex_scalars.loc[
-            (oemoflex_scalars['carrier'] == row['carrier']) &
-            (oemoflex_scalars['tech'] == row['tech']) &
-            (oemoflex_scalars['var_name'] == row['var_name']), ['region', 'var_value']]
+    for i, row in flexmex_scalars.loc[flexmex_scalars['UseCase'] == usecase].iterrows():
+        try:
+            select = mapping.loc[row['Parameter'], :]
+        except KeyError:
+            continue
 
-        values = values.set_index('region')['var_value']
+        try:
+            value = oemoflex_scalars.loc[
+                (row['Region'],
+                 select['carrier'],
+                 select['tech'],
+                 select['var_name']), 'var_value']
 
-        for region, value in values.iteritems():
-            flexmex_scalars.loc[
-                (flexmex_scalars['UseCase'] == usecase) &
-                (flexmex_scalars['Parameter'] == row['Parameter']) &
-                (flexmex_scalars['Region'] == region), 'Value'] = value
+        except KeyError:
+            print(f"Key "
+                  f"{(row['Region'], select['carrier'], select['tech'], select['var_name'])}"
+                  f" not found")
+
+            continue
+
+        if isinstance(value, float):
+            flexmex_scalars.loc[i, 'Value'] = np.around(value)
 
     return flexmex_scalars
 
 
 def get_varom_cost(oemoflex_scalars, prep_elements):
     varom_cost = []
-    for component, prep_el in prep_elements.items():
+    for _, prep_el in prep_elements.items():
         if 'marginal_cost' in prep_el.columns:
             df = prep_el[basic_columns]
-            if component == 'electricity-curtailment':
+            if prep_el['type'][0] == 'excess':
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
+            elif prep_el['type'][0] in ['backpressure', 'extraction']:
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_electricity']
             else:
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_out']
             df = pd.merge(
@@ -287,13 +298,12 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
     return varom_cost
 
 
-def get_fuel_cost(oemoflex_scalars, prep_elements):
-    fuel_cost = []
-    for component, prep_el in prep_elements.items():
-        if 'fuel_cost' in prep_el.columns:
+def get_carrier_cost(oemoflex_scalars, prep_elements):
+    carrier_cost = []
+    for _, prep_el in prep_elements.items():
+        if 'carrier_cost' in prep_el.columns:
             df = prep_el[basic_columns]
-
-            if component == 'b':
+            if prep_el['type'][0] in ['backpressure', 'extraction']:
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_fuel']
             else:
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
@@ -302,18 +312,18 @@ def get_fuel_cost(oemoflex_scalars, prep_elements):
                 on=basic_columns
             )
             df['var_value'] = df['var_value'] * prep_el['marginal_cost']
-            df['var_name'] = 'cost_fuel'
+            df['var_name'] = 'cost_carrier'
 
-            fuel_cost.append(df)
+            carrier_cost.append(df)
 
-    if fuel_cost:
-        fuel_cost = pd.concat(fuel_cost, sort=True)
+    if carrier_cost:
+        carrier_cost = pd.concat(carrier_cost, sort=True)
     else:
-        fuel_cost = pd.DataFrame(fuel_cost)
+        carrier_cost = pd.DataFrame(carrier_cost)
 
-    fuel_cost['var_unit'] = 'Eur'
+        carrier_cost['var_unit'] = 'Eur'
 
-    return fuel_cost
+    return carrier_cost
 
 
 def get_capacity_cost():
@@ -328,7 +338,9 @@ def get_total_system_cost(oemoflex_scalars):
     total_system_cost = pd.DataFrame(columns=oemoflex_scalars.columns)
     total_system_cost.loc[0, 'var_name'] = 'total_system_cost'
     total_system_cost.loc[0, 'var_value'] = df['var_value'].sum()
-
+    total_system_cost['carrier'] = 'ALL'
+    total_system_cost['tech'] = 'ALL'
+    total_system_cost['region'] = 'ALL'
     total_system_cost['var_unit'] = 'Eur'
 
     return total_system_cost
