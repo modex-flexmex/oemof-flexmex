@@ -28,6 +28,7 @@ def main():
         package_name='oemof-tabular-dispatch-example',
         foreign_keys={
             'bus': [
+                'heat-shortage',
                 'wind-onshore',
                 'wind-offshore',
                 'solar-pv',
@@ -44,7 +45,7 @@ def main():
                 'heat-demand',
             ],
             'chp': [
-                'gas-bpchp',
+                'ch4-bpchp',
             ],
         },
         path=exp_paths.data_preprocessed
