@@ -220,8 +220,8 @@ def get_parameter_values(scalars_df, parameter_name):
     return parameter_value
 
 
-def update_shortage(data_preprocessed_path, scalars):
-    logging.info("Updating shortage file")
+def update_electricity_shortage(data_preprocessed_path, scalars):
+    logging.info("Updating electricity shortage file")
 
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-shortage.csv')
 
@@ -232,6 +232,23 @@ def update_shortage(data_preprocessed_path, scalars):
     shortage['marginal_cost'] = get_parameter_values(
         scalars,
         'Energy_SlackCost_Electricity') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Write back to the CSV file
+    shortage.to_csv(shortage_file)
+
+
+def update_heat_shortage(data_preprocessed_path, scalars):
+    logging.info("Updating heat shortage file")
+
+    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'heat-shortage.csv')
+
+    # Read prepared CSV file
+    shortage = pd.read_csv(shortage_file, index_col='region')
+
+    # Fill column 'marginal_cost' with a fixed value for ALL the elements
+    shortage['marginal_cost'] = get_parameter_values(
+        scalars,
+        'Energy_SlackCost_Heat') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to the CSV file
     shortage.to_csv(shortage_file)
