@@ -473,6 +473,11 @@ def update_ch4_gt(data_preprocessed_path, scalars):
     df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNet_Electricity_CH4_GT') * 0.01  # Percent to decimals
 
+    df['carrier_cost'] = (
+        get_parameter_values(scalars, 'Energy_Price_CH4')
+        + get_parameter_values(scalars, 'Energy_Price_CO2')
+        * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
+
     df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Electricity_CH4_GT') * 1e3  # Eur/GWh to Eur/MWh
 
