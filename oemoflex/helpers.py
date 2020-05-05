@@ -226,3 +226,46 @@ def delete_empty_subdirs(path):
                 shutil.rmtree(p)
         else:
             break
+
+
+def get_name_path_dict(dir):
+    r"""
+    Returns a dictionary with all the csv files in
+    a given directory as keys and their paths as
+    values.
+
+    Parameters
+    ----------
+    dir : path
+
+    Returns
+    -------
+    name_path_dict : dict
+    """
+    name_path_dict = {
+        file.split('.')[0]: os.path.join(dir, file)
+        for file in os.listdir(dir)
+        if file.endswith('.csv')
+    }
+
+    return name_path_dict
+
+
+def load_elements(dir):
+    r"""
+
+    Parameters
+    ----------
+    dir : path
+
+    Returns
+    -------
+    name_dataframe_dict : dict
+    """
+    name_path_dict = get_name_path_dict(dir)
+
+    name_dataframe_dict = {}
+    for name, path in name_path_dict.items():
+        name_dataframe_dict[name] = pd.read_csv(path)
+
+    return name_dataframe_dict

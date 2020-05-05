@@ -13,7 +13,7 @@ from oemof.tabular.facades import TYPEMAP
 from oemoflex.helpers import setup_experiment_paths
 
 
-name = 'FlexMex1_4a'
+name = 'FlexMex1_10'
 
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 exp_paths = setup_experiment_paths(name, basepath)
