@@ -4,7 +4,7 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements, update_shortage, update_load,
+    create_default_elements, update_electricity_shortage, update_electricity_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     update_h2_cavern_simple, update_liion_battery,
     create_electricity_demand_profiles,
@@ -67,8 +67,8 @@ def main():
     )
 
     # update elements
-    update_shortage(exp_paths.data_preprocessed, scalars)
-    update_load(exp_paths.data_preprocessed, scalars)
+    update_electricity_shortage(exp_paths.data_preprocessed, scalars)
+    update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
