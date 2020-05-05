@@ -274,7 +274,7 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
 
 def get_varom_cost(oemoflex_scalars, prep_elements):
     varom_cost = []
-    for component, prep_el in prep_elements.items():
+    for _, prep_el in prep_elements.items():
         if 'marginal_cost' in prep_el.columns:
             df = prep_el[basic_columns]
             if prep_el['type'][0] == 'excess':
@@ -300,7 +300,7 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
 
 def get_carrier_cost(oemoflex_scalars, prep_elements):
     carrier_cost = []
-    for component, prep_el in prep_elements.items():
+    for _, prep_el in prep_elements.items():
         if 'carrier_cost' in prep_el.columns:
             df = prep_el[basic_columns]
             if prep_el['type'][0] in ['backpressure', 'extraction']:
