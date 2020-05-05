@@ -8,7 +8,7 @@ from oemoflex.postprocessing import \
     get_capacities, format_capacities,\
     get_summed_sequences, get_re_generation,\
     get_transmission_losses, get_storage_losses, get_emissions, \
-    get_varom_cost, get_fuel_cost, get_total_system_cost, \
+    get_varom_cost, get_carrier_cost, get_total_system_cost, \
     map_to_flexmex_results
 from oemoflex.helpers import \
     setup_experiment_paths, load_elements
@@ -80,7 +80,7 @@ emissions = get_emissions()
 
 # costs
 varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
-fuel_cost = get_fuel_cost(oemoflex_scalars, prep_elements)
+fuel_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
 oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, fuel_cost])
 
 total_system_cost = get_total_system_cost(oemoflex_scalars)
@@ -94,7 +94,7 @@ oemoflex_scalars['year'] = 2050
 oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
 # map to FlexMex data format
 flexmex_scalar_results = map_to_flexmex_results(
-    oemoflex_scalars, flexmex_scalars_template, mapping
+    oemoflex_scalars, flexmex_scalars_template, mapping, name
 )
 
 flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
