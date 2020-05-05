@@ -210,7 +210,11 @@ def get_re_generation(oemoflex_scalars):
     re_flow = oemoflex_scalars.loc[(oemoflex_scalars['carrier'].isin(renewable_carriers)) &
                                    (oemoflex_scalars['var_name'] == 'flow_out')]
 
-    sum = re_flow.groupby('region').sum()
+    curtailment = oemoflex_scalars.loc[(oemoflex_scalars['carrier'] == 'electricity') &
+                                       (oemoflex_scalars['tech'] == 'curtailment') &
+                                       (oemoflex_scalars['var_name'] == 'flow_in')]
+
+    sum = re_flow.groupby('region').sum() - curtailment.groupby('region').sum()
 
     re_generation['region'] = sum.index
     re_generation['carrier'] = 're'
