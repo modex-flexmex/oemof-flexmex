@@ -43,6 +43,7 @@ def main():
                 'wind-offshore',
                 'solar-pv',
                 'electricity-demand',
+                'heat-demand',
             ],
             'from_to_bus': ['electricity-heatpump'],
             'efficiency': ['electricity-heatpump'],

@@ -9,7 +9,6 @@ from oemof.solph import EnergySystem, Model
 # DONT REMOVE THIS LINE!
 from oemof.tabular import datapackage  # noqa
 from oemof.tabular.facades import TYPEMAP
-import oemof.tabular.tools.postprocessing as pp
 
 from oemoflex.helpers import setup_experiment_paths
 
@@ -55,12 +54,12 @@ def main():
     m.solve(solver=solver)
 
     # get the results from the the solved model(still oemof.solph)
-    m.results = m.results()
+    es.results = m.results()
 
     # now we use the write results method to write the results in oemof-tabular
     # format
     logging.info(f'Writing the results to {exp_paths.results_optimization}')
-    pp.write_results(m, exp_paths.results_optimization, raw=True)
+    es.dump(exp_paths.results_optimization)
 
 
 if __name__ == '__main__':
