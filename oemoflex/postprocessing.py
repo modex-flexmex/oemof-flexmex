@@ -257,7 +257,7 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
                 (row['Region'],
                  select['carrier'],
                  select['tech'],
-                 select['var_name']), 'var_value'].item()
+                 select['var_name']), 'var_value']
 
         except KeyError:
             print(f"Key "
@@ -312,7 +312,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
                 on=basic_columns
             )
             df['var_value'] = df['var_value'] * prep_el['marginal_cost']
-            df['var_name'] = 'carrier_cost'
+            df['var_name'] = 'cost_carrier'
 
             carrier_cost.append(df)
 
