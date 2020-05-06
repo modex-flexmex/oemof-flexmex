@@ -9,12 +9,11 @@ from oemof.solph import EnergySystem, Model
 # DONT REMOVE THIS LINE!
 from oemof.tabular import datapackage  # noqa
 from oemof.tabular.facades import TYPEMAP
-import oemof.tabular.tools.postprocessing as pp
 
 from oemoflex.helpers import setup_experiment_paths
 
 
-name = 'FlexMex1_10'
+name = 'FlexMex1_4a'
 
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 exp_paths = setup_experiment_paths(name, basepath)
@@ -44,10 +43,10 @@ def main():
     # if you want dual variables / shadow prices uncomment line below
     # m.receive_duals()
 
-    # save lp file together with optimization results
-    lp_file_dir = os.path.join(exp_paths.results_optimization, '{}.lp'.format(name))
-    logging.info(f"Saving the lp-file to {lp_file_dir}")
-    m.write(lp_file_dir, io_options={'symbolic_solver_labels': True})
+    # # save lp file together with optimization results
+    # lp_file_dir = os.path.join(exp_paths.results_optimization, '{}.lp'.format(name))
+    # logging.info(f"Saving the lp-file to {lp_file_dir}")
+    # m.write(lp_file_dir, io_options={'symbolic_solver_labels': True})
 
     # select solver 'gurobi', 'cplex', 'glpk' etc
     solver = 'cbc'
@@ -55,12 +54,12 @@ def main():
     m.solve(solver=solver)
 
     # get the results from the the solved model(still oemof.solph)
-    m.results = m.results()
+    es.results = m.results()
 
     # now we use the write results method to write the results in oemof-tabular
     # format
     logging.info(f'Writing the results to {exp_paths.results_optimization}')
-    pp.write_results(m, exp_paths.results_optimization, raw=True)
+    es.dump(exp_paths.results_optimization)
 
 
 if __name__ == '__main__':

@@ -3,6 +3,7 @@ region,str,n/a,n/a,,Country code
 name,str,n/a,,,Name
 type,str,n/a,link,,Type
 carrier,str,n/a,electricity,,Energy carrier
+tech,str,n/a,transmission,,Technology
 from_bus,str,n/a,,-electricity,Bus where link starts
 to_bus,str,n/a,,-electricity,Bus where link ends
 capacity,float,MW,n/a,,Net transfer capacity

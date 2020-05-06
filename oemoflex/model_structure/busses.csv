@@ -1,3 +1,4 @@
-carrier,description
-electricity,Electricity bus
-heat,Heat bus
+carrier,balanced,description
+electricity,true,Electricity bus
+heat,true,Heat bus
+ch4,false,CH4 bus

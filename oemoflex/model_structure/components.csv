@@ -1,10 +1,18 @@
 name,carrier,type,tech,description
 electricity-demand,electricity,load,demand,Electricity demand
+heat-shortage,heat,source,shortage,Shortage backup to keep model solvable
 electricity-shortage,electricity,source,shortage,Shortage backup to keep model solvable
 electricity-transmission,electricity,link,transmission,Electrical transmission between regions
 solar-pv,solar,volatile,pv,Solar pv capacities
 wind-offshore,wind,volatile,offshore,Offshore wind capacities
 wind-onshore,wind,volatile,onshore,Onshore wind capacities
 electricity-curtailment,electricity,sink,curtailment,Curtailment of non-dispatchable electricity
-ch4-gt,ch4,dispatchable,gt,Natural gas driven gas turbine capacities
+ch4-gt,ch4,dispatchable,gt,Open cycle gas turbine gas turbine capacities (natural gas driven)
 uranium-nuclear-st,uranium,dispatchable,nuclear-st,Nuclear power plant capacities (steam turbine)
+ch4-bpchp,ch4,backpressure,bpchp,Backpressure turbine CHP
+ch4-boiler,ch4,conversion,boiler,Peak load boiler
+ch4-extchp,ch4,extraction,extchp,Extraction turbine CHP
+electricity-pth,electricity,conversion,pth,Resistive heater (Power-to-Heat)
+heat-demand,heat,load,demand,Heat demand
+electricity-heatpump,electricity,conversion,heatpump,Airsource compression heatpump
+heat-storage,heat,storage,storage,Large scale sensible heat storage
