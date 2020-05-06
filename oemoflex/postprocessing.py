@@ -2,38 +2,30 @@ import os
 
 import numpy as np
 import pandas as pd
+import yaml
 
 from oemof.solph import Bus, Sink
 from oemof.tabular import facades
 import oemof.tabular.tools.postprocessing as pp
+from oemoflex.helpers import delete_empty_subdirs
+
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
-POSTPROC_RES_SUBDIR_LIST = [
-    'Boiler',
-    'CHP/BpCCGT',
-    'CHP/ExCCGT',
-    'ElectricBoiler',
-    'Fossil/Gasturbine',
-    'Fossil/Nuclear',
-    'Heatpump',
-    'Hydro/Reservoir',
-    'Hydro/RunOfRiver',
-    'RE/Curtailment',
-    'RE/Generation',
-    'RE/Curtailment',
-    'Storage',
-    'Transmission/ImportExport',
-    'Transmission/Import',
-    'Transport',
-]
+module_path = os.path.abspath(os.path.dirname(__file__))
+path_config = os.path.join(module_path, 'postprocessed_paths.yaml')
+
+with open(path_config, 'r') as config_file:
+    pp_paths = yaml.safe_load(config_file)
 
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):
-    for subdir in POSTPROC_RES_SUBDIR_LIST:
-        path = os.path.join(postprocessed_results_dir, subdir)
-        if not os.path.exists(path):
-            os.makedirs(path)
+    for subdir, value in pp_paths.items():
+        if value['sequences']:
+            for subsubdir in value['sequences']:
+                path = os.path.join(postprocessed_results_dir, subdir, subsubdir)
+                if not os.path.exists(path):
+                    os.makedirs(path)
 
 
 def get_capacities(es):
@@ -315,7 +307,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
                 df, flow,
                 on=basic_columns
             )
-            df['var_value'] = df['var_value'] * prep_el['marginal_cost']
+            df['var_value'] = df['var_value'] * prep_el['carrier_cost']
             df['var_name'] = 'cost_carrier'
 
             carrier_cost.append(df)
@@ -348,3 +340,34 @@ def get_total_system_cost(oemoflex_scalars):
     total_system_cost['var_unit'] = 'Eur'
 
     return total_system_cost
+
+
+def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
+    path_by_carrier_tech = {value['component']: key for key, value in pp_paths.items()}
+    sequences = {value['component']: value['sequences'] for key, value in pp_paths.items()}
+
+    for carrier_tech, df in sequences_by_tech.items():
+        try:
+            subfolder = path_by_carrier_tech[carrier_tech]
+        except KeyError:
+            print(f"Subfolder {subfolder} does not exist in {path_config}.")
+            continue
+
+        idx = pd.IndexSlice
+        for subsubfolder, var_name in sequences[carrier_tech].items():
+            print(carrier_tech)
+            print(var_name)
+            df_var_value = df.loc[:, idx[:, var_name]]
+            for column in df_var_value.columns:
+                print(column)
+                region = column[0].split('-')[0]
+                filename = os.path.join(
+                    dir,
+                    subfolder,
+                    subsubfolder,
+                    '_'.join(['FlexMex1', usecase, model, region, year]) + '.csv'
+                )
+
+                df_var_value[column].to_csv(filename)
+
+    delete_empty_subdirs(dir)
