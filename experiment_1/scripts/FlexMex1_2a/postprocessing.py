@@ -1,12 +1,17 @@
-import logging
 import os
-import re
 
 import pandas as pd
 
-from oemof.tools.logger import define_logging
-from oemoflex.postprocessing import create_postprocessed_results_subdirs
-from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal, delete_empty_subdirs
+from oemof.solph import EnergySystem
+from oemoflex.postprocessing import \
+    create_postprocessed_results_subdirs, get_sequences_by_tech,\
+    get_capacities, format_capacities,\
+    get_summed_sequences, get_re_generation,\
+    get_transmission_losses, get_storage_losses, get_emissions, \
+    get_varom_cost, get_carrier_cost, get_total_system_cost, \
+    map_to_flexmex_results
+from oemoflex.helpers import \
+    setup_experiment_paths, load_elements
 
 
 name = 'FlexMex1_2a'
@@ -18,179 +23,84 @@ exp_paths = setup_experiment_paths(name, basepath)
 
 create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
-logpath = define_logging(
-    logpath=exp_paths.results_postprocessed,
-    logfile='oemoflex.log'
-)
+def main():
+    # load scalars templates
+    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
+    flexmex_scalars_template = flexmex_scalars_template.loc[flexmex_scalars_template['UseCase'] == name]
 
-# load templates
-scalars = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
-timeseries = pd.read_csv(os.path.join(exp_paths.results_template, 'TimeSeries.csv'))
+    # load mapping
+    mapping = pd.read_csv(os.path.join(exp_paths.results_template, 'mapping.csv'))
 
-scalars = scalars.loc[scalars['UseCase'] == name]
-timeseries = timeseries.loc[timeseries['UseCase'] == name]
+    # Load preprocessed elements
+    prep_elements = load_elements(os.path.join(exp_paths.data_preprocessed, 'data', 'elements'))
 
+    # restore EnergySystem with results
+    es = EnergySystem()
+    es.restore(exp_paths.results_optimization)
 
-def calc_curtailment(bus_results, region):
-    # EnergyConversion_Curtailment_Electricity_RE [GWh]
-    energy_conversion_curtailment_electricity_re = bus_results.filter(regex='curtailment', axis=1)
+    # format results sequences
+    sequences_by_tech = get_sequences_by_tech(es.results)
 
-    energy_conversion_curtailment_electricity_re.columns = [
-        'EnergyConversion_Curtailment_Electricity_RE'
-    ]
-
-    energy_conversion_curtailment_electricity_re.to_csv(
-        os.path.join(
-            exp_paths.results_postprocessed,
-            'RE',
-            'Curtailment',
-            '{}_oemof_{}_{}.csv'.format(name, region, year),
-        )
+    oemoflex_scalars = pd.DataFrame(
+        columns=[
+            'usecase',
+            'region',
+            'model',
+            'year',
+            'name',
+            'type',
+            'carrier',
+            'tech',
+            'var_name',
+            'var_value',
+            'var_unit'
+        ]
     )
 
-    return energy_conversion_curtailment_electricity_re
+    # then sum the flows
+    summed_sequences = get_summed_sequences(sequences_by_tech, prep_elements)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, summed_sequences], sort=True)
 
+    # get re_generation
+    re_generation = get_re_generation(oemoflex_scalars)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation], sort=True)
 
-def calc_energy_conversion_secondary_energy_re(
-    bus_results, energy_conversion_curtailment_electricity_re, region
-):
-    r"""
-    Calculates EnergyConversion_SecondaryEnergy_RE [GWh]
-    """
-    energy_conversion_secondary_energy_re = bus_results.filter(regex='el-wind|solarpv', axis=1)
+    # losses (storage, transmission)
+    transmission_losses = get_transmission_losses()
+    storage_losses = get_storage_losses()
+    # oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses])
 
-    energy_conversion_secondary_energy_re = pd.DataFrame(
-        energy_conversion_secondary_energy_re.sum(axis=1)
+    # get capacities
+    capacities = get_capacities(es)
+    formatted_capacities = format_capacities(oemoflex_scalars, capacities)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, formatted_capacities])
+
+    # emissions
+    emissions = get_emissions()
+    # oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
+
+    # costs
+    varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
+    carrier_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, carrier_cost])
+
+    total_system_cost = get_total_system_cost(oemoflex_scalars)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
+
+    # set experiment info
+    oemoflex_scalars['usecase'] = name
+    oemoflex_scalars['model'] = 'oemof'
+    oemoflex_scalars['year'] = year
+
+    oemoflex_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'))
+    # map to FlexMex data format
+    flexmex_scalar_results = map_to_flexmex_results(
+        oemoflex_scalars, flexmex_scalars_template, mapping, name
     )
 
-    energy_conversion_secondary_energy_re.columns = ['EnergyConversion_SecondaryEnergy_RE']
+    flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
 
-    energy_conversion_secondary_energy_re[
-        'EnergyConversion_SecondaryEnergy_RE'
-    ] -= energy_conversion_curtailment_electricity_re['EnergyConversion_Curtailment_Electricity_RE']
-
-    energy_conversion_secondary_energy_re.to_csv(
-        os.path.join(
-            exp_paths.results_postprocessed,
-            'RE',
-            'Generation',
-            '{}_oemof_{}_{}.csv'.format(name, region, year),
-        ),
-        header=True,
-    )
-
-    return energy_conversion_secondary_energy_re
-
-
-def calc_transmission_import_electricity_grid(bus_results, region):
-    r"""
-    Calculates EnergyConversion_SecondaryEnergy_RE [GWh]
-    """
-    transmission_import_electricity_grid = bus_results.filter(regex='import', axis=1)
-
-    transmission_import_electricity_grid.columns = ['Transmission_Import_Electricity_Grid']
-
-    transmission_import_electricity_grid.to_csv(
-        os.path.join(
-            exp_paths.results_postprocessed,
-            'Transmission',
-            'Import',
-            '{}_oemof_{}_{}.csv'.format(name, region, year),
-        )
-    )
-
-    return transmission_import_electricity_grid
-
-
-def calc_fix_om():
-    # EnergyConversion_FixOM_Electricity_Solar_PV [Eur/a]
-    # EnergyConversion_FixOM_Electricity_Wind_Onshore [Eur/a]
-    pass
-
-
-def calc_var_om():
-    # EnergyConversion_VarOM_Electricity_Solar_PV [Eur/a]
-    # EnergyConversion_VarOM_Electricity_Wind_Onshore [Eur/a]
-    pass
-
-
-def calc_price_shortage():
-    # Energy_Price_Slack [Eur]
-    pass
-
-
-def write_value_to_scalars(scalars, region, param_name, value):
-    df = scalars.copy()
-
-    position = (df['Region'] == region) & (df['Parameter'] == param_name)
-
-    if not position.any():
-        raise ValueError(
-            "There is no field for region '{}' and parameter '{}'.".format(region, param_name)
-        )
-
-    else:
-        df.loc[position, 'Value'] = value
-
-    return df
-
-
-def main(name=name, scalars=scalars):
-    # Postprocess
-    bus_results_files = (
-        file for file in os.listdir(exp_paths.results_optimization)
-        if re.search('el-bus.csv', file)
-    )
-
-    for file in bus_results_files:
-        region = file.split('-')[0]
-
-        bus_results = pd.read_csv(os.path.join(exp_paths.results_optimization, file))
-
-        # EnergyConversion_Curtailment_Electricity_RE
-        # Read timeseries and write timeseries into file RE/Curtailment/FlexMex##_oemof_##_2050.csv
-        energy_conversion_curtailment_electricity_re = calc_curtailment(bus_results, region)
-
-        sum_in_gwh = 1e-3 * energy_conversion_curtailment_electricity_re.sum().values
-        scalars = write_value_to_scalars(
-            scalars,
-            region,
-            'EnergyConversion_Curtailment_Electricity_RE',
-            sum_in_gwh,
-        )
-
-        # EnergyConversion_SecondaryEnergy_RE
-        energy_conversion_secondary_energy_re = calc_energy_conversion_secondary_energy_re(
-            bus_results, energy_conversion_curtailment_electricity_re, region
-        )
-
-        sum_in_gwh = 1e-3 * energy_conversion_secondary_energy_re.sum().values
-        scalars = write_value_to_scalars(
-            scalars,
-            region,
-            'EnergyConversion_SecondaryEnergy_RE',
-            sum_in_gwh,
-        )
-
-        # Transmission_Import_Electricity_Grid
-        calc_transmission_import_electricity_grid(
-            bus_results, region
-        )
-
-    scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
-    timeseries.to_csv(os.path.join(exp_paths.results_postprocessed, 'TimeSeries.csv'))
-
-    # Check against previous results
-    previous_results_path = exp_paths.results_postprocessed + '_default'
-    new_results_path = exp_paths.results_postprocessed
-
-    check_if_csv_dirs_equal(new_results_path, previous_results_path)
-
-    logging.info(f"New results in {new_results_path}"
-                 f" match previous results in {previous_results_path}")
-
-    delete_empty_subdirs(exp_paths.results_postprocessed)
-
+    # save_flexmex_timeseries(sequences_by_tech)
 
 if __name__ == '__main__':
     main()
