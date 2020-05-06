@@ -350,7 +350,7 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
         try:
             subfolder = path_by_carrier_tech[carrier_tech]
         except KeyError:
-            print(f"Subfolder {subfolder} does not exist in {path_config}.")
+            print(f"Entry for {carrier_tech} does not exist in {path_config}.")
             continue
 
         idx = pd.IndexSlice
