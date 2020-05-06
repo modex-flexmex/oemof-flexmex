@@ -355,11 +355,8 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
 
         idx = pd.IndexSlice
         for subsubfolder, var_name in sequences[carrier_tech].items():
-            print(carrier_tech)
-            print(var_name)
             df_var_value = df.loc[:, idx[:, var_name]]
             for column in df_var_value.columns:
-                print(column)
                 region = column[0].split('-')[0]
                 filename = os.path.join(
                     dir,
@@ -368,6 +365,8 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
                     '_'.join(['FlexMex1', usecase, model, region, year]) + '.csv'
                 )
 
-                df_var_value[column].to_csv(filename)
+                single_column = df_var_value[column]
+                single_column = single_column.reset_index(drop=True)
+                single_column.to_csv(filename)
 
     delete_empty_subdirs(dir)
