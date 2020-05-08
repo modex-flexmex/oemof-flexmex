@@ -305,12 +305,12 @@ def update_bpchp(data_preprocessed_path, scalars):
     # eta_el = eta_total / (1 + 1 / electricity_per_heat)
     df['electric_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
-    ) / (1 + 1/electricity_per_heat)
+    ) / (1 + 1/electricity_per_heat) * 1e-2  # percent to decimal
 
     # eta_th = eta_total / (1 + electricity_per_heat)
     df['thermal_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
-    ) / (1 + electricity_per_heat)
+    ) / (1 + electricity_per_heat) * 1e-2  # percent to decimal
 
     df['carrier_cost'] = (
         get_parameter_values(scalars, 'Energy_Price_CH4')
@@ -341,14 +341,14 @@ def update_extchp(data_preprocessed_path, scalars):
     # eta_el = eta_total / (1 + 1 / electricity_per_heat)
     electric_efficiency = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
-    ) / (1 + 1/electricity_per_heat)
+    ) / (1 + 1/electricity_per_heat) * 1e-2  # percent to decimal
 
     df['electric_efficiency'] = electric_efficiency
 
     # eta_th = eta_total / (1 + electricity_per_heat)
     thermal_efficiency = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
-    ) / (1 + electricity_per_heat)
+    ) / (1 + electricity_per_heat) * 1e-2  # percent to decimal
 
     df['thermal_efficiency'] = thermal_efficiency
 
