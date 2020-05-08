@@ -4,7 +4,8 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements, update_shortage,
+    create_default_elements,
+    update_electricity_shortage, update_heat_shortage,
     update_electricity_demand, update_heat_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     update_electricity_heatpump, update_heat_storage, update_ch4_gt,
@@ -41,13 +42,19 @@ def main():
     )
 
     # Filter out only scenario-related input parameters
+    scalars = scalars.set_index(['Region', 'Parameter'])
+    overwrite_scalars = scalars.loc[scalars['Scenario'] == 'FlexMex1UC5_7_8', :]
     scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']), :]
+
+    scalars.update(overwrite_scalars)
+    scalars = scalars.reset_index()
 
     # Prepare oemof.tabular input CSV files
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
         select_components=[
             'electricity-shortage',
+            'heat-shortage',
             'electricity-curtailment',
             'electricity-demand',
             'heat-demand',
@@ -61,7 +68,8 @@ def main():
     )
 
     # update elements
-    update_shortage(exp_paths.data_preprocessed, scalars)
+    update_electricity_shortage(exp_paths.data_preprocessed, scalars)
+    update_heat_shortage(exp_paths.data_preprocessed, scalars)
     update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_heat_demand(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)

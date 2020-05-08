@@ -32,11 +32,11 @@ def main():
                 'wind-offshore',
                 'solar-pv',
                 'electricity-shortage',
+                'heat-shortage',
                 'electricity-curtailment',
                 'electricity-demand',
                 'heat-demand',
                 'heat-storage',
-                'ch4-gt',
             ],
             'profile': [
                 'wind-onshore',
@@ -45,7 +45,10 @@ def main():
                 'electricity-demand',
                 'heat-demand',
             ],
-            'from_to_bus': ['electricity-heatpump'],
+            'from_to_bus': [
+                'electricity-heatpump',
+                'ch4-gt',
+            ],
             'efficiency': ['electricity-heatpump'],
         },
         path=exp_paths.data_preprocessed
