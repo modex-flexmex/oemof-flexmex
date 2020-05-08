@@ -297,7 +297,10 @@ def update_bpchp(data_preprocessed_path, scalars):
     df = pd.read_csv(file_path, index_col='region')
 
     df['capacity'] = get_parameter_values(
-        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT')
+        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT'
+    ) * get_parameter_values(
+        scalars, 'EnergyConversion_Availability_ElectricityHeat_CH4_BpCCGT'
+    ) * 1e-2  # percent to decimals
 
     electricity_per_heat = get_parameter_values(
         scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
@@ -333,7 +336,10 @@ def update_extchp(data_preprocessed_path, scalars):
     df = pd.read_csv(file_path, index_col='region')
 
     df['capacity'] = get_parameter_values(
-        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT')
+        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT'
+    ) * get_parameter_values(
+        scalars, 'EnergyConversion_Availability_ElectricityHeat_CH4_ExCCGT'
+    ) * 1e-2  # percent to decimals
 
     electricity_per_heat = get_parameter_values(
         scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_ExCCGT')
