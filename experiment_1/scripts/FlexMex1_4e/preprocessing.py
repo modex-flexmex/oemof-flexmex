@@ -50,6 +50,8 @@ def main():
             'electricity-curtailment',
             'electricity-demand',
             'heat-demand',
+            'heat-excess',
+            'heat-shortage',
             'wind-offshore',
             'wind-onshore',
             'solar-pv',

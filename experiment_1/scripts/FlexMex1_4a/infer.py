@@ -29,6 +29,7 @@ def main():
         foreign_keys={
             'bus': [
                 'heat-shortage',
+                'heat-excess',
                 'wind-onshore',
                 'wind-offshore',
                 'solar-pv',
