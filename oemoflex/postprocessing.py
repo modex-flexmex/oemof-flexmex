@@ -8,7 +8,7 @@ from oemof.solph import EnergySystem, Bus, Sink
 from oemof.tabular import facades
 import oemof.tabular.tools.postprocessing as pp
 from oemoflex.helpers import delete_empty_subdirs, load_elements
-
+from oemoflex.preprocessing import get_parameter_values
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
@@ -322,6 +322,38 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
     return carrier_cost
 
 
+def get_fuel_cost(oemoflex_scalars, scalars_raw):
+    fuel_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+    fuel_cost['var_name'] = 'cost_fuel'
+
+    price_ch4 = get_parameter_values(scalars_raw, 'Energy_Price_CH4')
+
+    price_emission = get_parameter_values(scalars_raw, 'Energy_Price_CO2')\
+        * get_parameter_values(scalars_raw, 'Energy_EmissionFactor_CH4')
+
+    factor = price_ch4 / (price_ch4 + price_emission)
+
+    fuel_cost['var_value'] *= factor
+
+    return fuel_cost
+
+
+def get_emission_cost(oemoflex_scalars, scalars_raw):
+    emission_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+    emission_cost['var_name'] = 'cost_emission'
+
+    price_ch4 = get_parameter_values(scalars_raw, 'Energy_Price_CH4')
+
+    price_emission = get_parameter_values(scalars_raw, 'Energy_Price_CO2')\
+        * get_parameter_values(scalars_raw, 'Energy_EmissionFactor_CH4')
+
+    factor = price_emission / (price_ch4 + price_emission)
+
+    emission_cost['var_value'] *= factor
+
+    return emission_cost
+
+
 def get_capacity_cost():
     # TODO: Problem there is no distinction btw fixom and invest cost!
     # capacities * prep_elements[capacity_cost]
@@ -375,12 +407,16 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
 def run_postprocessing(
         year,
         name,
+        data_raw,
         data_preprocessed,
         results_optimization,
         results_template,
         results_postprocessed
 ):
     create_postprocessed_results_subdirs(results_postprocessed)
+
+    # load raw data
+    scalars_raw = pd.read_csv(os.path.join(data_raw, 'Scalars.csv'))
 
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(results_template, 'Scalars.csv'))
@@ -442,7 +478,11 @@ def run_postprocessing(
     # costs
     varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
     carrier_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, varom_cost, carrier_cost])
+    fuel_cost = get_fuel_cost(carrier_cost, scalars_raw)
+    emission_cost = get_emission_cost(carrier_cost, scalars_raw)
+    oemoflex_scalars = pd.concat([
+        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, emission_cost
+    ])
 
     total_system_cost = get_total_system_cost(oemoflex_scalars)
     oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)

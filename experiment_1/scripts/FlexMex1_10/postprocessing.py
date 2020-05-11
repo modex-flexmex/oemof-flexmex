@@ -16,6 +16,7 @@ def main():
     run_postprocessing(
         year,
         name,
+        exp_paths.data_raw,
         exp_paths.data_preprocessed,
         exp_paths.results_optimization,
         exp_paths.results_template,
