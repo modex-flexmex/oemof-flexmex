@@ -537,9 +537,9 @@ def update_nuclear_st(data_preprocessed_path, scalars):
     nuclear = pd.read_csv(nuclear_file, index_col='region')
 
     # Operation parameters
-    capacity = get_parameter_values(
-        scalars,
-        'EnergyConversion_Capacity_Electricity_Nuclear_ST')
+    # capacity = get_parameter_values(
+    #     scalars,
+    #     'EnergyConversion_Capacity_Electricity_Nuclear_ST')
 
     operation_cost = get_parameter_values(
         scalars,
@@ -552,8 +552,6 @@ def update_nuclear_st(data_preprocessed_path, scalars):
     carrier_price = get_parameter_values(
         scalars,
         'Energy_Price_Uranium') * 1e-3  # Eur/GWh -> Eur/MWh
-
-    production_cost = carrier_price / eta
 
     # Investment parameters
     capex = get_parameter_values(
@@ -580,7 +578,11 @@ def update_nuclear_st(data_preprocessed_path, scalars):
 
     nuclear['capacity_cost'] = annualized_cost + fix_cost * capex
 
-    nuclear['marginal_cost'] = operation_cost + production_cost
+    nuclear['marginal_cost'] = operation_cost
+
+    nuclear['carrier_cost'] = carrier_price
+
+    nuclear['efficiency'] = eta
 
     nuclear.to_csv(nuclear_file)
 

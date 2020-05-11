@@ -34,7 +34,6 @@ def main():
                 'electricity-shortage',
                 'electricity-curtailment',
                 'electricity-demand',
-                'uranium-nuclear-st',
             ],
             'profile': [
                 'wind-onshore',
@@ -44,6 +43,7 @@ def main():
             ],
             'from_to_bus': [
                 'ch4-gt',
+                'uranium-nuclear-st',
             ],
         },
         path=exp_paths.data_preprocessed
