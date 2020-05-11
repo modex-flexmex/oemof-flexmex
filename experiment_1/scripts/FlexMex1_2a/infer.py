@@ -35,14 +35,16 @@ def main():
                 'electricity-curtailment',
                 'electricity-demand',
                 'uranium-nuclear-st',
-                'ch4-gt'
             ],
             'profile': [
                 'wind-onshore',
                 'wind-offshore',
                 'solar-pv',
                 'electricity-demand',
-            ]
+            ],
+            'from_to_bus': [
+                'ch4-gt',
+            ],
         },
         path=exp_paths.data_preprocessed
     )

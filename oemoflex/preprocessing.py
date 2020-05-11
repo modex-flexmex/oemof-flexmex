@@ -593,9 +593,9 @@ def update_ch4_gt(data_preprocessed_path, scalars):
     ch4 = pd.read_csv(ch4_file, index_col='region')
 
     # Operation parameters
-    capacity = get_parameter_values(
-        scalars,
-        'EnergyConversion_Capacity_Electricity_CH4_GT')
+    # capacity = get_parameter_values(
+    #     scalars,
+    #     'EnergyConversion_Capacity_Electricity_CH4_GT')
 
     operation_cost = get_parameter_values(
         scalars,
@@ -608,8 +608,6 @@ def update_ch4_gt(data_preprocessed_path, scalars):
     carrier_price = get_parameter_values(
         scalars,
         'Energy_Price_CH4') * 1e-3  # Eur/GWh -> Eur/MWh
-
-    production_cost = carrier_price / eta
 
     # Investment parameters
     capex = get_parameter_values(
@@ -636,7 +634,11 @@ def update_ch4_gt(data_preprocessed_path, scalars):
 
     ch4['capacity_cost'] = annualized_cost + fix_cost * capex
 
-    ch4['marginal_cost'] = operation_cost + production_cost
+    ch4['marginal_cost'] = operation_cost
+
+    ch4['carrier_cost'] = carrier_price
+
+    ch4['efficiency'] = eta
 
     ch4.to_csv(ch4_file)
 
