@@ -1,4 +1,5 @@
 import os
+import logging
 
 import numpy as np
 import pandas as pd
@@ -323,7 +324,12 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
 
 
 def get_fuel_cost(oemoflex_scalars, scalars_raw):
-    fuel_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+    try:
+        fuel_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+    except KeyError:
+        logging.info("No key 'cost_carrier' found to calculate 'cost_fuel'.")
+        return None
+
     fuel_cost['var_name'] = 'cost_fuel'
 
     price_ch4 = get_parameter_values(scalars_raw, 'Energy_Price_CH4')
@@ -339,7 +345,12 @@ def get_fuel_cost(oemoflex_scalars, scalars_raw):
 
 
 def get_emission_cost(oemoflex_scalars, scalars_raw):
-    emission_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+    try:
+        emission_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+    except KeyError:
+        logging.info("No key 'cost_carrier' found to calculate 'cost_emission'.")
+        return None
+
     emission_cost['var_name'] = 'cost_emission'
 
     price_ch4 = get_parameter_values(scalars_raw, 'Energy_Price_CH4')
