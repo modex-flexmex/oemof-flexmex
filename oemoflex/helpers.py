@@ -222,7 +222,6 @@ def delete_empty_subdirs(path):
 
         if to_delete:
             for p in to_delete:
-                print(p)
                 shutil.rmtree(p)
         else:
             break
