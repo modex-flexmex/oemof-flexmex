@@ -502,7 +502,7 @@ def run_postprocessing(
 
     # set experiment info
     oemoflex_scalars['usecase'] = name
-    oemoflex_scalars['year'] = 2050
+    oemoflex_scalars['year'] = year
 
     oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
     # map to FlexMex data format
