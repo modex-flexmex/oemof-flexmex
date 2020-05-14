@@ -266,6 +266,8 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
         if isinstance(value, float):
             flexmex_scalars.loc[i, 'Value'] = np.around(value)
 
+    flexmex_scalars.loc[:, 'Modell'] = 'oemof'
+
     return flexmex_scalars
 
 
@@ -500,7 +502,6 @@ def run_postprocessing(
 
     # set experiment info
     oemoflex_scalars['usecase'] = name
-    oemoflex_scalars['model'] = 'oemof'
     oemoflex_scalars['year'] = 2050
 
     oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
