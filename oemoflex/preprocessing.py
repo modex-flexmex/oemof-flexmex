@@ -531,15 +531,16 @@ def update_solar_pv(data_preprocessed_path, scalars):
     solarpv.to_csv(solar_pv_file)
 
 
-def update_nuclear_st(data_preprocessed_path, scalars):
+def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
+
     file_path = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
 
     df = pd.read_csv(file_path, index_col='region')
 
     # Operation parameters
-    # capacity = get_parameter_values(
-    #     scalars,
-    #     'EnergyConversion_Capacity_Electricity_Nuclear_ST')
+    capacity = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Nuclear_ST')
 
     operation_cost = get_parameter_values(
         scalars,
@@ -573,8 +574,15 @@ def update_nuclear_st(data_preprocessed_path, scalars):
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    # nuclear['capacity'] = capacity
-    df['capacity'] = 0  # FlexMex 2a only!
+    if expandable:
+        df['expandable'] = True
+        if from_green_field:
+            df['capacity'] = 0
+        else:
+            df['capacity'] = capacity
+    else:
+        df['expandable'] = False
+        df['capacity'] = capacity
 
     df['capacity_cost'] = annualized_cost + fix_cost * capex
 
@@ -587,7 +595,7 @@ def update_nuclear_st(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
-def update_ch4_gt(data_preprocessed_path, scalars):
+def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
     logging.info("Updating ch4-gt file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
@@ -595,9 +603,9 @@ def update_ch4_gt(data_preprocessed_path, scalars):
     df = pd.read_csv(file_path, index_col='region')
 
     # Operation parameters
-    # capacity = get_parameter_values(
-    #     scalars,
-    #     'EnergyConversion_Capacity_Electricity_CH4_GT')
+    capacity = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_CH4_GT')
 
     operation_cost = get_parameter_values(
         scalars,
@@ -631,8 +639,15 @@ def update_ch4_gt(data_preprocessed_path, scalars):
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    # ch4['capacity'] = capacity
-    df['capacity'] = 0  # FlexMex 2a only!
+    if expandable:
+        df['expandable'] = True
+        if from_green_field:
+            df['capacity'] = 0
+        else:
+            df['capacity'] = capacity
+    else:
+        df['expandable'] = False
+        df['capacity'] = capacity
 
     df['capacity_cost'] = annualized_cost + fix_cost * capex
 
