@@ -280,6 +280,9 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
             elif prep_el['type'][0] in ['backpressure', 'extraction']:
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_electricity']
+            elif prep_el['type'][0] in ['link', 'electrical line']:
+                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_net_forward']\
+                    + oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_net_backward']
             else:
                 flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_out']
             df = pd.merge(
