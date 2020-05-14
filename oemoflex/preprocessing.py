@@ -532,9 +532,9 @@ def update_solar_pv(data_preprocessed_path, scalars):
 
 
 def update_nuclear_st(data_preprocessed_path, scalars):
-    nuclear_file = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
 
-    nuclear = pd.read_csv(nuclear_file, index_col='region')
+    df = pd.read_csv(file_path, index_col='region')
 
     # Operation parameters
     # capacity = get_parameter_values(
@@ -574,25 +574,25 @@ def update_nuclear_st(data_preprocessed_path, scalars):
 
     # Actual assignments
     # nuclear['capacity'] = capacity
-    nuclear['capacity'] = 0  # FlexMex 2a only!
+    df['capacity'] = 0  # FlexMex 2a only!
 
-    nuclear['capacity_cost'] = annualized_cost + fix_cost * capex
+    df['capacity_cost'] = annualized_cost + fix_cost * capex
 
-    nuclear['marginal_cost'] = operation_cost
+    df['marginal_cost'] = operation_cost
 
-    nuclear['carrier_cost'] = carrier_price
+    df['carrier_cost'] = carrier_price
 
-    nuclear['efficiency'] = eta
+    df['efficiency'] = eta
 
-    nuclear.to_csv(nuclear_file)
+    df.to_csv(file_path)
 
 
 def update_ch4_gt(data_preprocessed_path, scalars):
     logging.info("Updating ch4-gt file")
 
-    ch4_file = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
 
-    ch4 = pd.read_csv(ch4_file, index_col='region')
+    df = pd.read_csv(file_path, index_col='region')
 
     # Operation parameters
     # capacity = get_parameter_values(
@@ -632,17 +632,17 @@ def update_ch4_gt(data_preprocessed_path, scalars):
 
     # Actual assignments
     # ch4['capacity'] = capacity
-    ch4['capacity'] = 0  # FlexMex 2a only!
+    df['capacity'] = 0  # FlexMex 2a only!
 
-    ch4['capacity_cost'] = annualized_cost + fix_cost * capex
+    df['capacity_cost'] = annualized_cost + fix_cost * capex
 
-    ch4['marginal_cost'] = operation_cost
+    df['marginal_cost'] = operation_cost
 
-    ch4['carrier_cost'] = carrier_price
+    df['carrier_cost'] = carrier_price
 
-    ch4['efficiency'] = eta
+    df['efficiency'] = eta
 
-    ch4.to_csv(ch4_file)
+    df.to_csv(file_path)
 
 
 def combine_profiles(raw_profile_path, column_name):
