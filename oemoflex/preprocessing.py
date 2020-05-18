@@ -542,6 +542,10 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
         scalars,
         'EnergyConversion_Capacity_Electricity_Nuclear_ST')
 
+    availability = get_parameter_values(
+        scalars,
+        'EnergyConversion_Availability_Electricity_Nuclear_ST') * 1e-2  # percent -> 0...1
+
     operation_cost = get_parameter_values(
         scalars,
         'EnergyConversion_VarOM_Electricity_Nuclear_ST') * 1e-3  # Eur/GWh -> Eur/MWh
@@ -579,10 +583,10 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
         if from_green_field:
             df['capacity'] = 0
         else:
-            df['capacity'] = capacity
+            df['capacity'] = capacity * availability
     else:
         df['expandable'] = False
-        df['capacity'] = capacity
+        df['capacity'] = capacity * availability
 
     df['capacity_cost'] = annualized_cost + fix_cost * capex
 
@@ -606,6 +610,10 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
     capacity = get_parameter_values(
         scalars,
         'EnergyConversion_Capacity_Electricity_CH4_GT')
+
+    availability = get_parameter_values(
+        scalars,
+        'EnergyConversion_Availability_Electricity_CH4_GT') * 1e-2  # percent -> 0...1
 
     operation_cost = get_parameter_values(
         scalars,
@@ -644,10 +652,10 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
         if from_green_field:
             df['capacity'] = 0
         else:
-            df['capacity'] = capacity
+            df['capacity'] = capacity * availability
     else:
         df['expandable'] = False
-        df['capacity'] = capacity
+        df['capacity'] = capacity * availability
 
     df['capacity_cost'] = annualized_cost + fix_cost * capex
 
