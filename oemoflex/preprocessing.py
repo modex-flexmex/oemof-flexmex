@@ -620,6 +620,12 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
         scalars,
         'Energy_Price_CH4') * 1e-3  # Eur/GWh -> Eur/MWh
 
+    co2_price = get_parameter_values(scalars, 'Energy_Price_CO2')
+
+    emission_factor = get_parameter_values(
+        scalars,
+        'Energy_EmissionFactor_CH4') * 1e-3  # t/GWh -> t/MWh
+
     # Investment parameters
     capex = get_parameter_values(
         scalars,
@@ -647,7 +653,7 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
 
     df['marginal_cost'] = operation_cost
 
-    df['carrier_cost'] = carrier_price
+    df['carrier_cost'] = carrier_price + emission_factor * co2_price
 
     df['efficiency'] = eta
 
