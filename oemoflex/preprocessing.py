@@ -578,15 +578,8 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    if expandable:
-        df['expandable'] = True
-        if from_green_field:
-            df['capacity'] = 0
-        else:
-            df['capacity'] = capacity * availability
-    else:
-        df['expandable'] = False
-        df['capacity'] = capacity * availability
+    df['expandable'] = expandable
+    df['capacity'] = 0 if expandable and from_green_field else capacity * availability
 
     df['capacity_cost'] = annualized_cost + fix_cost * capex
 
@@ -647,15 +640,8 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    if expandable:
-        df['expandable'] = True
-        if from_green_field:
-            df['capacity'] = 0
-        else:
-            df['capacity'] = capacity * availability
-    else:
-        df['expandable'] = False
-        df['capacity'] = capacity * availability
+    df['expandable'] = expandable
+    df['capacity'] = 0 if expandable and from_green_field else capacity * availability
 
     df['capacity_cost'] = annualized_cost + fix_cost * capex
 
