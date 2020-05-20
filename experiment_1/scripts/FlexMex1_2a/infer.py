@@ -42,7 +42,7 @@ def main():
                 'electricity-demand',
             ],
             'from_to_bus': [
-                'ch4-gt',
+                # 'ch4-gt',
                 'uranium-nuclear-st',
             ],
         },
