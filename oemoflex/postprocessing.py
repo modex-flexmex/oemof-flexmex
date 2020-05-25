@@ -191,6 +191,7 @@ def get_summed_sequences(sequences_by_tech, prep_elements):
         summed_sequences.append(df)
 
     summed_sequences = pd.concat(summed_sequences, sort=True)
+    summed_sequences = summed_sequences.loc[summed_sequences['var_name'] != 'storage_content']
     summed_sequences['var_unit'] = 'MWh'
 
     return summed_sequences
