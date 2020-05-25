@@ -361,6 +361,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
 
 
 def get_fuel_cost(oemoflex_scalars, scalars_raw):
+    # TODO: Generalize to be useful for any kind of fossile carrier, not only CH4.
     try:
         fuel_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
     except KeyError:
@@ -382,6 +383,7 @@ def get_fuel_cost(oemoflex_scalars, scalars_raw):
 
 
 def get_emission_cost(oemoflex_scalars, scalars_raw):
+    # TODO: Generalize to be useful for any kind of fossile carrier, not only CH4.
     try:
         emission_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
     except KeyError:
