@@ -489,7 +489,6 @@ def run_postprocessing(
         columns=[
             'usecase',
             'region',
-            'model',
             'year',
             'name',
             'type',
