@@ -221,10 +221,30 @@ def get_re_generation(oemoflex_scalars):
     return re_generation
 
 
-def get_transmission_losses():
-    # oemoflex_scalars['var_name'] ==
-    #  'flow_gross_forward' - oemoflex_scalars['var_name'] == 'flow_net_forward'
-    pass
+def get_transmission_losses(oemoflex_scalars):
+    r"""Calculates losses_forward losses_backward for each link."""
+
+    def gross_minus_net_flow(direction):
+        flow_gross = oemoflex_scalars.loc[
+            oemoflex_scalars['var_name'] == f'flow_gross_{direction}'].set_index('name')
+
+        flow_net = oemoflex_scalars.loc[
+            oemoflex_scalars['var_name'] == f'flow_net_{direction}'].set_index('name')
+
+        loss = flow_gross.copy()
+        loss['var_name'] = f'loss_{direction}'
+        loss['var_value'] = flow_gross['var_value'] - flow_net['var_value']
+
+        return loss
+
+    losses = []
+    for direction in ['forward', 'backward']:
+        loss = gross_minus_net_flow(direction)
+        losses.append(loss)
+
+    losses = pd.concat(losses)
+
+    return losses
 
 
 def get_storage_losses():
@@ -480,9 +500,9 @@ def run_postprocessing(
     oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation], sort=True)
 
     # losses (storage, transmission)
-    # transmission_losses = get_transmission_losses()
+    transmission_losses = get_transmission_losses(oemoflex_scalars)
     # storage_losses = get_storage_losses()
-    # oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses])
+    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses])
 
     # get capacities
     capacities = get_capacities(es)
