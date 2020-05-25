@@ -6,7 +6,7 @@ from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_electricity_shortage, update_electricity_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    update_h2_cavern_simple, update_liion_battery,
+    update_h2_cavern_simple, update_liion_battery, update_ch4_gt,
     create_electricity_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
@@ -62,6 +62,7 @@ def main():
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
+            'ch4-gt'
         ]
 
     )
@@ -74,6 +75,7 @@ def main():
     update_solar_pv(exp_paths.data_preprocessed, scalars)
     update_h2_cavern_simple(exp_paths.data_preprocessed, scalars)
     update_liion_battery(exp_paths.data_preprocessed, scalars)
+    update_ch4_gt(exp_paths.data_preprocessed, scalars)
 
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
@@ -84,7 +86,7 @@ def main():
     # compare with previous data
     previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
     new_path = exp_paths.data_preprocessed
-    check_if_csv_dirs_equal(new_path, previous_path)
+    # check_if_csv_dirs_equal(new_path, previous_path)
 
 
 if __name__ == '__main__':

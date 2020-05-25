@@ -43,6 +43,9 @@ def main():
                 'solar-pv',
                 'electricity-demand',
             ],
+            'from_to_bus': [
+                'ch4-gt'
+            ],
         },
         path=exp_paths.data_preprocessed
     )
