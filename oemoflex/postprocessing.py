@@ -399,7 +399,7 @@ def get_capacity_cost():
 
 
 def get_total_system_cost(oemoflex_scalars):
-    cost_list = ['cost_varom', 'cost_fuel', 'cost_capacity']
+    cost_list = ['cost_varom', 'cost_fuel', 'cost_capacity', 'cost_emission']
     df = oemoflex_scalars.loc[oemoflex_scalars['var_name'].isin(cost_list)]
     total_system_cost = pd.DataFrame(columns=oemoflex_scalars.columns)
     total_system_cost.loc[0, 'var_name'] = 'total_system_cost'
