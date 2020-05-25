@@ -243,6 +243,7 @@ def get_transmission_losses(oemoflex_scalars):
         losses.append(loss)
 
     losses = pd.concat(losses)
+    losses = losses.reset_index()
 
     return losses
 
@@ -255,6 +256,7 @@ def get_storage_losses(oemoflex_scalars):
     losses = flow_in.copy()
     losses['var_name'] = 'losses'
     losses['var_value'] = flow_in['var_value'] - flow_out['var_value']
+    losses = losses.reset_index()
 
     return losses
 
