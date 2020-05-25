@@ -452,7 +452,7 @@ def update_heat_storage(data_preprocessed_path, scalars):
     df['storage_capacity'] = get_parameter_values(
         scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
 
-    df['losses'] = get_parameter_values(
+    df['loss_rate'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
 
     df['efficiency'] = get_parameter_values(
