@@ -4,6 +4,8 @@ import os
 import pandas as pd
 
 from oemof.tools.economics import annuity
+from json import dumps
+from csv import QUOTE_NONE
 
 module_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -460,27 +462,6 @@ def update_heat_storage(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
-def update_ch4_gt(data_preprocessed_path, scalars):
-    logging.info("Updating ch4-gt file")
-
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['capacity'] = get_parameter_values(
-        scalars, 'EnergyConversion_Capacity_Electricity_CH4_GT')
-
-    df['efficiency'] = get_parameter_values(
-        scalars, 'EnergyConversion_EtaNet_Electricity_CH4_GT') * 0.01  # Percent to decimals
-
-    df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_Electricity_CH4_GT') * 1e3  # Eur/GWh to Eur/MWh
-
-    # Write back to csv file
-    df.to_csv(file_path)
-
-
 def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
 
@@ -755,6 +736,149 @@ def update_liion_battery(data_preprocessed_path, scalars):
     df['marginal_cost'] = operation_cost
 
     # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
+
+    df = pd.read_csv(file_path, index_col='region')
+
+    # Operation parameters
+    capacity = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Nuclear_ST')
+
+    availability = get_parameter_values(
+        scalars,
+        'EnergyConversion_Availability_Electricity_Nuclear_ST') * 1e-2  # percent -> 0...1
+
+    operation_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_VarOM_Electricity_Nuclear_ST') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    eta = get_parameter_values(
+        scalars,
+        'EnergyConversion_EtaNet_Electricity_Nuclear_ST') * 1e-2  # percent -> 0...1
+
+    carrier_price = get_parameter_values(
+        scalars,
+        'Energy_Price_Uranium') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    gradient = get_parameter_values(
+        scalars,
+        "EnergyConversion_MaxPowerChange_Electricity_Nuclear_ST") \
+        * 12 * 1e-2 # percent Cap./5min -> 0..1 / 1 h
+
+    gradient_formatted = {"negative_gradient": {"ub": gradient, "costs": 0},
+                          "positive_gradient": {"ub": gradient, "costs": 0}}
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Electricity_Nuclear_ST')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Electricity_Nuclear_ST') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Electricity_Nuclear_ST')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    df['expandable'] = expandable
+    df['capacity'] = 0 if expandable and from_green_field else capacity * availability
+
+    df['capacity_cost'] = annualized_cost + fix_cost * capex
+
+    df['marginal_cost'] = operation_cost
+
+    df['carrier_cost'] = carrier_price
+
+    df['efficiency'] = eta
+
+    # Use string representation of the dict
+    df['output_parameters'] = dumps(gradient_formatted)
+
+    # Write to CSV
+    # With semicolon as field separator to be able to process "output_parameters" dict
+    # Quoting object str representations not necessary - better readability
+    df.to_csv(file_path, sep=';', quoting=QUOTE_NONE)
+
+
+def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
+    logging.info("Updating ch4-gt file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
+
+    df = pd.read_csv(file_path, index_col='region')
+
+    # Operation parameters
+    capacity = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_CH4_GT')
+
+    availability = get_parameter_values(
+        scalars,
+        'EnergyConversion_Availability_Electricity_CH4_GT') * 1e-2  # percent -> 0...1
+
+    operation_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_VarOM_Electricity_CH4_GT') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    eta = get_parameter_values(
+        scalars,
+        'EnergyConversion_EtaNet_Electricity_CH4_GT') * 1e-2  # percent -> 0...1
+
+    carrier_price = get_parameter_values(
+        scalars,
+        'Energy_Price_CH4') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    co2_price = get_parameter_values(scalars, 'Energy_Price_CO2')
+
+    emission_factor = get_parameter_values(
+        scalars,
+        'Energy_EmissionFactor_CH4') * 1e-3  # t/GWh -> t/MWh
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Electricity_CH4_GT')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Electricity_CH4_GT') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Electricity_CH4_GT')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    df['expandable'] = expandable
+    df['capacity'] = 0 if expandable and from_green_field else capacity * availability
+
+    df['capacity_cost'] = annualized_cost + fix_cost * capex
+
+    df['marginal_cost'] = operation_cost
+
+    df['carrier_cost'] = carrier_price + emission_factor * co2_price
+
+    df['efficiency'] = eta
+
     df.to_csv(file_path)
 
 
