@@ -247,9 +247,16 @@ def get_transmission_losses(oemoflex_scalars):
     return losses
 
 
-def get_storage_losses():
-    # oemoflex_scalars['var_name'] == 'flow_in' - oemoflex_scalars['var_name'] == 'flow_out'
-    pass
+def get_storage_losses(oemoflex_scalars):
+    storage_data = oemoflex_scalars.loc[oemoflex_scalars['type'] == 'storage']
+    flow_in = storage_data.loc[storage_data['var_name'] == 'flow_in'].set_index('name')
+    flow_out = storage_data.loc[storage_data['var_name'] == 'flow_out'].set_index('name')
+
+    losses = flow_in.copy()
+    losses['var_name'] = 'losses'
+    losses['var_value'] = flow_in['var_value'] - flow_out['var_value']
+
+    return losses
 
 
 def get_emissions():
@@ -501,8 +508,8 @@ def run_postprocessing(
 
     # losses (storage, transmission)
     transmission_losses = get_transmission_losses(oemoflex_scalars)
-    # storage_losses = get_storage_losses()
-    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses])
+    storage_losses = get_storage_losses(oemoflex_scalars)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses])
 
     # get capacities
     capacities = get_capacities(es)
