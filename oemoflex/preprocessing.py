@@ -533,16 +533,30 @@ def update_solar_pv(data_preprocessed_path, scalars):
     solarpv.to_csv(solar_pv_file)
 
 
-def update_h2_cavern_simple(data_preprocessed_path, scalars):
+def update_h2_cavern_simple(
+        data_preprocessed_path,
+        scalars,
+        expandable=False,
+        from_greenfield=False
+):
     r"""
     Simplified parameterization of a electricity H2 storage.
 
-    Storage, discharging and charging device are lumped together.
+    Discharging and charging device are lumped together.
+
+    Undependent expansion of either storage or (dis)charging devices is neglected.
+    (we only need full expandability for FlexMex_1_2b)
 
     Parameters
     ----------
     data_preprocessed_path
     scalars
+
+    expandable : bool
+    Determines whether capacity (discharge/charge and storage) is expandable
+
+    from_greenfield : bool
+    If true initial capacity is 0.
 
     Returns
     -------
@@ -554,14 +568,16 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
     df = pd.read_csv(file_path, index_col='region')
 
     # Operation parameters
+    availability = get_parameter_values(
+        scalars,
+        'Storage_Availability_H2_Cavern') * 1e-2  # percent -> 0...1
 
-    # not in FleMex 2b!
-    # capacity_charge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernCharge')
-    #
-    # capacity_discharge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernDischarge')
-    #
-    # storage_capacity = get_parameter_values(
-    #     scalars, 'Storage_Capacity_H2_CavernStorage') * 1e3  # GWh to MWh
+    capacity_charge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernCharge')
+
+    capacity_discharge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernDischarge')
+
+    storage_capacity = get_parameter_values(
+        scalars, 'Storage_Capacity_H2_CavernStorage') * 1e3  # GWh to MWh
 
     self_discharge = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Electricity_H2_Cavern') * 1e-2  # percent -> 0...1
@@ -615,9 +631,14 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
         wacc=interest)
 
     # Actual assignments
-    df['capacity'] = 0  # only for FlexMex 2b!
+    df['expandable'] = expandable
 
-    df['storage_capacity'] = 0  # only for FlexMex 2b!
+    if expandable and from_greenfield:
+        df['capacity'] = 0
+        df['storage_capacity'] = 0
+    else:
+        df['capacity'] = (capacity_charge + capacity_discharge) / 2 * availability
+        df['storage_capacity'] = storage_capacity * availability
 
     df['loss_rate'] = self_discharge
 
@@ -633,9 +654,18 @@ def update_h2_cavern_simple(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
-def update_liion_battery(data_preprocessed_path, scalars):
+def update_liion_battery(
+        data_preprocessed_path,
+        scalars,
+        expandable=False,
+        from_greenfield=False
+):
     r"""
     Parameterization of a Li-ion battery storage.
+
+    The battery storage is expandable only in conjunction with (dis)charging because the devices
+    are not separated. The same is true for greenfield/brownfield optimization:
+    Further (dis)charging devices cannot be added to existing storage capacities or vice versa.
 
     Mapping and calculation could be easier since symmetric parametrization of a battery fits
     perfectly to oemof facade's Storage object. For consistency reasons, however, we use H2_cavern
@@ -648,6 +678,12 @@ def update_liion_battery(data_preprocessed_path, scalars):
     data_preprocessed_path
     scalars
 
+    expandable : bool
+    Determines whether capacity is expandable
+
+    from_greenfield : bool
+    If true initial capacity is 0.
+
     Returns
     -------
 
@@ -658,16 +694,18 @@ def update_liion_battery(data_preprocessed_path, scalars):
     df = pd.read_csv(file_path, index_col='region')
 
     # Operation parameters
+    availability = get_parameter_values(
+        scalars,
+        'Storage_Availability_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
 
-    # not in FleMex 2b!
-    # capacity_charge = get_parameter_values(
-    #     scalars, 'Storage_Capacity_Electricity_LiIonBatteryCharge')
-    #
-    # capacity_discharge = get_parameter_values(
-    #     scalars, 'Storage_Capacity_Electricity_LiIonBatteryDischarge')
-    #
-    # storage_capacity = get_parameter_values(
-    #     scalars, 'Storage_Capacity_Electricity_LiIonBatteryStorage') * 1e3  # GWh to MWh
+    capacity_charge = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryCharge')
+
+    capacity_discharge = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryDischarge')
+
+    storage_capacity = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryStorage') * 1e3  # GWh to MWh
 
     self_discharge = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
@@ -721,9 +759,14 @@ def update_liion_battery(data_preprocessed_path, scalars):
         wacc=interest)
 
     # Actual assignments
-    df['capacity'] = 0  # only for FlexMex 2b!
+    df['expandable'] = expandable
 
-    df['storage_capacity'] = 0  # only for FlexMex 2b!
+    if expandable and from_greenfield:
+        df['capacity'] = 0
+        df['storage_capacity'] = 0
+    else:
+        df['capacity'] = (capacity_charge + capacity_discharge) / 2 * availability
+        df['storage_capacity'] = storage_capacity * availability
 
     df['loss_rate'] = self_discharge
 

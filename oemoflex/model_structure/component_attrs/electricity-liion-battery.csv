@@ -10,7 +10,7 @@ storage_capacity,float,MWh,n/a,,Installed storage capacity
 efficiency,float,unitless,n/a,,Efficiency of charging/discharging
 marginal_cost,float,Eur/MWh,n/a,,Marginal cost of charging/discharging
 loss_rate,float,unitless,n/a,,Losses due to self discharging
-expandable,boolean,n/a,true,,Capacity can be expanded
+expandable,boolean,n/a,,,Capacity can be expanded
 capacity_cost,float,Eur/MW,n/a,,Annualized investment cost per charging/discharging capacity
 storage_capacity_cost,float,Eur/MWh,n/a,,Annualized investment cost per storage capacity
 input_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's input flow
