@@ -12,4 +12,5 @@ efficiency,float,unitless,n/a,,Efficiency of the conversion ch4 to electricity
 carrier_cost,float,Eur/MWh,n/a,,Cost per unit of used fuel
 marginal_cost,float,Eur/MWh,0,,Marginal cost
 expandable,boolean,n/a,,,Capacity can be expanded
+input_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's input flow
 output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow

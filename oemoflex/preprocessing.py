@@ -563,7 +563,7 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
     gradient = get_parameter_values(
         scalars,
         "EnergyConversion_MaxPowerChange_Electricity_Nuclear_ST") \
-        * 12 * 1e-2 # percent Cap./5min -> 0..1 / 1 h
+        * 12 * 1e-2  # percent Cap./5min -> 0..1 / 1 h
 
     gradient_formatted = {"negative_gradient": {"ub": gradient, "costs": 0},
                           "positive_gradient": {"ub": gradient, "costs": 0}}
@@ -600,11 +600,11 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
     df['efficiency'] = eta
 
     # Use string representation of the dict
-    df['output_parameters'] = dumps(gradient_formatted)
+    df['input_parameters'] = dumps(gradient_formatted)
 
     # Write to CSV
     # With semicolon as field separator to be able to process "output_parameters" dict
-    # Quoting object str representations not necessary - better readability
+    # Do not quote object str representations for better readability
     df.to_csv(file_path, sep=';', quoting=QUOTE_NONE)
 
 
