@@ -9,7 +9,7 @@ from oemoflex.postprocessing import \
     get_summed_sequences, get_re_generation,\
     get_transmission_losses, get_storage_losses, get_emissions, \
     get_varom_cost, get_carrier_cost, get_total_system_cost, \
-    map_to_flexmex_results
+    map_to_flexmex_results, save_flexmex_timeseries
 from oemoflex.helpers import \
     setup_experiment_paths, load_elements
 
@@ -99,4 +99,4 @@ flexmex_scalar_results = map_to_flexmex_results(
 
 flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
 
-# save_flexmex_timeseries(sequences_by_tech)
+save_flexmex_timeseries(sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed)
