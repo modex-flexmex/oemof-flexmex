@@ -5,7 +5,7 @@ EnergyConversion_SecondaryEnergy_Electricity_RE,GWh,energysystem,re,none,none,re
 EnergyConversion_SecondaryEnergy_Electricity_Slack,GWh,electricity-shortage,electricity,shortage,shortage,flow_out
 Transmission_Losses_Electricity_Grid,GWh,electricity-transmission,electricity,link,transmission,loss
 Transmission_Flow_Electricity_Grid,GWh,electricity-transmission,electricity,link,transmission,gross_flow
-Energy_EmissionCost_CO2,Eur,energysystem,ALL,none,ALL,cost_emissions
+Energy_EmissionCost_CO2,Eur,energysystem,ALL,ALL,ALL,cost_emission
 Energy_Emissions_CO2,t,energysystem,none,none,none,emissions
 EnergyConversion_Capacity_Electricity_CH4_GT,MW,ch4-gt,ch4,conversion,gt,capacity
 EnergyConversion_Capacity_Electricity_Nuclear_ST,MW,uranium-nuclear,uranium,dispatchable,nuclear,capacity
