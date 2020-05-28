@@ -532,7 +532,6 @@ def run_postprocessing(year, name, exp_paths):
     oemoflex_scalars['usecase'] = name
     oemoflex_scalars['year'] = year
 
-    oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
     # map to FlexMex data format
     flexmex_scalar_results = map_to_flexmex_results(
         oemoflex_scalars, flexmex_scalars_template, mapping, name
