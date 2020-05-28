@@ -405,17 +405,20 @@ def get_emission_cost(oemoflex_scalars, scalars_raw):
 
 
 def aggregate_by_country(df):
+    if df:
+        aggregated = df.groupby(['region', 'var_name', 'var_unit']).sum()
 
-    aggregated = df.groupby(['region', 'var_name', 'var_unit']).sum()
+        aggregated['name'] = 'energysystem'
+        aggregated['carrier'] = 'ALL'
+        aggregated['tech'] = 'ALL'
+        aggregated['type'] = 'ALL'
 
-    aggregated['name'] = 'energysystem'
-    aggregated['carrier'] = 'ALL'
-    aggregated['tech'] = 'ALL'
-    aggregated['type'] = 'ALL'
+        aggregated = aggregated.reset_index()
 
-    aggregated = aggregated.reset_index()
+        return aggregated
 
-    return aggregated
+    else:
+        return None
 
 
 def get_capacity_cost():
