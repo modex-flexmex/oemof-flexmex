@@ -404,6 +404,20 @@ def get_emission_cost(oemoflex_scalars, scalars_raw):
     return emission_cost
 
 
+def aggregate_by_country(df):
+
+    aggregated = df.groupby(['region', 'var_name', 'var_unit']).sum()
+
+    aggregated['name'] = 'energysystem'
+    aggregated['carrier'] = 'ALL'
+    aggregated['tech'] = 'ALL'
+    aggregated['type'] = 'ALL'
+
+    aggregated = aggregated.reset_index()
+
+    return aggregated
+
+
 def get_capacity_cost():
     # TODO: Problem there is no distinction btw fixom and invest cost!
     # capacities * prep_elements[capacity_cost]
@@ -521,8 +535,9 @@ def run_postprocessing(year, name, exp_paths):
     carrier_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
     fuel_cost = get_fuel_cost(carrier_cost, scalars_raw)
     emission_cost = get_emission_cost(carrier_cost, scalars_raw)
+    aggregated_emission_cost = aggregate_by_country(emission_cost)
     oemoflex_scalars = pd.concat([
-        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, emission_cost
+        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost
     ])
 
     total_system_cost = get_total_system_cost(oemoflex_scalars)
@@ -538,6 +553,7 @@ def run_postprocessing(year, name, exp_paths):
     )
 
     flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
+    oemoflex_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'))
 
     save_flexmex_timeseries(
         sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed
