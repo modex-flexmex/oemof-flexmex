@@ -495,9 +495,7 @@ def run_postprocessing(year, name, exp_paths):
 
     oemoflex_scalars = pd.DataFrame(
         columns=[
-            'usecase',
             'region',
-            'year',
             'name',
             'type',
             'carrier',
