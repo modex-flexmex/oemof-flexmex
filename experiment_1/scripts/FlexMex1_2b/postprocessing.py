@@ -3,13 +3,13 @@ import os
 import pandas as pd
 
 from oemof.solph import EnergySystem
-from oemoflex.postprocessing import \
-    create_postprocessed_results_subdirs, get_sequences_by_tech,\
-    get_capacities, format_capacities,\
-    get_summed_sequences, get_re_generation,\
-    get_transmission_losses, get_storage_losses, get_emissions, \
-    get_varom_cost, get_carrier_cost, get_total_system_cost, \
-    map_to_flexmex_results
+from oemoflex.postprocessing import (
+    create_postprocessed_results_subdirs, get_sequences_by_tech,
+    get_capacities, format_capacities,
+    get_summed_sequences, get_re_generation,
+    # get_transmission_losses, get_storage_losses, get_emissions,
+    get_varom_cost, get_carrier_cost, get_total_system_cost,
+    map_to_flexmex_results)
 from oemoflex.helpers import \
     setup_experiment_paths, load_elements
 
@@ -23,10 +23,12 @@ exp_paths = setup_experiment_paths(name, basepath)
 
 create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
+
 def main():
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
-    flexmex_scalars_template = flexmex_scalars_template.loc[flexmex_scalars_template['UseCase'] == name]
+    flexmex_scalars_template = flexmex_scalars_template.loc[
+        flexmex_scalars_template['UseCase'] == name]
 
     # load mapping
     mapping = pd.read_csv(os.path.join(exp_paths.results_template, 'mapping.csv'))
@@ -66,8 +68,8 @@ def main():
     oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation], sort=True)
 
     # losses (storage, transmission)
-    transmission_losses = get_transmission_losses()
-    storage_losses = get_storage_losses()
+    # transmission_losses = get_transmission_losses()
+    # storage_losses = get_storage_losses()
     # oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses])
 
     # get capacities
@@ -76,7 +78,7 @@ def main():
     oemoflex_scalars = pd.concat([oemoflex_scalars, formatted_capacities])
 
     # emissions
-    emissions = get_emissions()
+    # emissions = get_emissions()
     # oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
 
     # costs
@@ -101,6 +103,7 @@ def main():
     flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
 
     # save_flexmex_timeseries(sequences_by_tech)
+
 
 if __name__ == '__main__':
     main()

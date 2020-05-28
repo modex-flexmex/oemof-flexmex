@@ -812,7 +812,7 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
     gradient = get_parameter_values(
         scalars,
         "EnergyConversion_MaxPowerChange_Electricity_Nuclear_ST") \
-        * 12 * 1e-2 # percent Cap./5min -> 0..1 / 1 h
+        * 12 * 1e-2  # percent Cap./5min -> 0..1 / 1 h
 
     gradient_formatted = {"negative_gradient": {"ub": gradient, "costs": 0},
                           "positive_gradient": {"ub": gradient, "costs": 0}}
