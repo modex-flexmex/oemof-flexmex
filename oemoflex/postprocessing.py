@@ -281,6 +281,29 @@ def get_emissions(oemoflex_scalars, scalars_raw):
     return emissions
 
 
+def map_link_direction(oemoflex_scalars):
+    r"""Swaps name and region for backward flows of links."""
+    backward = (
+        (oemoflex_scalars['type'] == 'link') &
+        (oemoflex_scalars['var_name'].str.contains('backward'))
+    )
+
+    def swap(series, delimiter):
+        return series.str.split(delimiter).apply(lambda x: delimiter.join(x[::-1]))
+
+    def drop_regex(series, regex):
+        return series.str.replace(regex, '', regex=True)
+
+    oemoflex_scalars.loc[backward, 'name'] = swap(oemoflex_scalars.loc[backward, 'name'], '-')
+    oemoflex_scalars.loc[backward, 'region'] = swap(oemoflex_scalars.loc[backward, 'region'], '_')
+
+    oemoflex_scalars.loc[:, 'var_name'] = drop_regex(
+        oemoflex_scalars.loc[:, 'var_name'], '.backward|.forward'
+    )
+
+    return oemoflex_scalars
+
+
 def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, usecase):
     mapping = mapping.set_index('Parameter')
     flexmex_scalars = flexmex_scalars_template.copy()
@@ -557,6 +580,9 @@ def run_postprocessing(year, name, exp_paths):
 
     total_system_cost = get_total_system_cost(oemoflex_scalars)
     oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
+
+    # map direction of links
+    oemoflex_scalars = map_link_direction(oemoflex_scalars)
 
     # set experiment info
     oemoflex_scalars['usecase'] = name
