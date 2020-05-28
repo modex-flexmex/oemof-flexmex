@@ -454,35 +454,27 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
     delete_empty_subdirs(dir)
 
 
-def run_postprocessing(
-        year,
-        name,
-        data_raw,
-        data_preprocessed,
-        results_optimization,
-        results_template,
-        results_postprocessed
-):
-    create_postprocessed_results_subdirs(results_postprocessed)
+def run_postprocessing(year, name, exp_paths):
+    create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = pd.read_csv(os.path.join(data_raw, 'Scalars.csv'))
+    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'))
 
     # load scalars templates
-    flexmex_scalars_template = pd.read_csv(os.path.join(results_template, 'Scalars.csv'))
+    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
     flexmex_scalars_template = flexmex_scalars_template.loc[
         flexmex_scalars_template['UseCase'] == name
     ]
 
     # load mapping
-    mapping = pd.read_csv(os.path.join(results_template, 'mapping.csv'))
+    mapping = pd.read_csv(os.path.join(exp_paths.results_mapping, 'mapping.csv'))
 
     # Load preprocessed elements
-    prep_elements = load_elements(os.path.join(data_preprocessed, 'data', 'elements'))
+    prep_elements = load_elements(os.path.join(exp_paths.data_preprocessed, 'data', 'elements'))
 
     # restore EnergySystem with results
     es = EnergySystem()
-    es.restore(results_optimization)
+    es.restore(exp_paths.results_optimization)
 
     # format results sequences
     sequences_by_tech = get_sequences_by_tech(es.results)
@@ -546,8 +538,8 @@ def run_postprocessing(
         oemoflex_scalars, flexmex_scalars_template, mapping, name
     )
 
-    flexmex_scalar_results.to_csv(os.path.join(results_postprocessed, 'Scalars.csv'))
+    flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
 
     save_flexmex_timeseries(
-        sequences_by_tech, name, 'oemof', '2050', results_postprocessed
+        sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed
     )
