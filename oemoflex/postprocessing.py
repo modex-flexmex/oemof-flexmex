@@ -262,9 +262,23 @@ def get_storage_losses(oemoflex_scalars):
     return losses
 
 
-def get_emissions():
-    # TODO: Not included yet
-    pass
+def get_emissions(oemoflex_scalars, scalars_raw):
+    try:
+        emissions = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_emission'].copy()
+    except KeyError:
+        logging.info("No key 'cost_emissions' found to calculate 'emissions'.")
+        return None
+
+    price_emission = get_parameter_values(scalars_raw, 'Energy_Price_CO2')
+
+    emissions['var_value'] *= 1/price_emission
+
+    emissions['var_name'] = 'emissions'
+
+    emissions['var_unit'] = 'tCO2'
+
+    print(emissions)
+    return emissions
 
 
 def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, usecase):
@@ -405,7 +419,7 @@ def get_emission_cost(oemoflex_scalars, scalars_raw):
 
 
 def aggregate_by_country(df):
-    if df:
+    if df is not None:
         aggregated = df.groupby(['region', 'var_name', 'var_unit']).sum()
 
         aggregated['name'] = 'energysystem'
@@ -527,10 +541,6 @@ def run_postprocessing(year, name, exp_paths):
     formatted_capacities = format_capacities(oemoflex_scalars, capacities)
     oemoflex_scalars = pd.concat([oemoflex_scalars, formatted_capacities])
 
-    # emissions
-    # emissions = get_emissions()
-    # oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
-
     # costs
     varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
     carrier_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
@@ -540,6 +550,10 @@ def run_postprocessing(year, name, exp_paths):
     oemoflex_scalars = pd.concat([
         oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost
     ])
+
+    # emissions
+    emissions = get_emissions(oemoflex_scalars, scalars_raw)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
 
     total_system_cost = get_total_system_cost(oemoflex_scalars)
     oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
