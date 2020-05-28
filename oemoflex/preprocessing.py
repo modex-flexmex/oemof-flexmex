@@ -523,6 +523,13 @@ def update_link(data_preprocessed_path, scalars):
         / transmission_capacity
     )
 
+    varom = get_parameter_values(scalars, 'Transmission_VarOM_Electricity_Grid')
+
+    link['marginal_cost'] = (
+        varom *
+        transmission_length
+    )
+
     link.to_csv(link_file)
 
 
