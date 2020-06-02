@@ -560,7 +560,7 @@ def update_h2_cavern_simple(
     -------
 
     """
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-h2-cavern.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-h2_cavern.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
@@ -686,7 +686,7 @@ def update_liion_battery(
     -------
 
     """
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-liion-battery.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-liion_battery.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
