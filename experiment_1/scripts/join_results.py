@@ -56,6 +56,6 @@ def copy_timeseries(experiments, fro, to):
 
 
 all_scalars = join_scalars(experiments)
-all_scalars.to_csv('../006_results_comparison/oemof/Scalars.csv', index=False)
+all_scalars.to_csv('../006_results_comparison/oemof/Scalars.csv')
 
 copy_timeseries(experiments, exp_paths.results_postprocessed, exp_paths.results_comparison)
