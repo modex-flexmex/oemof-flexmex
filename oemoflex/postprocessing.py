@@ -592,8 +592,18 @@ def run_postprocessing(year, name, exp_paths):
         oemoflex_scalars, flexmex_scalars_template, mapping, name
     )
 
-    flexmex_scalar_results.to_csv(os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'))
-    oemoflex_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'))
+    # save results
+    flexmex_scalar_results.to_csv(
+        os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'),
+        index=False
+    )
+
+    save_oemoflex_scalars = False
+    if save_oemoflex_scalars:
+        oemoflex_scalars.to_csv(
+            os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'),
+            index=False
+        )
 
     save_flexmex_timeseries(
         sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed
