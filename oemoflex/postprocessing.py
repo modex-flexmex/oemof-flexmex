@@ -453,8 +453,7 @@ def aggregate_by_country(df):
 
         return aggregated
 
-    else:
-        return None
+    return None
 
 
 def get_capacity_cost():

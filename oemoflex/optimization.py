@@ -4,6 +4,7 @@ import os
 from oemof.solph import EnergySystem, Model
 
 # DONT REMOVE THIS LINE!
+# pylint: disable=unused-import
 from oemof.tabular import datapackage  # noqa
 from oemof.tabular.facades import TYPEMAP
 
