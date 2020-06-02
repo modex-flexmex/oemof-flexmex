@@ -6,7 +6,7 @@ electricity-transmission,electricity,link,transmission,Electrical transmission b
 solar-pv,solar,volatile,pv,Solar pv capacities
 wind-offshore,wind,volatile,offshore,Offshore wind capacities
 wind-onshore,wind,volatile,onshore,Onshore wind capacities
-electricity-curtailment,electricity,sink,curtailment,Curtailment of non-dispatchable electricity
+electricity-curtailment,electricity,excess,curtailment,Curtailment of non-dispatchable electricity
 ch4-bpchp,ch4,backpressure,bpchp,Backpressure turbine CHP
 ch4-boiler,ch4,conversion,boiler,Peak load boiler
 ch4-extchp,ch4,extraction,extchp,Extraction turbine CHP
@@ -15,3 +15,4 @@ heat-demand,heat,load,demand,Heat demand
 electricity-heatpump,electricity,conversion,heatpump,Airsource compression heatpump
 ch4-gt,gas,dispatchable,gt,Open cycle gas turbine
 heat-storage,heat,storage,storage,Large scale sensible heat storage
+heat-excess,heat,excess,excess,Heat excess

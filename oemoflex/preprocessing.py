@@ -297,7 +297,10 @@ def update_bpchp(data_preprocessed_path, scalars):
     df = pd.read_csv(file_path, index_col='region')
 
     df['capacity'] = get_parameter_values(
-        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT')
+        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT'
+    ) * get_parameter_values(
+        scalars, 'EnergyConversion_Availability_ElectricityHeat_CH4_BpCCGT'
+    ) * 1e-2  # percent to decimals
 
     electricity_per_heat = get_parameter_values(
         scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
@@ -305,12 +308,12 @@ def update_bpchp(data_preprocessed_path, scalars):
     # eta_el = eta_total / (1 + 1 / electricity_per_heat)
     df['electric_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
-    ) / (1 + 1/electricity_per_heat)
+    ) / (1 + 1/electricity_per_heat) * 1e-2  # percent to decimal
 
     # eta_th = eta_total / (1 + electricity_per_heat)
     df['thermal_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
-    ) / (1 + electricity_per_heat)
+    ) / (1 + electricity_per_heat) * 1e-2  # percent to decimal
 
     df['carrier_cost'] = (
         get_parameter_values(scalars, 'Energy_Price_CH4')
@@ -333,7 +336,10 @@ def update_extchp(data_preprocessed_path, scalars):
     df = pd.read_csv(file_path, index_col='region')
 
     df['capacity'] = get_parameter_values(
-        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT')
+        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT'
+    ) * get_parameter_values(
+        scalars, 'EnergyConversion_Availability_ElectricityHeat_CH4_ExCCGT'
+    ) * 1e-2  # percent to decimals
 
     electricity_per_heat = get_parameter_values(
         scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_ExCCGT')
@@ -341,14 +347,14 @@ def update_extchp(data_preprocessed_path, scalars):
     # eta_el = eta_total / (1 + 1 / electricity_per_heat)
     electric_efficiency = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
-    ) / (1 + 1/electricity_per_heat)
+    ) / (1 + 1/electricity_per_heat) * 1e-2  # percent to decimal
 
     df['electric_efficiency'] = electric_efficiency
 
     # eta_th = eta_total / (1 + electricity_per_heat)
     thermal_efficiency = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
-    ) / (1 + electricity_per_heat)
+    ) / (1 + electricity_per_heat) * 1e-2  # percent to decimal
 
     df['thermal_efficiency'] = thermal_efficiency
 
@@ -446,7 +452,7 @@ def update_heat_storage(data_preprocessed_path, scalars):
     df['storage_capacity'] = get_parameter_values(
         scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
 
-    df['losses'] = get_parameter_values(
+    df['loss_rate'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
 
     df['efficiency'] = get_parameter_values(
@@ -515,6 +521,13 @@ def update_link(data_preprocessed_path, scalars):
         * 0.01
         * transmission_loss_per_100km
         / transmission_capacity
+    )
+
+    varom = get_parameter_values(scalars, 'Transmission_VarOM_Electricity_Grid')
+
+    link['marginal_cost'] = (
+        varom *
+        transmission_length
     )
 
     link.to_csv(link_file)
