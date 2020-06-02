@@ -277,7 +277,6 @@ def get_emissions(oemoflex_scalars, scalars_raw):
 
     emissions['var_unit'] = 'tCO2'
 
-    print(emissions)
     return emissions
 
 
