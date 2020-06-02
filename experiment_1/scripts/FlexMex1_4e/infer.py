@@ -37,7 +37,7 @@ def main():
                 'heat-demand',
                 'heat-excess',
                 'heat-shortage',
-                'heat_storage',
+                'heat-storage',
             ],
             'profile': [
                 'wind-onshore',
@@ -47,13 +47,14 @@ def main():
                 'heat-demand',
             ],
             'from_to_bus': [
-                'gas-boiler',
+                'ch4-boiler',
                 'electricity-pth',
+                'electricity-heatpump',
             ],
             'chp': [
-                'gas-extchp',
+                'ch4-extchp',
             ],
-            # TODO: Add heat pump
+            'efficiency': ['electricity-heatpump'],
         },
         path=exp_paths.data_preprocessed
     )
