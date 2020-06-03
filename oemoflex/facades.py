@@ -112,10 +112,10 @@ class AsymmetricStorage(GenericStorage, Facade):
             self._invest_group = True
         else:
             fi = Flow(
-                nominal_value=self._nominal_value(), **self.input_parameters
+                nominal_value=self._nominal_value()["charge"], **self.input_parameters
             )
             fo = Flow(
-                nominal_value=self._nominal_value(),
+                nominal_value=self._nominal_value()["discharge"],
                 variable_costs=self.marginal_cost,
                 **self.output_parameters
             )
