@@ -25,7 +25,7 @@ def main():
     r"""Infer the metadata of the datapackage"""
     logging.info("Inferring the metadata of the datapackage")
     building.infer_metadata(
-        package_name='oemof-tabular-dispatch-example',
+        package_name=name,
         foreign_keys={
             'bus': [
                 'wind-onshore',
@@ -35,6 +35,7 @@ def main():
                 'electricity-curtailment',
                 'electricity-demand',
                 'heat-demand',
+                'heat-excess',
                 'heat-shortage',
             ],
             'profile': [
