@@ -34,6 +34,7 @@ def main():
     # Load common input parameters
     scalars = pd.read_csv(
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+        sep=';',
         header=0,
         na_values=['not considered', 'no value']
     )
@@ -74,7 +75,7 @@ def main():
     # compare with previous data
     previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
     new_path = exp_paths.data_preprocessed
-    check_if_csv_dirs_equal(new_path, previous_path)
+    # check_if_csv_dirs_equal(new_path, previous_path)
 
 
 if __name__ == '__main__':
