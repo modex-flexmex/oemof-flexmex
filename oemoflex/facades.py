@@ -1,10 +1,10 @@
-from oemof.solph import sequence, Source, Flow
+from oemof.solph import sequence, Sink, Flow
 from oemof.solph.components import GenericStorage
 from oemof.tabular.facades import Facade
 
 
-class Reservoir(GenericStorage, Facade):
-    r""" A Reservoir storage unit, that is initially half full.
+class Bev(GenericStorage, Facade):
+    r""" A Battery electric vehicle unit.
 
     Note that the investment option is not available for this facade at
     the current development state.
@@ -67,18 +67,21 @@ class Reservoir(GenericStorage, Facade):
     >>> from oemof import solph
     >>> from oemof.tabular import facades
     >>> my_bus = solph.Bus('my_bus')
-    >>> my_reservoir = Reservoir(
-    ...     label='my_reservoir',
-    ...     bus=my_bus,
-    ...     carrier='water',
-    ...     tech='reservoir',
+    >>> my_bev = Bev(
+    ...     name='my_bev',
+    ...     bus=el_bus,
+    ...     carrier='electricity',
+    ...     tech='bev',
     ...     storage_capacity=1000,
     ...     capacity=50,
-    ...     profile=[1, 2, 6],
+    ...     availability=[0.8, 0.7, 0.6],
+    ...     drive_power=[1, 2, 6],
     ...     loss_rate=0.01,
     ...     initial_storage_level=0,
-    ...     max_storage_level = 0.9,
-    ...     efficiency=0.93)
+    ...     min_storage_level=[0.1, 0.2, 0.15],
+    ...     max_storage_level=[0.9, 0.95, 0.92],
+    ...     efficiency=0.93
+    ...     )
 
     """
 
@@ -90,7 +93,8 @@ class Reservoir(GenericStorage, Facade):
                     "bus",
                     "carrier",
                     "tech",
-                    "profile",
+                    "availability",
+                    "drive_power",
                     "efficiency",
                 ]
             }
@@ -125,11 +129,19 @@ class Reservoir(GenericStorage, Facade):
                 "Investment for reservoir class is not implemented."
             )
 
-        inflow = Source(
-            label=self.label + "-inflow",
-            outputs={
-                self: Flow(nominal_value=1, max=self.profile, fixed=False)
+        outflow = Sink(
+            label=self.label + "-outflow",
+            inputs={
+                self: Flow(nominal_value=1, max=self.drive_power, fixed=False)
             },
+        )
+
+        self.inputs.update(
+            {
+                self.bus: Flow(
+                    **self.input_parameters
+                )
+            }
         )
 
         self.outputs.update(
@@ -140,4 +152,4 @@ class Reservoir(GenericStorage, Facade):
             }
         )
 
-        self.subnodes = (inflow,)
+        self.subnodes = (outflow,)
