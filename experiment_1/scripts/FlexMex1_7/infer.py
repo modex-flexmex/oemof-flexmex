@@ -42,7 +42,6 @@ def main():
                 'solar-pv',
                 'electricity-demand',
             ],
-            'from_to_bus': ['electricity-transmission'],
         },
         path=exp_paths.data_preprocessed
     )
