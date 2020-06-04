@@ -1,5 +1,6 @@
 import os
 import logging
+import copy
 
 import numpy as np
 import pandas as pd
@@ -46,19 +47,33 @@ def get_capacities(es):
         DataFrame containing the capacities.
     """
     try:
-        # TODO: Adapt this for investment
         all = pp.bus_results(es, es.results, select="scalars", concat=True)
-        all.name = "value"
+
+        all.name = "var_value"
+
         endogenous = all.reset_index()
-        endogenous["tech"] = [
-            getattr(t, "tech", np.nan) for t in all.index.get_level_values(0)
+
+        endogenous.drop(['from', 'to'], axis=1, inplace=True)
+
+        endogenous["region"] = [
+            getattr(t, "region", np.nan) for t in all.index.get_level_values(0)
+        ]
+        endogenous["name"] = [
+            getattr(t, "label", np.nan) for t in all.index.get_level_values(0)
+        ]
+        endogenous["type"] = [
+            getattr(t, "type", np.nan) for t in all.index.get_level_values(0)
         ]
         endogenous["carrier"] = [
             getattr(t, "carrier", np.nan)
             for t in all.index.get_level_values(0)
         ]
+        endogenous["tech"] = [
+            getattr(t, "tech", np.nan) for t in all.index.get_level_values(0)
+        ]
+        endogenous["var_name"] = "invest"
         endogenous.set_index(
-            ["from", "to", "type", "tech", "carrier"], inplace=True
+            ["region", "name", "type", "carrier", "tech", "var_name"], inplace=True
         )
 
     except ValueError:
@@ -123,7 +138,8 @@ def get_sequences_by_tech(results):
     sequences_by_tech : dict
         Dictionary containing sequences with carrier-tech as keys.
     """
-    sequences = {key: value['sequences'] for key, value in results.items()}
+    # copy to avoid manipulating the data in es.results
+    sequences = copy.deepcopy({key: value['sequences'] for key, value in results.items()})
 
     sequences_by_tech = {}
     for key, df in sequences.items():
