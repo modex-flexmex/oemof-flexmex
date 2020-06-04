@@ -569,6 +569,14 @@ def update_solar_pv(data_preprocessed_path, scalars):
     solarpv.to_csv(solar_pv_file)
 
 
+def update_electricity_bev(data_preprocessed_path, scalars):
+    electricity_bev_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-bev.csv')
+
+    electricity_bev = pd.read_csv(electricity_bev_file, index_col='region')
+
+    electricity_bev.to_csv(electricity_bev_file)
+
+
 def combine_profiles(raw_profile_path, column_name):
     profile_file_list = sorted(os.listdir(raw_profile_path))
 
@@ -674,3 +682,7 @@ def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
     profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'efficiency_profile.csv')
     )
+
+
+def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
+    logging.info("Creating electricity bev profiles")

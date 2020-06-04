@@ -16,3 +16,4 @@ electricity-heatpump,electricity,conversion,heatpump,Airsource compression heatp
 ch4-gt,gas,dispatchable,gt,Open cycle gas turbine
 heat-storage,heat,storage,storage,Large scale sensible heat storage
 heat-excess,heat,excess,excess,Heat excess
+electricity-bev,electricity,storage,bev,Battery electric vehicle
