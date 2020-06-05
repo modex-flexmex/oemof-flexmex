@@ -355,6 +355,20 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
 
 
 def get_varom_cost(oemoflex_scalars, prep_elements):
+    r"""
+    Calculates the VarOM cost by multiplying consumption by marginal cost.
+
+    Which value is taken as consumption depends on the actual technology type.
+
+    Parameters
+    ----------
+    oemoflex_scalars
+    prep_elements
+
+    Returns
+    -------
+
+    """
     varom_cost = []
     for _, prep_el in prep_elements.items():
         if 'marginal_cost' in prep_el.columns:
@@ -423,6 +437,11 @@ def get_fuel_cost(oemoflex_scalars, scalars_raw):
 
     fuel_cost['var_name'] = 'cost_fuel'
 
+    # parameter_names = {'Energy_Price_CH4': 'Energy_EmissionFactor_CH4',
+    #                    'Energy_Price_Uranium': None}
+    #
+    # for carrier_price, emission_factor in parameter_names
+
     price_ch4 = get_parameter_values(scalars_raw, 'Energy_Price_CH4')
 
     price_emission = get_parameter_values(scalars_raw, 'Energy_Price_CO2')\
@@ -459,7 +478,7 @@ def get_emission_cost(oemoflex_scalars, scalars_raw):
 
 def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
-    invest_cost = []
+    invest_cost = pd.DataFrame()
     parameters = dict()
 
     for _, prep_el in prep_elements.items():
@@ -503,12 +522,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_name'] = 'cost_invest'
             df['var_unit'] = 'Eur'
 
-            invest_cost.append(df)
-
-    if invest_cost:
-        invest_cost = pd.concat(invest_cost, sort=True)
-    else:
-        invest_cost = pd.DataFrame(invest_cost)
+            invest_cost = pd.concat([invest_cost, df], sort=True)
 
     return invest_cost
 
