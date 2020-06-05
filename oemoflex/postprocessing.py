@@ -9,6 +9,7 @@ import yaml
 from oemof.solph import EnergySystem, Bus, Sink
 from oemof.tabular import facades
 import oemof.tabular.tools.postprocessing as pp
+from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements
 from oemoflex.preprocessing import get_parameter_values
 
@@ -456,6 +457,58 @@ def get_emission_cost(oemoflex_scalars, scalars_raw):
     return emission_cost
 
 
+def get_invest_cost(oemoflex_scalars, scalars_raw):
+
+    try:
+        capacities_invested = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'invest'].copy()
+    except KeyError:
+        logging.info("No key 'invest' found to calculate 'cost_invest'.")
+        return None
+
+    capacities_invested['var_name'] = 'cost_invest'
+
+    capex = get_parameter_values(
+        scalars_raw,
+        'EnergyConversion_Capex_Electricity_CH4_GT')
+
+    lifetime = get_parameter_values(
+        scalars_raw,
+        'EnergyConversion_LifeTime_Electricity_CH4_GT')
+
+    interest = get_parameter_values(
+        scalars_raw,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    capacities_invested['var_value'] *= annualized_cost
+
+    return capacities_invested
+
+
+def get_fixom_cost(oemoflex_scalars, scalars_raw):
+
+    try:
+        capacities_invested = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'invest'].copy()
+    except KeyError:
+        logging.info("No key 'invest' found to calculate 'capacity_cost'.")
+        return None
+
+    capacities_invested['var_name'] = 'cost_fixom'
+
+    capex = get_parameter_values(
+        scalars_raw,
+        'EnergyConversion_Capex_Electricity_CH4_GT')
+
+    fix_cost = get_parameter_values(
+        scalars_raw,
+        'EnergyConversion_FixOM_Electricity_CH4_GT') * 1e-2  # percent -> 0...1
+
+    capacities_invested['var_value'] *= fix_cost * capex
+
+    return capacities_invested
+
+
 def aggregate_by_country(df):
     if df is not None:
         aggregated = df.groupby(['region', 'var_name', 'var_unit']).sum()
@@ -470,12 +523,6 @@ def aggregate_by_country(df):
         return aggregated
 
     return None
-
-
-def get_capacity_cost():
-    # TODO: Problem there is no distinction btw fixom and invest cost!
-    # capacities * prep_elements[capacity_cost]
-    pass
 
 
 def get_total_system_cost(oemoflex_scalars):
@@ -584,8 +631,11 @@ def run_postprocessing(year, name, exp_paths):
     fuel_cost = get_fuel_cost(carrier_cost, scalars_raw)
     emission_cost = get_emission_cost(carrier_cost, scalars_raw)
     aggregated_emission_cost = aggregate_by_country(emission_cost)
+    invest_cost = get_invest_cost(oemoflex_scalars, scalars_raw)
+    fixom_cost = get_fixom_cost(oemoflex_scalars, scalars_raw)
     oemoflex_scalars = pd.concat([
-        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost
+        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
+        invest_cost, fixom_cost
     ])
 
     # emissions
