@@ -527,27 +527,50 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
     return invest_cost
 
 
-def get_fixom_cost(oemoflex_scalars, scalars_raw):
+def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
-    try:
-        capacities_invested = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'invest'].copy()
-    except KeyError:
-        logging.info("No key 'invest' found to calculate 'capacity_cost'.")
-        return None
+    fixom_cost = pd.DataFrame()
+    parameters = dict()
 
-    capacities_invested['var_name'] = 'cost_fixom'
+    for _, prep_el in prep_elements.items():
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
+            # element is expandable --> 'invest' values exist
+            df = prep_el[basic_columns]
 
-    capex = get_parameter_values(
-        scalars_raw,
-        'EnergyConversion_Capex_Electricity_CH4_GT')
+            try:
+                capacities_invested = oemoflex_scalars.loc[
+                    oemoflex_scalars['var_name'] == 'invest'].copy()
+            except KeyError:
+                logging.info("No key 'invest' found to calculate 'cost_fixom'.")
+                return None
 
-    fix_cost = get_parameter_values(
-        scalars_raw,
-        'EnergyConversion_FixOM_Electricity_CH4_GT') * 1e-2  # percent -> 0...1
+            df = pd.merge(
+                df, capacities_invested,
+                on=basic_columns
+            )
 
-    capacities_invested['var_value'] *= fix_cost * capex
+            # TODO This part could be easily modularized and reused (for preprocessing as well)
+            # TODO sugg: FlexMex_parameter_mapping(technology)
+            if prep_el['tech'][0] == 'gt':
+                parameters = {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
+                              'fixom': 'EnergyConversion_FixOM_Electricity_CH4_GT'}
+            elif prep_el['tech'][0] == 'nuclear-st':
+                parameters = {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
+                              'fixom': 'EnergyConversion_FixOM_Electricity_Nuclear_ST'}
 
-    return capacities_invested
+            capex = get_parameter_values(scalars_raw, parameters['capex'])
+
+            fix_cost = get_parameter_values(
+                scalars_raw, parameters['fixom']) * 1e-2  # percent -> 0...1
+
+            df['var_value'] = df['var_value'] * fix_cost * capex
+
+            df['var_name'] = 'cost_fixom'
+            df['var_unit'] = 'Eur'
+
+            fixom_cost = pd.concat([fixom_cost, df], sort=True)
+
+    return fixom_cost
 
 
 def aggregate_by_country(df):
@@ -673,7 +696,7 @@ def run_postprocessing(year, name, exp_paths):
     emission_cost = get_emission_cost(carrier_cost, scalars_raw)
     aggregated_emission_cost = aggregate_by_country(emission_cost)
     invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
-    fixom_cost = get_fixom_cost(oemoflex_scalars, scalars_raw)
+    fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
     oemoflex_scalars = pd.concat([
         oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
         invest_cost, fixom_cost
