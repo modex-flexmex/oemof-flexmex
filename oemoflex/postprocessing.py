@@ -457,33 +457,60 @@ def get_emission_cost(oemoflex_scalars, scalars_raw):
     return emission_cost
 
 
-def get_invest_cost(oemoflex_scalars, scalars_raw):
+def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
-    try:
-        capacities_invested = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'invest'].copy()
-    except KeyError:
-        logging.info("No key 'invest' found to calculate 'cost_invest'.")
-        return None
+    invest_cost = []
+    parameters = dict()
 
-    capacities_invested['var_name'] = 'cost_invest'
+    for _, prep_el in prep_elements.items():
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
+            # element is expandable --> 'invest' values exist
+            df = prep_el[basic_columns]
 
-    capex = get_parameter_values(
-        scalars_raw,
-        'EnergyConversion_Capex_Electricity_CH4_GT')
+            try:
+                capacities_invested = oemoflex_scalars.loc[
+                    oemoflex_scalars['var_name'] == 'invest'].copy()
+            except KeyError:
+                logging.info("No key 'invest' found to calculate 'cost_invest'.")
+                return None
 
-    lifetime = get_parameter_values(
-        scalars_raw,
-        'EnergyConversion_LifeTime_Electricity_CH4_GT')
+            df = pd.merge(
+                df, capacities_invested,
+                on=basic_columns
+            )
 
-    interest = get_parameter_values(
-        scalars_raw,
-        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+            # TODO This part could be easily modularized and reused (for preprocessing as well)
+            # TODO sugg: FlexMex_parameter_mapping(technology)
+            if prep_el['tech'][0] == 'gt':
+                parameters = {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
+                              'lifetime': 'EnergyConversion_LifeTime_Electricity_CH4_GT'}
+            elif prep_el['tech'][0] == 'nuclear-st':
+                parameters = {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
+                              'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST'}
 
-    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+            capex = get_parameter_values(scalars_raw, parameters['capex'])
 
-    capacities_invested['var_value'] *= annualized_cost
+            lifetime = get_parameter_values(scalars_raw, parameters['lifetime'])
 
-    return capacities_invested
+            interest = get_parameter_values(
+                scalars_raw,
+                'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+            annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+            df['var_value'] = df['var_value'] * annualized_cost
+
+            df['var_name'] = 'cost_invest'
+            df['var_unit'] = 'Eur'
+
+            invest_cost.append(df)
+
+    if invest_cost:
+        invest_cost = pd.concat(invest_cost, sort=True)
+    else:
+        invest_cost = pd.DataFrame(invest_cost)
+
+    return invest_cost
 
 
 def get_fixom_cost(oemoflex_scalars, scalars_raw):
@@ -631,7 +658,7 @@ def run_postprocessing(year, name, exp_paths):
     fuel_cost = get_fuel_cost(carrier_cost, scalars_raw)
     emission_cost = get_emission_cost(carrier_cost, scalars_raw)
     aggregated_emission_cost = aggregate_by_country(emission_cost)
-    invest_cost = get_invest_cost(oemoflex_scalars, scalars_raw)
+    invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
     fixom_cost = get_fixom_cost(oemoflex_scalars, scalars_raw)
     oemoflex_scalars = pd.concat([
         oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
