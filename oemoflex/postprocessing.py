@@ -19,15 +19,20 @@ FlexMex_Parameter_Map = {
     'carrier':
         {
             'ch4':
-                {
-                    'carrier_price': 'Energy_Price_CH4',
-                    'co2_price': 'Energy_Price_CO2',
-                    'emission_factor': 'Energy_EmissionFactor_CH4'
-                },
+                {'carrier_price': 'Energy_Price_CH4',
+                 'co2_price': 'Energy_Price_CO2',
+                 'emission_factor': 'Energy_EmissionFactor_CH4'},
             'uranium':
-                {
-                    'carrier_price': 'Energy_Price_Uranium'
-                }
+                {'carrier_price': 'Energy_Price_Uranium'}
+        },
+    'tech':
+        {
+            'gt':
+                {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
+                 'lifetime': 'EnergyConversion_LifeTime_Electricity_CH4_GT'},
+            'nuclear-st':
+                {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
+                 'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST'}
         }
 }
 
@@ -556,14 +561,8 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 on=basic_columns
             )
 
-            # TODO This part could be easily modularized and reused (for preprocessing as well)
-            # TODO sugg: FlexMex_parameter_mapping(technology)
-            if prep_el['tech'][0] == 'gt':
-                parameters = {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
-                              'lifetime': 'EnergyConversion_LifeTime_Electricity_CH4_GT'}
-            elif prep_el['tech'][0] == 'nuclear-st':
-                parameters = {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
-                              'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST'}
+            tech_name = prep_el['tech'][0]
+            parameters = FlexMex_Parameter_Map['tech'][tech_name]
 
             capex = get_parameter_values(scalars_raw, parameters['capex'])
 
