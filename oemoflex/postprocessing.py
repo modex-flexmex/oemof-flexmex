@@ -15,6 +15,22 @@ from oemoflex.preprocessing import get_parameter_values
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
+FlexMex_Parameter_Map = {
+    'carrier':
+        {
+            'ch4':
+                {
+                    'carrier_price': 'Energy_Price_CH4',
+                    'co2_price': 'Energy_Price_CO2',
+                    'emission_factor': 'Energy_EmissionFactor_CH4'
+                },
+            'uranium':
+                {
+                    'carrier_price': 'Energy_Price_Uranium'
+                }
+        }
+}
+
 module_path = os.path.abspath(os.path.dirname(__file__))
 path_config = os.path.join(module_path, 'postprocessed_paths.yaml')
 
@@ -470,14 +486,9 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
             # Take over values from output for the selected elements only
             df = pd.merge(df, carrier_cost, on=basic_columns)
 
-            # TODO This part could be easily modularized and reused (for preprocessing as well)
-            # TODO sugg: FlexMex_parameter_mapping(technology)
-            if prep_el['carrier'][0] == 'ch4':
-                parameters = {'carrier_price': 'Energy_Price_CH4',
-                              'co2_price': 'Energy_Price_CO2',
-                              'emission_factor': 'Energy_EmissionFactor_CH4'}
-            elif prep_el['carrier'][0] == 'uranium':
-                parameters = {'carrier_price': 'Energy_Price_Uranium'}
+            # Select carriers from the parameter map
+            carrier_name = prep_el['carrier'][0]
+            parameters = FlexMex_Parameter_Map['carrier'][carrier_name]
 
             # Only re-calculate if there is a CO2 emission
             if 'emission_factor' in parameters.keys():
