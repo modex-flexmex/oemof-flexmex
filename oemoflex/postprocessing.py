@@ -498,6 +498,7 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
             parameters = FlexMex_Parameter_Map['carrier'][carrier_name]
 
             # Only re-calculate if there is a CO2 emission
+            # Otherwise take the carrier cost value for the fuel cost
             if 'emission_factor' in parameters.keys():
 
                 price_carrier = get_parameter_values(scalars_raw, parameters['carrier_price'])
@@ -520,6 +521,22 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
 
 def get_emission_cost(oemoflex_scalars, prep_elements, scalars_raw):
+    r"""
+    Re-calculates the emission costs from the carrier costs if there are CO2 emissions.
+
+    Structure only slightly different (+ else branch) from get_fuel_cost() because there are costs
+    of zero instead of the fuel costs (in get_fuel_cost()) if there are no emissions.
+
+    Parameters
+    ----------
+    oemoflex_scalars
+    prep_elements
+    scalars_raw
+
+    Returns
+    -------
+
+    """
 
     emission_cost = pd.DataFrame()
 
@@ -548,11 +565,14 @@ def get_emission_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 price_carrier = get_parameter_values(scalars_raw, parameters['carrier_price'])
 
                 price_emission = get_parameter_values(scalars_raw, parameters['co2_price']) \
-                                 * get_parameter_values(scalars_raw, parameters['emission_factor'])
+                    * get_parameter_values(scalars_raw, parameters['emission_factor'])
 
                 factor = price_emission / (price_carrier + price_emission)
 
                 df['var_value'] *= factor
+
+            else:
+                df['var_value'] = 0.0
 
             # Update other columns
             df['var_name'] = 'cost_emission'
@@ -773,6 +793,7 @@ def run_postprocessing(year, name, exp_paths):
     fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
     oemoflex_scalars = pd.concat([
         oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
+        emission_cost,
         invest_cost, fixom_cost
     ])
 
@@ -801,7 +822,7 @@ def run_postprocessing(year, name, exp_paths):
         index=False
     )
 
-    save_oemoflex_scalars = False
+    save_oemoflex_scalars = True
     if save_oemoflex_scalars:
         oemoflex_scalars.to_csv(
             os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'),
