@@ -481,17 +481,17 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
     invest_cost = pd.DataFrame()
     parameters = dict()
 
+    try:
+        capacities_invested = oemoflex_scalars.loc[
+            oemoflex_scalars['var_name'] == 'invest'].copy()
+    except KeyError:
+        logging.info("No key 'invest' found to calculate 'cost_invest'.")
+        return None
+
     for _, prep_el in prep_elements.items():
         if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
-
-            try:
-                capacities_invested = oemoflex_scalars.loc[
-                    oemoflex_scalars['var_name'] == 'invest'].copy()
-            except KeyError:
-                logging.info("No key 'invest' found to calculate 'cost_invest'.")
-                return None
 
             df = pd.merge(
                 df, capacities_invested,
@@ -532,17 +532,17 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
     fixom_cost = pd.DataFrame()
     parameters = dict()
 
+    try:
+        capacities_invested = oemoflex_scalars.loc[
+            oemoflex_scalars['var_name'] == 'invest'].copy()
+    except KeyError:
+        logging.info("No key 'invest' found to calculate 'cost_fixom'.")
+        return None
+
     for _, prep_el in prep_elements.items():
         if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
-
-            try:
-                capacities_invested = oemoflex_scalars.loc[
-                    oemoflex_scalars['var_name'] == 'invest'].copy()
-            except KeyError:
-                logging.info("No key 'invest' found to calculate 'cost_fixom'.")
-                return None
 
             df = pd.merge(
                 df, capacities_invested,
