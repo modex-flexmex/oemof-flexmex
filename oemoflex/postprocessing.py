@@ -475,7 +475,6 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
     """
 
     fuel_cost = pd.DataFrame()
-    parameters = dict()
 
     # Get the optimization output values
     try:
@@ -545,7 +544,6 @@ def get_emission_cost(oemoflex_scalars, scalars_raw):
 def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     invest_cost = pd.DataFrame()
-    parameters = dict()
 
     try:
         capacities_invested = oemoflex_scalars.loc[
@@ -590,7 +588,6 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     fixom_cost = pd.DataFrame()
-    parameters = dict()
 
     try:
         capacities_invested = oemoflex_scalars.loc[
