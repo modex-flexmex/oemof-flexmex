@@ -428,21 +428,46 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
 
 
 def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
+    r"""
+    Re-calculates the fuel costs from the carrier costs if there are CO2 emissions.
+
+    Bypass for non-emission carriers (cost_carrier = cost_fuel).
+
+    Having emissions or not is determined by the parameter mapping dict (emission_factor).
+
+    TODO Let's think about using the 'flow' values as input because this way we could
+     generalize the structure with get_varom_cost() and get_emission_cost() into one function
+     for all 'flow'-derived values.
+
+    Parameters
+    ----------
+    oemoflex_scalars
+    prep_elements
+    scalars_raw
+
+    Returns
+    -------
+
+    """
 
     fuel_cost = pd.DataFrame()
     parameters = dict()
 
+    # Get the optimization output values
     try:
         carrier_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
     except KeyError:
         logging.info("No key 'cost_carrier' found to calculate 'cost_fuel'.")
         return None
 
+    # Iterate over oemof.tabular components (technologies)
     for _, prep_el in prep_elements.items():
         if 'carrier_cost' in prep_el.columns:
 
+            # Set up a list of the current technology's elements
             df = prep_el[basic_columns]
 
+            # Take over values from output for the selected elements only
             df = pd.merge(df, carrier_cost, on=basic_columns)
 
             # TODO This part could be easily modularized and reused (for preprocessing as well)
@@ -466,9 +491,11 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
                 df['var_value'] *= factor
 
+            # Update other columns
             df['var_name'] = 'cost_fuel'
             df['var_unit'] = 'Eur'
 
+            # Append current technology elements to the return DataFrame
             fuel_cost = pd.concat([fuel_cost, df], sort=True)
 
     return fuel_cost
