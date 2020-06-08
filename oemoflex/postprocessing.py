@@ -427,29 +427,49 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
     return carrier_cost
 
 
-def get_fuel_cost(oemoflex_scalars, scalars_raw):
-    # TODO: Generalize to be useful for any kind of fossile carrier, not only CH4.
+def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
+
+    fuel_cost = pd.DataFrame()
+    parameters = dict()
+
     try:
-        fuel_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+        carrier_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
     except KeyError:
         logging.info("No key 'cost_carrier' found to calculate 'cost_fuel'.")
         return None
 
-    fuel_cost['var_name'] = 'cost_fuel'
+    for _, prep_el in prep_elements.items():
+        if 'carrier_cost' in prep_el.columns:
 
-    # parameter_names = {'Energy_Price_CH4': 'Energy_EmissionFactor_CH4',
-    #                    'Energy_Price_Uranium': None}
-    #
-    # for carrier_price, emission_factor in parameter_names
+            df = prep_el[basic_columns]
 
-    price_ch4 = get_parameter_values(scalars_raw, 'Energy_Price_CH4')
+            df = pd.merge(df, carrier_cost, on=basic_columns)
 
-    price_emission = get_parameter_values(scalars_raw, 'Energy_Price_CO2')\
-        * get_parameter_values(scalars_raw, 'Energy_EmissionFactor_CH4')
+            # TODO This part could be easily modularized and reused (for preprocessing as well)
+            # TODO sugg: FlexMex_parameter_mapping(technology)
+            if prep_el['carrier'][0] == 'ch4':
+                parameters = {'carrier_price': 'Energy_Price_CH4',
+                              'co2_price': 'Energy_Price_CO2',
+                              'emission_factor': 'Energy_EmissionFactor_CH4'}
+            elif prep_el['carrier'][0] == 'uranium':
+                parameters = {'carrier_price': 'Energy_Price_Uranium'}
 
-    factor = price_ch4 / (price_ch4 + price_emission)
+            # Only re-calculate if there is a CO2 emission
+            if 'emission_factor' in parameters.keys():
 
-    fuel_cost['var_value'] *= factor
+                price_carrier = get_parameter_values(scalars_raw, parameters['carrier_price'])
+
+                price_emission = get_parameter_values(scalars_raw, parameters['co2_price'])\
+                    * get_parameter_values(scalars_raw, parameters['emission_factor'])
+
+                factor = price_carrier / (price_carrier + price_emission)
+
+                df['var_value'] *= factor
+
+            df['var_name'] = 'cost_fuel'
+            df['var_unit'] = 'Eur'
+
+            fuel_cost = pd.concat([fuel_cost, df], sort=True)
 
     return fuel_cost
 
@@ -692,7 +712,7 @@ def run_postprocessing(year, name, exp_paths):
     # costs
     varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
     carrier_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
-    fuel_cost = get_fuel_cost(carrier_cost, scalars_raw)
+    fuel_cost = get_fuel_cost(carrier_cost, prep_elements, scalars_raw)
     emission_cost = get_emission_cost(carrier_cost, scalars_raw)
     aggregated_emission_cost = aggregate_by_country(emission_cost)
     invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
