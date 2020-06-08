@@ -29,10 +29,13 @@ FlexMex_Parameter_Map = {
         {
             'gt':
                 {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
-                 'lifetime': 'EnergyConversion_LifeTime_Electricity_CH4_GT'},
+                 'lifetime': 'EnergyConversion_LifeTime_Electricity_CH4_GT',
+                 'fixom': 'EnergyConversion_FixOM_Electricity_CH4_GT'},
             'nuclear-st':
                 {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
-                 'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST'}
+                 'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST',
+                 'fixom': 'EnergyConversion_FixOM_Electricity_Nuclear_ST'}
+
         }
 }
 
@@ -606,14 +609,8 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 on=basic_columns
             )
 
-            # TODO This part could be easily modularized and reused (for preprocessing as well)
-            # TODO sugg: FlexMex_parameter_mapping(technology)
-            if prep_el['tech'][0] == 'gt':
-                parameters = {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
-                              'fixom': 'EnergyConversion_FixOM_Electricity_CH4_GT'}
-            elif prep_el['tech'][0] == 'nuclear-st':
-                parameters = {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
-                              'fixom': 'EnergyConversion_FixOM_Electricity_Nuclear_ST'}
+            tech_name = prep_el['tech'][0]
+            parameters = FlexMex_Parameter_Map['tech'][tech_name]
 
             capex = get_parameter_values(scalars_raw, parameters['capex'])
 
