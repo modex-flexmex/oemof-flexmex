@@ -75,47 +75,54 @@ class AsymmetricStorage(GenericStorage, Facade):
 
         self.outflow_conversion_factor = sequence(self.efficiency_discharge)
 
-        # make it investment but don't set costs (set below for flow (power))
-        self.investment = self._investment()
+        # self.investment = self._investment()
+        if self.expandable is True:
+            if any([self.capacity_cost_charge,
+                   self.capacity_cost_discharge,
+                   self.storage_capacity_cost]) is None:
+                msg = (
+                    "If you set `expandable` to True you need to set "
+                    "attribute `storage_capacity_cost`,"
+                    "`capacity_cost_charge` and `capacity_cost_discharge` of component {}!"
+                )
+                raise ValueError(msg.format(self.label))
+            else:
+                self.investment = Investment(
+                    ep_costs=self.storage_capacity_cost,
+                    maximum=getattr(self, "storage_capacity_potential", float("+inf")),
+                    minimum=getattr(self, "minimum_storage_capacity", 0),
+                    existing=getattr(self, "storage_capacity", 0),
+                )
 
-        if self.investment:
-            self.invest_relation_input_output = 1
+                fi = Flow(
+                    investment=Investment(
+                        ep_costs=self.capacity_cost_charge,
+                        maximum=getattr(self, "capacity_potential_charge", float("+inf")),
+                        existing=getattr(self, "capacity_charge", 0),
+                    ),
+                    **self.input_parameters
+                )
 
-            for attr in ["invest_relation_input_output"]:
-                if getattr(self, attr) is None:
-                    raise AttributeError(
-                        (
-                            "You need to set attr " "`{}` " "for component {}"
-                        ).format(attr, self.label)
-                    )
+                fo = Flow(
+                    investment=Investment(
+                        ep_costs=self.capacity_cost_discharge,
+                        maximum=getattr(self, "capacity_potential_discharge", float("+inf")),
+                        existing=getattr(self, "capacity_discharge", 0),
+                    ),
+                    # Attach marginal cost to Flow out
+                    variable_costs=self.marginal_cost,
+                    **self.output_parameters
+                )
+                # required for correct grouping in oemof.solph.components
+                self._invest_group = True
 
-            # set capacity costs at one of the flows
-            fi = Flow(
-                investment=Investment(
-                    ep_costs=self.capacity_cost_charge,
-                    maximum=self.capacity_potential_charge,
-                    existing=self.capacity_charge,
-                ),
-                **self.input_parameters
-            )
-            # set investment, but no costs (as relation input / output = 1)
-            fo = Flow(
-                investment=Investment(
-                    ep_costs=self.capacity_cost_discharge,
-                    maximum=self.capacity_potential_discharge,
-                    existing=self.capacity_discharge,
-                ),
-                variable_costs=self.marginal_cost,
-                **self.output_parameters
-            )
-            # required for correct grouping in oemof.solph.components
-            self._invest_group = True
         else:
             fi = Flow(
                 nominal_value=self._nominal_value()["charge"], **self.input_parameters
             )
             fo = Flow(
                 nominal_value=self._nominal_value()["discharge"],
+                # Attach marginal cost to Flow out
                 variable_costs=self.marginal_cost,
                 **self.output_parameters
             )
