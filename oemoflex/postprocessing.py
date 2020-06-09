@@ -130,6 +130,11 @@ def get_capacities(es):
 
     capacities = pd.concat([endogenous, exogenous])
 
+    capacities = capacities.groupby(level=[0, 1, 2, 3, 4]).sum()
+
+    capacities['var_name'] = 'capacity'
+    capacities.set_index('var_name', append=True, inplace=True)
+
     return capacities
 
 
