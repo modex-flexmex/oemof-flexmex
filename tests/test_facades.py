@@ -9,7 +9,6 @@ solver = 'cbc'
 
 
 def check_init_methods():
-    pass
     # bus = Bus('bus_elec')
     # storage =  AsymmetricStorage(
     #        label="h2-cavern",
@@ -25,6 +24,29 @@ def check_init_methods():
     # assert storage.inputs[bus] == 0.3
     # assert storage.conversion_factors[bus] ==
 
+    bus = Bus('bus_elec')
+    storage = AsymmetricStorage(
+           label="h2-cavern",
+           bus=bus,
+           carrier="electricity",
+           tech="cavern",
+           storage_capacity=10,
+           marginal_cost=5,
+    )
+
+    # assert storage.inputs[bus] == 0.3
+    # assert storage.conversion_factors[bus] ==
+
+    bus = Bus('bus_elec')
+    storage = AsymmetricStorage(
+        label="h2-cavern",
+        bus=bus,
+        carrier="electricity",
+        tech="cavern",
+        expandable=True,
+        storage_capacity_cost=100,
+        marginal_cost=5,
+    )
 
 def check_asymmetric_storage_optimize_dispatch():
     r"""
@@ -159,7 +181,7 @@ def check_asymmetric_storage_optimize_investment():
             tech="h2-cavern",
             expandable=True,
             capacity_charge=0,
-            capacity_discharge=0,  # limiting
+            capacity_discharge=0,
             storage_capacity=0,
             capacity_cost_charge=1,
             capacity_cost_discharge=1,
@@ -179,9 +201,7 @@ def check_asymmetric_storage_optimize_investment():
 
     results = views.convert_keys_to_strings(optimization_model.results())
 
-    # Check the limiting condition
-    assert all(results[('h2-cavern', 'electricity')]['sequences']['flow'].values == [0, 2., 2.])
-
-    # Check what follows from the limting condition
-    assert all(results[('electricity', 'h2-cavern')]['sequences']['flow'].values == [4., 0, 0])
+    # TODO Check actual invested capacities would be better
+    assert all(results[('h2-cavern', 'electricity')]['sequences']['flow'].values == [0, 3., 3.])
+    assert all(results[('electricity', 'h2-cavern')]['sequences']['flow'].values == [6., 0, 0])
 
