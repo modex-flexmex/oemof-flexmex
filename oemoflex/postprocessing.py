@@ -794,12 +794,12 @@ def run_postprocessing(year, name, exp_paths):
     fuel_cost = get_fuel_cost(carrier_cost, prep_elements, scalars_raw)
     emission_cost = get_emission_cost(carrier_cost, prep_elements, scalars_raw)
     aggregated_emission_cost = aggregate_by_country(emission_cost)
-    invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
-    fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
+    # invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
+    # fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
     oemoflex_scalars = pd.concat([
         oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
         emission_cost,
-        invest_cost, fixom_cost
+        # invest_cost, fixom_cost
     ])
 
     # emissions
