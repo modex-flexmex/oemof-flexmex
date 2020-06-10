@@ -1,5 +1,6 @@
 import os
 import logging
+import copy
 
 import numpy as np
 import pandas as pd
@@ -8,10 +9,35 @@ import yaml
 from oemof.solph import EnergySystem, Bus, Sink
 from oemof.tabular import facades
 import oemof.tabular.tools.postprocessing as pp
+from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements
 from oemoflex.preprocessing import get_parameter_values
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
+
+FlexMex_Parameter_Map = {
+    'carrier':
+        {
+            'ch4':
+                {'carrier_price': 'Energy_Price_CH4',
+                 'co2_price': 'Energy_Price_CO2',
+                 'emission_factor': 'Energy_EmissionFactor_CH4'},
+            'uranium':
+                {'carrier_price': 'Energy_Price_Uranium'}
+        },
+    'tech':
+        {
+            'gt':
+                {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
+                 'lifetime': 'EnergyConversion_LifeTime_Electricity_CH4_GT',
+                 'fixom': 'EnergyConversion_FixOM_Electricity_CH4_GT'},
+            'nuclear-st':
+                {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
+                 'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST',
+                 'fixom': 'EnergyConversion_FixOM_Electricity_Nuclear_ST'}
+
+        }
+}
 
 module_path = os.path.abspath(os.path.dirname(__file__))
 path_config = os.path.join(module_path, 'postprocessed_paths.yaml')
@@ -46,19 +72,33 @@ def get_capacities(es):
         DataFrame containing the capacities.
     """
     try:
-        # TODO: Adapt this for investment
         all = pp.bus_results(es, es.results, select="scalars", concat=True)
-        all.name = "value"
+
+        all.name = "var_value"
+
         endogenous = all.reset_index()
-        endogenous["tech"] = [
-            getattr(t, "tech", np.nan) for t in all.index.get_level_values(0)
+
+        endogenous.drop(['from', 'to'], axis=1, inplace=True)
+
+        endogenous["region"] = [
+            getattr(t, "region", np.nan) for t in all.index.get_level_values(0)
+        ]
+        endogenous["name"] = [
+            getattr(t, "label", np.nan) for t in all.index.get_level_values(0)
+        ]
+        endogenous["type"] = [
+            getattr(t, "type", np.nan) for t in all.index.get_level_values(0)
         ]
         endogenous["carrier"] = [
             getattr(t, "carrier", np.nan)
             for t in all.index.get_level_values(0)
         ]
+        endogenous["tech"] = [
+            getattr(t, "tech", np.nan) for t in all.index.get_level_values(0)
+        ]
+        endogenous["var_name"] = "invest"
         endogenous.set_index(
-            ["from", "to", "type", "tech", "carrier"], inplace=True
+            ["region", "name", "type", "carrier", "tech", "var_name"], inplace=True
         )
 
     except ValueError:
@@ -89,6 +129,11 @@ def get_capacities(es):
         )
 
     capacities = pd.concat([endogenous, exogenous])
+
+    capacities = capacities.groupby(level=[0, 1, 2, 3, 4]).sum()
+
+    capacities['var_name'] = 'capacity'
+    capacities.set_index('var_name', append=True, inplace=True)
 
     return capacities
 
@@ -123,7 +168,8 @@ def get_sequences_by_tech(results):
     sequences_by_tech : dict
         Dictionary containing sequences with carrier-tech as keys.
     """
-    sequences = {key: value['sequences'] for key, value in results.items()}
+    # copy to avoid manipulating the data in es.results
+    sequences = copy.deepcopy({key: value['sequences'] for key, value in results.items()})
 
     sequences_by_tech = {}
     for key, df in sequences.items():
@@ -338,6 +384,20 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
 
 
 def get_varom_cost(oemoflex_scalars, prep_elements):
+    r"""
+    Calculates the VarOM cost by multiplying consumption by marginal cost.
+
+    Which value is taken as consumption depends on the actual technology type.
+
+    Parameters
+    ----------
+    oemoflex_scalars
+    prep_elements
+
+    Returns
+    -------
+
+    """
     varom_cost = []
     for _, prep_el in prep_elements.items():
         if 'marginal_cost' in prep_el.columns:
@@ -396,48 +456,220 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
     return carrier_cost
 
 
-def get_fuel_cost(oemoflex_scalars, scalars_raw):
-    # TODO: Generalize to be useful for any kind of fossile carrier, not only CH4.
+def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
+    r"""
+    Re-calculates the fuel costs from the carrier costs if there are CO2 emissions.
+
+    Bypass for non-emission carriers (cost_carrier = cost_fuel).
+
+    Having emissions or not is determined by the parameter mapping dict (emission_factor).
+
+    TODO Let's think about using the 'flow' values as input because this way we could
+     generalize the structure with get_varom_cost() and get_emission_cost() into one function
+     for all 'flow'-derived values.
+
+    Parameters
+    ----------
+    oemoflex_scalars
+    prep_elements
+    scalars_raw
+
+    Returns
+    -------
+
+    """
+
+    fuel_cost = pd.DataFrame()
+
+    # Get the optimization output values
     try:
-        fuel_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+        carrier_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
     except KeyError:
         logging.info("No key 'cost_carrier' found to calculate 'cost_fuel'.")
         return None
 
-    fuel_cost['var_name'] = 'cost_fuel'
+    # Iterate over oemof.tabular components (technologies)
+    for _, prep_el in prep_elements.items():
+        if 'carrier_cost' in prep_el.columns:
 
-    price_ch4 = get_parameter_values(scalars_raw, 'Energy_Price_CH4')
+            # Set up a list of the current technology's elements
+            df = prep_el[basic_columns]
 
-    price_emission = get_parameter_values(scalars_raw, 'Energy_Price_CO2')\
-        * get_parameter_values(scalars_raw, 'Energy_EmissionFactor_CH4')
+            # Take over values from output for the selected elements only
+            df = pd.merge(df, carrier_cost, on=basic_columns)
 
-    factor = price_ch4 / (price_ch4 + price_emission)
+            # Select carriers from the parameter map
+            carrier_name = prep_el['carrier'][0]
+            parameters = FlexMex_Parameter_Map['carrier'][carrier_name]
 
-    fuel_cost['var_value'] *= factor
+            # Only re-calculate if there is a CO2 emission
+            # Otherwise take the carrier cost value for the fuel cost
+            if 'emission_factor' in parameters.keys():
+
+                price_carrier = get_parameter_values(scalars_raw, parameters['carrier_price'])
+
+                price_emission = get_parameter_values(scalars_raw, parameters['co2_price'])\
+                    * get_parameter_values(scalars_raw, parameters['emission_factor'])
+
+                factor = price_carrier / (price_carrier + price_emission)
+
+                df['var_value'] *= factor
+
+            # Update other columns
+            df['var_name'] = 'cost_fuel'
+            df['var_unit'] = 'Eur'
+
+            # Append current technology elements to the return DataFrame
+            fuel_cost = pd.concat([fuel_cost, df], sort=True)
 
     return fuel_cost
 
 
-def get_emission_cost(oemoflex_scalars, scalars_raw):
-    # TODO: Generalize to be useful for any kind of fossile carrier, not only CH4.
+def get_emission_cost(oemoflex_scalars, prep_elements, scalars_raw):
+    r"""
+    Re-calculates the emission costs from the carrier costs if there are CO2 emissions.
+
+    Structure only slightly different (+ else branch) from get_fuel_cost() because there are costs
+    of zero instead of the fuel costs (in get_fuel_cost()) if there are no emissions.
+
+    Parameters
+    ----------
+    oemoflex_scalars
+    prep_elements
+    scalars_raw
+
+    Returns
+    -------
+
+    """
+
+    emission_cost = pd.DataFrame()
+
     try:
-        emission_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
+        carrier_cost = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_carrier'].copy()
     except KeyError:
         logging.info("No key 'cost_carrier' found to calculate 'cost_emission'.")
         return None
 
-    emission_cost['var_name'] = 'cost_emission'
+    # Iterate over oemof.tabular components (technologies)
+    for _, prep_el in prep_elements.items():
+        if 'carrier_cost' in prep_el.columns:
 
-    price_ch4 = get_parameter_values(scalars_raw, 'Energy_Price_CH4')
+            # Set up a list of the current technology's elements
+            df = prep_el[basic_columns]
 
-    price_emission = get_parameter_values(scalars_raw, 'Energy_Price_CO2')\
-        * get_parameter_values(scalars_raw, 'Energy_EmissionFactor_CH4')
+            # Take over values from output for the selected elements only
+            df = pd.merge(df, carrier_cost, on=basic_columns)
 
-    factor = price_emission / (price_ch4 + price_emission)
+            # Select carriers from the parameter map
+            carrier_name = prep_el['carrier'][0]
+            parameters = FlexMex_Parameter_Map['carrier'][carrier_name]
 
-    emission_cost['var_value'] *= factor
+            # Only re-calculate if there is a CO2 emission
+            if 'emission_factor' in parameters.keys():
+                price_carrier = get_parameter_values(scalars_raw, parameters['carrier_price'])
+
+                price_emission = get_parameter_values(scalars_raw, parameters['co2_price']) \
+                    * get_parameter_values(scalars_raw, parameters['emission_factor'])
+
+                factor = price_emission / (price_carrier + price_emission)
+
+                df['var_value'] *= factor
+
+            else:
+                df['var_value'] = 0.0
+
+            # Update other columns
+            df['var_name'] = 'cost_emission'
+            df['var_unit'] = 'Eur'
+
+            # Append current technology elements to the return DataFrame
+            emission_cost = pd.concat([emission_cost, df], sort=True)
 
     return emission_cost
+
+
+def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
+
+    invest_cost = pd.DataFrame()
+
+    try:
+        capacities_invested = oemoflex_scalars.loc[
+            oemoflex_scalars['var_name'] == 'invest'].copy()
+    except KeyError:
+        logging.info("No key 'invest' found to calculate 'cost_invest'.")
+        return None
+
+    for _, prep_el in prep_elements.items():
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
+            # element is expandable --> 'invest' values exist
+            df = prep_el[basic_columns]
+
+            df = pd.merge(
+                df, capacities_invested,
+                on=basic_columns
+            )
+
+            tech_name = prep_el['tech'][0]
+            parameters = FlexMex_Parameter_Map['tech'][tech_name]
+
+            capex = get_parameter_values(scalars_raw, parameters['capex'])
+
+            lifetime = get_parameter_values(scalars_raw, parameters['lifetime'])
+
+            interest = get_parameter_values(
+                scalars_raw,
+                'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+            annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+            df['var_value'] = df['var_value'] * annualized_cost
+
+            df['var_name'] = 'cost_invest'
+            df['var_unit'] = 'Eur'
+
+            invest_cost = pd.concat([invest_cost, df], sort=True)
+
+    return invest_cost
+
+
+def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
+
+    fixom_cost = pd.DataFrame()
+
+    try:
+        capacities_invested = oemoflex_scalars.loc[
+            oemoflex_scalars['var_name'] == 'invest'].copy()
+    except KeyError:
+        logging.info("No key 'invest' found to calculate 'cost_fixom'.")
+        return None
+
+    for _, prep_el in prep_elements.items():
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
+            # element is expandable --> 'invest' values exist
+            df = prep_el[basic_columns]
+
+            df = pd.merge(
+                df, capacities_invested,
+                on=basic_columns
+            )
+
+            tech_name = prep_el['tech'][0]
+            parameters = FlexMex_Parameter_Map['tech'][tech_name]
+
+            capex = get_parameter_values(scalars_raw, parameters['capex'])
+
+            fix_cost = get_parameter_values(
+                scalars_raw, parameters['fixom']) * 1e-2  # percent -> 0...1
+
+            df['var_value'] = df['var_value'] * fix_cost * capex
+
+            df['var_name'] = 'cost_fixom'
+            df['var_unit'] = 'Eur'
+
+            fixom_cost = pd.concat([fixom_cost, df], sort=True)
+
+    return fixom_cost
 
 
 def aggregate_by_country(df):
@@ -454,12 +686,6 @@ def aggregate_by_country(df):
         return aggregated
 
     return None
-
-
-def get_capacity_cost():
-    # TODO: Problem there is no distinction btw fixom and invest cost!
-    # capacities * prep_elements[capacity_cost]
-    pass
 
 
 def get_total_system_cost(oemoflex_scalars):
@@ -510,7 +736,7 @@ def run_postprocessing(year, name, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'))
+    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=';')
 
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
@@ -565,11 +791,15 @@ def run_postprocessing(year, name, exp_paths):
     # costs
     varom_cost = get_varom_cost(oemoflex_scalars, prep_elements)
     carrier_cost = get_carrier_cost(oemoflex_scalars, prep_elements)
-    fuel_cost = get_fuel_cost(carrier_cost, scalars_raw)
-    emission_cost = get_emission_cost(carrier_cost, scalars_raw)
+    fuel_cost = get_fuel_cost(carrier_cost, prep_elements, scalars_raw)
+    emission_cost = get_emission_cost(carrier_cost, prep_elements, scalars_raw)
     aggregated_emission_cost = aggregate_by_country(emission_cost)
+    invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
+    fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
     oemoflex_scalars = pd.concat([
-        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost
+        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
+        emission_cost,
+        invest_cost, fixom_cost
     ])
 
     # emissions
@@ -597,7 +827,7 @@ def run_postprocessing(year, name, exp_paths):
         index=False
     )
 
-    save_oemoflex_scalars = False
+    save_oemoflex_scalars = True
     if save_oemoflex_scalars:
         oemoflex_scalars.to_csv(
             os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'),
