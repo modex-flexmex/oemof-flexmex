@@ -544,14 +544,14 @@ def update_solar_pv(data_preprocessed_path, scalars):
     solarpv.to_csv(solar_pv_file)
 
 
-def update_h2_cavern_simple(
+def update_h2_cavern(
         data_preprocessed_path,
         scalars,
         expandable=False,
         from_greenfield=False
 ):
     r"""
-    Simplified parameterization of a electricity H2 storage.
+    Parameterization of a electricity H2 storage as asymmetrical storage.
 
     Discharging and charging device are lumped together.
 
@@ -632,7 +632,12 @@ def update_h2_cavern_simple(
         'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
 
     annualized_cost_charge = annuity(
-        capex=capex_charge + capex_discharge,
+        capex=capex_charge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_discharge = annuity(
+        capex=capex_discharge,
         n=lifetime,
         wacc=interest)
 
@@ -645,17 +650,21 @@ def update_h2_cavern_simple(
     df['expandable'] = expandable
 
     if expandable and from_greenfield:
-        df['capacity'] = 0
+        df['capacity_charge'] = 0
+        df['capacity_discharge'] = 0
         df['storage_capacity'] = 0
     else:
-        df['capacity'] = (capacity_charge + capacity_discharge) / 2 * availability
+        df['capacity_charge'] = capacity_charge * availability
+        df['capacity_discharge'] = capacity_discharge * availability
         df['storage_capacity'] = storage_capacity * availability
 
     df['loss_rate'] = self_discharge
 
-    df['efficiency'] = (eta_charge + eta_discharge) / 2
+    df['efficiency_charge'] = eta_charge
+    df['efficiency_discharge'] = eta_discharge
 
-    df['capacity_cost'] = annualized_cost_charge + fix_cost * (capex_charge + capex_discharge)
+    df['capacity_cost_charge'] = annualized_cost_charge + fix_cost * capex_charge
+    df['capacity_cost_discharge'] = annualized_cost_discharge + fix_cost * capex_discharge
 
     df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
 
