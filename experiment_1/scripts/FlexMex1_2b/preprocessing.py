@@ -34,6 +34,7 @@ def main():
     # Load common input parameters
     scalars = pd.read_csv(
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+        sep=';',
         header=0,
         na_values=['not considered', 'no value'],
     )
