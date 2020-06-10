@@ -7,7 +7,9 @@ from oemof.solph import EnergySystem, Model
 # pylint: disable=unused-import
 from oemof.tabular import datapackage  # noqa
 from oemof.tabular.facades import TYPEMAP
+from oemoflex.facades import AsymmetricStorage
 
+TYPEMAP.update({"asymmetric storage": AsymmetricStorage})
 
 def optimize(data_preprocessed, results_optimization, solver='cbc', save_lp=False):
     r"""
