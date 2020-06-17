@@ -39,6 +39,7 @@ def main():
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
         header=0,
         na_values=['not considered', 'no value'],
+        sep=';',
     )
 
     # Filter out only scenario-related input parameters
@@ -69,6 +70,7 @@ def main():
     # update elements
     update_electricity_shortage(exp_paths.data_preprocessed, scalars)
     update_heat_shortage(exp_paths.data_preprocessed, scalars)
+    update_heat_storage(exp_paths.data_preprocessed, scalars)
     update_heat_demand(exp_paths.data_preprocessed, scalars)
     update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_extchp(exp_paths.data_preprocessed, scalars)
