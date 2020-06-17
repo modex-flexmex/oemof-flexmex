@@ -374,7 +374,7 @@ def get_transmission_losses(oemoflex_scalars):
 
 
 def get_storage_losses(oemoflex_scalars):
-    storage_data = oemoflex_scalars.loc[oemoflex_scalars['type'] == 'storage']
+    storage_data = oemoflex_scalars.loc[oemoflex_scalars['type'].isin(['storage', 'asymmetric storage'])]
     flow_in = storage_data.loc[storage_data['var_name'] == 'flow_in'].set_index('name')
     flow_out = storage_data.loc[storage_data['var_name'] == 'flow_out'].set_index('name')
 
