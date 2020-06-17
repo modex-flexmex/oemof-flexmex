@@ -7,7 +7,7 @@ from oemoflex.preprocessing import (
     create_default_elements,
     update_electricity_shortage, update_heat_shortage,
     update_heat_demand, update_electricity_demand,
-    create_electricity_heatpump_profiles,
+    create_electricity_heatpump_profiles, update_heat_storage,
     update_extchp, update_boiler, update_electricity_heatpump,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     create_electricity_demand_profiles, create_heat_demand_profiles,
