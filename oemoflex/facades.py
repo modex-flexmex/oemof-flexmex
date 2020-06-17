@@ -76,6 +76,7 @@ class Bev(GenericStorage, Facade):
     ...     capacity=50,
     ...     availability=[0.8, 0.7, 0.6],
     ...     drive_power=[1, 2, 6],
+    ...     amount=1e9,
     ...     loss_rate=0.01,
     ...     initial_storage_level=0,
     ...     min_storage_level=[0.1, 0.2, 0.15],
@@ -95,6 +96,7 @@ class Bev(GenericStorage, Facade):
                     "tech",
                     "availability",
                     "drive_power",
+                    "amount",
                     "efficiency",
                 ]
             }
@@ -122,6 +124,8 @@ class Bev(GenericStorage, Facade):
         """
         self.nominal_storage_capacity = self.storage_capacity
 
+        self.inflow_conversion_factor = sequence(self.efficiency)
+
         self.outflow_conversion_factor = sequence(self.efficiency)
 
         if self.expandable:
@@ -132,13 +136,16 @@ class Bev(GenericStorage, Facade):
         outflow = Sink(
             label=self.label + "-outflow",
             inputs={
-                self: Flow(nominal_value=1, max=self.drive_power, fixed=False)
+                self: Flow(nominal_value=self.amount, actual_value=self.drive_power, fixed=True)
             },
         )
 
         self.inputs.update(
             {
                 self.bus: Flow(
+                    nominal_value=self.capacity,
+                    max=self.availability,
+                    conversion_factors=self.efficiency,
                     **self.input_parameters
                 )
             }
@@ -147,7 +154,10 @@ class Bev(GenericStorage, Facade):
         self.outputs.update(
             {
                 self.bus: Flow(
-                    nominal_value=self.capacity, **self.output_parameters
+                    nominal_value=self.capacity,
+                    max=self.availability,
+                    conversion_factors=self.efficiency,
+                    **self.output_parameters
                 )
             }
         )
