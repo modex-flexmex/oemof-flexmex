@@ -72,11 +72,12 @@ def get_capacities(es):
         DataFrame containing the capacities.
     """
 
-    def get_flow_attr(attr):
+    def get_facade_attr(attr):
         # Function constructor for getting a specific property from
-        # the Facade object in bus results DataFrame column "from" or "to"
+        # the Facade object in bus_results() DataFrame columns "from" or "to"
         def fnc(flow):
             return getattr(flow['from'], attr, np.nan)
+
         return fnc
 
     try:
@@ -86,15 +87,15 @@ def get_capacities(es):
 
         endogenous = flows.reset_index()
 
-        # Results already contain a column named "type".
-        # This becomes "var_name" and preserves its content ("invest" for now)
+        # Results already contain a column named "type". Call this "var_name" to
+        # preserve its content ("invest" for now)
         endogenous.rename(columns={"type": "var_name"}, inplace=True)
 
-        endogenous["region"] = endogenous.apply(get_flow_attr('region'), axis=1)
-        endogenous["name"] = endogenous.apply(get_flow_attr('label'), axis=1)
-        endogenous["type"] = endogenous.apply(get_flow_attr('type'), axis=1)
-        endogenous["carrier"] = endogenous.apply(get_flow_attr('carrier'), axis=1)
-        endogenous["tech"] = endogenous.apply(get_flow_attr('tech'), axis=1)
+        endogenous["region"] = endogenous.apply(get_facade_attr('region'), axis=1)
+        endogenous["name"] = endogenous.apply(get_facade_attr('label'), axis=1)
+        endogenous["type"] = endogenous.apply(get_facade_attr('type'), axis=1)
+        endogenous["carrier"] = endogenous.apply(get_facade_attr('carrier'), axis=1)
+        endogenous["tech"] = endogenous.apply(get_facade_attr('tech'), axis=1)
 
         endogenous.drop(['from', 'to'], axis=1, inplace=True)
 
