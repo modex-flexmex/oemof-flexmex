@@ -76,9 +76,33 @@ def get_capacities(es):
         # Function constructor for getting a specific property from
         # the Facade object in bus_results() DataFrame columns "from" or "to"
         def fnc(flow):
-            return getattr(flow['from'], attr, np.nan)
+            # Get property from the Storage object in "from" for the discharge device
+            if isinstance(flow['from'], (facades.TYPEMAP["storage"],
+                                         facades.TYPEMAP["asymmetric storage"])):
+                return getattr(flow['from'], attr, np.nan)
+
+            # Get property from the Storage object in "to" for the charge device
+            elif isinstance(flow['to'], (facades.TYPEMAP["storage"],
+                                         facades.TYPEMAP["asymmetric storage"])):
+                return getattr(flow['to'], attr, np.nan)
+
+            # Get property from other object in "from"
+            else:
+                return getattr(flow['from'], attr, np.nan)
 
         return fnc
+
+    def get_parameter_name(flow):
+        if isinstance(flow['from'], (facades.TYPEMAP["storage"],
+                                     facades.TYPEMAP["asymmetric storage"])):
+            return "capacity_discharge_invest"
+
+        elif isinstance(flow['to'], (facades.TYPEMAP["storage"],
+                                     facades.TYPEMAP["asymmetric storage"])):
+            return "capacity_charge_invest"
+
+        else:
+            return np.nan
 
     try:
         flows = pp.bus_results(es, es.results, select="scalars", concat=True)
@@ -90,6 +114,10 @@ def get_capacities(es):
         # Results already contain a column named "type". Call this "var_name" to
         # preserve its content ("invest" for now)
         endogenous.rename(columns={"type": "var_name"}, inplace=True)
+
+        # Update "var_name" with Storage specific parameter names for charge and discharge devices
+        df = pd.DataFrame({'var_name': endogenous.apply(get_parameter_name, axis=1)})
+        endogenous.update(df)
 
         endogenous["region"] = endogenous.apply(get_facade_attr('region'), axis=1)
         endogenous["name"] = endogenous.apply(get_facade_attr('label'), axis=1)
@@ -167,10 +195,11 @@ def get_capacities(es):
 
     capacities = pd.concat([endogenous, exogenous, storage])
 
-    capacities = capacities.groupby(level=[0, 1, 2, 3, 4]).sum()
+    # 3 verschiedene grouby's:
+    # capacities = capacities.groupby(level=[0, 1, 2, 3, 4]).sum()
 
-    capacities['var_name'] = 'capacity'
-    capacities.set_index('var_name', append=True, inplace=True)
+    # capacities['var_name'] = 'capacity'
+    #capacities.set_index('var_name', append=True, inplace=True)
 
     return capacities
 
@@ -776,7 +805,7 @@ def run_postprocessing(year, name, exp_paths):
     scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=';')
 
     # load scalars templates
-    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
+    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars_2b_AT-BE.csv'))
     flexmex_scalars_template = flexmex_scalars_template.loc[
         flexmex_scalars_template['UseCase'] == name
     ]
