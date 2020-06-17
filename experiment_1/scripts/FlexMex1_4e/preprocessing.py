@@ -6,7 +6,7 @@ from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements,
     update_electricity_shortage, update_heat_shortage,
-    update_heat_demand, update_electricity_demand,
+    update_heat_demand, update_electricity_demand, update_pth,
     create_electricity_heatpump_profiles, update_heat_storage,
     update_extchp, update_boiler, update_electricity_heatpump,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
@@ -76,6 +76,7 @@ def main():
     update_extchp(exp_paths.data_preprocessed, scalars)
     update_boiler(exp_paths.data_preprocessed, scalars)
     update_electricity_heatpump(exp_paths.data_preprocessed, scalars)
+    update_pth(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
