@@ -71,30 +71,30 @@ def get_capacities(es):
     capacities : pd.DataFrame
         DataFrame containing the capacities.
     """
+
+    def get_flow_attr(attr):
+        # Function constructor for getting a specific property from
+        # the Facade object in bus results DataFrame column "from" or "to"
+        def fnc(flow):
+            return getattr(flow['from'], attr, np.nan)
+        return fnc
+
     try:
-        all = pp.bus_results(es, es.results, select="scalars", concat=True)
+        flows = pp.bus_results(es, es.results, select="scalars", concat=True)
 
-        all.name = "var_value"
+        flows.name = "var_value"
 
-        endogenous = all.reset_index()
+        endogenous = flows.reset_index()
 
-        endogenous["region"] = [
-            getattr(t, "region", np.nan) for t in all.index.get_level_values(0)
-        ]
-        endogenous["name"] = [
-            getattr(t, "label", np.nan) for t in all.index.get_level_values(0)
-        ]
-        endogenous["type"] = [
-            getattr(t, "type", np.nan) for t in all.index.get_level_values(0)
-        ]
-        endogenous["carrier"] = [
-            getattr(t, "carrier", np.nan)
-            for t in all.index.get_level_values(0)
-        ]
-        endogenous["tech"] = [
-            getattr(t, "tech", np.nan) for t in all.index.get_level_values(0)
-        ]
-        endogenous["var_name"] = "invest"
+        # Results already contain a column named "type".
+        # This becomes "var_name" and preserves its content ("invest" for now)
+        endogenous.rename(columns={"type": "var_name"}, inplace=True)
+
+        endogenous["region"] = endogenous.apply(get_flow_attr('region'), axis=1)
+        endogenous["name"] = endogenous.apply(get_flow_attr('label'), axis=1)
+        endogenous["type"] = endogenous.apply(get_flow_attr('type'), axis=1)
+        endogenous["carrier"] = endogenous.apply(get_flow_attr('carrier'), axis=1)
+        endogenous["tech"] = endogenous.apply(get_flow_attr('tech'), axis=1)
 
         endogenous.drop(['from', 'to'], axis=1, inplace=True)
 
