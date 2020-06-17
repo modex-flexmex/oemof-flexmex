@@ -78,8 +78,6 @@ def get_capacities(es):
 
         endogenous = all.reset_index()
 
-        endogenous.drop(['from', 'to'], axis=1, inplace=True)
-
         endogenous["region"] = [
             getattr(t, "region", np.nan) for t in all.index.get_level_values(0)
         ]
@@ -97,6 +95,9 @@ def get_capacities(es):
             getattr(t, "tech", np.nan) for t in all.index.get_level_values(0)
         ]
         endogenous["var_name"] = "invest"
+
+        endogenous.drop(['from', 'to'], axis=1, inplace=True)
+
         endogenous.set_index(
             ["region", "name", "type", "carrier", "tech", "var_name"], inplace=True
         )
