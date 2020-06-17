@@ -26,7 +26,7 @@ def test_bev():
         storage_capacity=1000,
         capacity=50,
         availability=[0.8, 0.7, 0.6],  # GridAvailabilityRate
-        drive_power=[1, 2, 6],  # DrivePower
+        drive_power=[0.01, 0.02, 0.006],  # DrivePower
         amount=1000,  # AnnualDemand
         loss_rate=0.01,
         initial_storage_level=0.5,
