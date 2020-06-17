@@ -129,7 +129,42 @@ def get_capacities(es):
             ['region', 'name', 'type', 'carrier', 'tech', 'var_name']
         )
 
-    capacities = pd.concat([endogenous, exogenous])
+    # Read storage capacities (from oemof.heat)
+    # only component_results() knows about 'storage_capacity'
+    try:
+        flows = pp.component_results(es, es.results, select='scalars')['storage']
+        flows.name = 'var_value'
+
+        storage = flows.reset_index()
+        storage.columns = ['name', 'to', 'var_name', 'var_value']
+        storage['region'] = [
+            getattr(t, "region", np.nan) for t in flows.index.get_level_values(0)
+        ]
+        storage['type'] = [
+            getattr(t, "type", np.nan) for t in flows.index.get_level_values(0)
+        ]
+        storage['carrier'] = [
+            getattr(t, "carrier", np.nan) for t in flows.index.get_level_values(0)
+        ]
+        storage['tech'] = [
+            getattr(t, "tech", np.nan) for t in flows.index.get_level_values(0)
+        ]
+        storage = storage.loc[storage['to'].isna()]
+        storage.drop('to', 1, inplace=True)
+        storage = storage[['region', 'name', 'type', 'carrier', 'tech', 'var_name', 'var_value']]
+        storage.replace(
+            ['init_cap', 'invest'],
+            ['storage_capacity', 'storage_capacity_invest'],
+            inplace=True
+        )
+        storage.set_index(
+            ['region', "name", "type", "carrier", "tech", "var_name"], inplace=True
+        )
+
+    except ValueError:
+        storage = pd.DataFrame()
+
+    capacities = pd.concat([endogenous, exogenous, storage])
 
     capacities = capacities.groupby(level=[0, 1, 2, 3, 4]).sum()
 
