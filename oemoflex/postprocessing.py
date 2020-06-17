@@ -166,22 +166,25 @@ def get_capacities(es):
     # Read storage capacities (from oemof.heat)
     # only component_results() knows about 'storage_capacity'
     try:
-        components = pp.component_results(es, es.results, select='scalars')['storage']
+        components = pd.concat(pp.component_results(es, es.results, select='scalars'))
         components.name = 'var_value'
 
         storage = components.reset_index()
+
+        storage.drop('level_0', 1, inplace=True)
+
         storage.columns = ['name', 'to', 'var_name', 'var_value']
         storage['region'] = [
-            getattr(t, "region", np.nan) for t in components.index.get_level_values(0)
+            getattr(t, "region", np.nan) for t in components.index.get_level_values('from')
         ]
         storage['type'] = [
-            getattr(t, "type", np.nan) for t in components.index.get_level_values(0)
+            getattr(t, "type", np.nan) for t in components.index.get_level_values('from')
         ]
         storage['carrier'] = [
-            getattr(t, "carrier", np.nan) for t in components.index.get_level_values(0)
+            getattr(t, "carrier", np.nan) for t in components.index.get_level_values('from')
         ]
         storage['tech'] = [
-            getattr(t, "tech", np.nan) for t in components.index.get_level_values(0)
+            getattr(t, "tech", np.nan) for t in components.index.get_level_values('from')
         ]
         storage = storage.loc[storage['to'].isna()]
         storage.drop('to', 1, inplace=True)
