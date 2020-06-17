@@ -29,7 +29,7 @@ def test_bev():
         drive_power=[1, 2, 6],  # DrivePower
         amount=1000,  # AnnualDemand
         loss_rate=0.01,
-        initial_storage_level=0,
+        initial_storage_level=0.5,
         min_storage_level=[0.1, 0.2, 0.15],  # MinBatteryLevel
         max_storage_level=[0.9, 0.95, 0.92],  # MaxBatteryLevel
         efficiency=0.93
