@@ -6,7 +6,7 @@ from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_electricity_shortage, update_electricity_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    update_hydro_reservoir, create_electricity_demand_profiles,
+    update_hydro_reservoir, create_hydro_reservoir_profiles, create_electricity_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
@@ -68,6 +68,7 @@ def main():
     create_wind_onshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_wind_offshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
+    create_hydro_reservoir_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
 
     # compare with previous data
     previous_path = os.path.join(
