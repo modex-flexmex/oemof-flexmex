@@ -47,6 +47,12 @@ def test_bev():
     lp_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'lp-file.lp')
     m.write(lp_file_path, io_options={'symbolic_solver_labels': True})
 
+    import sys
+    f = open("pprint.txt", 'w')
+    sys.stdout = f
+    m.pprint()
+    f.close()
+
     m.solve()
 
     results = m.results()

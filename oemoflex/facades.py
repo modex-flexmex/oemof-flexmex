@@ -1,4 +1,4 @@
-from oemof.solph import sequence, Sink, Flow
+from oemof.solph import sequence, Sink, Flow, Bus
 from oemof.solph.components import GenericStorage
 from oemof.tabular.facades import Facade
 
@@ -133,10 +133,14 @@ class Bev(GenericStorage, Facade):
                 "Investment for reservoir class is not implemented."
             )
 
+        internal_bus = Bus(label=self.label + "-bus")
+
         outflow = Sink(
             label=self.label + "-outflow",
             inputs={
-                self: Flow(nominal_value=self.amount, actual_value=self.drive_power, fixed=True)
+                internal_bus: Flow(nominal_value=self.amount,
+                                   actual_value=self.drive_power,
+                                   fixed=True)
             },
         )
 
@@ -153,7 +157,7 @@ class Bev(GenericStorage, Facade):
 
         self.outputs.update(
             {
-                self.bus: Flow(
+                internal_bus: Flow(
                     nominal_value=self.capacity,
                     max=self.availability,
                     conversion_factors=self.efficiency,
@@ -162,4 +166,4 @@ class Bev(GenericStorage, Facade):
             }
         )
 
-        self.subnodes = (outflow,)
+        self.subnodes = (outflow, internal_bus)
