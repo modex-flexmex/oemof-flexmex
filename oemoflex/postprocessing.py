@@ -713,26 +713,27 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     fixom_cost = pd.DataFrame()
 
-    capacities_invested = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'] == 'invest'].copy()
-
     for _, prep_el in prep_elements.items():
         if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
-            df = pd.merge(
-                df, capacities_invested,
-                on=basic_columns
-            )
-
             tech_name = prep_el['tech'][0]
+
             parameters = FlexMex_Parameter_Map['tech'][tech_name]
 
             capex = get_parameter_values(scalars_raw, parameters['capex'])
 
             fix_cost = get_parameter_values(
                 scalars_raw, parameters['fixom']) * 1e-2  # percent -> 0...1
+
+            capacities_invested = oemoflex_scalars.loc[
+                oemoflex_scalars['var_name'] == 'invest'].copy()
+
+            df = pd.merge(
+                df, capacities_invested,
+                on=basic_columns
+            )
 
             df['var_value'] = df['var_value'] * fix_cost * capex
 
