@@ -97,15 +97,15 @@ def get_capacities(es):
     def get_parameter_name(flow):
         if isinstance(flow['from'], (facades.TYPEMAP["storage"],
                                      facades.TYPEMAP["asymmetric storage"])):
-            # return "capacity_discharge_invest"
+            return "capacity_discharge_invest"
             # TODO Workaround for 2b! capacities invested = capacity (no initial capacities)
-            return "capacity_discharge"
+            # return "capacity_discharge"
 
         elif isinstance(flow['to'], (facades.TYPEMAP["storage"],
                                      facades.TYPEMAP["asymmetric storage"])):
-            # return "capacity_charge_invest"
+            return "capacity_charge_invest"
             # TODO Workaround for 2b!
-            return "capacity_charge"
+            # return "capacity_charge"
 
         else:
             return np.nan
@@ -200,9 +200,9 @@ def get_capacities(es):
             ['region', "name", "type", "carrier", "tech", "var_name"], inplace=True
         )
 
-        storage = storage.groupby(level=[0, 1, 2, 3, 4]).sum()
-        storage['var_name'] = 'storage_capacity'
-        storage.set_index('var_name', append=True, inplace=True)
+        # storage = storage.groupby(level=[0, 1, 2, 3, 4]).sum()
+        # storage['var_name'] = 'storage_capacity'
+        # storage.set_index('var_name', append=True, inplace=True)
 
     except ValueError:
         storage = pd.DataFrame()
