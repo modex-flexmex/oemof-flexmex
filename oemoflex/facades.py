@@ -3,6 +3,8 @@ from oemof.solph import Flow, Investment
 from oemof.solph.components import GenericStorage
 from oemof.solph.plumbing import sequence
 
+from oemof.tabular.facades import TYPEMAP
+
 
 class Facade(Facade):
 
@@ -132,3 +134,6 @@ class AsymmetricStorage(GenericStorage, Facade):
         self.outputs.update({self.bus: fo})
 
         self._set_flows()
+
+
+TYPEMAP.update({"asymmetric storage": AsymmetricStorage})

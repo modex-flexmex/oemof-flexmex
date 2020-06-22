@@ -13,6 +13,8 @@ from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements
 from oemoflex.preprocessing import get_parameter_values
 
+from oemoflex.facades import TYPEMAP
+
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
 FlexMex_Parameter_Map = {
