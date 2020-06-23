@@ -113,14 +113,10 @@ def get_capacities(es):
         if isinstance(flow['from'], (facades.TYPEMAP["storage"],
                                      facades.TYPEMAP["asymmetric storage"])):
             return "capacity_discharge_invest"
-            # TODO Workaround for 2b! capacities invested = capacity (no initial capacities)
-            # return "capacity_discharge"
 
         elif isinstance(flow['to'], (facades.TYPEMAP["storage"],
                                      facades.TYPEMAP["asymmetric storage"])):
             return "capacity_charge_invest"
-            # TODO Workaround for 2b!
-            # return "capacity_charge"
 
         else:
             return np.nan
@@ -413,6 +409,7 @@ def aggregate_storage_capacities(oemoflex_scalars):
     discharge['var_unit'] = 'MW'
 
     return pd.concat([storage, charge, discharge])
+
 
 def get_emissions(oemoflex_scalars, scalars_raw):
     try:
@@ -920,7 +917,7 @@ def run_postprocessing(year, name, exp_paths):
     scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=';')
 
     # load scalars templates
-    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars_2b_AT-BE.csv'))
+    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
     flexmex_scalars_template = flexmex_scalars_template.loc[
         flexmex_scalars_template['UseCase'] == name
     ]
