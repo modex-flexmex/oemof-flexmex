@@ -684,6 +684,30 @@ def get_emission_cost(oemoflex_scalars, prep_elements, scalars_raw):
     return emission_cost
 
 
+def get_calculated_parameters(df, oemoflex_scalars, invest_parameter_name, factor):
+    r"""
+    Takes the pre-calculated invest parameter 'invest_parameter_name' from
+    'oemoflex_scalars' DataFrame and returns it multiplied by 'factor' (element-wise)
+    with 'df' as a template
+    """
+
+    capacities_invested = oemoflex_scalars.loc[
+        oemoflex_scalars['var_name'] == invest_parameter_name].copy()
+
+    # Make sure that values in columns to merge on are strings
+    # See https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
+    capacities_invested[basic_columns] = capacities_invested[basic_columns].astype(str)
+
+    df = pd.merge(
+        df, capacities_invested,
+        on=basic_columns
+    )
+
+    df['var_value'] = df['var_value'] * factor
+
+    return df
+
+
 def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     invest_cost = pd.DataFrame()
@@ -725,29 +749,6 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
 
 def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
-
-    def get_calculated_parameters(df, oemoflex_scalars, invest_parameter_name, factor):
-        r"""
-        Takes the pre-calculated invest parameter 'invest_parameter_name' from
-        'oemoflex_scalars' DataFrame and returns it multiplied by 'factor' (element-wise)
-        with 'df' as a template
-        """
-
-        capacities_invested = oemoflex_scalars.loc[
-            oemoflex_scalars['var_name'] == invest_parameter_name].copy()
-
-        # Make sure that values in columns to merge on are strings
-        # See https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
-        capacities_invested[basic_columns] = capacities_invested[basic_columns].astype(str)
-
-        df = pd.merge(
-            df, capacities_invested,
-            on=basic_columns
-        )
-
-        df['var_value'] = df['var_value'] * factor
-
-        return df
 
     fixom_cost = pd.DataFrame()
 
@@ -929,12 +930,12 @@ def run_postprocessing(year, name, exp_paths):
     fuel_cost = get_fuel_cost(carrier_cost, prep_elements, scalars_raw)
     emission_cost = get_emission_cost(carrier_cost, prep_elements, scalars_raw)
     aggregated_emission_cost = aggregate_by_country(emission_cost)
-    # invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
+    invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
     fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
     oemoflex_scalars = pd.concat([
         oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
         emission_cost,
-        # invest_cost,
+        invest_cost,
         fixom_cost
     ])
 
