@@ -215,20 +215,10 @@ def get_capacities(es):
             ['region', "name", "type", "carrier", "tech", "var_name"], inplace=True
         )
 
-        # storage = storage.groupby(level=[0, 1, 2, 3, 4]).sum()
-        # storage['var_name'] = 'storage_capacity'
-        # storage.set_index('var_name', append=True, inplace=True)
-
     except ValueError:
         storage = pd.DataFrame()
 
     capacities = pd.concat([endogenous, exogenous, storage])
-
-    # 3 verschiedene grouby's:
-    # capacities = capacities.groupby(level=[0, 1, 2, 3, 4]).sum()
-
-    # capacities['var_name'] = 'capacity'
-    #capacities.set_index('var_name', append=True, inplace=True)
 
     return capacities
 
@@ -402,6 +392,27 @@ def get_storage_losses(oemoflex_scalars):
 
     return losses
 
+
+def aggregate_storage_capacities(oemoflex_scalars):
+    storage = oemoflex_scalars.loc[
+        oemoflex_scalars['var_name'].isin(['storage_capacity', 'storage_capacity_invest'])]
+    storage = storage.groupby(by=basic_columns, as_index=False).sum()
+    storage['var_name'] = 'storage_capacity_sum'
+    storage['var_unit'] = 'GWh'
+
+    charge = oemoflex_scalars.loc[
+        oemoflex_scalars['var_name'].isin(['capacity_charge', 'capacity_charge_invest'])]
+    charge = charge.groupby(by=basic_columns, as_index=False).sum()
+    charge['var_name'] = 'capacity_charge_sum'
+    charge['var_unit'] = 'MW'
+
+    discharge = oemoflex_scalars.loc[
+        oemoflex_scalars['var_name'].isin(['capacity_discharge', 'capacity_discharge_invest'])]
+    discharge = discharge.groupby(by=basic_columns, as_index=False).sum()
+    discharge['var_name'] = 'capacity_discharge_sum'
+    discharge['var_unit'] = 'MW'
+
+    return pd.concat([storage, charge, discharge])
 
 def get_emissions(oemoflex_scalars, scalars_raw):
     try:
@@ -977,6 +988,9 @@ def run_postprocessing(year, name, exp_paths):
     emissions = get_emissions(oemoflex_scalars, scalars_raw)
     oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
 
+    storage = aggregate_storage_capacities(oemoflex_scalars)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, storage], sort=True)
+
     total_system_cost = get_total_system_cost(oemoflex_scalars)
     oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
 
@@ -1008,3 +1022,5 @@ def run_postprocessing(year, name, exp_paths):
     save_flexmex_timeseries(
         sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed
     )
+
+
