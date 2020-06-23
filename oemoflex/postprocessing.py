@@ -720,6 +720,10 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
             tech_name = prep_el['tech'][0]
             parameters = FlexMex_Parameter_Map['tech'][tech_name]
 
+            # Special treatment for storages
+            if tech_name in ['h2_cavern', 'liion_battery']:
+                continue
+
             capex = get_parameter_values(scalars_raw, parameters['capex'])
 
             lifetime = get_parameter_values(scalars_raw, parameters['lifetime'])
@@ -730,15 +734,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
             annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
-            capacities_invested = oemoflex_scalars.loc[
-                oemoflex_scalars['var_name'] == 'invest'].copy()
-
-            df = pd.merge(
-                df, capacities_invested,
-                on=basic_columns
-            )
-
-            df['var_value'] = df['var_value'] * annualized_cost
+            df = get_calculated_parameters(df, oemoflex_scalars, 'invest', annualized_cost)
 
             df['var_name'] = 'cost_invest'
             df['var_unit'] = 'Eur'
