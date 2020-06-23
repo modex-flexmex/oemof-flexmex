@@ -712,18 +712,10 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     invest_cost = pd.DataFrame()
 
-    capacities_invested = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'] == 'invest'].copy()
-
     for _, prep_el in prep_elements.items():
         if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
-
-            df = pd.merge(
-                df, capacities_invested,
-                on=basic_columns
-            )
 
             tech_name = prep_el['tech'][0]
             parameters = FlexMex_Parameter_Map['tech'][tech_name]
@@ -737,6 +729,14 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
 
             annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+            capacities_invested = oemoflex_scalars.loc[
+                oemoflex_scalars['var_name'] == 'invest'].copy()
+
+            df = pd.merge(
+                df, capacities_invested,
+                on=basic_columns
+            )
 
             df['var_value'] = df['var_value'] * annualized_cost
 
