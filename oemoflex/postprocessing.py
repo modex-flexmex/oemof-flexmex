@@ -36,8 +36,23 @@ FlexMex_Parameter_Map = {
             'nuclear-st':
                 {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
                  'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST',
-                 'fixom': 'EnergyConversion_FixOM_Electricity_Nuclear_ST'}
-
+                 'fixom': 'EnergyConversion_FixOM_Electricity_Nuclear_ST'},
+            'liion_battery':
+                {'charge_capex': 'Storage_Capex_Electricity_LiIonBatteryCharge',
+                 'discharge_capex': 'Storage_Capex_Electricity_LiIonBatteryDischarge',
+                 'storage_capex': 'Storage_Capex_Electricity_LiIonBatteryStorage',
+                 'charge_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryCharge',
+                 'discharge_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryDischarge',
+                 'storage_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryStorage',
+                 'fixom': 'Storage_FixOM_Electricity_LiIonBattery'},
+            'h2_cavern':
+                {'charge_capex': 'Storage_Capex_H2_CavernCharge',
+                 'discharge_capex': 'Storage_Capex_H2_CavernDischarge',
+                 'storage_capex': 'Storage_Capex_H2_CavernStorage',
+                 'charge_lifetime': 'Storage_LifeTime_H2_CavernCharge',
+                 'discharge_lifetime': 'Storage_LifeTime_H2_CavernDischarge',
+                 'storage_lifetime': 'Storage_LifeTime_H2_CavernStorage',
+                 'fixom': 'Storage_FixOM_H2_Cavern'},
         }
 }
 
@@ -711,6 +726,29 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
 def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
+    def get_calculated_parameters(df, oemoflex_scalars, invest_parameter_name, factor):
+        r"""
+        Takes the pre-calculated invest parameter 'invest_parameter_name' from
+        'oemoflex_scalars' DataFrame and returns it multiplied by 'factor' (element-wise)
+        with 'df' as a template
+        """
+
+        capacities_invested = oemoflex_scalars.loc[
+            oemoflex_scalars['var_name'] == invest_parameter_name].copy()
+
+        # Make sure that values in columns to merge on are strings
+        # See https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
+        capacities_invested[basic_columns] = capacities_invested[basic_columns].astype(str)
+
+        df = pd.merge(
+            df, capacities_invested,
+            on=basic_columns
+        )
+
+        df['var_value'] = df['var_value'] * factor
+
+        return df
+
     fixom_cost = pd.DataFrame()
 
     for _, prep_el in prep_elements.items():
@@ -719,23 +757,47 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df = prep_el[basic_columns]
 
             tech_name = prep_el['tech'][0]
-
             parameters = FlexMex_Parameter_Map['tech'][tech_name]
 
-            capex = get_parameter_values(scalars_raw, parameters['capex'])
+            # Special treatment for storages
+            if tech_name in ['h2_cavern', 'liion_battery']:
 
-            fix_cost = get_parameter_values(
-                scalars_raw, parameters['fixom']) * 1e-2  # percent -> 0...1
+                # One fix cost factor for all sub-components
+                fix_cost_factor = get_parameter_values(
+                    scalars_raw, parameters['fixom']) * 1e-2  # percent -> 0...1
 
-            capacities_invested = oemoflex_scalars.loc[
-                oemoflex_scalars['var_name'] == 'invest'].copy()
+                # Charge device
+                capex = get_parameter_values(scalars_raw, parameters['charge_capex'])
+                df_charge = get_calculated_parameters(df, oemoflex_scalars,
+                                                      'capacity_charge_invest',
+                                                      fix_cost_factor * capex)
 
-            df = pd.merge(
-                df, capacities_invested,
-                on=basic_columns
-            )
+                # Discharge device
+                capex = get_parameter_values(scalars_raw, parameters['discharge_capex'])
+                df_discharge = get_calculated_parameters(df, oemoflex_scalars,
+                                                         'capacity_discharge_invest',
+                                                         fix_cost_factor * capex)
 
-            df['var_value'] = df['var_value'] * fix_cost * capex
+                # Storage cavern
+                capex = get_parameter_values(scalars_raw, parameters['storage_capex'])
+                df_storage = get_calculated_parameters(df, oemoflex_scalars,
+                                                       'storage_capacity_invest',
+                                                       fix_cost_factor * capex)
+
+                df = pd.concat([df_charge, df_discharge, df_storage], sort=True)
+
+                # Sum the 3 amounts per storage, keep indexes as columns
+                df = df.groupby(by=basic_columns, as_index=False).sum()
+
+            else:
+                capex = get_parameter_values(scalars_raw, parameters['capex'])
+
+                fix_cost_factor = get_parameter_values(
+                    scalars_raw, parameters['fixom']) * 1e-2  # percent -> 0...1
+
+                df = get_calculated_parameters(df, oemoflex_scalars,
+                                               'invest',
+                                               fix_cost_factor * capex)
 
             df['var_name'] = 'cost_fixom'
             df['var_unit'] = 'Eur'
@@ -868,11 +930,12 @@ def run_postprocessing(year, name, exp_paths):
     emission_cost = get_emission_cost(carrier_cost, prep_elements, scalars_raw)
     aggregated_emission_cost = aggregate_by_country(emission_cost)
     # invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
-    # fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
+    fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
     oemoflex_scalars = pd.concat([
         oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
         emission_cost,
-        # invest_cost, fixom_cost
+        # invest_cost,
+        fixom_cost
     ])
 
     # emissions
