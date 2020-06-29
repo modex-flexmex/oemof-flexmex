@@ -154,21 +154,18 @@ def get_capacities(es):
     d = dict()
     # TODO initial capacities for storages' charge/discharge devices
     for node in es.nodes:
-        if not isinstance(node, (Bus, Sink, facades.Shortage)):
+        if not isinstance(node, (Bus, Sink, facades.Shortage, facades.TYPEMAP["link"])):
             if getattr(node, "capacity", None) is not None:
-                if isinstance(node, facades.TYPEMAP["link"]):
-                    pass
-                else:
-                    key = (
-                        node.region,
-                        node.label,
-                        # [n for n in node.outputs.keys()][0],
-                        node.type,
-                        node.carrier,
-                        node.tech,  # tech & carrier are oemof-tabular specific
-                        'capacity'
-                    )  # for oemof logic
-                    d[key] = {'var_value': node.capacity}
+                key = (
+                    node.region,
+                    node.label,
+                    # [n for n in node.outputs.keys()][0],
+                    node.type,
+                    node.carrier,
+                    node.tech,  # tech & carrier are oemof-tabular specific
+                    'capacity'
+                )  # for oemof logic
+                d[key] = {'var_value': node.capacity}
     exogenous = pd.DataFrame.from_dict(d).T  # .dropna()
 
     if not exogenous.empty:
