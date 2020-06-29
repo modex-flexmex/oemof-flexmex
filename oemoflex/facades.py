@@ -133,10 +133,12 @@ class Bev(GenericStorage, Facade):
                 "Investment for reservoir class is not implemented."
             )
 
-        internal_bus = Bus(label=self.label + "-bus")
+        internal_bus = Bus(label=self.label + "-internal_bus")
 
-        outflow = Sink(
-            label=self.label + "-outflow",
+        Flow(input=internal_bus, output=self.bus)
+
+        drive_power = Sink(
+            label=self.label + "-drive_power",
             inputs={
                 internal_bus: Flow(nominal_value=self.amount,
                                    actual_value=self.drive_power,
@@ -166,4 +168,4 @@ class Bev(GenericStorage, Facade):
             }
         )
 
-        self.subnodes = (outflow, internal_bus)
+        self.subnodes = (drive_power, internal_bus)
