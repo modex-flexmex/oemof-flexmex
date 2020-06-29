@@ -14,8 +14,17 @@ def test_bev():
     el_bus = Bus(label='electricity')
 
     el_grid = Source(
-        label='el_grid',
-        outputs={el_bus: Flow(variable_costs=120)}
+        label='windpark',
+        outputs={el_bus: Flow(fixed=True,
+                              nominal_value=150,
+                              actual_value=[0.7, 0.2, 0.9])}
+    )
+
+    el_demand = Sink(
+        label='el_demand',
+        inputs={el_bus: Flow(fixed=True,
+                             nominal_value=100,
+                             actual_value=[0.1, 0.2, 0.1])}
     )
 
     el_excess = Sink(
@@ -40,18 +49,12 @@ def test_bev():
         efficiency=0.93
     )
 
-    es.add(el_bus, el_grid, el_excess, bev)
+    es.add(el_bus, el_grid, el_demand, el_excess, bev)
 
     m = Model(es)
 
     lp_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'lp-file.lp')
     m.write(lp_file_path, io_options={'symbolic_solver_labels': True})
-
-    import sys
-    f = open("pprint.txt", 'w')
-    sys.stdout = f
-    m.pprint()
-    f.close()
 
     m.solve()
 
