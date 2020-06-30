@@ -990,8 +990,11 @@ def run_postprocessing(year, name, exp_paths):
     invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
     fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
     oemoflex_scalars = pd.concat([
-        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
-        emission_cost,
+        oemoflex_scalars,
+        varom_cost,
+        carrier_cost,
+        fuel_cost,
+        aggregated_emission_cost,
         invest_cost,
         fixom_cost
     ])
