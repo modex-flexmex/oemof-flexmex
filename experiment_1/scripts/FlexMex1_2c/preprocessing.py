@@ -6,7 +6,7 @@ from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_electricity_shortage, update_electricity_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    update_h2_cavern, update_liion_battery, update_ch4_gt,
+    update_liion_battery,
     create_electricity_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
@@ -58,12 +58,10 @@ def main():
             'electricity-shortage',
             'electricity-curtailment',
             'electricity-demand',
-            'electricity-h2_cavern',
             'electricity-liion_battery',
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
-            'ch4-gt'
         ]
 
     )
@@ -74,15 +72,10 @@ def main():
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
-    update_h2_cavern(exp_paths.data_preprocessed,
-                            scalars,
-                            expandable=True,
-                            from_greenfield=True)
     update_liion_battery(exp_paths.data_preprocessed,
                          scalars,
                          expandable=True,
                          from_greenfield=True)
-    update_ch4_gt(exp_paths.data_preprocessed, scalars)
 
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)

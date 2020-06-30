@@ -34,7 +34,6 @@ def main():
                 'electricity-shortage',
                 'electricity-curtailment',
                 'electricity-demand',
-                'electricity-h2_cavern',
                 'electricity-liion_battery',
             ],
             'profile': [
@@ -44,7 +43,6 @@ def main():
                 'electricity-demand',
             ],
             'from_to_bus': [
-                'ch4-gt'
             ],
         },
         path=exp_paths.data_preprocessed
