@@ -152,10 +152,19 @@ def get_capacities(es):
         endogenous = pd.DataFrame()
 
     d = dict()
-    # TODO initial capacities for storages' charge/discharge devices
     for node in es.nodes:
         if not isinstance(node, (Bus, Sink, facades.Shortage, facades.TYPEMAP["link"])):
-            if getattr(node, "capacity", None) is not None:
+            # Specify which parameters to read depending on the technology
+            parameters_to_read = []
+            if isinstance(node, facades.TYPEMAP["storage"]):
+                parameters_to_read = ['capacity', 'storage_capacity']
+            elif isinstance(node, facades.TYPEMAP["asymmetric storage"]):
+                parameters_to_read = ['capacity_charge', 'capacity_discharge', 'storage_capacity']
+            elif getattr(node, "capacity", None) is not None:
+                parameters_to_read = ['capacity']
+
+            # Update dict with values in oemof's parameter->value structure
+            for p in parameters_to_read:
                 key = (
                     node.region,
                     node.label,
@@ -163,9 +172,10 @@ def get_capacities(es):
                     node.type,
                     node.carrier,
                     node.tech,  # tech & carrier are oemof-tabular specific
-                    'capacity'
+                    p
                 )  # for oemof logic
-                d[key] = {'var_value': node.capacity}
+                d[key] = {'var_value': getattr(node, p)}
+
     exogenous = pd.DataFrame.from_dict(d).T  # .dropna()
 
     if not exogenous.empty:
@@ -199,9 +209,13 @@ def get_capacities(es):
         storage = storage.loc[storage['to'].isna()]
         storage.drop('to', 1, inplace=True)
         storage = storage[['region', 'name', 'type', 'carrier', 'tech', 'var_name', 'var_value']]
+
+        # Delete unused 'init_cap' rows - parameter name misleading! (oemof issue)
+        storage.drop(storage.loc[storage['var_name'] == 'init_cap'].index, axis=0, inplace=True)
+
         storage.replace(
-            ['init_cap', 'invest'],
-            ['storage_capacity', 'storage_capacity_invest'],
+            ['invest'],
+            ['storage_capacity_invest'],
             inplace=True
         )
         storage.set_index(
