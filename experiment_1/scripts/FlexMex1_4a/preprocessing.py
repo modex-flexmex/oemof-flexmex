@@ -38,6 +38,7 @@ def main():
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
         header=0,
         na_values=['not considered', 'no value'],
+        sep=';'
     )
 
     # Filter out only scenario-related input parameters
