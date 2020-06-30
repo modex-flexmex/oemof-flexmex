@@ -416,6 +416,7 @@ def aggregate_storage_capacities(oemoflex_scalars):
 
     storage = storage.groupby(by=basic_columns, as_index=False).sum()
     storage['var_name'] = 'storage_capacity_sum'
+    storage['var_value'] = storage['var_value'] * 1e-3  # MWh -> GWh
     storage['var_unit'] = 'GWh'
 
     charge = oemoflex_scalars.loc[
