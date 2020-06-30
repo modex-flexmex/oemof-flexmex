@@ -4,7 +4,7 @@ from oemoflex.postprocessing import run_postprocessing
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
-name = 'FlexMex1_2b'
+name = 'FlexMex1_2c'
 
 year = 2050
 

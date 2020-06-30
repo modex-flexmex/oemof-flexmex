@@ -12,7 +12,7 @@ from oemoflex.preprocessing import (
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
-name = 'FlexMex1_2b'
+name = 'FlexMex1_2c'
 
 # Get paths
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
