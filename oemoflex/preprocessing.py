@@ -544,6 +544,264 @@ def update_solar_pv(data_preprocessed_path, scalars):
     solarpv.to_csv(solar_pv_file)
 
 
+def update_h2_cavern(
+        data_preprocessed_path,
+        scalars,
+        expandable=False,
+        from_greenfield=False
+):
+    r"""
+    Parameterization of a electricity H2 storage as asymmetrical storage.
+
+    Discharging and charging device are lumped together.
+
+    Undependent expansion of either storage or (dis)charging devices is neglected.
+    (we only need full expandability for FlexMex_1_2b)
+
+    Parameters
+    ----------
+    data_preprocessed_path
+    scalars
+
+    expandable : bool
+    Determines whether capacity (discharge/charge and storage) is expandable
+
+    from_greenfield : bool
+    If true initial capacity is 0.
+
+    Returns
+    -------
+
+    """
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-h2_cavern.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    # Operation parameters
+    availability = get_parameter_values(
+        scalars,
+        'Storage_Availability_H2_Cavern') * 1e-2  # percent -> 0...1
+
+    capacity_charge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernCharge')
+
+    capacity_discharge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernDischarge')
+
+    storage_capacity = get_parameter_values(
+        scalars, 'Storage_Capacity_H2_CavernStorage') * 1e3  # GWh to MWh
+
+    self_discharge = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Electricity_H2_Cavern') * 1e-2  # percent -> 0...1
+
+    operation_cost = get_parameter_values(
+        scalars, 'Storage_VarOM_H2_Cavern') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    eta_charge = get_parameter_values(
+        scalars, 'Storage_Eta_H2_CavernCharge') * 1e-2  # percent -> 0...1
+
+    eta_discharge = get_parameter_values(
+        scalars, 'Storage_Eta_H2_CavernDischarge') * 1e-2  # percent -> 0...1
+
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernCharge')
+
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernDischarge')
+
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernStorage') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_H2_Cavern') * 1e-2  # percent -> 0...1
+
+    # ignored:
+    # Storage_LifeTime_H2_CavernCharge
+    # Storage_LifeTime_H2_CavernDischarge
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_H2_CavernStorage')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_discharge = annuity(
+        capex=capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    df['expandable'] = expandable
+
+    if expandable and from_greenfield:
+        df['capacity_charge'] = 0
+        df['capacity_discharge'] = 0
+        df['storage_capacity'] = 0
+    else:
+        df['capacity_charge'] = capacity_charge * availability
+        df['capacity_discharge'] = capacity_discharge * availability
+        df['storage_capacity'] = storage_capacity * availability
+
+    df['loss_rate'] = self_discharge
+
+    df['efficiency_charge'] = eta_charge
+    df['efficiency_discharge'] = eta_discharge
+
+    df['capacity_cost_charge'] = annualized_cost_charge + fix_cost * capex_charge
+    df['capacity_cost_discharge'] = annualized_cost_discharge + fix_cost * capex_discharge
+
+    df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    df['marginal_cost'] = operation_cost
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_liion_battery(
+        data_preprocessed_path,
+        scalars,
+        expandable=False,
+        from_greenfield=False
+):
+    r"""
+    Parameterization of a Li-ion battery storage.
+
+    The battery storage is expandable only in conjunction with (dis)charging because the devices
+    are not separated. The same is true for greenfield/brownfield optimization:
+    Further (dis)charging devices cannot be added to existing storage capacities or vice versa.
+
+    Mapping and calculation could be easier since symmetric parametrization of a battery fits
+    perfectly to oemof facade's Storage object. For consistency reasons, however, we use H2_cavern
+    update function as a template and keep as much as possible similar (values in Scalars.csv will
+    make sure that it is symmetric again) making future abstraction into one update function
+    easier.
+
+    Parameters
+    ----------
+    data_preprocessed_path
+    scalars
+
+    expandable : bool
+    Determines whether capacity is expandable
+
+    from_greenfield : bool
+    If true initial capacity is 0.
+
+    Returns
+    -------
+
+    """
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-liion_battery.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    # Operation parameters
+    availability = get_parameter_values(
+        scalars,
+        'Storage_Availability_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
+
+    capacity_charge = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryCharge')
+
+    capacity_discharge = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryDischarge')
+
+    storage_capacity = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryStorage') * 1e3  # GWh to MWh
+
+    self_discharge = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
+
+    operation_cost = get_parameter_values(
+        scalars, 'Storage_VarOM_Electricity_LiIonBattery') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    eta_charge = get_parameter_values(
+        scalars, 'Storage_Eta_Electricity_LiIonBatteryCharge') * 1e-2  # percent -> 0...1
+
+    eta_discharge = get_parameter_values(
+        scalars, 'Storage_Eta_Electricity_LiIonBatteryDischarge') * 1e-2  # percent -> 0...1
+
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryCharge')
+
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryDischarge')
+
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryStorage') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
+
+    # ignored:
+    # Storage_LifeTime_Electricity_LiIonBatteryCharge
+    # Storage_LifeTime_Electricity_LiIonBatteryDischarge
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_Electricity_LiIonBatteryStorage')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge + capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    df['expandable'] = expandable
+
+    if expandable and from_greenfield:
+        df['capacity'] = 0
+        df['storage_capacity'] = 0
+    else:
+        df['capacity'] = (capacity_charge + capacity_discharge) / 2 * availability
+        df['storage_capacity'] = storage_capacity * availability
+
+    df['loss_rate'] = self_discharge
+
+    df['efficiency'] = (eta_charge + eta_discharge) / 2
+
+    df['capacity_cost'] = annualized_cost_charge + fix_cost * (capex_charge + capex_discharge)
+
+    df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    df['marginal_cost'] = operation_cost
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
 def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')

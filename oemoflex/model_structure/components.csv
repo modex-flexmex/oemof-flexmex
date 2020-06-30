@@ -14,6 +14,8 @@ ch4-boiler,ch4,conversion,boiler,Peak load boiler
 ch4-extchp,ch4,extraction,extchp,Extraction turbine CHP
 electricity-pth,electricity,conversion,pth,Resistive heater (Power-to-Heat)
 heat-demand,heat,load,demand,Heat demand
+electricity-h2_cavern,electricity,storage,cavern,Large scale H2 storage
+electricity-liion_battery,electricity,storage,liion-battery,Li-ion battery storage
 electricity-heatpump,electricity,conversion,heatpump,Airsource compression heatpump
 heat-storage,heat,storage,storage,Large scale sensible heat storage
 heat-excess,heat,excess,excess,Heat excess
