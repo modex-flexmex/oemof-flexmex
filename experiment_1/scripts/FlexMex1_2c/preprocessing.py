@@ -7,8 +7,9 @@ from oemoflex.preprocessing import (
     create_default_elements, update_electricity_shortage, update_electricity_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     update_liion_battery,
-    create_electricity_demand_profiles,
-    create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
+    update_nuclear_st,
+    create_electricity_demand_profiles, create_wind_onshore_profiles, create_wind_offshore_profiles,
+    create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
@@ -62,6 +63,7 @@ def main():
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
+            'uranium-nuclear-st',
         ]
 
     )
@@ -76,6 +78,7 @@ def main():
                          scalars,
                          expandable=True,
                          from_greenfield=True)
+    update_nuclear_st(exp_paths.data_preprocessed, scalars, expandable=True, from_green_field=True)
 
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)

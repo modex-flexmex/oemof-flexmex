@@ -43,6 +43,7 @@ def main():
                 'electricity-demand',
             ],
             'from_to_bus': [
+                'uranium-nuclear-st',
             ],
         },
         path=exp_paths.data_preprocessed
