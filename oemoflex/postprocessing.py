@@ -157,7 +157,14 @@ def get_capacities(es):
             # Specify which parameters to read depending on the technology
             parameters_to_read = []
             if isinstance(node, facades.TYPEMAP["storage"]):
-                parameters_to_read = ['capacity', 'storage_capacity']
+
+                # TODO for brownfield optimization
+                # parameters_to_read = ['capacity', 'storage_capacity']
+
+                # WORKAROUND Skip 'capacity' to safe some effort in aggregation and elsewhere
+                # possible because storages are greenfield optimized only: 'capacity' = 0
+                parameters_to_read = ['storage_capacity']
+
             elif isinstance(node, facades.TYPEMAP["asymmetric storage"]):
                 parameters_to_read = ['capacity_charge', 'capacity_discharge', 'storage_capacity']
             elif getattr(node, "capacity", None) is not None:
@@ -425,6 +432,19 @@ def aggregate_storage_capacities(oemoflex_scalars):
 
     return pd.concat([storage, charge, discharge])
 
+
+def aggregate_other_capacities(oemoflex_scalars):
+    capacities = oemoflex_scalars.loc[
+        oemoflex_scalars['var_name'].isin(['capacity', 'invest'])]
+
+    # Make sure that values in columns used to group on are strings and thus equatable
+    capacities[basic_columns] = capacities[basic_columns].astype(str)
+
+    capacities = capacities.groupby(by=basic_columns, as_index=False).sum()
+    capacities['var_name'] = 'capacity_sum'
+    capacities['var_unit'] = 'MW'
+
+    return capacities
 
 def get_emissions(oemoflex_scalars, scalars_raw):
     try:
@@ -1001,7 +1021,8 @@ def run_postprocessing(year, name, exp_paths):
     oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
 
     storage = aggregate_storage_capacities(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, storage], sort=True)
+    other = aggregate_other_capacities(oemoflex_scalars)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, storage, other], sort=True)
 
     total_system_cost = get_total_system_cost(oemoflex_scalars)
     oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
