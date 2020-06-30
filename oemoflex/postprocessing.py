@@ -403,6 +403,10 @@ def get_storage_losses(oemoflex_scalars):
 def aggregate_storage_capacities(oemoflex_scalars):
     storage = oemoflex_scalars.loc[
         oemoflex_scalars['var_name'].isin(['storage_capacity', 'storage_capacity_invest'])]
+
+    # Make sure that values in columns used to group on are strings and thus equatable
+    storage[basic_columns] = storage[basic_columns].astype(str)
+
     storage = storage.groupby(by=basic_columns, as_index=False).sum()
     storage['var_name'] = 'storage_capacity_sum'
     storage['var_unit'] = 'GWh'
