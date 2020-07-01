@@ -71,7 +71,7 @@ def main():
 
     # compare with previous data
     previous_path = os.path.join(
-        os.path.split(exp_paths.data_preprocessed)[0] + '_default_v0.03', 'data'
+        os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data'
     )
     new_path = exp_paths.data_preprocessed
     try:
