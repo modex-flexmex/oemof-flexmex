@@ -925,7 +925,7 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
 
                 single_column = df_var_value[column]
                 single_column = single_column.reset_index(drop=True)
-                single_column.to_csv(filename)
+                single_column.to_csv(filename, header=False)
 
     delete_empty_subdirs(dir)
 
@@ -979,7 +979,7 @@ def run_postprocessing(year, name, exp_paths):
     # losses (storage, transmission)
     transmission_losses = get_transmission_losses(oemoflex_scalars)
     storage_losses = get_storage_losses(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses])
+    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses], sort=True)
 
     # get capacities
     capacities = get_capacities(es)
@@ -1002,7 +1002,7 @@ def run_postprocessing(year, name, exp_paths):
         aggregated_emission_cost,
         invest_cost,
         fixom_cost
-    ])
+    ], sort=True)
 
     # emissions
     emissions = get_emissions(oemoflex_scalars, scalars_raw)
