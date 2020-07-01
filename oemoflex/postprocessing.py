@@ -98,13 +98,12 @@ def get_capacities(es):
                 return getattr(flow['from'], attr, np.nan)
 
             # Get property from the Storage object in "to" for the charge device
-            elif isinstance(flow['to'], (TYPEMAP["storage"],
-                                         TYPEMAP["asymmetric storage"])):
+            if isinstance(flow['to'], (TYPEMAP["storage"],
+                                       TYPEMAP["asymmetric storage"])):
                 return getattr(flow['to'], attr, np.nan)
 
             # Get property from other object in "from"
-            else:
-                return getattr(flow['from'], attr, np.nan)
+            return getattr(flow['from'], attr, np.nan)
 
         return fnc
 
@@ -113,12 +112,11 @@ def get_capacities(es):
                                      TYPEMAP["asymmetric storage"])):
             return "capacity_discharge_invest"
 
-        elif isinstance(flow['to'], (TYPEMAP["storage"],
-                                     TYPEMAP["asymmetric storage"])):
+        if isinstance(flow['to'], (TYPEMAP["storage"],
+                                   TYPEMAP["asymmetric storage"])):
             return "capacity_charge_invest"
 
-        else:
-            return np.nan
+        return np.nan
 
     try:
         flows = pp.bus_results(es, es.results, select="scalars", concat=True)
@@ -739,7 +737,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     for _, prep_el in prep_elements.items():
         # In the following line: Not 'is'! pandas overloads operators!
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
@@ -814,7 +812,7 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     for _, prep_el in prep_elements.items():
         # not 'is'! pandas overloads operators!
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 

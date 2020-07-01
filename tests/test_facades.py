@@ -1,52 +1,52 @@
 import pandas as pd
 from oemof.solph import (Sink, Source, Bus, Flow, Model,
                          EnergySystem)
-from oemoflex.facades import AsymmetricStorage
 from oemof.outputlib import views
+from oemoflex.facades import AsymmetricStorage
 
 
 solver = 'cbc'
 
 
-def check_init_methods():
-    # bus = Bus('bus_elec')
-    # storage =  AsymmetricStorage(
-    #        label="h2-cavern",
-    #        bus=bus,
-    #        carrier="electricity",
-    #        tech="cavern",
-    #        storage_capacity_cost=10,
-    #        invest_relation_output_capacity=1/6, # oemof.solph
-    #        marginal_cost=5,
-    #        initial_storage_level=1, # oemof.solph argument
-    # )
-    #
-    # assert storage.inputs[bus] == 0.3
-    # assert storage.conversion_factors[bus] ==
-
-    bus = Bus('bus_elec')
-    storage = AsymmetricStorage(
-           label="h2-cavern",
-           bus=bus,
-           carrier="electricity",
-           tech="cavern",
-           storage_capacity=10,
-           marginal_cost=5,
-    )
-
-    # assert storage.inputs[bus] == 0.3
-    # assert storage.conversion_factors[bus] ==
-
-    bus = Bus('bus_elec')
-    storage = AsymmetricStorage(
-        label="h2-cavern",
-        bus=bus,
-        carrier="electricity",
-        tech="cavern",
-        expandable=True,
-        storage_capacity_cost=100,
-        marginal_cost=5,
-    )
+# def check_init_methods():
+#     # bus = Bus('bus_elec')
+#     # storage =  AsymmetricStorage(
+#     #        label="h2-cavern",
+#     #        bus=bus,
+#     #        carrier="electricity",
+#     #        tech="cavern",
+#     #        storage_capacity_cost=10,
+#     #        invest_relation_output_capacity=1/6, # oemof.solph
+#     #        marginal_cost=5,
+#     #        initial_storage_level=1, # oemof.solph argument
+#     # )
+#     #
+#     # assert storage.inputs[bus] == 0.3
+#     # assert storage.conversion_factors[bus] ==
+#
+#     bus = Bus('bus_elec')
+#     storage = AsymmetricStorage(
+#            label="h2-cavern",
+#            bus=bus,
+#            carrier="electricity",
+#            tech="cavern",
+#            storage_capacity=10,
+#            marginal_cost=5,
+#     )
+#
+#     # assert storage.inputs[bus] == 0.3
+#     # assert storage.conversion_factors[bus] ==
+#
+#     bus = Bus('bus_elec')
+#     storage = AsymmetricStorage(
+#         label="h2-cavern",
+#         bus=bus,
+#         carrier="electricity",
+#         tech="cavern",
+#         expandable=True,
+#         storage_capacity_cost=100,
+#         marginal_cost=5,
+#     )
 
 
 def check_asymmetric_storage_optimize_dispatch():
