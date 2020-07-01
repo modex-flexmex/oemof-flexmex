@@ -764,45 +764,27 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
             tech_name = prep_el['tech'][0]
             parameters = FlexMex_Parameter_Map['tech'][tech_name]
 
-            interest = get_parameter_values(
-                scalars_raw,
-                'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
-
             # Special treatment for storages
             if tech_name in ['h2_cavern', 'liion_battery']:
 
                 # Charge device
                 capex = get_parameter_values(scalars_raw, parameters['charge_capex'])
-
-                lifetime = get_parameter_values(scalars_raw, parameters['charge_lifetime'])
-
-                annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
-
                 df_charge = get_calculated_parameters(df, oemoflex_scalars,
-                                                      'charge_capacity_invest',
-                                                      annualized_cost)
+                                                      'capacity_charge_invest',
+                                                      capex)
 
                 # Discharge device
                 capex = get_parameter_values(scalars_raw, parameters['discharge_capex'])
-
-                lifetime = get_parameter_values(scalars_raw, parameters['discharge_lifetime'])
-
-                annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
-
                 df_discharge = get_calculated_parameters(df, oemoflex_scalars,
-                                                         'discharge_capacity_invest',
-                                                         annualized_cost)
+                                                         'capacity_discharge_invest',
+                                                         capex)
 
                 # Storage cavern
-                capex = get_parameter_values(scalars_raw, parameters['storage_capex'])
-
-                lifetime = get_parameter_values(scalars_raw, parameters['storage_lifetime'])
-
-                annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
-
+                capex = get_parameter_values(scalars_raw,
+                                             parameters['storage_capex']) * 1e-3  # €/MWh -> €/GWh
                 df_storage = get_calculated_parameters(df, oemoflex_scalars,
                                                        'storage_capacity_invest',
-                                                       annualized_cost)
+                                                       capex)
 
                 df = pd.concat([df_charge, df_discharge, df_storage], sort=True)
 
@@ -812,11 +794,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
             else:
                 capex = get_parameter_values(scalars_raw, parameters['capex'])
 
-                lifetime = get_parameter_values(scalars_raw, parameters['lifetime'])
-
-                annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
-
-                df = get_calculated_parameters(df, oemoflex_scalars, 'invest', annualized_cost)
+                df = get_calculated_parameters(df, oemoflex_scalars, 'invest', capex)
 
             df['var_name'] = 'cost_invest'
             df['var_unit'] = 'Eur'
@@ -858,7 +836,8 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
                                                          fix_cost_factor * capex)
 
                 # Storage cavern
-                capex = get_parameter_values(scalars_raw, parameters['storage_capex'])
+                capex = get_parameter_values(scalars_raw,
+                                             parameters['storage_capex']) * 1e-3  # €/MWh -> €/GWh
                 df_storage = get_calculated_parameters(df, oemoflex_scalars,
                                                        'storage_capacity_invest',
                                                        fix_cost_factor * capex)
