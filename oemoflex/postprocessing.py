@@ -738,6 +738,10 @@ def get_calculated_parameters(df, oemoflex_scalars, invest_parameter_name, facto
     capacities_invested = oemoflex_scalars.loc[
         oemoflex_scalars['var_name'] == invest_parameter_name].copy()
 
+    if capacities_invested.empty:
+        logging.info("No key '{}' found.".format(invest_parameter_name))
+        raise KeyError
+
     # Make sure that values in columns to merge on are strings
     # See https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
     capacities_invested[basic_columns] = capacities_invested[basic_columns].astype(str)
