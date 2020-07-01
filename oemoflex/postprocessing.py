@@ -7,7 +7,6 @@ import pandas as pd
 import yaml
 
 from oemof.solph import EnergySystem, Bus, Sink
-from oemof.tabular import facades
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements
@@ -94,13 +93,13 @@ def get_capacities(es):
         # the Facade object in bus_results() DataFrame columns "from" or "to"
         def fnc(flow):
             # Get property from the Storage object in "from" for the discharge device
-            if isinstance(flow['from'], (facades.TYPEMAP["storage"],
-                                         facades.TYPEMAP["asymmetric storage"])):
+            if isinstance(flow['from'], (TYPEMAP["storage"],
+                                         TYPEMAP["asymmetric storage"])):
                 return getattr(flow['from'], attr, np.nan)
 
             # Get property from the Storage object in "to" for the charge device
-            elif isinstance(flow['to'], (facades.TYPEMAP["storage"],
-                                         facades.TYPEMAP["asymmetric storage"])):
+            elif isinstance(flow['to'], (TYPEMAP["storage"],
+                                         TYPEMAP["asymmetric storage"])):
                 return getattr(flow['to'], attr, np.nan)
 
             # Get property from other object in "from"
@@ -110,12 +109,12 @@ def get_capacities(es):
         return fnc
 
     def get_parameter_name(flow):
-        if isinstance(flow['from'], (facades.TYPEMAP["storage"],
-                                     facades.TYPEMAP["asymmetric storage"])):
+        if isinstance(flow['from'], (TYPEMAP["storage"],
+                                     TYPEMAP["asymmetric storage"])):
             return "capacity_discharge_invest"
 
-        elif isinstance(flow['to'], (facades.TYPEMAP["storage"],
-                                     facades.TYPEMAP["asymmetric storage"])):
+        elif isinstance(flow['to'], (TYPEMAP["storage"],
+                                     TYPEMAP["asymmetric storage"])):
             return "capacity_charge_invest"
 
         else:
@@ -153,12 +152,12 @@ def get_capacities(es):
 
     d = dict()
     for node in es.nodes:
-        if not isinstance(node, (Bus, Sink, facades.Shortage, facades.TYPEMAP["link"])):
+        if not isinstance(node, (Bus, Sink, TYPEMAP["shortage"], TYPEMAP["link"])):
             # Specify which parameters to read depending on the technology
             parameters_to_read = []
-            if isinstance(node, facades.TYPEMAP["storage"]):
+            if isinstance(node, TYPEMAP["storage"]):
                 parameters_to_read = ['capacity', 'storage_capacity']
-            elif isinstance(node, facades.TYPEMAP["asymmetric storage"]):
+            elif isinstance(node, TYPEMAP["asymmetric storage"]):
                 parameters_to_read = ['capacity_charge', 'capacity_discharge', 'storage_capacity']
             elif getattr(node, "capacity", None) is not None:
                 parameters_to_read = ['capacity']
@@ -269,13 +268,13 @@ def get_sequences_by_tech(results):
             component = key[1]
             bus = key[0]
 
-            if isinstance(component, facades.Link):
+            if isinstance(component, TYPEMAP["link"]):
                 if bus == component.from_bus:
                     var_name = 'flow_gross_forward'
                 elif bus == component.to_bus:
                     var_name = 'flow_gross_backward'
 
-            elif isinstance(component, (facades.ExtractionTurbine, facades.BackpressureTurbine)):
+            elif isinstance(component, (TYPEMAP["extraction"], TYPEMAP["backpressure"])):
                 var_name = 'flow_fuel'
 
             else:
@@ -285,13 +284,13 @@ def get_sequences_by_tech(results):
             bus = key[1]
             component = key[0]
 
-            if isinstance(component, facades.Link):
+            if isinstance(component, TYPEMAP["link"]):
                 if bus == component.to_bus:
                     var_name = 'flow_net_forward'
                 elif bus == component.from_bus:
                     var_name = 'flow_net_backward'
 
-            elif isinstance(component, (facades.ExtractionTurbine, facades.BackpressureTurbine)):
+            elif isinstance(component, (TYPEMAP["extraction"], TYPEMAP["backpressure"])):
                 if bus == component.electricity_bus:
                     var_name = 'flow_electricity'
 
