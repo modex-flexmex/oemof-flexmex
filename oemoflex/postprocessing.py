@@ -388,7 +388,9 @@ def get_transmission_losses(oemoflex_scalars):
 
 
 def get_storage_losses(oemoflex_scalars):
-    storage_data = oemoflex_scalars.loc[oemoflex_scalars['type'].isin(['storage', 'asymmetric storage'])]
+    storage_data = oemoflex_scalars.loc[
+        oemoflex_scalars['type'].isin(['storage', 'asymmetric storage'])
+    ]
     flow_in = storage_data.loc[storage_data['var_name'] == 'flow_in'].set_index('name')
     flow_out = storage_data.loc[storage_data['var_name'] == 'flow_out'].set_index('name')
 
@@ -718,7 +720,8 @@ def get_calculated_parameters(df, oemoflex_scalars, invest_parameter_name, facto
         oemoflex_scalars['var_name'] == invest_parameter_name].copy()
 
     # Make sure that values in columns to merge on are strings
-    # See https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
+    # See here:
+    # https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
     capacities_invested[basic_columns] = capacities_invested[basic_columns].astype(str)
 
     df = pd.merge(
@@ -736,7 +739,8 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
     invest_cost = pd.DataFrame()
 
     for _, prep_el in prep_elements.items():
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
+        # In the following line: Not 'is'! pandas overloads operators!
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
@@ -810,7 +814,8 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
     fixom_cost = pd.DataFrame()
 
     for _, prep_el in prep_elements.items():
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
+        # not 'is'! pandas overloads operators!
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
@@ -1037,5 +1042,3 @@ def run_postprocessing(year, name, exp_paths):
     save_flexmex_timeseries(
         sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed
     )
-
-

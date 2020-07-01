@@ -8,6 +8,7 @@ from oemof.solph import EnergySystem, Model
 from oemof.tabular import datapackage  # noqa
 from oemoflex.facades import TYPEMAP
 
+
 def optimize(data_preprocessed, results_optimization, solver='cbc', save_lp=False):
     r"""
     Takes the specified datapackage, creates an energysystem and solves the

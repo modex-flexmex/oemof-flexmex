@@ -74,14 +74,18 @@ def main():
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
-    update_h2_cavern(exp_paths.data_preprocessed,
-                            scalars,
-                            expandable=True,
-                            from_greenfield=True)
-    update_liion_battery(exp_paths.data_preprocessed,
-                         scalars,
-                         expandable=True,
-                         from_greenfield=True)
+    update_h2_cavern(
+        exp_paths.data_preprocessed,
+        scalars,
+        expandable=True,
+        from_greenfield=True
+    )
+    update_liion_battery(
+        exp_paths.data_preprocessed,
+        scalars,
+        expandable=True,
+        from_greenfield=True
+    )
     update_ch4_gt(exp_paths.data_preprocessed, scalars)
 
     # create sequences

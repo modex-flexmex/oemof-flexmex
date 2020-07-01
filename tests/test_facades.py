@@ -1,9 +1,9 @@
 import pandas as pd
 from oemof.solph import (Sink, Source, Bus, Flow, Model,
-                         EnergySystem, Investment)
+                         EnergySystem)
 from oemoflex.facades import AsymmetricStorage
 from oemof.outputlib import views
-import oemof.outputlib.processing as pp
+
 
 solver = 'cbc'
 
@@ -47,6 +47,7 @@ def check_init_methods():
         storage_capacity_cost=100,
         marginal_cost=5,
     )
+
 
 def check_asymmetric_storage_optimize_dispatch():
     r"""
@@ -114,8 +115,8 @@ def check_asymmetric_storage_optimize_dispatch():
     optimization_model.solve(solver=solver,
                              solve_kwargs={'tee': True, 'keepfiles': True})
 
-    #data = views.node(optimization_model.results(), 'electricity')
-    #res = pp.results(optimization_model)
+    # data = views.node(optimization_model.results(), 'electricity')
+    # res = pp.results(optimization_model)
 
     results = views.convert_keys_to_strings(optimization_model.results())
 
@@ -204,4 +205,3 @@ def check_asymmetric_storage_optimize_investment():
     # TODO Check actual invested capacities would be better
     assert all(results[('h2-cavern', 'electricity')]['sequences']['flow'].values == [0, 3., 3.])
     assert all(results[('electricity', 'h2-cavern')]['sequences']['flow'].values == [6., 0, 0])
-
