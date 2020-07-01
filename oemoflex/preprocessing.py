@@ -663,10 +663,11 @@ def update_h2_cavern(
     df['efficiency_charge'] = eta_charge
     df['efficiency_discharge'] = eta_discharge
 
-    df['capacity_cost_charge'] = annualized_cost_charge + fix_cost * capex_charge
-    df['capacity_cost_discharge'] = annualized_cost_discharge + fix_cost * capex_discharge
+    if expandable:
+        df['capacity_cost_charge'] = annualized_cost_charge + fix_cost * capex_charge
+        df['capacity_cost_discharge'] = annualized_cost_discharge + fix_cost * capex_discharge
 
-    df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+        df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
 
     df['marginal_cost'] = operation_cost
 
@@ -792,9 +793,10 @@ def update_liion_battery(
 
     df['efficiency'] = (eta_charge + eta_discharge) / 2
 
-    df['capacity_cost'] = annualized_cost_charge + fix_cost * (capex_charge + capex_discharge)
+    if expandable:
+        df['capacity_cost'] = annualized_cost_charge + fix_cost * (capex_charge + capex_discharge)
 
-    df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+        df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
 
     df['marginal_cost'] = operation_cost
 
@@ -852,7 +854,8 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
     df['expandable'] = expandable
     df['capacity'] = 0 if expandable and from_green_field else capacity * availability
 
-    df['capacity_cost'] = annualized_cost + fix_cost * capex
+    if expandable:
+        df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     df['marginal_cost'] = operation_cost
 
@@ -920,7 +923,8 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
     df['expandable'] = expandable
     df['capacity'] = 0 if expandable and from_green_field else capacity * availability
 
-    df['capacity_cost'] = annualized_cost + fix_cost * capex
+    if expandable:
+        df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     df['marginal_cost'] = operation_cost
 
