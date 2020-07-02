@@ -9,9 +9,10 @@ basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 comparison_path = os.path.join(basepath, '006_results_comparison')
 
 
-def load_oemof_and_comparision_scalars(model):
+def load_scalars(model, base_path=comparison_path):
+    r""" Loads Scalars.csv. Default base_path is comparison_path"""
 
-    sc_path = os.path.join(comparison_path, model, 'Scalars.csv')
+    sc_path = os.path.join(base_path, model, 'Scalars.csv')
 
     sc = pd.read_csv(sc_path)
 
@@ -19,8 +20,9 @@ def load_oemof_and_comparision_scalars(model):
 
 
 def filter_by_usecase(sc_in, usecase):
+    r""" Filter scalars for UseCase """
 
-    sc = sc_in.copy()  # copy to avoid inintended overwriting
+    sc = sc_in.copy()  # copy to avoid unintended overwriting
 
     sc = sc.loc[sc['UseCase'] == usecase]
 
@@ -28,8 +30,9 @@ def filter_by_usecase(sc_in, usecase):
 
 
 def prepare_scalars(model, usecase, index=['UseCase', 'Region', 'Year', 'Parameter']):
+    r""" Load scalars, filter for usecase, sort and set name of pd.Series. """
 
-    sc = load_oemof_and_comparision_scalars(model)
+    sc = load_scalars(model)
 
     sc = filter_by_usecase(sc, usecase)
 
@@ -45,6 +48,8 @@ def prepare_scalars(model, usecase, index=['UseCase', 'Region', 'Year', 'Paramet
 
 
 def calculate_diff_and_relative_deviation(a, b):
+    r""" Takes two pd.Series and returns a pd.DataFrame containing the original
+    Series' as columns as well as absolute and relative differences. """
 
     abs_diff = a - b
 
@@ -60,6 +65,7 @@ def calculate_diff_and_relative_deviation(a, b):
 
 
 def mean_diffs_per_region(diff_in):
+    r""" Takes the regional average of a pd.DataFrame. """
 
     mean_diff = diff_in.copy()
 
