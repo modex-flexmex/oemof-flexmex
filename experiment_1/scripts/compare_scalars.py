@@ -50,8 +50,6 @@ def calculate_diff_and_relative_deviation(a, b):
 
     rel_diff = abs_diff / a * 100  # decimal to percent
 
-    rel_diff = rel_diff.round(1)
-
     abs_diff.name = 'abs_diff'
 
     rel_diff.name = 'rel_diff'
@@ -81,6 +79,8 @@ sc_compare = prepare_scalars(compare_with, usecase)
 diff = calculate_diff_and_relative_deviation(sc_oemof, sc_compare)
 
 mean_diff = mean_diffs_per_region(diff)
+
+mean_diff = mean_diff.round()
 
 print('\n##### diff ################################################')
 print(diff.head())
