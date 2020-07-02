@@ -61,13 +61,32 @@ def calculate_diff_and_relative_deviation(a, b):
     return diff
 
 
+def mean_diffs_per_region(diff_in):
+
+    mean_diff = diff_in.copy()
+
+    by = list(mean_diff.index.names)
+
+    by.remove('Region')  # groupby all index levels apart from 'Region'
+
+    mean_diff = mean_diff.groupby(by=by).mean()
+
+    return mean_diff
+
+
 sc_oemof = prepare_scalars('oemof', usecase)
 
 sc_compare = prepare_scalars(compare_with, usecase)
 
 diff = calculate_diff_and_relative_deviation(sc_oemof, sc_compare)
 
+mean_diff = mean_diffs_per_region(diff)
+
+print('\n##### diff ################################################')
 print(diff.head())
 
+print('\n##### diff region average #################################')
+print(mean_diff.head())
+
 save_to_path = os.path.join(comparison_path, f'Relative_dev_{usecase}_oemof_{compare_with}.csv')
-diff.to_csv(save_to_path, header=True)
+mean_diff.to_csv(save_to_path, header=True)
