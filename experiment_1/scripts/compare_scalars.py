@@ -69,4 +69,5 @@ diff = calculate_diff_and_relative_deviation(sc_oemof, sc_compare)
 
 print(diff.head())
 
-diff.to_csv(f'~/Desktop/relative_dev_{usecase}_oemof_{compare_with}.csv', header=True)
+save_to_path = os.path.join(comparison_path, f'Relative_dev_{usecase}_oemof_{compare_with}.csv')
+diff.to_csv(save_to_path, header=True)
