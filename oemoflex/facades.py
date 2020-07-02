@@ -1,9 +1,9 @@
-from oemof.solph import sequence, Sink, Source, Flow, Bus
+from oemof.solph import sequence, Source, Flow, Bus, Transformer
 from oemof.solph.components import GenericStorage
 from oemof.tabular.facades import Facade
 
 
-class Reservoir(GenericStorage, Facade):
+class ReservoirWithPump(GenericStorage, Facade):
     r""" A Reservoir storage unit, that is initially half full.
 
     Note that the investment option is not available for this facade at
@@ -73,7 +73,7 @@ class Reservoir(GenericStorage, Facade):
     ...     carrier='water',
     ...     tech='reservoir',
     ...     storage_capacity=1000,
-    ...     capacity=50,
+    ...     capacity_charge=50,
     ...     profile=[1, 2, 6],
     ...     loss_rate=0.01,
     ...     initial_storage_level=0,
@@ -83,7 +83,6 @@ class Reservoir(GenericStorage, Facade):
     """
 
     def __init__(self, *args, **kwargs):
-
         kwargs.update(
             {
                 "_facade_requires_": [
@@ -91,19 +90,16 @@ class Reservoir(GenericStorage, Facade):
                     "carrier",
                     "tech",
                     "profile",
-                    "efficiency",
+                    "amount",
+                    "capacity_pump",
+                    "capacity",
+                    "storage_capacity",
+                    "efficiency_pump",
+                    "efficiency_turbine",
                 ]
             }
         )
         super().__init__(*args, **kwargs)
-
-        self.storage_capacity = kwargs.get("storage_capacity")
-
-        self.capacity = kwargs.get("capacity")
-
-        self.efficiency = kwargs.get("efficiency", 1)
-
-        self.profile = kwargs.get("profile")
 
         self.input_parameters = kwargs.get("input_parameters", {})
 
@@ -118,17 +114,26 @@ class Reservoir(GenericStorage, Facade):
         """
         self.nominal_storage_capacity = self.storage_capacity
 
-        self.outflow_conversion_factor = sequence(self.efficiency)
+        self.outflow_conversion_factor = sequence(self.efficiency_turbine)
 
         if self.expandable:
             raise NotImplementedError(
                 "Investment for reservoir class is not implemented."
             )
 
+        internal_bus = Bus(label=self.label + '-internal_bus')
+
+        pump = Transformer(
+            label=self.label + '-pump',
+            inputs={self.bus: Flow()},
+            outputs={internal_bus: Flow()},
+            conversion_factors={internal_bus: self.efficiency_pump},
+        )
+
         inflow = Source(
             label=self.label + "-inflow",
             outputs={
-                self: Flow(nominal_value=1, max=self.profile, fixed=False)
+                self: Flow(nominal_value=self.amount, max=self.profile, fixed=False)
             },
         )
 
@@ -140,4 +145,4 @@ class Reservoir(GenericStorage, Facade):
             }
         )
 
-        self.subnodes = (inflow,)
+        self.subnodes = (inflow, internal_bus, pump)
