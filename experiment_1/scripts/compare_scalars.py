@@ -2,8 +2,19 @@ import os
 import pandas as pd
 
 
-compare_with = 'REMix'
-usecase = 'FlexMex1_4b'
+compare_with = 'DIETER'
+
+usecases = [
+    'FlexMex1_2a',
+    # 'FlexMex1_2b',
+    'FlexMex1_2c',
+    'FlexMex1_4a',
+    'FlexMex1_4b',
+    'FlexMex1_4c',
+    'FlexMex1_4d',
+    'FlexMex1_5',
+    'FlexMex1_10',
+]
 
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 comparison_path = os.path.join(basepath, '006_results_comparison')
@@ -78,21 +89,23 @@ def mean_diffs_per_region(diff_in):
     return mean_diff
 
 
-sc_oemof = prepare_scalars('oemof', usecase)
+for usecase in usecases:
+    print(f"Comparing usecase {usecase}.")
+    sc_oemof = prepare_scalars('oemof', usecase)
 
-sc_compare = prepare_scalars(compare_with, usecase)
+    sc_compare = prepare_scalars(compare_with, usecase)
 
-diff = calculate_diff_and_relative_deviation(sc_oemof, sc_compare)
+    diff = calculate_diff_and_relative_deviation(sc_oemof, sc_compare)
 
-mean_diff = mean_diffs_per_region(diff)
+    mean_diff = mean_diffs_per_region(diff)
 
-mean_diff = mean_diff.round()
+    mean_diff = mean_diff.round()
 
-print('\n##### diff ################################################')
-print(diff.head())
+    print('\n##### diff ################################################')
+    print(diff.head())
 
-print('\n##### diff region average #################################')
-print(mean_diff.head())
+    print('\n##### diff region average #################################')
+    print(mean_diff.head())
 
-save_to_path = os.path.join(comparison_path, f'Relative_dev_{usecase}_oemof_{compare_with}.csv')
-mean_diff.to_csv(save_to_path, header=True)
+    save_to_path = os.path.join(comparison_path, f'Relative_dev_{usecase}_oemof_{compare_with}.csv')
+    mean_diff.to_csv(save_to_path, header=True)
