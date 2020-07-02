@@ -37,26 +37,36 @@ def prepare_scalars(model, usecase, index=['UseCase', 'Region', 'Year', 'Paramet
 
     sc.sort_index(inplace=True)
 
+    sc = sc['Value']
+
+    sc.name = f'value_{model}'
+
     return sc
 
 
 def calculate_diff_and_relative_deviation(a, b):
 
-    diff = a - b
+    abs_diff = a - b
 
-    dev = diff / a * 100  # decimal to percent
+    rel_diff = abs_diff / a * 100  # decimal to percent
 
-    dev = dev.round(1)
+    rel_diff = rel_diff.round(1)
 
-    return diff, dev
+    abs_diff.name = 'abs_diff'
+
+    rel_diff.name = 'rel_diff'
+
+    diff = pd.concat([a, b, abs_diff, rel_diff], 1)
+
+    return diff
 
 
 sc_oemof = prepare_scalars('oemof', usecase)
 
 sc_compare = prepare_scalars(compare_with, usecase)
 
-diff, relative_dev = calculate_diff_and_relative_deviation(sc_oemof['Value'], sc_compare['Value'])
+diff = calculate_diff_and_relative_deviation(sc_oemof, sc_compare)
 
-print(relative_dev.head())
+print(diff.head())
 
-relative_dev.to_csv(f'~/Desktop/relative_dev_{usecase}_oemof_{compare_with}.csv', header=True)
+diff.to_csv(f'~/Desktop/relative_dev_{usecase}_oemof_{compare_with}.csv', header=True)
