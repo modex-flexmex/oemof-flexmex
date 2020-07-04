@@ -13,9 +13,11 @@ def test_reservoir():
 
     el_bus = Bus(label='electricity')
 
-    shortage = Source(
-        label='shortage',
-        outputs={el_bus: Flow(variable_costs=1e9)}
+    windpark = Source(
+        label='windpark',
+        outputs={el_bus: Flow(fixed=True,
+                              nominal_value=15,
+                              actual_value=[0.7, 0.2, 0.9])}
     )
 
     el_demand = Sink(
@@ -36,7 +38,7 @@ def test_reservoir():
         carrier='water',
         tech='reservoir',
         storage_capacity=1000,
-        capacity_pump=50,
+        capacity_pump=20,
         capacity=50,
         profile=[0.2, 0.5, 0.3],
         amount=1000,
@@ -47,7 +49,7 @@ def test_reservoir():
         efficiency_turbine=0.93,
     )
 
-    es.add(el_bus, shortage, el_demand, el_excess, reservoir)
+    es.add(el_bus, windpark, el_demand, el_excess, reservoir)
 
     m = Model(es)
 

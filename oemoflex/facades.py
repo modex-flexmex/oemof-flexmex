@@ -143,8 +143,14 @@ class ReservoirWithPump(GenericStorage, Facade):
         inflow = Source(
             label=self.label + "-inflow",
             outputs={
-                self: Flow(nominal_value=self.amount, max=self.profile, fixed=False)
+                internal_bus: Flow(nominal_value=self.amount, max=self.profile, fixed=False)
             },
+        )
+
+        self.inputs.update(
+            {
+                internal_bus: Flow()
+            }
         )
 
         self.outputs.update(
