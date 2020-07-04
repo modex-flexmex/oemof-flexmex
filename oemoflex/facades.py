@@ -18,11 +18,18 @@ class ReservoirWithPump(GenericStorage, Facade):
     capacity: numeric
         Installed production capacity of the turbine installed at the
         reservoir
+    capacity_pump: numeric
+        Installed pump capacity
     efficiency: numeric
         Efficiency of the turbine converting inflow to electricity
         production, default: 1
+    efficiency_pump: numeric
+        Efficiency of the turbine converting inflow to electricity
+        production, default: 1
     profile: array-like
-        Absolute inflow profile of inflow into the storage
+        Relative inflow profile of inflow into the storage
+    amount: numeric
+        Total amount of inflow
     input_parameters: dict
         Dictionary to specifiy parameters on the input edge. You can use
         all keys that are available for the  oemof.solph.network.Flow class.
@@ -55,7 +62,7 @@ class ReservoirWithPump(GenericStorage, Facade):
 
     Note
     ----
-    As the Reservoir is a sub-class of `oemof.solph.GenericStorage` you also
+    As the ReservoirWithPump is a sub-class of `oemof.solph.GenericStorage` you also
     pass all arguments of this class.
 
 
@@ -67,18 +74,21 @@ class ReservoirWithPump(GenericStorage, Facade):
     >>> from oemof import solph
     >>> from oemof.tabular import facades
     >>> my_bus = solph.Bus('my_bus')
-    >>> my_reservoir = Reservoir(
+    >>> my_reservoir = ReservoirWithPump(
     ...     label='my_reservoir',
     ...     bus=my_bus,
     ...     carrier='water',
-    ...     tech='reservoir',
+    ...     tech='reservoir with pump',
     ...     storage_capacity=1000,
-    ...     capacity_charge=50,
-    ...     profile=[1, 2, 6],
+    ...     capacity=50,
+    ...     capacity_pump=20,
+    ...     profile=[0.1, 0.2, 0.7],
+    ...     amount=100,
     ...     loss_rate=0.01,
     ...     initial_storage_level=0,
     ...     max_storage_level = 0.9,
-    ...     efficiency=0.93)
+    ...     efficiency=0.93
+    ...     efficiency_pump=0.8)
 
     """
 
@@ -94,8 +104,8 @@ class ReservoirWithPump(GenericStorage, Facade):
                     "capacity_pump",
                     "capacity",
                     "storage_capacity",
-                    "efficiency_pump",
                     "efficiency_turbine",
+                    "efficiency_pump",
                 ]
             }
         )
