@@ -135,7 +135,7 @@ class ReservoirWithPump(GenericStorage, Facade):
 
         pump = Transformer(
             label=self.label + '-pump',
-            inputs={self.bus: Flow()},
+            inputs={self.bus: Flow(nominal_value=self.capacity_pump)},
             outputs={internal_bus: Flow()},
             conversion_factors={internal_bus: self.efficiency_pump},
         )
