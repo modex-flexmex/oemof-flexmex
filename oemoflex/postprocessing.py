@@ -783,7 +783,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
                 df_charge = get_calculated_parameters(df, oemoflex_scalars,
-                                                      'charge_capacity_invest',
+                                                      'capacity_charge_invest',
                                                       annualized_cost)
 
                 # Discharge device
@@ -794,7 +794,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
                 df_discharge = get_calculated_parameters(df, oemoflex_scalars,
-                                                         'discharge_capacity_invest',
+                                                         'capacity_discharge_invest',
                                                          annualized_cost)
 
                 # Storage cavern
