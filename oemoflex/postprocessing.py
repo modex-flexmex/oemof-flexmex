@@ -798,7 +798,8 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                                                          annualized_cost)
 
                 # Storage cavern
-                capex = get_parameter_values(scalars_raw, parameters['storage_capex'])
+                capex = get_parameter_values(scalars_raw,
+                                             parameters['storage_capex']) * 1e-3  # €/MWh -> €/GWh
 
                 lifetime = get_parameter_values(scalars_raw, parameters['storage_lifetime'])
 
@@ -862,7 +863,9 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
                                                          fix_cost_factor * capex)
 
                 # Storage cavern
-                capex = get_parameter_values(scalars_raw, parameters['storage_capex'])
+                capex = get_parameter_values(scalars_raw,
+                                             parameters['storage_capex']) * 1e-3  # €/MWh -> €/GWh
+
                 df_storage = get_calculated_parameters(df, oemoflex_scalars,
                                                        'storage_capacity_invest',
                                                        fix_cost_factor * capex)
