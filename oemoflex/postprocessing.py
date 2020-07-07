@@ -7,7 +7,6 @@ import pandas as pd
 import yaml
 
 from oemof.solph import EnergySystem, Bus, Sink
-from oemof.tabular import facades
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements
@@ -94,32 +93,30 @@ def get_capacities(es):
         # the Facade object in bus_results() DataFrame columns "from" or "to"
         def fnc(flow):
             # Get property from the Storage object in "from" for the discharge device
-            if isinstance(flow['from'], (facades.TYPEMAP["storage"],
-                                         facades.TYPEMAP["asymmetric storage"])):
+            if isinstance(flow['from'], (TYPEMAP["storage"],
+                                         TYPEMAP["asymmetric storage"])):
                 return getattr(flow['from'], attr, np.nan)
 
             # Get property from the Storage object in "to" for the charge device
-            elif isinstance(flow['to'], (facades.TYPEMAP["storage"],
-                                         facades.TYPEMAP["asymmetric storage"])):
+            if isinstance(flow['to'], (TYPEMAP["storage"],
+                                       TYPEMAP["asymmetric storage"])):
                 return getattr(flow['to'], attr, np.nan)
 
             # Get property from other object in "from"
-            else:
-                return getattr(flow['from'], attr, np.nan)
+            return getattr(flow['from'], attr, np.nan)
 
         return fnc
 
     def get_parameter_name(flow):
-        if isinstance(flow['from'], (facades.TYPEMAP["storage"],
-                                     facades.TYPEMAP["asymmetric storage"])):
+        if isinstance(flow['from'], (TYPEMAP["storage"],
+                                     TYPEMAP["asymmetric storage"])):
             return "capacity_discharge_invest"
 
-        elif isinstance(flow['to'], (facades.TYPEMAP["storage"],
-                                     facades.TYPEMAP["asymmetric storage"])):
+        if isinstance(flow['to'], (TYPEMAP["storage"],
+                                   TYPEMAP["asymmetric storage"])):
             return "capacity_charge_invest"
 
-        else:
-            return np.nan
+        return np.nan
 
     try:
         flows = pp.bus_results(es, es.results, select="scalars", concat=True)
@@ -153,10 +150,10 @@ def get_capacities(es):
 
     d = dict()
     for node in es.nodes:
-        if not isinstance(node, (Bus, Sink, facades.Shortage, facades.TYPEMAP["link"])):
+        if not isinstance(node, (Bus, Sink, TYPEMAP["shortage"], TYPEMAP["link"])):
             # Specify which parameters to read depending on the technology
             parameters_to_read = []
-            if isinstance(node, facades.TYPEMAP["storage"]):
+            if isinstance(node, TYPEMAP["storage"]):
 
                 # TODO for brownfield optimization
                 # parameters_to_read = ['capacity', 'storage_capacity']
@@ -165,7 +162,7 @@ def get_capacities(es):
                 # possible because storages are greenfield optimized only: 'capacity' = 0
                 parameters_to_read = ['storage_capacity']
 
-            elif isinstance(node, facades.TYPEMAP["asymmetric storage"]):
+            elif isinstance(node, TYPEMAP["asymmetric storage"]):
                 parameters_to_read = ['capacity_charge', 'capacity_discharge', 'storage_capacity']
             elif getattr(node, "capacity", None) is not None:
                 parameters_to_read = ['capacity']
@@ -276,13 +273,13 @@ def get_sequences_by_tech(results):
             component = key[1]
             bus = key[0]
 
-            if isinstance(component, facades.Link):
+            if isinstance(component, TYPEMAP["link"]):
                 if bus == component.from_bus:
                     var_name = 'flow_gross_forward'
                 elif bus == component.to_bus:
                     var_name = 'flow_gross_backward'
 
-            elif isinstance(component, (facades.ExtractionTurbine, facades.BackpressureTurbine)):
+            elif isinstance(component, (TYPEMAP["extraction"], TYPEMAP["backpressure"])):
                 var_name = 'flow_fuel'
 
             else:
@@ -292,13 +289,13 @@ def get_sequences_by_tech(results):
             bus = key[1]
             component = key[0]
 
-            if isinstance(component, facades.Link):
+            if isinstance(component, TYPEMAP["link"]):
                 if bus == component.to_bus:
                     var_name = 'flow_net_forward'
                 elif bus == component.from_bus:
                     var_name = 'flow_net_backward'
 
-            elif isinstance(component, (facades.ExtractionTurbine, facades.BackpressureTurbine)):
+            elif isinstance(component, (TYPEMAP["extraction"], TYPEMAP["backpressure"])):
                 if bus == component.electricity_bus:
                     var_name = 'flow_electricity'
 
@@ -395,7 +392,9 @@ def get_transmission_losses(oemoflex_scalars):
 
 
 def get_storage_losses(oemoflex_scalars):
-    storage_data = oemoflex_scalars.loc[oemoflex_scalars['type'].isin(['storage', 'asymmetric storage'])]
+    storage_data = oemoflex_scalars.loc[
+        oemoflex_scalars['type'].isin(['storage', 'asymmetric storage'])
+    ]
     flow_in = storage_data.loc[storage_data['var_name'] == 'flow_in'].set_index('name')
     flow_out = storage_data.loc[storage_data['var_name'] == 'flow_out'].set_index('name')
 
@@ -743,7 +742,8 @@ def get_calculated_parameters(df, oemoflex_scalars, invest_parameter_name, facto
         raise KeyError
 
     # Make sure that values in columns to merge on are strings
-    # See https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
+    # See here:
+    # https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
     capacities_invested[basic_columns] = capacities_invested[basic_columns].astype(str)
 
     df = pd.merge(
@@ -761,7 +761,8 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
     invest_cost = pd.DataFrame()
 
     for _, prep_el in prep_elements.items():
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
+        # In the following line: Not 'is'! pandas overloads operators!
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
@@ -836,7 +837,8 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
     fixom_cost = pd.DataFrame()
 
     for _, prep_el in prep_elements.items():
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # not 'is'! pandas overloads operators!
+        # not 'is'! pandas overloads operators!
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
@@ -948,7 +950,7 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
 
                 single_column = df_var_value[column]
                 single_column = single_column.reset_index(drop=True)
-                single_column.to_csv(filename)
+                single_column.to_csv(filename, header=False)
 
     delete_empty_subdirs(dir)
 
@@ -1002,7 +1004,7 @@ def run_postprocessing(year, name, exp_paths):
     # losses (storage, transmission)
     transmission_losses = get_transmission_losses(oemoflex_scalars)
     storage_losses = get_storage_losses(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses])
+    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses], sort=True)
 
     # get capacities
     capacities = get_capacities(es)
@@ -1018,11 +1020,14 @@ def run_postprocessing(year, name, exp_paths):
     invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
     fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
     oemoflex_scalars = pd.concat([
-        oemoflex_scalars, varom_cost, carrier_cost, fuel_cost, aggregated_emission_cost,
-        emission_cost,
+        oemoflex_scalars,
+        varom_cost,
+        carrier_cost,
+        fuel_cost,
+        aggregated_emission_cost,
         invest_cost,
         fixom_cost
-    ])
+    ], sort=True)
 
     # emissions
     emissions = get_emissions(oemoflex_scalars, scalars_raw)
@@ -1063,5 +1068,3 @@ def run_postprocessing(year, name, exp_paths):
     save_flexmex_timeseries(
         sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed
     )
-
-

@@ -6,7 +6,7 @@ from oemof.solph.plumbing import sequence
 from oemof.tabular.facades import TYPEMAP
 
 
-class Facade(Facade):
+class Facade(Facade):  # pylint: disable=E0102
 
     def _nominal_value(self):
         """ Returns None if self.expandable ist True otherwise it returns
@@ -15,13 +15,12 @@ class Facade(Facade):
         if self.expandable is True:
             return None
 
-        else:
-            if isinstance(self, AsymmetricStorage):
-                return {
-                    "charge": self.capacity_charge,
-                    "discharge": self.capacity_discharge}
-            else:
-                return self.capacity
+        if isinstance(self, AsymmetricStorage):
+            return {
+                "charge": self.capacity_charge,
+                "discharge": self.capacity_discharge}
+
+        return self.capacity
 
 
 class AsymmetricStorage(GenericStorage, Facade):
@@ -69,8 +68,7 @@ class AsymmetricStorage(GenericStorage, Facade):
         self.build_solph_components()
 
     def build_solph_components(self):
-        """
-        """
+
         self.nominal_storage_capacity = self.storage_capacity
 
         self.inflow_conversion_factor = sequence(self.efficiency_charge)
@@ -80,43 +78,43 @@ class AsymmetricStorage(GenericStorage, Facade):
         # self.investment = self._investment()
         if self.expandable is True:
             if any([self.capacity_cost_charge,
-                   self.capacity_cost_discharge,
-                   self.storage_capacity_cost]) is None:
+                    self.capacity_cost_discharge,
+                    self.storage_capacity_cost]) is None:
                 msg = (
                     "If you set `expandable` to True you need to set "
                     "attribute `storage_capacity_cost`,"
                     "`capacity_cost_charge` and `capacity_cost_discharge` of component {}!"
                 )
                 raise ValueError(msg.format(self.label))
-            else:
-                self.investment = Investment(
-                    ep_costs=self.storage_capacity_cost,
-                    maximum=getattr(self, "storage_capacity_potential", float("+inf")),
-                    minimum=getattr(self, "minimum_storage_capacity", 0),
-                    existing=getattr(self, "storage_capacity", 0),
-                )
 
-                fi = Flow(
-                    investment=Investment(
-                        ep_costs=self.capacity_cost_charge,
-                        maximum=getattr(self, "capacity_potential_charge", float("+inf")),
-                        existing=getattr(self, "capacity_charge", 0),
-                    ),
-                    **self.input_parameters
-                )
+            self.investment = Investment(
+                ep_costs=self.storage_capacity_cost,
+                maximum=getattr(self, "storage_capacity_potential", float("+inf")),
+                minimum=getattr(self, "minimum_storage_capacity", 0),
+                existing=getattr(self, "storage_capacity", 0),
+            )
 
-                fo = Flow(
-                    investment=Investment(
-                        ep_costs=self.capacity_cost_discharge,
-                        maximum=getattr(self, "capacity_potential_discharge", float("+inf")),
-                        existing=getattr(self, "capacity_discharge", 0),
-                    ),
-                    # Attach marginal cost to Flow out
-                    variable_costs=self.marginal_cost,
-                    **self.output_parameters
-                )
-                # required for correct grouping in oemof.solph.components
-                self._invest_group = True
+            fi = Flow(
+                investment=Investment(
+                    ep_costs=self.capacity_cost_charge,
+                    maximum=getattr(self, "capacity_potential_charge", float("+inf")),
+                    existing=getattr(self, "capacity_charge", 0),
+                ),
+                **self.input_parameters
+            )
+
+            fo = Flow(
+                investment=Investment(
+                    ep_costs=self.capacity_cost_discharge,
+                    maximum=getattr(self, "capacity_potential_discharge", float("+inf")),
+                    existing=getattr(self, "capacity_discharge", 0),
+                ),
+                # Attach marginal cost to Flow out
+                variable_costs=self.marginal_cost,
+                **self.output_parameters
+            )
+            # required for correct grouping in oemof.solph.components
+            self._invest_group = True
 
         else:
             fi = Flow(
