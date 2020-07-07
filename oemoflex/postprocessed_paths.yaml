@@ -26,7 +26,7 @@ Fossil/Gasturbine:
     Generation: flow_out
 
 Fossil/Nuclear:
-  component:  uranium-nuclear
+  component:  uranium-nuclear-st
   sequences:
     Generation: flow_out
 
