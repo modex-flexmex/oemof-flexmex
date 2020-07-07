@@ -154,7 +154,14 @@ def get_capacities(es):
             # Specify which parameters to read depending on the technology
             parameters_to_read = []
             if isinstance(node, TYPEMAP["storage"]):
-                parameters_to_read = ['capacity', 'storage_capacity']
+
+                # TODO for brownfield optimization
+                # parameters_to_read = ['capacity', 'storage_capacity']
+
+                # WORKAROUND Skip 'capacity' to safe some effort in aggregation and elsewhere
+                # possible because storages are greenfield optimized only: 'capacity' = 0
+                parameters_to_read = ['storage_capacity']
+
             elif isinstance(node, TYPEMAP["asymmetric storage"]):
                 parameters_to_read = ['capacity_charge', 'capacity_discharge', 'storage_capacity']
             elif getattr(node, "capacity", None) is not None:
@@ -408,6 +415,7 @@ def aggregate_storage_capacities(oemoflex_scalars):
 
     storage = storage.groupby(by=basic_columns, as_index=False).sum()
     storage['var_name'] = 'storage_capacity_sum'
+    storage['var_value'] = storage['var_value'] * 1e-3  # MWh -> GWh
     storage['var_unit'] = 'GWh'
 
     charge = oemoflex_scalars.loc[
@@ -424,6 +432,19 @@ def aggregate_storage_capacities(oemoflex_scalars):
 
     return pd.concat([storage, charge, discharge])
 
+
+def aggregate_other_capacities(oemoflex_scalars):
+    capacities = oemoflex_scalars.loc[
+        oemoflex_scalars['var_name'].isin(['capacity', 'invest'])]
+
+    # Make sure that values in columns used to group on are strings and thus equatable
+    capacities[basic_columns] = capacities[basic_columns].astype(str)
+
+    capacities = capacities.groupby(by=basic_columns, as_index=False).sum()
+    capacities['var_name'] = 'capacity_sum'
+    capacities['var_unit'] = 'MW'
+
+    return capacities
 
 def get_emissions(oemoflex_scalars, scalars_raw):
     try:
@@ -716,6 +737,10 @@ def get_calculated_parameters(df, oemoflex_scalars, invest_parameter_name, facto
     capacities_invested = oemoflex_scalars.loc[
         oemoflex_scalars['var_name'] == invest_parameter_name].copy()
 
+    if capacities_invested.empty:
+        logging.info("No key '{}' found.".format(invest_parameter_name))
+        raise KeyError
+
     # Make sure that values in columns to merge on are strings
     # See here:
     # https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
@@ -759,7 +784,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
                 df_charge = get_calculated_parameters(df, oemoflex_scalars,
-                                                      'charge_capacity_invest',
+                                                      'capacity_charge_invest',
                                                       annualized_cost)
 
                 # Discharge device
@@ -770,11 +795,12 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
                 df_discharge = get_calculated_parameters(df, oemoflex_scalars,
-                                                         'discharge_capacity_invest',
+                                                         'capacity_discharge_invest',
                                                          annualized_cost)
 
                 # Storage cavern
-                capex = get_parameter_values(scalars_raw, parameters['storage_capex'])
+                capex = get_parameter_values(scalars_raw,
+                                             parameters['storage_capex']) * 1e-3  # €/MWh -> €/GWh
 
                 lifetime = get_parameter_values(scalars_raw, parameters['storage_lifetime'])
 
@@ -839,7 +865,9 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
                                                          fix_cost_factor * capex)
 
                 # Storage cavern
-                capex = get_parameter_values(scalars_raw, parameters['storage_capex'])
+                capex = get_parameter_values(scalars_raw,
+                                             parameters['storage_capex']) * 1e-3  # €/MWh -> €/GWh
+
                 df_storage = get_calculated_parameters(df, oemoflex_scalars,
                                                        'storage_capacity_invest',
                                                        fix_cost_factor * capex)
@@ -1006,7 +1034,8 @@ def run_postprocessing(year, name, exp_paths):
     oemoflex_scalars = pd.concat([oemoflex_scalars, emissions])
 
     storage = aggregate_storage_capacities(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, storage], sort=True)
+    other = aggregate_other_capacities(oemoflex_scalars)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, storage, other], sort=True)
 
     total_system_cost = get_total_system_cost(oemoflex_scalars)
     oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)

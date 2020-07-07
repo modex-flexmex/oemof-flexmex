@@ -7,8 +7,8 @@ Transmission_Losses_Electricity_Grid,GWh,electricity-transmission,electricity,li
 Transmission_Flows_Electricity_Grid,GWh,electricity-transmission,electricity,link,transmission,flow_gross
 Energy_EmissionCost_CO2,Eur,energysystem,ALL,ALL,ALL,cost_emission
 Energy_Emissions_CO2,t,energysystem,ALL,ALL,ALL,emissions
-EnergyConversion_Capacity_Electricity_CH4_GT,MW,ch4-gt,ch4,conversion,gt,capacity
-EnergyConversion_Capacity_Electricity_Nuclear_ST,MW,uranium-nuclear-st,uranium,dispatchable,nuclear-st,capacity
+EnergyConversion_Capacity_Electricity_CH4_GT,MW,ch4-gt,ch4,conversion,gt,capacity_sum
+EnergyConversion_Capacity_Electricity_Nuclear_ST,MW,uranium-nuclear-st,uranium,conversion,nuclear-st,capacity_sum
 EnergyConversion_FixOM_Electricity_CH4_GT,Eur,ch4-gt,ch4,conversion,gt,cost_fixom
 EnergyConversion_FixOM_Electricity_Nuclear_ST,Eur,uranium-nuclear-st,uranium,conversion,nuclear-st,cost_fixom
 EnergyConversion_FuelCosts_Electricity_CH4_GT,Eur,ch4-gt,ch4,conversion,gt,cost_carrier
