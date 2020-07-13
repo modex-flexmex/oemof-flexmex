@@ -9,7 +9,7 @@ capacity_turbine,float,MW,n/a,,Installed turbine capacity
 capacity_pump,float,MW,n/a,,Installed pump capacity
 storage_capacity,float,MWh,n/a,,Installed storage capacity
 efficiency_turbine,float,unitless,n/a,,Turbine efficiency (discharging)
-effiency_pump,float,unitless,n/a,,Pump efficiency (charging)
+efficiency_pump,float,unitless,n/a,,Pump efficiency (charging)
 marginal_cost,float,Eur/MWh,n/a,,Marginal cost of charging/discharging
 profile,str,,,-hydro-reservoir-profile,Name of the inflow profile of inflow into the storage
 amount,float,MWh,,,Total amount of inflow

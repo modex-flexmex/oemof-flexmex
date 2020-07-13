@@ -961,7 +961,7 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
         scalars,
         'EnergyConversion_Eta_Electricity_Hydro_ReservoirTurbine') * 1e-2  # percent -> 0...1
 
-    element_df['effiency_pump'] = get_parameter_values(
+    element_df['efficiency_pump'] = get_parameter_values(
         scalars,
         'EnergyConversion_Eta_Electricity_Hydro_ReservoirPump') * 1e-2  # percent -> 0...1
 
