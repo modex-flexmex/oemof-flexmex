@@ -440,6 +440,25 @@ def update_electricity_heatpump(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
+def update_electricity_heatpump_large(data_preprocessed_path, scalars):
+    logging.info("Updating electricity-heatpump file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Large'
+    )
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Large') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
 def update_heat_storage(data_preprocessed_path, scalars):
     logging.info("Updating heat-storage file")
 
