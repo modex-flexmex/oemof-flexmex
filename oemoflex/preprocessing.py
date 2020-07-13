@@ -579,13 +579,37 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
 
     element_df = pd.read_csv(file_path, index_col='region')
 
-    element_df['capacity'] = 0
+    element_df['capacity_turbine'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirTurbine')
 
-    element_df['storage_capacity'] = 0
+    element_df['capacity_pump'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirPump')
 
-    element_df['efficiency'] = 1
+    element_df['storage_capacity'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirStorage')
 
-    element_df['marginal_cost'] = 0
+    element_df['efficiency_turbine'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Eta_Electricity_Hydro_ReservoirTurbine') * 1e-2  # percent -> 0...1
+
+    element_df['effiency_pump'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Eta_Electricity_Hydro_ReservoirPump') * 1e-2  # percent -> 0...1
+
+    element_df['marginal_cost'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_VarOM_Electricity_Hydro_Reservoir') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    # TODO Parameter name unknown
+    # element_df['amount'] = get_parameter_values(
+    #     scalars,
+    #     '')
+    #
+    # Only as a placeholder:
+    element_df['amount'] = 100
 
     element_df.to_csv(file_path)
 
