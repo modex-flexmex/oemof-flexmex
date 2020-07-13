@@ -485,6 +485,32 @@ def update_heat_storage(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
+def update_heat_storage_large(data_preprocessed_path, scalars):
+    logging.info("Updating heat-storage file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
+
+    df['storage_capacity'] = get_parameter_values(
+        scalars, 'Storage_Capacity_Heat_LargeStorage') * 1e3  # GWh to MWh
+
+    df['loss_rate'] = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Heat_Large') * 0.01  # Percent to decimals
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'Storage_Eta_Heat_LargeCharge') * 0.01  # Percent to decimals
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'Storage_VarOM_Heat_Large') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+    
+
 def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
 
