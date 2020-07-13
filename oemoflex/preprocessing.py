@@ -1075,7 +1075,7 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
 
 def create_hydro_reservoir_profiles(data_raw_path, data_preprocessed_path):
     # TODO: Use this function to generalize the other create_profile functions.
-    profile_name = 'hydro_reservoir_profile'
+    profile_name = 'hydro-reservoir_profile'
     raw_profile_spec = ['Energy', 'SecondaryEnergy', 'Hydro', 'Reservoir']
 
     logging.info(f"Creating {profile_name} profile")
