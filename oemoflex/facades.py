@@ -15,12 +15,12 @@ class ReservoirWithPump(GenericStorage, Facade):
         An oemof bus instance where the storage unit is connected to.
     storage_capacity: numeric
         The total storage capacity of the storage (e.g. in MWh)
-    capacity: numeric
+    capacity_turbine: numeric
         Installed production capacity of the turbine installed at the
         reservoir
     capacity_pump: numeric
         Installed pump capacity
-    efficiency: numeric
+    efficiency_turbine: numeric
         Efficiency of the turbine converting inflow to electricity
         production, default: 1
     efficiency_pump: numeric
@@ -80,14 +80,14 @@ class ReservoirWithPump(GenericStorage, Facade):
     ...     carrier='water',
     ...     tech='reservoir with pump',
     ...     storage_capacity=1000,
-    ...     capacity=50,
+    ...     capacity_turbine=50,
     ...     capacity_pump=20,
     ...     profile=[0.1, 0.2, 0.7],
     ...     amount=100,
     ...     loss_rate=0.01,
     ...     initial_storage_level=0,
     ...     max_storage_level = 0.9,
-    ...     efficiency=0.93
+    ...     efficiency_turbine=0.93
     ...     efficiency_pump=0.8)
 
     """
@@ -102,7 +102,7 @@ class ReservoirWithPump(GenericStorage, Facade):
                     "profile",
                     "amount",
                     "capacity_pump",
-                    "capacity",
+                    "capacity_turbine",
                     "storage_capacity",
                     "efficiency_turbine",
                     "efficiency_pump",
@@ -156,7 +156,7 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.outputs.update(
             {
                 self.bus: Flow(
-                    nominal_value=self.capacity, **self.output_parameters
+                    nominal_value=self.capacity_turbine, **self.output_parameters
                 )
             }
         )
