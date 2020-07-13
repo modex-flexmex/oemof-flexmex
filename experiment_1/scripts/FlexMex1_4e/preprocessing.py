@@ -7,7 +7,7 @@ from oemoflex.preprocessing import (
     create_default_elements,
     update_electricity_shortage, update_heat_shortage,
     update_heat_demand, update_electricity_demand, update_pth,
-    create_electricity_heatpump_profiles, update_heat_storage,
+    create_electricity_heatpump_profiles, update_heat_storage_large,
     update_extchp, update_boiler, update_electricity_heatpump_large,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     create_electricity_demand_profiles, create_heat_demand_profiles,
@@ -70,7 +70,7 @@ def main():
     # update elements
     update_electricity_shortage(exp_paths.data_preprocessed, scalars)
     update_heat_shortage(exp_paths.data_preprocessed, scalars)
-    update_heat_storage(exp_paths.data_preprocessed, scalars)
+    update_heat_storage_large(exp_paths.data_preprocessed, scalars)
     update_heat_demand(exp_paths.data_preprocessed, scalars)
     update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_extchp(exp_paths.data_preprocessed, scalars)
