@@ -41,6 +41,7 @@ def main():
                 'wind-offshore',
                 'solar-pv',
                 'electricity-demand',
+                'hydro-reservoir',
             ],
         },
         path=exp_paths.data_preprocessed
