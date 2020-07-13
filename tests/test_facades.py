@@ -39,7 +39,7 @@ def test_reservoir():
         tech='reservoir',
         storage_capacity=1000,
         capacity_pump=20,
-        capacity=50,
+        capacity_turbine=50,
         profile=[0.2, 0.5, 0.3],
         amount=1000,
         loss_rate=0.01,
