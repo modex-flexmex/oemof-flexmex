@@ -4,17 +4,15 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements,
-    update_electricity_shortage, update_heat_shortage,
-    update_heat_demand, update_electricity_demand,
-    update_bpchp,
+    create_default_elements, update_electricity_shortage, update_electricity_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    create_electricity_demand_profiles, create_heat_demand_profiles,
-    create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
+    update_nuclear_st, update_ch4_gt,
+    create_electricity_demand_profiles, create_wind_onshore_profiles, create_wind_offshore_profiles,
+    create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
-name = 'FlexMex1_4a'
+name = 'FlexMex1_2a'
 
 # Get paths
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -36,9 +34,9 @@ def main():
     # Load common input parameters
     scalars = pd.read_csv(
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+        sep=';',
         header=0,
-        na_values=['not considered', 'no value'],
-        sep=';'
+        na_values=['not considered', 'no value']
     )
 
     # Filter out only scenario-related input parameters
@@ -51,30 +49,25 @@ def main():
             'electricity-shortage',
             'electricity-curtailment',
             'electricity-demand',
-            'heat-demand',
-            'heat-shortage',
-            'heat-excess',
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
-            'ch4-bpchp',
+            'uranium-nuclear-st',
+            'ch4-gt'
         ]
-
     )
 
     # update elements
     update_electricity_shortage(exp_paths.data_preprocessed, scalars)
-    update_heat_shortage(exp_paths.data_preprocessed, scalars)
-    update_heat_demand(exp_paths.data_preprocessed, scalars)
     update_electricity_demand(exp_paths.data_preprocessed, scalars)
-    update_bpchp(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
+    update_nuclear_st(exp_paths.data_preprocessed, scalars, expandable=True, from_green_field=True)
+    update_ch4_gt(exp_paths.data_preprocessed, scalars, expandable=True, from_green_field=True)
 
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_heat_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_wind_onshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_wind_offshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
@@ -82,10 +75,7 @@ def main():
     # compare with previous data
     previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
     new_path = exp_paths.data_preprocessed
-    try:
-        check_if_csv_dirs_equal(new_path, previous_path)
-    except AssertionError as e:
-        print(e)
+    check_if_csv_dirs_equal(new_path, previous_path)
 
 
 if __name__ == '__main__':
