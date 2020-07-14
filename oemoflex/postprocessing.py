@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from oemof.solph import EnergySystem, Bus, Sink
+from oemof.solph import EnergySystem, Bus, Sink, Transformer, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements
@@ -309,13 +309,14 @@ def get_sequences_by_tech(results):
             component = key[0]
             var_name = 'storage_content'
 
-        carrier_tech = component.carrier + '-' + component.tech
-        if carrier_tech not in sequences_by_tech:
-            sequences_by_tech[carrier_tech] = []
+        if not isinstance(component, (Transformer, Source)):
+            carrier_tech = component.carrier + '-' + component.tech
+            if carrier_tech not in sequences_by_tech:
+                sequences_by_tech[carrier_tech] = []
 
-        df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
-        df.columns.names = ['name', 'var_name']
-        sequences_by_tech[carrier_tech].append(df)
+            df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
+            df.columns.names = ['name', 'var_name']
+            sequences_by_tech[carrier_tech].append(df)
 
     sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
 
