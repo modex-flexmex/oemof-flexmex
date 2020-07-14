@@ -250,8 +250,7 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.build_solph_components()
 
     def build_solph_components(self):
-        """
-        """
+
         self.nominal_storage_capacity = self.storage_capacity
 
         self.outflow_conversion_factor = sequence(self.efficiency_turbine)

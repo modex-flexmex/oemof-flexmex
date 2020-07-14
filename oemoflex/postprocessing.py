@@ -450,6 +450,7 @@ def aggregate_other_capacities(oemoflex_scalars):
 
     return capacities
 
+
 def get_emissions(oemoflex_scalars, scalars_raw):
     try:
         emissions = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_emission'].copy()
