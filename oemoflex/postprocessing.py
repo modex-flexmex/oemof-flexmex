@@ -309,14 +309,17 @@ def get_sequences_by_tech(results):
             component = key[0]
             var_name = 'storage_content'
 
-        if not isinstance(component, (Transformer, Source)):
-            carrier_tech = component.carrier + '-' + component.tech
-            if carrier_tech not in sequences_by_tech:
-                sequences_by_tech[carrier_tech] = []
+        # Ignore sequences of subnodes (concerns ReservoirWithPump)
+        if isinstance(component, (Transformer, Source)):
+            continue
 
-            df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
-            df.columns.names = ['name', 'var_name']
-            sequences_by_tech[carrier_tech].append(df)
+        carrier_tech = component.carrier + '-' + component.tech
+        if carrier_tech not in sequences_by_tech:
+            sequences_by_tech[carrier_tech] = []
+
+        df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
+        df.columns.names = ['name', 'var_name']
+        sequences_by_tech[carrier_tech].append(df)
 
     sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
 
