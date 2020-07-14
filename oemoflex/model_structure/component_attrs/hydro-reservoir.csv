@@ -11,6 +11,6 @@ storage_capacity,float,MWh,n/a,,Installed storage capacity
 efficiency_turbine,float,unitless,n/a,,Turbine efficiency (discharging)
 efficiency_pump,float,unitless,n/a,,Pump efficiency (charging)
 marginal_cost,float,Eur/MWh,n/a,,Marginal cost of charging/discharging
-profile,str,,,-hydro-reservoir-profile,Name of the inflow profile of inflow into the storage
+profile,str,,,-hydro-reservoir_profile,Name of the inflow profile of inflow into the storage
 amount,float,MWh,,,Total amount of inflow
 output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow
