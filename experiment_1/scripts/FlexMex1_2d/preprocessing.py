@@ -60,8 +60,8 @@ def main():
     # update elements
     update_link(exp_paths.data_preprocessed, scalars)
     update_electricity_demand(exp_paths.data_preprocessed, scalars)
-    update_nuclear_st(exp_paths.data_preprocessed, scalars)
     update_electricity_shortage(exp_paths.data_preprocessed, scalars)
+    update_nuclear_st(exp_paths.data_preprocessed, scalars, expandable=True, from_green_field=True)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
