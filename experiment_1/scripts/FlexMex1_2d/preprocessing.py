@@ -4,8 +4,9 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements, update_shortage, update_load, update_wind_onshore,
-    update_wind_offshore, update_solar_pv, update_nuclear_st, update_ch4_gt, update_link,
+    create_default_elements, update_electricity_shortage, update_electricity_demand,
+    update_wind_onshore, update_wind_offshore, update_solar_pv,
+    update_nuclear_st, update_link,
     create_electricity_demand_profiles, create_wind_onshore_profiles, create_wind_offshore_profiles,
     create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
@@ -33,6 +34,7 @@ def main():
     # Load common input parameters
     scalars = pd.read_csv(
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+        sep=';',
         header=0,
         na_values=['not considered', 'no value']
     )
@@ -57,9 +59,9 @@ def main():
 
     # update elements
     update_link(exp_paths.data_preprocessed, scalars)
-    update_load(exp_paths.data_preprocessed, scalars)
+    update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_nuclear_st(exp_paths.data_preprocessed, scalars)
-    update_shortage(exp_paths.data_preprocessed, scalars)
+    update_electricity_shortage(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
