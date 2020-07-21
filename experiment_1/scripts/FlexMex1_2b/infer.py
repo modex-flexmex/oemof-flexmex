@@ -10,7 +10,7 @@ from oemof.tabular.datapackage import building
 from oemoflex.helpers import setup_experiment_paths
 
 
-name = 'FlexMex1_10'
+name = 'FlexMex1_2b'
 
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 exp_paths = setup_experiment_paths(name, basepath)
@@ -34,6 +34,8 @@ def main():
                 'electricity-shortage',
                 'electricity-curtailment',
                 'electricity-demand',
+                'electricity-h2_cavern',
+                'electricity-liion_battery',
             ],
             'profile': [
                 'wind-onshore',
@@ -41,7 +43,9 @@ def main():
                 'solar-pv',
                 'electricity-demand',
             ],
-            'from_to_bus': ['electricity-transmission'],
+            'from_to_bus': [
+                'ch4-gt'
+            ],
         },
         path=exp_paths.data_preprocessed
     )

@@ -4,7 +4,9 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements, update_shortage, update_load,
+    create_default_elements,
+    update_electricity_shortage, update_heat_shortage,
+    update_heat_demand, update_electricity_demand,
     update_bpchp, update_boiler,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     create_electricity_demand_profiles, create_heat_demand_profiles,
@@ -36,6 +38,7 @@ def main():
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
         header=0,
         na_values=['not considered', 'no value'],
+        sep=';',
     )
 
     # Filter out only scenario-related input parameters
@@ -49,18 +52,22 @@ def main():
             'electricity-curtailment',
             'electricity-demand',
             'heat-demand',
+            'heat-excess',
+            'heat-shortage',
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
-            'gas-bpchp',
-            'gas-boiler',
+            'ch4-bpchp',
+            'ch4-boiler',
         ]
 
     )
 
     # update elements
-    update_shortage(exp_paths.data_preprocessed, scalars)
-    update_load(exp_paths.data_preprocessed, scalars)
+    update_electricity_shortage(exp_paths.data_preprocessed, scalars)
+    update_heat_shortage(exp_paths.data_preprocessed, scalars)
+    update_heat_demand(exp_paths.data_preprocessed, scalars)
+    update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_bpchp(exp_paths.data_preprocessed, scalars)
     update_boiler(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
@@ -77,7 +84,10 @@ def main():
     # compare with previous data
     previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
     new_path = exp_paths.data_preprocessed
-    check_if_csv_dirs_equal(new_path, previous_path)
+    try:
+        check_if_csv_dirs_equal(new_path, previous_path)
+    except AssertionError as e:
+        print(e)
 
 
 if __name__ == '__main__':

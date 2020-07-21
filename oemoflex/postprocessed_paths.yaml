@@ -1,0 +1,83 @@
+Boiler/Large:
+  component: ch4-boiler
+  sequences:
+    HeatGeneration: flow_out
+    
+CHP/BpCCGT:
+  component: ch4-bpchp
+  sequences:
+     HeatGeneration: flow_heat
+     ElectricityGeneration: flow_electricity
+
+CHP/ExCCGT:
+  component: ch4-extchp
+  sequences:
+    HeatGeneration: flow_heat
+    ElectricityGeneration: flow_electricity
+
+ElectricBoiler/Large:
+  component: electricity-pth
+  sequences:
+    HeatGeneration: flow_heat
+
+Fossil/Gasturbine:
+  component: ch4-gt
+  sequences:
+    Generation: flow_out
+
+Fossil/Nuclear:
+  component:  uranium-nuclear-st
+  sequences:
+    Generation: flow_out
+
+Heatpump/Large:
+  component: electricity-heatpump
+  sequences:
+    HeatGeneration: flow_out
+
+Heatpump/Small:
+  component: electricity-heatpump
+  sequences:
+    HeatGeneration: flow_out
+
+Hydro/Reservoir:
+  component: hydro-reservoir
+  sequences:
+
+Hydro/RunOfRiver:
+  component: hydro-ror
+  sequences:
+    Generation: flow_out
+
+RE:
+  component: electricity-curtailment
+  sequences:
+    Curtailment: flow_in #TODO probelm
+
+Storage/Electricity/LiIonBattery:
+  component: electricity-storage
+  sequences:
+    In: flow_in
+    Level: storage_content
+    Out: flow_out
+
+Storage/Electricity/H2Cavern:
+  component: electricity-h2-cavern
+  sequences:
+    In: flow_in
+    Level: storage_content
+    Out: flow_out
+
+Storage/Heat/Large:
+  component: heat-storage
+  sequences:
+    In: flow_in
+    Level: storage_content
+    Out: flow_out
+
+Storage/Heat/Small:
+  component: heat-storage  # TODO Missing distinction in oemoflex
+  sequences:
+    In: flow_in
+    Level: storage_content
+    Out: flow_out

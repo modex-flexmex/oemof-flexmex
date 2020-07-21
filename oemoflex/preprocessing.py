@@ -89,20 +89,23 @@ def create_bus_element(busses_file):
     bus_df : pd.DataFrame
         Bus element DataFrame
     """
-    busses = pd.read_csv(busses_file, squeeze=True)
+    busses = pd.read_csv(busses_file, index_col='carrier')
 
     regions = []
     carriers = []
+    balanced = []
 
     for region in regions_list:
-        for carrier in busses['carrier']:
+        for carrier, row in busses.iterrows():
             regions.append(region)
             carriers.append(region + '-' + carrier)
+            balanced.append(row['balanced'])
 
     bus_df = pd.DataFrame({
         'region': regions,
         'name': carriers,
         'type': 'bus',
+        'balanced': balanced
     })
 
     bus_df = bus_df.set_index('region')
@@ -151,6 +154,9 @@ def create_component_element(component_attrs_file):
         comp_data['name'] = [region + suffices['name'] for region in regions_list]
         comp_data['from_bus'] = [region + suffices['from_bus'] for region in regions_list]
         comp_data['to_bus'] = [region + suffices['to_bus'] for region in regions_list]
+
+        if 'efficiency' in suffices:
+            comp_data['efficiency'] = [region + suffices['efficiency'] for region in regions_list]
 
     elif defaults['type'] in ['backpressure', 'extraction']:
         comp_data['region'] = regions_list
@@ -215,8 +221,8 @@ def get_parameter_values(scalars_df, parameter_name):
     return parameter_value
 
 
-def update_shortage(data_preprocessed_path, scalars):
-    logging.info("Updating shortage file")
+def update_electricity_shortage(data_preprocessed_path, scalars):
+    logging.info("Updating electricity shortage file")
 
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-shortage.csv')
 
@@ -232,8 +238,25 @@ def update_shortage(data_preprocessed_path, scalars):
     shortage.to_csv(shortage_file)
 
 
-def update_load(data_preprocessed_path, scalars):
-    logging.info("Updating load file")
+def update_heat_shortage(data_preprocessed_path, scalars):
+    logging.info("Updating heat shortage file")
+
+    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'heat-shortage.csv')
+
+    # Read prepared CSV file
+    shortage = pd.read_csv(shortage_file, index_col='region')
+
+    # Fill column 'marginal_cost' with a fixed value for ALL the elements
+    shortage['marginal_cost'] = get_parameter_values(
+        scalars,
+        'Energy_SlackCost_Heat') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Write back to the CSV file
+    shortage.to_csv(shortage_file)
+
+
+def update_electricity_demand(data_preprocessed_path, scalars):
+    logging.info("Updating electricity-demand file")
 
     load_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-demand.csv')
 
@@ -249,16 +272,36 @@ def update_load(data_preprocessed_path, scalars):
     load.to_csv(load_file)
 
 
-def update_bpchp(data_preprocessed_path, scalars):
-    logging.info("Updating gas-bpchp file")
+def update_heat_demand(data_preprocessed_path, scalars):
+    logging.info("Updating heat-demand file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-bpchp.csv')
+    load_file = os.path.join(data_preprocessed_path, 'elements', 'heat-demand.csv')
+
+    # Read prepared CSV file
+    load = pd.read_csv(load_file, index_col='region')
+
+    # Fill column for ALL the elements
+    load['amount'] = get_parameter_values(
+        scalars,
+        'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
+
+    # Write back to the CSV file
+    load.to_csv(load_file)
+
+
+def update_bpchp(data_preprocessed_path, scalars):
+    logging.info("Updating ch4-bpchp file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-bpchp.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
 
     df['capacity'] = get_parameter_values(
-        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT')
+        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT'
+    ) * get_parameter_values(
+        scalars, 'EnergyConversion_Availability_ElectricityHeat_CH4_BpCCGT'
+    ) * 1e-2  # percent to decimals
 
     electricity_per_heat = get_parameter_values(
         scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
@@ -266,33 +309,38 @@ def update_bpchp(data_preprocessed_path, scalars):
     # eta_el = eta_total / (1 + 1 / electricity_per_heat)
     df['electric_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
-    ) / (1 + 1/electricity_per_heat)
+    ) / (1 + 1/electricity_per_heat) * 1e-2  # percent to decimal
 
     # eta_th = eta_total / (1 + electricity_per_heat)
     df['thermal_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
-    ) / (1 + electricity_per_heat)
+    ) / (1 + electricity_per_heat) * 1e-2  # percent to decimal
 
-    df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
+    df['carrier_cost'] = (
+        get_parameter_values(scalars, 'Energy_Price_CH4')
+        + get_parameter_values(scalars, 'Energy_Price_CO2')
+        * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
     df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_BpCCGT') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_BpCCGT') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
 
 
 def update_extchp(data_preprocessed_path, scalars):
-    logging.info("Updating gas-extchp file")
+    logging.info("Updating ch4-extchp file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-extchp.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-extchp.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
 
     df['capacity'] = get_parameter_values(
-        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT')
+        scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT'
+    ) * get_parameter_values(
+        scalars, 'EnergyConversion_Availability_ElectricityHeat_CH4_ExCCGT'
+    ) * 1e-2  # percent to decimals
 
     electricity_per_heat = get_parameter_values(
         scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_ExCCGT')
@@ -300,14 +348,14 @@ def update_extchp(data_preprocessed_path, scalars):
     # eta_el = eta_total / (1 + 1 / electricity_per_heat)
     electric_efficiency = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
-    ) / (1 + 1/electricity_per_heat)
+    ) / (1 + 1/electricity_per_heat) * 1e-2  # percent to decimal
 
     df['electric_efficiency'] = electric_efficiency
 
     # eta_th = eta_total / (1 + electricity_per_heat)
     thermal_efficiency = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
-    ) / (1 + electricity_per_heat)
+    ) / (1 + electricity_per_heat) * 1e-2  # percent to decimal
 
     df['thermal_efficiency'] = thermal_efficiency
 
@@ -317,20 +365,22 @@ def update_extchp(data_preprocessed_path, scalars):
         * thermal_efficiency\
         + electric_efficiency
 
-    df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
+    df['carrier_cost'] = (
+        get_parameter_values(scalars, 'Energy_Price_CH4')
+        + get_parameter_values(scalars, 'Energy_Price_CO2')
+        * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
     df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
 
 
 def update_boiler(data_preprocessed_path, scalars):
-    logging.info("Updating gas-boiler file")
+    logging.info("Updating ch4-boiler file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'gas-boiler.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
@@ -341,10 +391,10 @@ def update_boiler(data_preprocessed_path, scalars):
         scalars, 'EnergyConversion_Eta_Heat_CH4_Large') * 0.01  # Percent to decimals
 
     df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
 
     df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_Heat_CH4_Large') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'EnergyConversion_VarOM_Heat_CH4_Large') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
@@ -365,7 +415,52 @@ def update_pth(data_preprocessed_path, scalars):
         scalars, 'EnergyConversion_Eta_Heat_Electricity_Large') * 0.01  # Percent to decimals
 
     df['marginal_cost'] = get_parameter_values(
-        scalars, 'EnergyConversion_VarOM_Heat_Electricity_Large') * 1e3  # Eur/GWh to Eur/MWh
+        scalars, 'EnergyConversion_VarOM_Heat_Electricity_Large') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_electricity_heatpump(data_preprocessed_path, scalars):
+    logging.info("Updating electricity-heatpump file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Small'
+    )
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Small') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_heat_storage(data_preprocessed_path, scalars):
+    logging.info("Updating heat-storage file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
+
+    df['storage_capacity'] = get_parameter_values(
+        scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
+
+    df['loss_rate'] = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'Storage_Eta_Heat_SmallCharge') * 0.01  # Percent to decimals
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'Storage_VarOM_Heat_Small') * 1e-3  # Eur/GWh to Eur/MWh
 
     # Write back to csv file
     df.to_csv(file_path)
@@ -401,6 +496,13 @@ def update_link(data_preprocessed_path, scalars):
         * 0.01
         * transmission_loss_per_100km
         / transmission_capacity
+    )
+
+    varom = get_parameter_values(scalars, 'Transmission_VarOM_Electricity_Grid')
+
+    link['marginal_cost'] = (
+        varom *
+        transmission_length
     )
 
     link.to_csv(link_file)
@@ -442,15 +544,280 @@ def update_solar_pv(data_preprocessed_path, scalars):
     solarpv.to_csv(solar_pv_file)
 
 
-def update_nuclear_st(data_preprocessed_path, scalars):
-    nuclear_file = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
+def update_h2_cavern(
+        data_preprocessed_path,
+        scalars,
+        expandable=False,
+        from_greenfield=False
+):
+    r"""
+    Parameterization of a electricity H2 storage as asymmetrical storage.
 
-    nuclear = pd.read_csv(nuclear_file, index_col='region')
+    Discharging and charging device are lumped together.
+
+    Undependent expansion of either storage or (dis)charging devices is neglected.
+    (we only need full expandability for FlexMex_1_2b)
+
+    Parameters
+    ----------
+    data_preprocessed_path
+    scalars
+
+    expandable : bool
+    Determines whether capacity (discharge/charge and storage) is expandable
+
+    from_greenfield : bool
+    If true initial capacity is 0.
+
+    Returns
+    -------
+
+    """
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-h2_cavern.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    # Operation parameters
+    availability = get_parameter_values(
+        scalars,
+        'Storage_Availability_H2_Cavern') * 1e-2  # percent -> 0...1
+
+    capacity_charge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernCharge')
+
+    capacity_discharge = get_parameter_values(scalars, 'Storage_Capacity_H2_CavernDischarge')
+
+    storage_capacity = get_parameter_values(
+        scalars, 'Storage_Capacity_H2_CavernStorage') * 1e3  # GWh to MWh
+
+    self_discharge = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Electricity_H2_Cavern') * 1e-2  # percent -> 0...1
+
+    operation_cost = get_parameter_values(
+        scalars, 'Storage_VarOM_H2_Cavern') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    eta_charge = get_parameter_values(
+        scalars, 'Storage_Eta_H2_CavernCharge') * 1e-2  # percent -> 0...1
+
+    eta_discharge = get_parameter_values(
+        scalars, 'Storage_Eta_H2_CavernDischarge') * 1e-2  # percent -> 0...1
+
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernCharge')
+
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernDischarge')
+
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_H2_CavernStorage') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_H2_Cavern') * 1e-2  # percent -> 0...1
+
+    # ignored:
+    # Storage_LifeTime_H2_CavernCharge
+    # Storage_LifeTime_H2_CavernDischarge
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_H2_CavernStorage')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_discharge = annuity(
+        capex=capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    df['expandable'] = expandable
+
+    if expandable and from_greenfield:
+        df['capacity_charge'] = 0
+        df['capacity_discharge'] = 0
+        df['storage_capacity'] = 0
+    else:
+        df['capacity_charge'] = capacity_charge * availability
+        df['capacity_discharge'] = capacity_discharge * availability
+        df['storage_capacity'] = storage_capacity * availability
+
+    df['loss_rate'] = self_discharge
+
+    df['efficiency_charge'] = eta_charge
+    df['efficiency_discharge'] = eta_discharge
+
+    if expandable:
+        df['capacity_cost_charge'] = annualized_cost_charge + fix_cost * capex_charge
+        df['capacity_cost_discharge'] = annualized_cost_discharge + fix_cost * capex_discharge
+
+        df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    df['marginal_cost'] = operation_cost
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_liion_battery(
+        data_preprocessed_path,
+        scalars,
+        expandable=False,
+        from_greenfield=False
+):
+    r"""
+    Parameterization of a Li-ion battery storage.
+
+    The battery storage is expandable only in conjunction with (dis)charging because the devices
+    are not separated. The same is true for greenfield/brownfield optimization:
+    Further (dis)charging devices cannot be added to existing storage capacities or vice versa.
+
+    Mapping and calculation could be easier since symmetric parametrization of a battery fits
+    perfectly to oemof facade's Storage object. For consistency reasons, however, we use H2_cavern
+    update function as a template and keep as much as possible similar (values in Scalars.csv will
+    make sure that it is symmetric again) making future abstraction into one update function
+    easier.
+
+    Parameters
+    ----------
+    data_preprocessed_path
+    scalars
+
+    expandable : bool
+    Determines whether capacity is expandable
+
+    from_greenfield : bool
+    If true initial capacity is 0.
+
+    Returns
+    -------
+
+    """
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-liion_battery.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    # Operation parameters
+    availability = get_parameter_values(
+        scalars,
+        'Storage_Availability_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
+
+    capacity_charge = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryCharge')
+
+    capacity_discharge = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryDischarge')
+
+    storage_capacity = get_parameter_values(
+        scalars, 'Storage_Capacity_Electricity_LiIonBatteryStorage') * 1e3  # GWh to MWh
+
+    self_discharge = get_parameter_values(
+        scalars, 'Storage_SelfDischarge_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
+
+    operation_cost = get_parameter_values(
+        scalars, 'Storage_VarOM_Electricity_LiIonBattery') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    eta_charge = get_parameter_values(
+        scalars, 'Storage_Eta_Electricity_LiIonBatteryCharge') * 1e-2  # percent -> 0...1
+
+    eta_discharge = get_parameter_values(
+        scalars, 'Storage_Eta_Electricity_LiIonBatteryDischarge') * 1e-2  # percent -> 0...1
+
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryCharge')
+
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryDischarge')
+
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_Electricity_LiIonBatteryStorage') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_Electricity_LiIonBattery') * 1e-2  # percent -> 0...1
+
+    # ignored:
+    # Storage_LifeTime_Electricity_LiIonBatteryCharge
+    # Storage_LifeTime_Electricity_LiIonBatteryDischarge
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_Electricity_LiIonBatteryStorage')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge + capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    df['expandable'] = expandable
+
+    if expandable and from_greenfield:
+        df['capacity'] = 0
+        df['storage_capacity'] = 0
+    else:
+        df['capacity'] = (capacity_charge + capacity_discharge) / 2 * availability
+        df['storage_capacity'] = storage_capacity * availability
+
+    df['loss_rate'] = self_discharge
+
+    df['efficiency'] = (eta_charge + eta_discharge) / 2
+
+    if expandable:
+        df['capacity_cost'] = annualized_cost_charge + fix_cost * (capex_charge + capex_discharge)
+
+        df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    df['marginal_cost'] = operation_cost
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
+def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
+
+    df = pd.read_csv(file_path, index_col='region')
 
     # Operation parameters
     capacity = get_parameter_values(
         scalars,
         'EnergyConversion_Capacity_Electricity_Nuclear_ST')
+
+    availability = get_parameter_values(
+        scalars,
+        'EnergyConversion_Availability_Electricity_Nuclear_ST') * 1e-2  # percent -> 0...1
 
     operation_cost = get_parameter_values(
         scalars,
@@ -463,8 +830,6 @@ def update_nuclear_st(data_preprocessed_path, scalars):
     carrier_price = get_parameter_values(
         scalars,
         'Energy_Price_Uranium') * 1e-3  # Eur/GWh -> Eur/MWh
-
-    production_cost = carrier_price / eta
 
     # Investment parameters
     capex = get_parameter_values(
@@ -486,24 +851,36 @@ def update_nuclear_st(data_preprocessed_path, scalars):
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    nuclear['capacity'] = capacity
+    df['expandable'] = expandable
+    df['capacity'] = 0 if expandable and from_green_field else capacity * availability
 
-    nuclear['capacity_cost'] = annualized_cost + fix_cost * capex
+    if expandable:
+        df['capacity_cost'] = annualized_cost + fix_cost * capex
 
-    nuclear['marginal_cost'] = operation_cost + production_cost
+    df['marginal_cost'] = operation_cost
 
-    nuclear.to_csv(nuclear_file)
+    df['carrier_cost'] = carrier_price
+
+    df['efficiency'] = eta
+
+    df.to_csv(file_path)
 
 
-def update_ch4_gt(data_preprocessed_path, scalars):
-    ch4_file = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
+def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
+    logging.info("Updating ch4-gt file")
 
-    ch4 = pd.read_csv(ch4_file, index_col='region')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
+
+    df = pd.read_csv(file_path, index_col='region')
 
     # Operation parameters
     capacity = get_parameter_values(
         scalars,
         'EnergyConversion_Capacity_Electricity_CH4_GT')
+
+    availability = get_parameter_values(
+        scalars,
+        'EnergyConversion_Availability_Electricity_CH4_GT') * 1e-2  # percent -> 0...1
 
     operation_cost = get_parameter_values(
         scalars,
@@ -517,7 +894,11 @@ def update_ch4_gt(data_preprocessed_path, scalars):
         scalars,
         'Energy_Price_CH4') * 1e-3  # Eur/GWh -> Eur/MWh
 
-    production_cost = carrier_price / eta
+    co2_price = get_parameter_values(scalars, 'Energy_Price_CO2')
+
+    emission_factor = get_parameter_values(
+        scalars,
+        'Energy_EmissionFactor_CH4') * 1e-3  # t/GWh -> t/MWh
 
     # Investment parameters
     capex = get_parameter_values(
@@ -539,13 +920,19 @@ def update_ch4_gt(data_preprocessed_path, scalars):
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    ch4['capacity'] = capacity
+    df['expandable'] = expandable
+    df['capacity'] = 0 if expandable and from_green_field else capacity * availability
 
-    ch4['capacity_cost'] = annualized_cost + fix_cost * capex
+    if expandable:
+        df['capacity_cost'] = annualized_cost + fix_cost * capex
 
-    ch4['marginal_cost'] = operation_cost + production_cost
+    df['marginal_cost'] = operation_cost
 
-    ch4.to_csv(ch4_file)
+    df['carrier_cost'] = carrier_price + emission_factor * co2_price
+
+    df['efficiency'] = eta
+
+    df.to_csv(file_path)
 
 
 def combine_profiles(raw_profile_path, column_name):
@@ -638,4 +1025,18 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
 
     solar_pv_profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'solar-pv_profile.csv')
+    )
+
+
+def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
+    logging.info("Creating electricity heatpump profiles")
+
+    raw_profile_paths = os.path.join(
+        data_raw_path, 'OtherProfiles', 'COP'
+    )
+
+    profile_df = combine_profiles(raw_profile_paths, 'cop-profile')
+
+    profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', 'efficiency_profile.csv')
     )
