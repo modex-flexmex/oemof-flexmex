@@ -64,13 +64,13 @@ def calculate_diff_and_relative_deviation(a, b):
 
     abs_diff = a - b
 
-    rel_diff = abs_diff / a
+    rel_diff = abs_diff / b
 
-    abs_diff.name = 'abs_diff'
+    abs_diff.name = 'abs_mean_diff'
 
-    rel_diff.name = 'rel_diff'
+    rel_diff.name = 'rel_mean_diff'
 
-    diff = pd.concat([a, b, abs_diff, rel_diff], 1)
+    diff = pd.concat([b, a, abs_diff, rel_diff], 1)
 
     return diff
 
