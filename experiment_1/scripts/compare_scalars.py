@@ -64,7 +64,7 @@ def calculate_diff_and_relative_deviation(a, b):
 
     abs_diff = a - b
 
-    rel_diff = abs_diff / a * 100  # decimal to percent
+    rel_diff = abs_diff / a
 
     abs_diff.name = 'abs_diff'
 
