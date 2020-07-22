@@ -955,7 +955,7 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
 
     element_df['storage_capacity'] = get_parameter_values(
         scalars,
-        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirStorage')
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirStorage') * 1e-3  # GWh -> MWh
 
     element_df['efficiency_turbine'] = get_parameter_values(
         scalars,
