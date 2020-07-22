@@ -75,7 +75,7 @@ def calculate_diff_and_relative_deviation(a, b):
     return diff
 
 
-def mean_diffs_per_region(diff_in):
+def average_per_region(diff_in):
     r""" Takes the regional average of a pd.DataFrame. """
 
     mean_diff = diff_in.copy()
@@ -92,17 +92,14 @@ def mean_diffs_per_region(diff_in):
 for usecase in usecases:
     print(f"Comparing usecase {usecase}.")
     sc_oemof = prepare_scalars('oemof', usecase)
+    mean_sc_oemof = average_per_region(sc_oemof)
 
     sc_compare = prepare_scalars(compare_with, usecase)
+    mean_sc_compare = average_per_region(sc_compare)
 
-    diff = calculate_diff_and_relative_deviation(sc_oemof, sc_compare)
+    mean_diff = calculate_diff_and_relative_deviation(mean_sc_oemof, mean_sc_compare)
 
-    mean_diff = mean_diffs_per_region(diff)
-
-    mean_diff = mean_diff.round()
-
-    print('\n##### diff ################################################')
-    print(diff.head())
+    mean_diff = mean_diff.round(3)
 
     print('\n##### diff region average #################################')
     print(mean_diff.head())
