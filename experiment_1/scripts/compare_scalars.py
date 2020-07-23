@@ -99,10 +99,10 @@ for usecase in usecases:
     if sc_compare.empty:
         continue
 
-    mean_sc_oemof = average_per_region(sc_oemof)
-    mean_sc_compare = average_per_region(sc_compare)
+    sc_oemof = average_per_region(sc_oemof)
+    sc_compare = average_per_region(sc_compare)
 
-    mean_diff = calculate_diff_and_relative_deviation(mean_sc_oemof, mean_sc_compare)
+    mean_diff = calculate_diff_and_relative_deviation(sc_oemof, sc_compare)
 
     mean_diff = mean_diff.round(3)
 
