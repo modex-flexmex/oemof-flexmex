@@ -2,12 +2,13 @@ import os
 import pandas as pd
 
 
-compare_with = 'DIETER'
+compare_with = 'REMix'
 
 usecases = [
     'FlexMex1_2a',
     'FlexMex1_2b',
     'FlexMex1_2c',
+    'FlexMex1_2d',
     'FlexMex1_4a',
     'FlexMex1_4b',
     'FlexMex1_4c',
