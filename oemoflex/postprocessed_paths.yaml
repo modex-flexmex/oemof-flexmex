@@ -18,7 +18,7 @@ CHP/ExCCGT:
 ElectricBoiler/Large:
   component: electricity-pth
   sequences:
-    HeatGeneration: flow_heat
+    HeatGeneration: flow_out
 
 Fossil/Gasturbine:
   component: ch4-gt

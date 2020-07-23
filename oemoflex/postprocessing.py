@@ -399,7 +399,7 @@ def get_storage_losses(oemoflex_scalars):
     flow_out = storage_data.loc[storage_data['var_name'] == 'flow_out'].set_index('name')
 
     losses = flow_in.copy()
-    losses['var_name'] = 'losses'
+    losses['var_name'] = 'loss'
     losses['var_value'] = flow_in['var_value'] - flow_out['var_value']
     losses = losses.reset_index()
 
@@ -1047,6 +1047,8 @@ def run_postprocessing(year, name, exp_paths):
     # set experiment info
     oemoflex_scalars['usecase'] = name
     oemoflex_scalars['year'] = year
+
+    # oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
 
     # map to FlexMex data format
     flexmex_scalar_results = map_to_flexmex_results(
