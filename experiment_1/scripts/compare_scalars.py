@@ -92,9 +92,12 @@ def average_per_region(diff_in):
 for usecase in usecases:
     print(f"Comparing usecase {usecase}.")
     sc_oemof = prepare_scalars('oemof', usecase)
-    mean_sc_oemof = average_per_region(sc_oemof)
-
     sc_compare = prepare_scalars(compare_with, usecase)
+
+    if sc_compare.empty:
+        continue
+
+    mean_sc_oemof = average_per_region(sc_oemof)
     mean_sc_compare = average_per_region(sc_compare)
 
     mean_diff = calculate_diff_and_relative_deviation(mean_sc_oemof, mean_sc_compare)
