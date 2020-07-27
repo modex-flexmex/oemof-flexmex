@@ -5,6 +5,22 @@ from oemof.solph.components import GenericStorage
 from oemof.tabular.facades import TYPEMAP
 
 
+class Transformer(Transformer):
+    r"""
+    Supplement Transformer with carrier and tech properties to work with labeling in postprocessing
+
+    Needed for Transformer subnodes in
+    * ReservoirWithPump: pump subnode
+    * BEV: drive_power subnode
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.carrier = kwargs.get('carrier', None)
+        self.tech = kwargs.get('tech', None)
+
+
 class Facade(Facade):  # pylint: disable=E0102
 
     def _nominal_value(self):
@@ -267,6 +283,8 @@ class ReservoirWithPump(GenericStorage, Facade):
             inputs={self.bus: Flow(nominal_value=self.capacity_pump)},
             outputs={internal_bus: Flow()},
             conversion_factors={internal_bus: self.efficiency_pump},
+            carrier=self.carrier,
+            tech=self.tech
         )
 
         inflow = Source(
