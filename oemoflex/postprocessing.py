@@ -269,19 +269,17 @@ def get_sequences_by_tech(results):
 
     sequences_by_tech = {}
 
-    from_node = []
-    to_node = []
-    for k, s in sequences.items():
-        from_node.append(k[0])
-        to_node.append(k[1])
-
     # Get a list of internal busses for all 'ReservoirWithPump' nodes to be ignored later
-    reservoir_busses = []
-    for node in to_node:
-        if isinstance(node, TYPEMAP['reservoir']):
+    to_nodes = []
+    for k, s in sequences.items():
+        to_nodes.append(k[1])
+
+    internal_busses = []
+    for node in to_nodes:
+        if hasattr(node, 'subnodes'):
             # Only get the subnodes of type Bus
             internal_bus = [n for n in node.subnodes if isinstance(n, Bus)]
-            reservoir_busses.extend(internal_bus)
+            internal_busses.extend(internal_bus)
 
     for key, df in sequences.items():
         if isinstance(key[0], Bus):
@@ -325,7 +323,7 @@ def get_sequences_by_tech(results):
             var_name = 'storage_content'
 
         # Ignore sequences of internal busses (concerns ReservoirWithPump)
-        if component in reservoir_busses or bus in reservoir_busses:
+        if bus in internal_busses:
             continue
 
         carrier_tech = component.carrier + '-' + component.tech
