@@ -270,16 +270,7 @@ def get_sequences_by_tech(results):
     sequences_by_tech = {}
 
     # Get a list of internal busses for all 'ReservoirWithPump' nodes to be ignored later
-    to_nodes = []
-    for k, s in sequences.items():
-        to_nodes.append(k[1])
-
-    internal_busses = []
-    for node in to_nodes:
-        if hasattr(node, 'subnodes'):
-            # Only get the subnodes of type Bus
-            internal_bus = [n for n in node.subnodes if isinstance(n, Bus)]
-            internal_busses.extend(internal_bus)
+    internal_busses = get_busses_in_subnodes(sequences)
 
     for key, df in sequences.items():
         if isinstance(key[0], Bus):
@@ -337,6 +328,33 @@ def get_sequences_by_tech(results):
     sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
 
     return sequences_by_tech
+
+
+def get_busses_in_subnodes(sequences):
+    r"""
+    Get all the subnodes in 'sequences' which are Busses
+
+    Parameters
+    ----------
+    sequences
+
+    Returns
+    -------
+    A list of all subnodes with type Bus
+    """
+
+    to_nodes = []
+    for k, s in sequences.items():
+        to_nodes.append(k[1])
+
+    internal_busses = []
+    for node in to_nodes:
+        if hasattr(node, 'subnodes'):
+            # Only get the subnodes of type Bus
+            internal_bus = [n for n in node.subnodes if isinstance(n, Bus)]
+            internal_busses.extend(internal_bus)
+
+    return internal_busses
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):
