@@ -321,6 +321,14 @@ def get_sequences_by_tech(results):
         if carrier_tech not in sequences_by_tech:
             sequences_by_tech[carrier_tech] = []
 
+        # WORKAROUND for ReservoirWithPump (subnodes):
+        #  Since the pump subnode has a name different from the Reservoir node
+        #  we have to rename it to be merged properly along with the other parameters
+        if isinstance(component, Transformer):
+            name = component.label.rsplit('-', 1)
+            if name[1] == 'pump':
+                component.label = name[0]
+
         df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
         df.columns.names = ['name', 'var_name']
         sequences_by_tech[carrier_tech].append(df)
