@@ -157,6 +157,7 @@ class Bev(GenericStorage, Facade):
                     nominal_value=self.capacity,
                     max=self.availability,
                     conversion_factors=self.efficiency,
+                    variable_costs=0.00001,
                     **self.input_parameters
                 )
             }
