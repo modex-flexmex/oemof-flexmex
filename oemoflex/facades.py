@@ -1,4 +1,4 @@
-from oemof.solph import sequence, Sink, Flow, Bus
+from oemof.solph import sequence, Sink, Flow, Bus, Transformer
 from oemof.solph.components import GenericStorage
 from oemof.tabular.facades import Facade
 
@@ -135,7 +135,12 @@ class Bev(GenericStorage, Facade):
 
         internal_bus = Bus(label=self.label + "-internal_bus")
 
-        Flow(input=internal_bus, output=self.bus)
+        vehicle_to_grid = Transformer(
+            label=self.label + '-vehicle_to_grid',
+            inputs={internal_bus: Flow()},
+            outputs={self.bus: Flow(nominal_value=self.capacity)},
+            conversion_factors={internal_bus: self.efficiency},
+        )
 
         drive_power = Sink(
             label=self.label + "-drive_power",
@@ -159,13 +164,8 @@ class Bev(GenericStorage, Facade):
 
         self.outputs.update(
             {
-                internal_bus: Flow(
-                    nominal_value=self.capacity,
-                    max=self.availability,
-                    conversion_factors=self.efficiency,
-                    **self.output_parameters
-                )
+                internal_bus: Flow()
             }
         )
 
-        self.subnodes = (drive_power, internal_bus)
+        self.subnodes = (internal_bus, drive_power, vehicle_to_grid)
