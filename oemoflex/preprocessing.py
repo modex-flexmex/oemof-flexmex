@@ -574,6 +574,36 @@ def update_electricity_bev(data_preprocessed_path, scalars):
 
     electricity_bev = pd.read_csv(electricity_bev_file, index_col='region')
 
+    electricity_bev['capacity'] = get_parameter_values(
+        scalars,
+        'Transport_CarNumber_Electricity_Cars'
+    ) * get_parameter_values(
+        scalars,
+        'Transport_ConnecPower_Electricity_Cars')
+
+    electricity_bev['storage_capacity'] = get_parameter_values(
+        scalars,
+        'Transport_CarNumber_Electricity_Cars'
+    ) * get_parameter_values(
+        scalars,
+        'Transport_BatteryCap_Electricity_Cars')
+
+    electricity_bev['efficiency'] = get_parameter_values(
+        scalars,
+        'Transport_EtaFeedIn_Electricity_Cars') * 1e-2  # percentage to decimal
+
+    electricity_bev['amount'] = get_parameter_values(
+        scalars,
+        'Transport_AnnualDemand_Electricity_Cars')
+
+    electricity_bev['availability'] = 'availability-profile'
+
+    electricity_bev['drive_power'] = 'drive_power-profile'
+
+    electricity_bev['min_storage_level'] = 'min_storage-profile'
+
+    electricity_bev['max_storage_level'] = 'max_storage-profile'
+
     electricity_bev.to_csv(electricity_bev_file)
 
 
@@ -686,3 +716,23 @@ def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
 
 def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating electricity bev profiles")
+
+    raw_profile_paths = os.path.join(
+        data_raw_path, 'OtherProfiles', 'Transport'
+    )
+
+    profiles = {
+        'drive_power-profile': 'DrivePower',
+        'availability_profile': 'GridArrivalabilityRate',
+        'max_storage_level_profile': 'MaxBatteryLevel',
+        'min_storage_level_profile': 'MinBatteryLevel'
+    }
+
+    for k, v in profiles.items():
+        path = os.path.join(raw_profile_paths, v)
+        print(path)
+        profile_df = combine_profiles(path, k)
+
+        profile_df.to_csv(
+            os.path.join(data_preprocessed_path, 'sequences', k + '.csv')
+        )
