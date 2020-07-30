@@ -5,14 +5,14 @@ import pandas as pd
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_electricity_shortage, update_electricity_demand,
-    update_wind_onshore, update_wind_offshore, update_solar_pv,
+    update_ch4_gt, update_wind_onshore, update_wind_offshore, update_solar_pv,
     update_electricity_bev, create_electricity_bev_profiles,
     create_electricity_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
 
 
-name = 'FlexMex1_7'
+name = 'FlexMex1_7b'
 
 # Get paths
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -50,6 +50,7 @@ def main():
             'electricity-curtailment',
             'electricity-demand',
             'electricity-bev',
+            'ch4-gt',
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
@@ -63,6 +64,7 @@ def main():
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
     update_electricity_bev(exp_paths.data_preprocessed, scalars)
+    update_ch4_gt(exp_paths.data_preprocessed, scalars)
 
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
