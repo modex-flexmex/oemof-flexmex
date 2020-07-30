@@ -1,6 +1,6 @@
 from oemof.solph import sequence, Sink, Flow, Bus, Transformer
 from oemof.solph.components import GenericStorage
-from oemof.tabular.facades import Facade
+from oemof.tabular.facades import Facade, TYPEMAP
 
 
 class Bev(GenericStorage, Facade):
@@ -170,3 +170,6 @@ class Bev(GenericStorage, Facade):
         )
 
         self.subnodes = (internal_bus, drive_power, vehicle_to_grid)
+
+
+TYPEMAP.update({"bev": Bev})
