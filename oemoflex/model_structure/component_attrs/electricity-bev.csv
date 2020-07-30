@@ -1,7 +1,7 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
 name,str,n/a,,-electricity-bev,Name
-type,str,n/a,storage,,Type
+type,str,n/a,bev,,Type
 carrier,str,n/a,electricity,,Energy carrier
 tech,str,n/a,bev,,Technology
 bus,str,n/a,,-electricity,The bus this component is connected to
