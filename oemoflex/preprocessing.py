@@ -596,14 +596,6 @@ def update_electricity_bev(data_preprocessed_path, scalars):
         scalars,
         'Transport_AnnualDemand_Electricity_Cars')
 
-    electricity_bev['availability'] = 'availability-profile'
-
-    electricity_bev['drive_power'] = 'drive_power-profile'
-
-    electricity_bev['min_storage_level'] = 'min_storage-profile'
-
-    electricity_bev['max_storage_level'] = 'max_storage-profile'
-
     electricity_bev.to_csv(electricity_bev_file)
 
 
@@ -722,17 +714,17 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
     )
 
     profiles = {
-        'drive_power-profile': 'DrivePower',
-        'availability_profile': 'GridArrivalabilityRate',
-        'max_storage_level_profile': 'MaxBatteryLevel',
-        'min_storage_level_profile': 'MinBatteryLevel'
+        'drive_power': 'DrivePower',
+        'availability': 'GridArrivalabilityRate',
+        'max_storage_level': 'MaxBatteryLevel',
+        'min_storage_level': 'MinBatteryLevel'
     }
 
     for k, v in profiles.items():
         path = os.path.join(raw_profile_paths, v)
-        print(path)
-        profile_df = combine_profiles(path, k)
+
+        profile_df = combine_profiles(path, k + '-profile')
 
         profile_df.to_csv(
-            os.path.join(data_preprocessed_path, 'sequences', k + '.csv')
+            os.path.join(data_preprocessed_path, 'sequences', k + '_profile.csv')
         )
