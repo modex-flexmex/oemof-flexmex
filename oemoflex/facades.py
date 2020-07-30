@@ -281,6 +281,8 @@ class Bev(GenericStorage, Facade):
         internal_bus = Bus(label=self.label + "-internal_bus")
 
         vehicle_to_grid = Transformer(
+            carrier=self.carrier,
+            tech=self.tech,
             label=self.label + '-vehicle_to_grid',
             inputs={internal_bus: Flow()},
             outputs={self.bus: Flow(nominal_value=self.capacity)},
