@@ -4,9 +4,11 @@ import pandas as pd
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements, update_shortage, update_load,
-    update_extchp, update_boiler, update_pth,
-    update_heat_airsourcehp, update_heat_storage,
+    create_default_elements,
+    update_electricity_shortage, update_heat_shortage,
+    update_heat_demand, update_electricity_demand, update_pth,
+    create_electricity_heatpump_profiles, update_heat_storage_large,
+    update_extchp, update_boiler, update_electricity_heatpump_large,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     create_electricity_demand_profiles, create_heat_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
@@ -37,6 +39,7 @@ def main():
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
         header=0,
         na_values=['not considered', 'no value'],
+        sep=';',
     )
 
     # Filter out only scenario-related input parameters
@@ -55,23 +58,25 @@ def main():
             'wind-offshore',
             'wind-onshore',
             'solar-pv',
-            'gas-extchp',
-            'gas-boiler',
+            'ch4-extchp',
+            'ch4-boiler',
             'electricity-pth',
-            'electricity-airsourcehp',
+            'electricity-heatpump',
             'heat-storage',
         ]
 
     )
 
     # update elements
-    update_shortage(exp_paths.data_preprocessed, scalars)
-    update_load(exp_paths.data_preprocessed, scalars)
+    update_electricity_shortage(exp_paths.data_preprocessed, scalars)
+    update_heat_shortage(exp_paths.data_preprocessed, scalars)
+    update_heat_storage_large(exp_paths.data_preprocessed, scalars)
+    update_heat_demand(exp_paths.data_preprocessed, scalars)
+    update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_extchp(exp_paths.data_preprocessed, scalars)
     update_boiler(exp_paths.data_preprocessed, scalars)
+    update_electricity_heatpump_large(exp_paths.data_preprocessed, scalars)
     update_pth(exp_paths.data_preprocessed, scalars)
-    update_heat_airsourcehp(exp_paths.data_preprocessed, scalars)
-    update_heat_storage(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
@@ -79,6 +84,7 @@ def main():
     # create sequences
     create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_heat_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
+    create_electricity_heatpump_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_wind_onshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_wind_offshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
     create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
