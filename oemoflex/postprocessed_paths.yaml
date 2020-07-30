@@ -84,3 +84,9 @@ Storage/Heat/Small:
     In: flow_in
     Level: storage_content
     Out: flow_out
+
+Transport/BEV:
+  component: electricity-bev
+  sequences:
+    FeedIn: flow_out
+    Charging: flow_in
