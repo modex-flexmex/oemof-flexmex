@@ -961,6 +961,51 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
     df.to_csv(file_path)
 
 
+def update_hydro_reservoir(data_preprocessed_path, scalars):
+    component = 'hydro-reservoir'
+
+    logging.info(f"Updating {component} file")
+
+    # TODO: This filepath should be moved to components.csv
+    file_path = os.path.join(data_preprocessed_path, 'elements', component + '.csv')
+
+    element_df = pd.read_csv(file_path, index_col='region')
+
+    element_df['capacity_turbine'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirTurbine')
+
+    element_df['capacity_pump'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirPump')
+
+    element_df['storage_capacity'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirStorage') * 1e-3  # GWh -> MWh
+
+    element_df['efficiency_turbine'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Eta_Electricity_Hydro_ReservoirTurbine') * 1e-2  # percent -> 0...1
+
+    element_df['efficiency_pump'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Eta_Electricity_Hydro_ReservoirPump') * 1e-2  # percent -> 0...1
+
+    element_df['marginal_cost'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_VarOM_Electricity_Hydro_Reservoir') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    # TODO Parameter name unknown
+    # element_df['amount'] = get_parameter_values(
+    #     scalars,
+    #     '')
+    #
+    # Only as a placeholder:
+    element_df['amount'] = 100
+
+    element_df.to_csv(file_path)
+
+
 def update_electricity_bev(data_preprocessed_path, scalars):
     electricity_bev_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-bev.csv')
 
@@ -1081,6 +1126,24 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
 
     solar_pv_profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'solar-pv_profile.csv')
+    )
+
+
+def create_hydro_reservoir_profiles(data_raw_path, data_preprocessed_path):
+    # TODO: Use this function to generalize the other create_profile functions.
+    profile_name = 'hydro-reservoir_profile'
+    raw_profile_spec = ['Energy', 'SecondaryEnergy', 'Hydro', 'Reservoir']
+
+    logging.info(f"Creating {profile_name} profile")
+
+    raw_profile_paths = os.path.join(
+        data_raw_path, *raw_profile_spec
+    )
+
+    profile_df = combine_profiles(raw_profile_paths, profile_name)
+
+    profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', profile_name + '.csv')
     )
 
 

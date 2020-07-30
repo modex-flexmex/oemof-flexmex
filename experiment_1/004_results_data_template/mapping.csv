@@ -64,3 +64,7 @@ EnergyConversion_VarOM_Heat_ElectricityHeat_Small,Eur,electricity-heatpump,elect
 Storage_Input_Heat_SmallStorage,GWh,heat-storage,heat,storage,storage,flow_in
 Transport_Shifting_DrivePower_Electricity,GWh,electricity-bev,electricity,?,bev,?
 Transport_VarOM_DrivePower_Electricity,Eur,electricity-bev,electricity,?,bev,cost_varom
+Storage_Pump_Electricity_ReservoirHydro,MWh,hydro-reservoir,hydro,reservoir,reservoir,flow_in
+Storage_Losses_Electricity_ReservoirHydro,MWh,hydro-reservoir,hydro,reservoir,reservoir,losses
+Storage_Turbine_Electricity_ReservoirHydro,MWh,hydro-reservoir,hydro,reservoir,reservoir,flow_out
+Storage_VarOM_Electricity_ReservoirHydro,Eur,hydro-reservoir,hydro,reservoir,reservoir,cost_varom

@@ -43,6 +43,9 @@ Heatpump/Small:
 Hydro/Reservoir:
   component: hydro-reservoir
   sequences:
+    In: flow_in
+    Level: storage_content
+    Out: flow_out
 
 Hydro/RunOfRiver:
   component: hydro-ror

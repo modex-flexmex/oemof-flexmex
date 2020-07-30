@@ -19,4 +19,5 @@ electricity-liion_battery,electricity,storage,liion-battery,Li-ion battery stora
 electricity-heatpump,electricity,conversion,heatpump,Airsource compression heatpump
 heat-storage,heat,storage,storage,Large scale sensible heat storage
 heat-excess,heat,excess,excess,Heat excess
+hydro-reservoir,hydro,reservoir,reservoir,Hydro reservoir
 electricity-bev,electricity,bev,bev,Battery electric vehicle

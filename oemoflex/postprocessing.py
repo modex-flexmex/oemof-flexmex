@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from oemof.solph import EnergySystem, Bus, Sink
+from oemof.solph import EnergySystem, Bus, Sink, Transformer
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements
@@ -268,6 +268,10 @@ def get_sequences_by_tech(results):
     sequences = copy.deepcopy({key: value['sequences'] for key, value in results.items()})
 
     sequences_by_tech = {}
+
+    # Get a list of internal busses for all 'ReservoirWithPump' nodes to be ignored later
+    internal_busses = get_busses_in_subnodes(sequences)
+
     for key, df in sequences.items():
         if isinstance(key[0], Bus):
             component = key[1]
@@ -309,9 +313,21 @@ def get_sequences_by_tech(results):
             component = key[0]
             var_name = 'storage_content'
 
+        # Ignore sequences of internal busses (concerns ReservoirWithPump)
+        if bus in internal_busses:
+            continue
+
         carrier_tech = component.carrier + '-' + component.tech
         if carrier_tech not in sequences_by_tech:
             sequences_by_tech[carrier_tech] = []
+
+        # WORKAROUND for ReservoirWithPump (subnodes):
+        #  Since the pump subnode has a name different from the Reservoir node
+        #  we have to rename it to be merged properly along with the other parameters
+        if isinstance(component, Transformer):
+            name = component.label.rsplit('-', 1)
+            if name[1] == 'pump':
+                component.label = name[0]
 
         df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
         df.columns.names = ['name', 'var_name']
@@ -320,6 +336,33 @@ def get_sequences_by_tech(results):
     sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
 
     return sequences_by_tech
+
+
+def get_busses_in_subnodes(sequences):
+    r"""
+    Get all the subnodes in 'sequences' which are Busses
+
+    Parameters
+    ----------
+    sequences
+
+    Returns
+    -------
+    A list of all subnodes with type Bus
+    """
+
+    to_nodes = []
+    for k, s in sequences.items():
+        to_nodes.append(k[1])
+
+    internal_busses = []
+    for node in to_nodes:
+        if hasattr(node, 'subnodes'):
+            # Only get the subnodes of type Bus
+            internal_bus = [n for n in node.subnodes if isinstance(n, Bus)]
+            internal_busses.extend(internal_bus)
+
+    return internal_busses
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):
@@ -960,7 +1003,7 @@ def run_postprocessing(year, name, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=';')
+    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=',')
 
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
