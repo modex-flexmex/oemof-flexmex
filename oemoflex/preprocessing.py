@@ -149,31 +149,12 @@ def create_component_element(component_attrs_file):
         comp_data['from_bus'] = [link.split('-')[0] + suffices['from_bus'] for link in link_list]
         comp_data['to_bus'] = [link.split('-')[1] + suffices['to_bus'] for link in link_list]
 
-    elif defaults['type'] == 'conversion':
-        comp_data['region'] = regions_list
-        comp_data['name'] = [region + suffices['name'] for region in regions_list]
-        comp_data['from_bus'] = [region + suffices['from_bus'] for region in regions_list]
-        comp_data['to_bus'] = [region + suffices['to_bus'] for region in regions_list]
-
-        if 'efficiency' in suffices:
-            comp_data['efficiency'] = [region + suffices['efficiency'] for region in regions_list]
-
-    elif defaults['type'] in ['backpressure', 'extraction']:
-        comp_data['region'] = regions_list
-        comp_data['name'] = [region + suffices['name'] for region in regions_list]
-        comp_data['fuel_bus'] = [region + suffices['fuel_bus'] for region in regions_list]
-        comp_data['heat_bus'] = [region + suffices['heat_bus'] for region in regions_list]
-        comp_data['electricity_bus'] = [
-            region + suffices['electricity_bus'] for region in regions_list
-        ]
-
     else:
         comp_data['region'] = regions_list
         comp_data['name'] = [region + suffices['name'] for region in regions_list]
-        comp_data['bus'] = [region + suffices['bus'] for region in regions_list]
 
-        if 'profile' in suffices:
-            comp_data['profile'] = [region + suffices['profile'] for region in regions_list]
+        for key, value in suffices.items():
+            comp_data[key] = [region + value for region in regions_list]
 
     for key, value in defaults.items():
         comp_data[key] = value
@@ -509,7 +490,7 @@ def update_heat_storage_large(data_preprocessed_path, scalars):
 
     # Write back to csv file
     df.to_csv(file_path)
-    
+
 
 def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
