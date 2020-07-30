@@ -12,6 +12,5 @@ availability,str,,,-availability-profile,Ratio of cars with grid contact profile
 drive_power,str,,,-drive_power-profile,Drive power profile
 min_storage_level,str,,,-min_storage_level-profile,Min charge level profile
 max_storage_level,str,,,-max_storage_level-profile,Max charge level profile
-marginal_cost,float,Eur/MWh,n/a,,Marginal cost of charging/discharging
 input_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's input flow
 output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow
