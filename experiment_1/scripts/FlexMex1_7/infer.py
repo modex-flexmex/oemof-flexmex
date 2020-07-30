@@ -42,6 +42,10 @@ def main():
                 'solar-pv',
                 'electricity-demand',
             ],
+            'availability': ['electricity-bev'],
+            'drive_power': ['electricity-bev'],
+            'min_storage_level': ['electricity-bev'],
+            'max_storage_level': ['electricity-bev'],
         },
         path=exp_paths.data_preprocessed
     )
