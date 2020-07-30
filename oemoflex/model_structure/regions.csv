@@ -1,12 +1,12 @@
-region
-AT
-BE
-CH
-CZ
-DE
-DK
-FR
-IT
-LU
-NL
-PL
+region,name
+AT,Austria
+BE,Belgium
+CH,Switzerland
+CZ,Czech Republic
+DE,Germany
+DK,Denmark
+FR,France
+IT,Italy
+LU,Luxembourg
+NL,Netherlands
+PL,Poland
