@@ -1023,7 +1023,7 @@ def update_electricity_bev(data_preprocessed_path, scalars):
         'Transport_CarNumber_Electricity_Cars'
     ) * get_parameter_values(
         scalars,
-        'Transport_BatteryCap_Electricity_Cars')
+        'Transport_BatteryCap_Electricity_Cars') * 1e3  # GWh to MWh
 
     electricity_bev['efficiency_v2g'] = get_parameter_values(
         scalars,
