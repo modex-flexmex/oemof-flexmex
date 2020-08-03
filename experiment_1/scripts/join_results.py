@@ -59,7 +59,11 @@ def copy_timeseries(experiments, fro, to):
     from_to = {os.path.join(fro, e): os.path.join(to, e) for e in experiments}
 
     for src, dst in from_to.items():
-        shutil.copytree(src, dst, ignore=shutil.ignore_patterns('Scalars.csv', 'oemoflex.log*'))
+        shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
+            'Scalars.csv',
+            'oemoflex.log*',
+            'oemoflex_scalars.csv',
+        ))
 
 
 all_scalars = join_scalars(experiments)
