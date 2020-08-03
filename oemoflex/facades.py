@@ -259,6 +259,8 @@ class Bev(GenericStorage, Facade):
 
         self.profile = kwargs.get("profile")
 
+        self.marginal_cost = kwargs.get("marginal_cost", 0)
+
         self.input_parameters = kwargs.get("input_parameters", {})
 
         self.output_parameters = kwargs.get("output_parameters", {})
@@ -292,6 +294,7 @@ class Bev(GenericStorage, Facade):
                 self.bus: Flow(
                     nominal_value=self.capacity,
                     max=self.availability,
+                    variable_cost=self.marginal_cost,
                 )
             },
             conversion_factors={internal_bus: self.efficiency_v2g},
