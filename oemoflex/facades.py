@@ -294,7 +294,7 @@ class Bev(GenericStorage, Facade):
                 self.bus: Flow(
                     nominal_value=self.capacity,
                     max=self.availability,
-                    variable_cost=self.marginal_cost,
+                    variable_costs=self.marginal_cost,
                 )
             },
             conversion_factors={internal_bus: self.efficiency_v2g},
