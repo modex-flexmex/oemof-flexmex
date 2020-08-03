@@ -1031,7 +1031,7 @@ def update_electricity_bev(data_preprocessed_path, scalars):
 
     electricity_bev['amount'] = get_parameter_values(
         scalars,
-        'Transport_AnnualDemand_Electricity_Cars')
+        'Transport_AnnualDemand_Electricity_Cars') * 1e3 / 1780.43  # GWh to MWh
 
     electricity_bev.to_csv(electricity_bev_file)
 
