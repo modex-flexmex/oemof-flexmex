@@ -7,7 +7,9 @@ tech,str,n/a,bev,,Technology
 bus,str,n/a,,-electricity,The bus this component is connected to
 capacity,float,MW,n/a,,Installed capacity
 storage_capacity,float,MWh,n/a,,Installed storage capacity
-efficiency,float,unitless,n/a,,Efficiency of charging/discharging
+efficiency_charging,float,unitless,1,,Efficiency of charging
+efficiency_discharging,float,unitless,1,,Efficiency of discharging
+efficiency_v2g,float,unitless,1,,Efficiency of vehicle-to-grid
 availability,str,,,-availability-profile,Ratio of cars with grid contact profile
 drive_power,str,,,-drive_power-profile,Drive power profile
 min_storage_level,str,,,-min_storage_level-profile,Min charge level profile

@@ -242,7 +242,6 @@ class Bev(GenericStorage, Facade):
                     "availability",
                     "drive_power",
                     "amount",
-                    "efficiency",
                 ]
             }
         )
@@ -252,7 +251,11 @@ class Bev(GenericStorage, Facade):
 
         self.capacity = kwargs.get("capacity")
 
-        self.efficiency = kwargs.get("efficiency", 1)
+        self.efficiency_charging = kwargs.get("efficiency_charging", 1)
+
+        self.efficiency_discharging = kwargs.get("efficiency_discharging", 1)
+
+        self.efficiency_v2g = kwargs.get("efficiency_v2g", 1)
 
         self.profile = kwargs.get("profile")
 
@@ -269,13 +272,13 @@ class Bev(GenericStorage, Facade):
         """
         self.nominal_storage_capacity = self.storage_capacity
 
-        self.inflow_conversion_factor = sequence(self.efficiency)
+        self.inflow_conversion_factor = sequence(self.efficiency_charging)
 
-        self.outflow_conversion_factor = sequence(self.efficiency)
+        self.outflow_conversion_factor = sequence(self.efficiency_discharging)
 
         if self.expandable:
             raise NotImplementedError(
-                "Investment for reservoir class is not implemented."
+                "Investment for bev class is not implemented."
             )
 
         internal_bus = Bus(label=self.label + "-internal_bus")
@@ -286,7 +289,7 @@ class Bev(GenericStorage, Facade):
             label=self.label + '-vehicle_to_grid',
             inputs={internal_bus: Flow()},
             outputs={self.bus: Flow(nominal_value=self.capacity)},
-            conversion_factors={internal_bus: self.efficiency},
+            conversion_factors={internal_bus: self.efficiency_v2g},
         )
 
         drive_power = Sink(
@@ -303,7 +306,6 @@ class Bev(GenericStorage, Facade):
                 self.bus: Flow(
                     nominal_value=self.capacity,
                     max=self.availability,
-                    conversion_factors=self.efficiency,
                     variable_costs=0.00001,
                     **self.input_parameters
                 )

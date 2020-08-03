@@ -1025,7 +1025,7 @@ def update_electricity_bev(data_preprocessed_path, scalars):
         scalars,
         'Transport_BatteryCap_Electricity_Cars')
 
-    electricity_bev['efficiency'] = get_parameter_values(
+    electricity_bev['efficiency_v2g'] = get_parameter_values(
         scalars,
         'Transport_EtaFeedIn_Electricity_Cars') * 1e-2  # percentage to decimal
 
