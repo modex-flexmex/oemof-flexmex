@@ -31,12 +31,14 @@ experiments = [
     'FlexMex1_2b',
     'FlexMex1_2c',
     'FlexMex1_2d',
+    'FlexMex1_3',
     'FlexMex1_4a',
     'FlexMex1_4b',
     'FlexMex1_4c',
     'FlexMex1_4d',
     'FlexMex1_4e',
     'FlexMex1_5',
+    'FlexMex1_7b',
     'FlexMex1_10',
 ]
 
