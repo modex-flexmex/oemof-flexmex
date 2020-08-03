@@ -288,7 +288,12 @@ class Bev(GenericStorage, Facade):
             tech=self.tech,
             label=self.label + '-vehicle_to_grid',
             inputs={internal_bus: Flow()},
-            outputs={self.bus: Flow(nominal_value=self.capacity)},
+            outputs={
+                self.bus: Flow(
+                    nominal_value=self.capacity,
+                    max=self.availability,
+                )
+            },
             conversion_factors={internal_bus: self.efficiency_v2g},
         )
 
