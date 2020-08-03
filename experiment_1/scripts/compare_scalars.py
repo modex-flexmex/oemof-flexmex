@@ -15,6 +15,7 @@ usecases = [
     'FlexMex1_4d',
     'FlexMex1_4e',
     'FlexMex1_5',
+    'FlexMex1_7b',
     'FlexMex1_10',
 ]
 
