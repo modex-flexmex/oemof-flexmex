@@ -173,9 +173,7 @@ class ReservoirWithPump(GenericStorage, Facade):
         Efficiency of the turbine converting inflow to electricity
         production, default: 1
     profile: array-like
-        Relative inflow profile of inflow into the storage
-    amount: numeric
-        Total amount of inflow
+        Relative inflow profile of inflow into the storage, ratio of turbine power
     input_parameters: dict
         Dictionary to specifiy parameters on the input edge. You can use
         all keys that are available for the  oemof.solph.network.Flow class.
@@ -229,7 +227,6 @@ class ReservoirWithPump(GenericStorage, Facade):
     ...     capacity_turbine=50,
     ...     capacity_pump=20,
     ...     profile=[0.1, 0.2, 0.7],
-    ...     amount=100,
     ...     loss_rate=0.01,
     ...     initial_storage_level=0,
     ...     max_storage_level = 0.9,
@@ -246,7 +243,6 @@ class ReservoirWithPump(GenericStorage, Facade):
                     "carrier",
                     "tech",
                     "profile",
-                    "amount",
                     "capacity_pump",
                     "capacity_turbine",
                     "storage_capacity",
@@ -290,7 +286,7 @@ class ReservoirWithPump(GenericStorage, Facade):
         inflow = Source(
             label=self.label + "-inflow",
             outputs={
-                internal_bus: Flow(nominal_value=self.amount, max=self.profile, fixed=False)
+                internal_bus: Flow(nominal_value=self.capacity_turbine, max=self.profile, fixed=False)
             },
         )
 

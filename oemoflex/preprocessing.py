@@ -969,14 +969,6 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
         scalars,
         'EnergyConversion_VarOM_Electricity_Hydro_Reservoir') * 1e-3  # Eur/GWh -> Eur/MWh
 
-    # TODO Parameter name unknown
-    # element_df['amount'] = get_parameter_values(
-    #     scalars,
-    #     '')
-    #
-    # Only as a placeholder:
-    element_df['amount'] = 100
-
     element_df.to_csv(file_path)
 
 
