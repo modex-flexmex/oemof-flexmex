@@ -324,11 +324,6 @@ def get_sequences_by_tech(results):
         if bus in internal_busses and not component in reservoir_inflows:
             continue
 
-        # HACK for ReservoirWithPump inflow:
-        if component in reservoir_inflows:
-            component.carrier = 'hydro'
-            component.tech = 'reservoir'
-
         carrier_tech = component.carrier + '-' + component.tech
         if carrier_tech not in sequences_by_tech:
             sequences_by_tech[carrier_tech] = []
