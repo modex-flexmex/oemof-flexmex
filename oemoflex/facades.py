@@ -4,13 +4,13 @@ from oemof.solph.components import GenericStorage
 from oemof.tabular.facades import Facade, TYPEMAP
 
 
-class Transformer(Transformer):
+class Transformer(Transformer):  # pylint: disable=E0102
     r"""
     Supplement Transformer with carrier and tech properties to work with labeling in postprocessing
 
     Needed for Transformer subnodes in
     * ReservoirWithPump: pump subnode
-    * BEV: drive_power subnode
+    * Bev: vehicle_to_grid subnode
     """
 
     def __init__(self, *args, **kwargs):
