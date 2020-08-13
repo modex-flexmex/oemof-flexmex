@@ -271,6 +271,7 @@ def get_sequences_by_tech(results):
 
     # Get a list of internal busses for all 'ReservoirWithPump' nodes to be ignored later
     internal_busses = get_busses_in_subnodes(sequences)
+    inflows = get_inflows_in_subnodes(sequences)
 
     for key, df in sequences.items():
         if isinstance(key[0], Bus):
@@ -306,6 +307,10 @@ def get_sequences_by_tech(results):
                 elif bus == component.heat_bus:
                     var_name = 'flow_heat'
 
+            # HACK for ReservoirWithPump inflow:
+            elif isinstance(component, Source):
+                var_name = 'flow_inflow'
+
             else:
                 var_name = 'flow_out'
 
@@ -314,8 +319,13 @@ def get_sequences_by_tech(results):
             var_name = 'storage_content'
 
         # Ignore sequences of internal busses (concerns ReservoirWithPump)
-        if bus in internal_busses:
+        if bus in internal_busses and not component in inflows:
             continue
+
+        # HACK for ReservoirWithPump inflow:
+        if component in inflows:
+            component.carrier = 'hydro'
+            component.tech = 'reservoir'
 
         carrier_tech = component.carrier + '-' + component.tech
         if carrier_tech not in sequences_by_tech:
@@ -324,9 +334,14 @@ def get_sequences_by_tech(results):
         # WORKAROUND for ReservoirWithPump (subnodes):
         #  Since the pump subnode has a name different from the Reservoir node
         #  we have to rename it to be merged properly along with the other parameters
-        if isinstance(component, Transformer):
+
+        # HACK for ReservoirWithPump inflow:
+        #if isinstance(component, Transformer):
+        if isinstance(component, (Transformer, Source)):
             name = component.label.rsplit('-', 1)
-            if name[1] == 'pump':
+            # HACK for ReservoirWithPump inflow:
+            # if name[1] == 'pump':
+            if name[1] == 'pump' or name[1] == 'inflow':
                 component.label = name[0]
 
         df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
@@ -363,6 +378,33 @@ def get_busses_in_subnodes(sequences):
             internal_busses.extend(internal_bus)
 
     return internal_busses
+
+
+def get_inflows_in_subnodes(sequences):
+    r"""
+    Get all the subnodes in 'sequences' which are Sources/"Inflow"
+
+    Parameters
+    ----------
+    sequences
+
+    Returns
+    -------
+    A list of all subnodes with type Source
+    """
+
+    to_nodes = []
+    for k, s in sequences.items():
+        to_nodes.append(k[1])
+
+    inflows = []
+    for node in to_nodes:
+        if hasattr(node, 'subnodes'):
+            # Only get the subnodes of type Source
+            inflow = [n for n in node.subnodes if isinstance(n, Source)]
+            inflows.extend(inflow)
+
+    return inflows
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):

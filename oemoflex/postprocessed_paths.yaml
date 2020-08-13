@@ -46,6 +46,7 @@ Hydro/Reservoir:
     In: flow_in
     Level: storage_content
     Out: flow_out
+    Inflow: flow_inflow #HACK!
 
 Hydro/RunOfRiver:
   component: hydro-ror
