@@ -464,6 +464,22 @@ def get_storage_losses(oemoflex_scalars):
     return losses
 
 
+def get_reservoir_losses(oemoflex_scalars):
+    reservoir_data = oemoflex_scalars.loc[
+        oemoflex_scalars['type'].isin(['reservoir'])
+    ]
+    flow_in = reservoir_data.loc[reservoir_data['var_name'] == 'flow_in'].set_index('name')
+    flow_out = reservoir_data.loc[reservoir_data['var_name'] == 'flow_out'].set_index('name')
+    flow_inflow = reservoir_data.loc[reservoir_data['var_name'] == 'flow_inflow'].set_index('name')
+
+    losses = flow_in.copy()
+    losses['var_name'] = 'losses'
+    losses['var_value'] = flow_inflow['var_value'] - (flow_out['var_value'] - flow_in['var_value'])
+    losses = losses.reset_index()
+
+    return losses
+
+
 def aggregate_storage_capacities(oemoflex_scalars):
     storage = oemoflex_scalars.loc[
         oemoflex_scalars['var_name'].isin(['storage_capacity', 'storage_capacity_invest'])]
@@ -1063,7 +1079,13 @@ def run_postprocessing(year, name, exp_paths):
     # losses (storage, transmission)
     transmission_losses = get_transmission_losses(oemoflex_scalars)
     storage_losses = get_storage_losses(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses], sort=True)
+    reservoir_losses = get_reservoir_losses(oemoflex_scalars)
+    oemoflex_scalars = pd.concat([
+        oemoflex_scalars,
+        transmission_losses,
+        storage_losses,
+        reservoir_losses
+    ], sort=True)
 
     # get capacities
     capacities = get_capacities(es)
