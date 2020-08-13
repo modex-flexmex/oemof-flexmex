@@ -309,7 +309,7 @@ def get_sequences_by_tech(results):
                 elif bus == component.heat_bus:
                     var_name = 'flow_heat'
 
-            elif isinstance(component, Source):
+            elif component in reservoir_inflows:
                 var_name = 'flow_inflow'
 
             else:
