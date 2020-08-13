@@ -309,7 +309,6 @@ def get_sequences_by_tech(results):
                 elif bus == component.heat_bus:
                     var_name = 'flow_heat'
 
-            # HACK for ReservoirWithPump inflow:
             elif isinstance(component, Source):
                 var_name = 'flow_inflow'
 
