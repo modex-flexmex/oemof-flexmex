@@ -269,9 +269,11 @@ def get_sequences_by_tech(results):
 
     sequences_by_tech = {}
 
-    # Get a list of internal busses for all 'ReservoirWithPump' nodes to be ignored later
-    internal_busses = get_busses_in_subnodes(sequences)
-    inflows = get_inflows_in_subnodes(sequences)
+    # Get internal busses for all 'ReservoirWithPump' and 'Bev' nodes to be ignored later
+    internal_busses = get_subnodes_by_type(sequences, Bus)
+
+    # Get inflows for all 'ReservoirWithPump' nodes
+    reservoir_inflows = get_subnodes_by_type(sequences, Source)
 
     for key, df in sequences.items():
         if isinstance(key[0], Bus):
@@ -318,12 +320,12 @@ def get_sequences_by_tech(results):
             component = key[0]
             var_name = 'storage_content'
 
-        # Ignore sequences of internal busses (concerns ReservoirWithPump)
-        if bus in internal_busses and not component in inflows:
+        # Ignore sequences FROM internal busses (concerns ReservoirWithPump, Bev)
+        if bus in internal_busses and not component in reservoir_inflows:
             continue
 
         # HACK for ReservoirWithPump inflow:
-        if component in inflows:
+        if component in reservoir_inflows:
             component.carrier = 'hydro'
             component.tech = 'reservoir'
 
@@ -353,58 +355,38 @@ def get_sequences_by_tech(results):
     return sequences_by_tech
 
 
-def get_busses_in_subnodes(sequences):
+def get_subnodes_by_type(sequences, cls):
     r"""
-    Get all the subnodes in 'sequences' which are Busses
+    Get all the subnodes of type 'cls' in the <to> nodes of 'sequences'
 
     Parameters
     ----------
-    sequences
+    sequences : dict (special format, see get_sequences_by_tech() and before)
+        key: tuple of 'to' node and 'from' node: (from, to)
+        value: timeseries DataFrame
+
+    cls : Class
+        Class to check against
 
     Returns
     -------
-    A list of all subnodes with type Bus
+    A list of all subnodes of type 'cls'
     """
 
+    # Get a list of all the components
     to_nodes = []
     for k, s in sequences.items():
+        # It's sufficient to look into one side of the flows ('to' node, k[1])
         to_nodes.append(k[1])
 
-    internal_busses = []
-    for node in to_nodes:
-        if hasattr(node, 'subnodes'):
-            # Only get the subnodes of type Bus
-            internal_bus = [n for n in node.subnodes if isinstance(n, Bus)]
-            internal_busses.extend(internal_bus)
+    subnodes_list = []
+    for component in to_nodes:
+        if hasattr(component, 'subnodes'):
+            # Only get subnodes of type 'cls'
+            subnodes_per_component = [n for n in component.subnodes if isinstance(n, cls)]
+            subnodes_list.extend(subnodes_per_component)
 
-    return internal_busses
-
-
-def get_inflows_in_subnodes(sequences):
-    r"""
-    Get all the subnodes in 'sequences' which are Sources/"Inflow"
-
-    Parameters
-    ----------
-    sequences
-
-    Returns
-    -------
-    A list of all subnodes with type Source
-    """
-
-    to_nodes = []
-    for k, s in sequences.items():
-        to_nodes.append(k[1])
-
-    inflows = []
-    for node in to_nodes:
-        if hasattr(node, 'subnodes'):
-            # Only get the subnodes of type Source
-            inflow = [n for n in node.subnodes if isinstance(n, Source)]
-            inflows.extend(inflow)
-
-    return inflows
+    return subnodes_list
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):
