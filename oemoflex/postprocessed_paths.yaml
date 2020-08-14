@@ -40,19 +40,6 @@ Heatpump/Small:
   sequences:
     HeatGeneration: flow_out
 
-Hydro/Reservoir:
-  component: hydro-reservoir
-  sequences:
-    In: flow_in
-    Level: storage_content
-    Out: flow_out
-    Inflow: flow_inflow
-
-Hydro/RunOfRiver:
-  component: hydro-ror
-  sequences:
-    Generation: flow_out
-
 RE:
   component: electricity-curtailment
   sequences:
@@ -71,6 +58,14 @@ Storage/Electricity/H2Cavern:
     In: flow_in
     Level: storage_content
     Out: flow_out
+
+Storage/Electricity/HydroRes:
+  component: hydro-reservoir
+  sequences:
+    Pump: flow_in
+    Level: storage_content
+    Turbine: flow_out
+    Inflow: flow_inflow
 
 Storage/Heat/Large:
   component: heat-storage
