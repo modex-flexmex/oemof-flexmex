@@ -55,14 +55,14 @@ RE:
     Curtailment: flow_in #TODO probelm
 
 Storage/Electricity/LiIonBattery:
-  component: electricity-storage
+  component: electricity-liion_battery
   sequences:
     In: flow_in
     Level: storage_content
     Out: flow_out
 
 Storage/Electricity/H2Cavern:
-  component: electricity-h2-cavern
+  component: electricity-h2_cavern
   sequences:
     In: flow_in
     Level: storage_content
