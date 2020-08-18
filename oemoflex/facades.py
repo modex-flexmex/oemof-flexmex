@@ -4,6 +4,21 @@ from oemof.solph.components import GenericStorage
 from oemof.tabular.facades import Facade, TYPEMAP
 
 
+class Source(Source):  # pylint: disable=E0102
+    r"""
+    Supplement Source with carrier and tech properties to work with labeling in postprocessing
+
+    Needed for Source subnodes in
+    * ReservoirWithPump: inflow subnode
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.carrier = kwargs.get('carrier', None)
+        self.tech = kwargs.get('tech', None)
+
+
 class Transformer(Transformer):  # pylint: disable=E0102
     r"""
     Supplement Transformer with carrier and tech properties to work with labeling in postprocessing
@@ -353,9 +368,7 @@ class ReservoirWithPump(GenericStorage, Facade):
         Efficiency of the turbine converting inflow to electricity
         production, default: 1
     profile: array-like
-        Relative inflow profile of inflow into the storage
-    amount: numeric
-        Total amount of inflow
+        Relative inflow profile of inflow into the storage, ratio of turbine power
     input_parameters: dict
         Dictionary to specifiy parameters on the input edge. You can use
         all keys that are available for the  oemof.solph.network.Flow class.
@@ -409,7 +422,6 @@ class ReservoirWithPump(GenericStorage, Facade):
     ...     capacity_turbine=50,
     ...     capacity_pump=20,
     ...     profile=[0.1, 0.2, 0.7],
-    ...     amount=100,
     ...     loss_rate=0.01,
     ...     initial_storage_level=0,
     ...     max_storage_level = 0.9,
@@ -426,7 +438,6 @@ class ReservoirWithPump(GenericStorage, Facade):
                     "carrier",
                     "tech",
                     "profile",
-                    "amount",
                     "capacity_pump",
                     "capacity_turbine",
                     "storage_capacity",
@@ -442,6 +453,8 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.output_parameters = kwargs.get("output_parameters", {})
 
         self.expandable = bool(kwargs.get("expandable", False))
+
+        self.initial_storage_level = kwargs.get("initial_filling_level")
 
         self.build_solph_components()
 
@@ -470,8 +483,10 @@ class ReservoirWithPump(GenericStorage, Facade):
         inflow = Source(
             label=self.label + "-inflow",
             outputs={
-                internal_bus: Flow(nominal_value=self.amount, max=self.profile, fixed=False)
+                internal_bus: Flow(nominal_value=self.capacity_turbine, max=self.profile, fixed=False)
             },
+            carrier=self.carrier,
+            tech=self.tech
         )
 
         self.inputs.update(
@@ -491,4 +506,4 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.subnodes = (inflow, internal_bus, pump)
 
 
-TYPEMAP.update({"asymmetric storage": AsymmetricStorage, "bev": Bev})
+TYPEMAP.update({"asymmetric storage": AsymmetricStorage, "reservoir": ReservoirWithPump, "bev": Bev})

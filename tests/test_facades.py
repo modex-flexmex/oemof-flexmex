@@ -246,7 +246,6 @@ def test_reservoir():
         capacity_pump=20,
         capacity_turbine=50,
         profile=[0.2, 0.5, 0.3],
-        amount=1000,
         loss_rate=0.01,
         max_storage_level=0.9,
         min_storage_level=0.1,

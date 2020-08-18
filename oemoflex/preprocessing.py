@@ -979,9 +979,18 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
         scalars,
         'EnergyConversion_Capacity_Electricity_Hydro_ReservoirPump')
 
-    element_df['storage_capacity'] = get_parameter_values(
+    storage_capacity = get_parameter_values(
         scalars,
-        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirStorage') * 1e-3  # GWh -> MWh
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirStorage')
+
+    initial_filling_level = get_parameter_values(
+        scalars,
+        'Energy_PrimaryEnergy_Hydro_Reservoir_FillingLevelStart')
+
+    element_df['storage_capacity'] = storage_capacity
+
+    # Recalculate filling level as a ratio of storage capacity (refer oemof.solph.components)
+    element_df['initial_filling_level'] = initial_filling_level / storage_capacity
 
     element_df['efficiency_turbine'] = get_parameter_values(
         scalars,
@@ -994,14 +1003,6 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
     element_df['marginal_cost'] = get_parameter_values(
         scalars,
         'EnergyConversion_VarOM_Electricity_Hydro_Reservoir') * 1e-3  # Eur/GWh -> Eur/MWh
-
-    # TODO Parameter name unknown
-    # element_df['amount'] = get_parameter_values(
-    #     scalars,
-    #     '')
-    #
-    # Only as a placeholder:
-    element_df['amount'] = 100
 
     element_df.to_csv(file_path)
 
