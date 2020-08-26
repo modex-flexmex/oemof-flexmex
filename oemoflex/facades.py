@@ -483,7 +483,9 @@ class ReservoirWithPump(GenericStorage, Facade):
         inflow = Source(
             label=self.label + "-inflow",
             outputs={
-                internal_bus: Flow(nominal_value=self.capacity_turbine, max=self.profile, fixed=False)
+                internal_bus: Flow(
+                    nominal_value=self.capacity_turbine, max=self.profile, fixed=False
+                )
             },
             carrier=self.carrier,
             tech=self.tech
@@ -506,4 +508,6 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.subnodes = (inflow, internal_bus, pump)
 
 
-TYPEMAP.update({"asymmetric storage": AsymmetricStorage, "reservoir": ReservoirWithPump, "bev": Bev})
+TYPEMAP.update(
+    {"asymmetric storage": AsymmetricStorage, "reservoir": ReservoirWithPump, "bev": Bev}
+)
