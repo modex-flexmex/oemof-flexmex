@@ -72,6 +72,18 @@ def setup_experiment_paths(name, basepath):
     return experiment_paths
 
 
+def load_scalar_input_data(path_data_raw):
+
+    scalars = pd.read_csv(
+        path_data_raw,
+        header=0,
+        na_values=['not considered', 'no value'],
+        sep=',',
+    )
+
+    return scalars
+
+
 def get_all_file_paths(dir):
     r"""
     Finds all paths of files in a directory.
