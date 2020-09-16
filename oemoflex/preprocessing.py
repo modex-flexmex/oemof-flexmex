@@ -984,14 +984,14 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
         scalars,
         'EnergyConversion_Capacity_Electricity_Hydro_ReservoirStorage')
 
-    initial_filling_level = get_parameter_values(
+    initial_storage_level = get_parameter_values(
         scalars,
         'Energy_PrimaryEnergy_Hydro_Reservoir_FillingLevelStart')
 
     element_df['storage_capacity'] = storage_capacity
 
     # Recalculate filling level as a ratio of storage capacity (refer oemof.solph.components)
-    element_df['initial_filling_level'] = initial_filling_level / storage_capacity
+    element_df['initial_storage_level'] = initial_storage_level / storage_capacity
 
     element_df['efficiency_turbine'] = get_parameter_values(
         scalars,
