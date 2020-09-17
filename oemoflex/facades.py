@@ -178,17 +178,24 @@ class Bev(GenericStorage, Facade):
     capacity: numeric
         Installed production capacity of the turbine installed at the
         reservoir
-    availability : numeric
+    availability : array-like
         Ratio of available capacity for charging/vehicle-to-grid due to
         grid connection.
-    drive_power : numeric
+    drive_power : array-like
         Profile of the load of the fleet through driving relative amount.
     amount : numeric
         Total amount of energy consumed by driving. The drive_power profile
         will be scaled by this number.
-    efficiency: numeric
-        Efficiency of the turbine converting inflow to electricity
-        production, default: 1
+    efficiency_charging: numeric
+        Efficiency of charging the batteries, default: 1
+    efficiency_discharging: numeric
+        Efficiency of discharging the batteries, default: 1
+    efficiency_v2g: numeric
+        Efficiency of vehicle-to-grid, default: 1
+    min_storage_level : array-like
+        Profile of minimum storage level.
+    max_storage_level : array-like
+        Profile of minimum storage level.
     input_parameters: dict
         Dictionary to specify parameters on the input edge. You can use
         all keys that are available for the  oemof.solph.network.Flow class.
@@ -203,9 +210,10 @@ class Bev(GenericStorage, Facade):
 
         x^{level}(t) =
         x^{level}(t-1) \cdot (1 - c^{loss\_rate}(t))
-        - x^{drive_power}(t)
-        + \frac{x^{flow, in}(t)}{c^{efficiency}(t)}
-        - \frac{x^{flow, out}(t)}{c^{efficiency}(t)}
+        + c^{efficiency\_charging}(t) \cdot  x^{flow, in}(t)
+        - \frac{x^{drive\_power}(t)}{c^{efficiency\_discharging}(t)}
+        - \frac{x^{flow, v2g}(t)}
+               {c^{efficiency\_discharging}(t) \cdot c^{efficiency\_v2g}(t)}
         \qquad \forall t \in T
 
     Note
@@ -213,8 +221,8 @@ class Bev(GenericStorage, Facade):
     As the Bev is a sub-class of `oemof.solph.GenericStorage` you also
     pass all arguments of this class.
 
-    The concept refers to the following publications with the exception that uncontrolled charging
-    is not (yet) considered.
+    The concept is similar to the one described in the following publications with the difference
+    that uncontrolled charging is not (yet) considered.
 
     Wulff, N., Steck, F., Gils, H. C., Hoyer-Klick, C., van den Adel, B., & Anderson, J. E. (2020).
     Comparing power-system and user-oriented battery electric vehicle charging representation and
