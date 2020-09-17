@@ -1188,9 +1188,9 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
 
         if k == 'drive_power':
 
-            sum = profile_df.sum(axis=0)
+            yearly_amount = profile_df.sum(axis=0)
 
-            profile_df = profile_df.divide(sum)
+            profile_df = profile_df.divide(yearly_amount)
 
         profile_df.to_csv(
             os.path.join(data_preprocessed_path, 'sequences', k + '_profile.csv')
