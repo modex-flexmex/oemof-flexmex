@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from oemof.solph import EnergySystem, Bus, Sink
+from oemof.solph import EnergySystem, Bus, Sink, Transformer, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements
@@ -268,6 +268,13 @@ def get_sequences_by_tech(results):
     sequences = copy.deepcopy({key: value['sequences'] for key, value in results.items()})
 
     sequences_by_tech = {}
+
+    # Get internal busses for all 'ReservoirWithPump' and 'Bev' nodes to be ignored later
+    internal_busses = get_subnodes_by_type(sequences, Bus)
+
+    # Get inflows for all 'ReservoirWithPump' nodes
+    reservoir_inflows = get_subnodes_by_type(sequences, Source)
+
     for key, df in sequences.items():
         if isinstance(key[0], Bus):
             component = key[1]
@@ -302,6 +309,9 @@ def get_sequences_by_tech(results):
                 elif bus == component.heat_bus:
                     var_name = 'flow_heat'
 
+            elif component in reservoir_inflows:
+                var_name = 'flow_inflow'
+
             else:
                 var_name = 'flow_out'
 
@@ -309,9 +319,23 @@ def get_sequences_by_tech(results):
             component = key[0]
             var_name = 'storage_content'
 
+        # Ignore sequences FROM internal busses (concerns ReservoirWithPump, Bev)
+        if bus in internal_busses and not component in reservoir_inflows:
+            continue
+
         carrier_tech = component.carrier + '-' + component.tech
         if carrier_tech not in sequences_by_tech:
             sequences_by_tech[carrier_tech] = []
+
+        # WORKAROUND for components with subnodes (ReservoirWithPump, Bev):
+        #  Since a subnode has a name different from its main node we have to rename them
+        #  to be merged properly along with the other parameters of the main node
+        name = component.label.rsplit('-', 1)
+        if isinstance(component, Transformer) and name[1] == 'pump' \
+                or isinstance(component, Source) and name[1] == 'inflow' \
+                or isinstance(component, Transformer) and name[1] == 'vehicle_to_grid':
+            # Rename the subnode to the main node's name (drop the suffix)
+            component.label = name[0]
 
         df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
         df.columns.names = ['name', 'var_name']
@@ -320,6 +344,40 @@ def get_sequences_by_tech(results):
     sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
 
     return sequences_by_tech
+
+
+def get_subnodes_by_type(sequences, cls):
+    r"""
+    Get all the subnodes of type 'cls' in the <to> nodes of 'sequences'
+
+    Parameters
+    ----------
+    sequences : dict (special format, see get_sequences_by_tech() and before)
+        key: tuple of 'to' node and 'from' node: (from, to)
+        value: timeseries DataFrame
+
+    cls : Class
+        Class to check against
+
+    Returns
+    -------
+    A list of all subnodes of type 'cls'
+    """
+
+    # Get a list of all the components
+    to_nodes = []
+    for k, s in sequences.items():
+        # It's sufficient to look into one side of the flows ('to' node, k[1])
+        to_nodes.append(k[1])
+
+    subnodes_list = []
+    for component in to_nodes:
+        if hasattr(component, 'subnodes'):
+            # Only get subnodes of type 'cls'
+            subnodes_per_component = [n for n in component.subnodes if isinstance(n, cls)]
+            subnodes_list.extend(subnodes_per_component)
+
+    return subnodes_list
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):
@@ -401,6 +459,22 @@ def get_storage_losses(oemoflex_scalars):
     losses = flow_in.copy()
     losses['var_name'] = 'loss'
     losses['var_value'] = flow_in['var_value'] - flow_out['var_value']
+    losses = losses.reset_index()
+
+    return losses
+
+
+def get_reservoir_losses(oemoflex_scalars):
+    reservoir_data = oemoflex_scalars.loc[
+        oemoflex_scalars['type'].isin(['reservoir'])
+    ]
+    flow_in = reservoir_data.loc[reservoir_data['var_name'] == 'flow_in'].set_index('name')
+    flow_out = reservoir_data.loc[reservoir_data['var_name'] == 'flow_out'].set_index('name')
+    flow_inflow = reservoir_data.loc[reservoir_data['var_name'] == 'flow_inflow'].set_index('name')
+
+    losses = flow_in.copy()
+    losses['var_name'] = 'losses'
+    losses['var_value'] = flow_inflow['var_value'] - (flow_out['var_value'] - flow_in['var_value'])
     losses = losses.reset_index()
 
     return losses
@@ -913,7 +987,7 @@ def aggregate_by_country(df):
 
 
 def get_total_system_cost(oemoflex_scalars):
-    cost_list = ['cost_varom', 'cost_fuel', 'cost_capacity', 'cost_emission']
+    cost_list = ['cost_varom', 'cost_fuel', 'cost_invest', 'cost_emission']
     df = oemoflex_scalars.loc[oemoflex_scalars['var_name'].isin(cost_list)]
     total_system_cost = pd.DataFrame(columns=oemoflex_scalars.columns)
     total_system_cost.loc[0, 'var_name'] = 'total_system_cost'
@@ -960,7 +1034,7 @@ def run_postprocessing(year, name, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=';')
+    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=',')
 
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
@@ -1005,7 +1079,13 @@ def run_postprocessing(year, name, exp_paths):
     # losses (storage, transmission)
     transmission_losses = get_transmission_losses(oemoflex_scalars)
     storage_losses = get_storage_losses(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, transmission_losses, storage_losses], sort=True)
+    reservoir_losses = get_reservoir_losses(oemoflex_scalars)
+    oemoflex_scalars = pd.concat([
+        oemoflex_scalars,
+        transmission_losses,
+        storage_losses,
+        reservoir_losses
+    ], sort=True)
 
     # get capacities
     capacities = get_capacities(es)

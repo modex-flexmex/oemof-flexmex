@@ -27,11 +27,18 @@ if os.path.exists(exp_paths.results_comparison):
 os.makedirs(exp_paths.results_comparison)
 
 experiments = [
+    'FlexMex1_2a',
+    'FlexMex1_2b',
+    'FlexMex1_2c',
+    'FlexMex1_2d',
+    'FlexMex1_3',
     'FlexMex1_4a',
     'FlexMex1_4b',
     'FlexMex1_4c',
     'FlexMex1_4d',
+    'FlexMex1_4e',
     'FlexMex1_5',
+    'FlexMex1_7b',
     'FlexMex1_10',
 ]
 
@@ -52,7 +59,11 @@ def copy_timeseries(experiments, fro, to):
     from_to = {os.path.join(fro, e): os.path.join(to, e) for e in experiments}
 
     for src, dst in from_to.items():
-        shutil.copytree(src, dst, ignore=shutil.ignore_patterns('Scalars.csv', 'oemoflex.log*'))
+        shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
+            'Scalars.csv',
+            'oemoflex.log*',
+            'oemoflex_scalars.csv',
+        ))
 
 
 all_scalars = join_scalars(experiments)

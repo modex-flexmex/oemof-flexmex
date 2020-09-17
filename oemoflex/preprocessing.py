@@ -144,36 +144,18 @@ def create_component_element(component_attrs_file):
 
     # Create dict for component data
     if defaults['type'] == 'link':
+        # TODO: Check the diverging conventions of '-' and '_' and think about unifying.
         comp_data['region'] = [link.replace('-', '_') for link in link_list]
         comp_data['name'] = link_list
         comp_data['from_bus'] = [link.split('-')[0] + suffices['from_bus'] for link in link_list]
         comp_data['to_bus'] = [link.split('-')[1] + suffices['to_bus'] for link in link_list]
 
-    elif defaults['type'] == 'conversion':
-        comp_data['region'] = regions_list
-        comp_data['name'] = [region + suffices['name'] for region in regions_list]
-        comp_data['from_bus'] = [region + suffices['from_bus'] for region in regions_list]
-        comp_data['to_bus'] = [region + suffices['to_bus'] for region in regions_list]
-
-        if 'efficiency' in suffices:
-            comp_data['efficiency'] = [region + suffices['efficiency'] for region in regions_list]
-
-    elif defaults['type'] in ['backpressure', 'extraction']:
-        comp_data['region'] = regions_list
-        comp_data['name'] = [region + suffices['name'] for region in regions_list]
-        comp_data['fuel_bus'] = [region + suffices['fuel_bus'] for region in regions_list]
-        comp_data['heat_bus'] = [region + suffices['heat_bus'] for region in regions_list]
-        comp_data['electricity_bus'] = [
-            region + suffices['electricity_bus'] for region in regions_list
-        ]
-
     else:
         comp_data['region'] = regions_list
         comp_data['name'] = [region + suffices['name'] for region in regions_list]
-        comp_data['bus'] = [region + suffices['bus'] for region in regions_list]
 
-        if 'profile' in suffices:
-            comp_data['profile'] = [region + suffices['profile'] for region in regions_list]
+        for key, value in suffices.items():
+            comp_data[key] = [region + value for region in regions_list]
 
     for key, value in defaults.items():
         comp_data[key] = value
@@ -509,7 +491,7 @@ def update_heat_storage_large(data_preprocessed_path, scalars):
 
     # Write back to csv file
     df.to_csv(file_path)
-    
+
 
 def update_link(data_preprocessed_path, scalars):
     logging.info("Updating link file")
@@ -980,6 +962,86 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
     df.to_csv(file_path)
 
 
+def update_hydro_reservoir(data_preprocessed_path, scalars):
+    component = 'hydro-reservoir'
+
+    logging.info(f"Updating {component} file")
+
+    # TODO: This filepath should be moved to components.csv
+    file_path = os.path.join(data_preprocessed_path, 'elements', component + '.csv')
+
+    element_df = pd.read_csv(file_path, index_col='region')
+
+    element_df['capacity_turbine'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirTurbine')
+
+    element_df['capacity_pump'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirPump')
+
+    storage_capacity = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capacity_Electricity_Hydro_ReservoirStorage')
+
+    initial_filling_level = get_parameter_values(
+        scalars,
+        'Energy_PrimaryEnergy_Hydro_Reservoir_FillingLevelStart')
+
+    element_df['storage_capacity'] = storage_capacity
+
+    # Recalculate filling level as a ratio of storage capacity (refer oemof.solph.components)
+    element_df['initial_filling_level'] = initial_filling_level / storage_capacity
+
+    element_df['efficiency_turbine'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Eta_Electricity_Hydro_ReservoirTurbine') * 1e-2  # percent -> 0...1
+
+    element_df['efficiency_pump'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_Eta_Electricity_Hydro_ReservoirPump') * 1e-2  # percent -> 0...1
+
+    element_df['marginal_cost'] = get_parameter_values(
+        scalars,
+        'EnergyConversion_VarOM_Electricity_Hydro_Reservoir') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    element_df.to_csv(file_path)
+
+
+def update_electricity_bev(data_preprocessed_path, scalars):
+    electricity_bev_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-bev.csv')
+
+    electricity_bev = pd.read_csv(electricity_bev_file, index_col='region')
+
+    electricity_bev['capacity'] = get_parameter_values(
+        scalars,
+        'Transport_CarNumber_Electricity_Cars'
+    ) * get_parameter_values(
+        scalars,
+        'Transport_ConnecPower_Electricity_Cars')
+
+    electricity_bev['storage_capacity'] = get_parameter_values(
+        scalars,
+        'Transport_CarNumber_Electricity_Cars'
+    ) * get_parameter_values(
+        scalars,
+        'Transport_BatteryCap_Electricity_Cars') * 1e3  # GWh to MWh
+
+    electricity_bev['efficiency_v2g'] = get_parameter_values(
+        scalars,
+        'Transport_EtaFeedIn_Electricity_Cars') * 1e-2  # percentage to decimal
+
+    electricity_bev['amount'] = get_parameter_values(
+        scalars,
+        'Transport_AnnualDemand_Electricity_Cars') * 1e3 / 1780.43  # GWh to MWh
+
+    electricity_bev['marginal_cost'] = get_parameter_values(
+        scalars,
+        'Transport_VarOMGridFeedIn_Electricity_Cars') * 1e-3  # Eur/GWh to Eur/MWh
+
+    electricity_bev.to_csv(electricity_bev_file)
+
+
 def combine_profiles(raw_profile_path, column_name):
     profile_file_list = sorted(os.listdir(raw_profile_path))
 
@@ -1073,6 +1135,24 @@ def create_solar_pv_profiles(data_raw_path, data_preprocessed_path):
     )
 
 
+def create_hydro_reservoir_profiles(data_raw_path, data_preprocessed_path):
+    # TODO: Use this function to generalize the other create_profile functions.
+    profile_name = 'hydro-reservoir_profile'
+    raw_profile_spec = ['Energy', 'SecondaryEnergy', 'Hydro', 'Reservoir']
+
+    logging.info(f"Creating {profile_name} profile")
+
+    raw_profile_paths = os.path.join(
+        data_raw_path, *raw_profile_spec
+    )
+
+    profile_df = combine_profiles(raw_profile_paths, profile_name)
+
+    profile_df.to_csv(
+        os.path.join(data_preprocessed_path, 'sequences', profile_name + '.csv')
+    )
+
+
 def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
     logging.info("Creating electricity heatpump profiles")
 
@@ -1085,3 +1165,27 @@ def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
     profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'efficiency_profile.csv')
     )
+
+
+def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
+    logging.info("Creating electricity bev profiles")
+
+    raw_profile_paths = os.path.join(
+        data_raw_path, 'OtherProfiles', 'Transport'
+    )
+
+    profiles = {
+        'drive_power': 'DrivePower',
+        'availability': 'GridArrivalabilityRate',
+        'max_storage_level': 'MaxBatteryLevel',
+        'min_storage_level': 'MinBatteryLevel'
+    }
+
+    for k, v in profiles.items():
+        path = os.path.join(raw_profile_paths, v)
+
+        profile_df = combine_profiles(path, k + '-profile')
+
+        profile_df.to_csv(
+            os.path.join(data_preprocessed_path, 'sequences', k + '_profile.csv')
+        )
