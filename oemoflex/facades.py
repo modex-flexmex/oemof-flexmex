@@ -313,6 +313,7 @@ class Bev(GenericStorage, Facade):
                 )
             },
             conversion_factors={internal_bus: self.efficiency_v2g},
+            **self.output_parameters
         )
 
         drive_power = Sink(
