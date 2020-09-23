@@ -1007,6 +1007,10 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
         scalars,
         'EnergyConversion_VarOM_Electricity_Hydro_Reservoir') * 1e-3  # Eur/GWh -> Eur/MWh
 
+    # Apply auxilliary costs to the pump flow to avoid costless 'pump-and-spillover curtailment'
+    # Use string representation of the dict
+    element_df['input_parameters'] = dumps({"variable_costs": 0.00001})
+
     element_df.to_csv(file_path)
 
 
