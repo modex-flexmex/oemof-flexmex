@@ -330,7 +330,6 @@ class Bev(GenericStorage, Facade):
                 self.bus: Flow(
                     nominal_value=self.capacity,
                     max=self.availability,
-                    variable_costs=0.00001,
                     **self.input_parameters
                 )
             }
