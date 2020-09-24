@@ -11,6 +11,7 @@ Welcome to oemoflex's documentation!
    :caption: Getting started
 
    getting_started
+   overview
 
 .. toctree::
    :maxdepth: 2
