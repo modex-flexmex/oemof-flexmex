@@ -8,7 +8,7 @@ from pandas.testing import assert_frame_equal
 import yaml
 
 
-def get_experiment_paths(basepath):
+def get_experiment_paths():
     r"""
 
     Parameters
@@ -28,6 +28,8 @@ def get_experiment_paths(basepath):
     with open(path_config, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
+    # Use base path to make other paths absolute and drop it
+    basepath = os.path.realpath(os.path.join(module_path, config.pop('base')))
     experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
 
     experiment_paths = Dict(experiment_paths)
@@ -67,7 +69,7 @@ def add_usecase_paths(experiment_paths, name):
     return experiment_paths
 
 
-def setup_experiment_paths(name, basepath):
+def setup_experiment_paths(name):
     r"""
     Gets the experiment paths for a given experiment and
     a basepath. If they do not exist, they are created.
@@ -85,7 +87,7 @@ def setup_experiment_paths(name, basepath):
     experiment_paths : dict
         Dictionary listing all experiment paths
     """
-    experiment_paths = get_experiment_paths(basepath)
+    experiment_paths = get_experiment_paths()
     experiment_paths = add_usecase_paths(experiment_paths, name)
 
     for path in experiment_paths.values():
