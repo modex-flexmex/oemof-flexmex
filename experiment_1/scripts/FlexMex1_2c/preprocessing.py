@@ -14,8 +14,7 @@ from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, che
 name = 'FlexMex1_2c'
 
 # Get paths
-basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-exp_paths = setup_experiment_paths(name, basepath)
+exp_paths = setup_experiment_paths(name)
 
 exp_paths.data_preprocessed = os.path.join(exp_paths.data_preprocessed, 'data')
 

@@ -12,8 +12,7 @@ from oemoflex.helpers import setup_experiment_paths
 
 name = 'FlexMex1_3'
 
-basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-exp_paths = setup_experiment_paths(name, basepath)
+exp_paths = setup_experiment_paths(name)
 
 logpath = define_logging(
     logpath=exp_paths.results_postprocessed,

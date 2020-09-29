@@ -8,8 +8,7 @@ name = 'FlexMex1_5'
 
 year = 2050
 
-basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-exp_paths = setup_experiment_paths(name, basepath)
+exp_paths = setup_experiment_paths(name)
 
 
 def main():
