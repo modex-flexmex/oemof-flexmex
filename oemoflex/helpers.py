@@ -97,10 +97,12 @@ def setup_experiment_paths(name):
     return experiment_paths
 
 
-def load_scalar_input_data(path_data_raw):
+def load_scalar_input_data():
+
+    exp_paths = get_experiment_paths()
 
     scalars = pd.read_csv(
-        path_data_raw,
+        os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
         header=0,
         na_values=['not considered', 'no value'],
         sep=',',
