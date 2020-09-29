@@ -29,9 +29,7 @@ if not os.path.exists(exp_paths.data_preprocessed):
 
 def main():
     # Load common input parameters
-    scalars = load_scalar_input_data(
-        os.path.join(exp_paths['data_raw'], 'Scalars.csv')
-    )
+    scalars = load_scalar_input_data()
 
     # Filter out only scenario-related input parameters
     scalars = scalars.set_index(['Region', 'Parameter'])
