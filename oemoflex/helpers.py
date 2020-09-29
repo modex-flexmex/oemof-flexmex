@@ -8,15 +8,13 @@ from pandas.testing import assert_frame_equal
 import yaml
 
 
-def get_experiment_paths(name, basepath):
+def get_experiment_paths(basepath):
     r"""
 
     Parameters
     ----------
-    name : str
-        Name of the scenario
-    path_config : str
-        Path to the config.yml containing the experiment's path structure
+    basepath : str
+        Path to experiment's root
 
     Returns
     -------
@@ -32,6 +30,31 @@ def get_experiment_paths(name, basepath):
 
     experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
 
+    experiment_paths = Dict(experiment_paths)
+
+    return experiment_paths
+
+
+def add_usecase_paths(experiment_paths, name):
+    r"""
+    Add use case name to several paths.
+
+    NOTE: Can be dropped as soon as directory structure is reordered.
+
+    Parameters
+    ----------
+    experiment_paths : addict.Dict
+        experiment paths
+
+    name : str
+        Name of the usecase
+
+    Returns
+    -------
+    experiment_paths : addict.Dict
+        Dictionary containing the experiment's path structure
+    """
+
     experiment_paths['data_preprocessed'] = os.path.join(
         experiment_paths['data_preprocessed'], name)
 
@@ -40,8 +63,6 @@ def get_experiment_paths(name, basepath):
 
     experiment_paths['results_postprocessed'] = os.path.join(
         experiment_paths['results_postprocessed'], name)
-
-    experiment_paths = Dict(experiment_paths)
 
     return experiment_paths
 
@@ -64,7 +85,9 @@ def setup_experiment_paths(name, basepath):
     experiment_paths : dict
         Dictionary listing all experiment paths
     """
-    experiment_paths = get_experiment_paths(name, basepath)
+    experiment_paths = get_experiment_paths(basepath)
+    experiment_paths = add_usecase_paths(experiment_paths, name)
+
     for path in experiment_paths.values():
         if not os.path.exists(path):
             os.makedirs(path)
