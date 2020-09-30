@@ -174,10 +174,9 @@ class Bev(GenericStorage, Facade):
     bus: oemof.solph.Bus
         An oemof bus instance where the storage unit is connected to.
     storage_capacity: numeric
-        The total storage capacity of the storage (e.g. in MWh)
+        The total storage capacity of the vehicles (e.g. in MWh)
     capacity: numeric
-        Installed production capacity of the turbine installed at the
-        reservoir
+        Total charging/discharging capacity of the vehicles.
     availability : array-like
         Ratio of available capacity for charging/vehicle-to-grid due to
         grid connection.
@@ -195,7 +194,7 @@ class Bev(GenericStorage, Facade):
     min_storage_level : array-like
         Profile of minimum storage level.
     max_storage_level : array-like
-        Profile of minimum storage level.
+        Profile of maximum storage level.
     input_parameters: dict
         Dictionary to specify parameters on the input edge. You can use
         all keys that are available for the  oemof.solph.network.Flow class.
