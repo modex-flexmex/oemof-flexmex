@@ -3,7 +3,6 @@ Run this script from the root directory of the datapackage to update
 or create meta data.
 """
 import logging
-import os
 
 from oemof.tools.logger import define_logging
 from oemof.tabular.datapackage import building

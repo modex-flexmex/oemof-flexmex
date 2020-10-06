@@ -1,7 +1,5 @@
 """
 """
-import os
-
 from oemof.tools.logger import define_logging
 
 from oemoflex.helpers import setup_experiment_paths
