@@ -1,7 +1,7 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
 name,str,n/a,,-heat-shortage,Name
-type,str,n/a,dispatchable,,Type
+type,str,n/a,shortage,,Type
 carrier,str,n/a,heat,,Energy carrier
 tech,str,n/a,shortage,,Technology
 bus,str,n/a,,-heat,The bus this component is connected to
