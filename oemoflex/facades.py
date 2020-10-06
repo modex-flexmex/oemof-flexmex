@@ -164,7 +164,7 @@ class AsymmetricStorage(GenericStorage, Facade):
 
 
 class Bev(GenericStorage, Facade):
-    r""" A Battery electric vehicle unit.
+    r""" A fleet of Battery electric vehicles with vehicle-to-grid.
 
     Note that the investment option is not available for this facade at
     the current development state.
@@ -174,55 +174,66 @@ class Bev(GenericStorage, Facade):
     bus: oemof.solph.Bus
         An oemof bus instance where the storage unit is connected to.
     storage_capacity: numeric
-        The total storage capacity of the storage (e.g. in MWh)
+        The total storage capacity of the vehicles (e.g. in MWh)
     capacity: numeric
-        Installed production capacity of the turbine installed at the
-        reservoir
-    efficiency: numeric
-        Efficiency of the turbine converting inflow to electricity
-        production, default: 1
-    profile: array-like
-        Absolute inflow profile of inflow into the storage
+        Total charging/discharging capacity of the vehicles.
+    availability : array-like
+        Ratio of available capacity for charging/vehicle-to-grid due to
+        grid connection.
+    drive_power : array-like
+        Profile of the load of the fleet through driving relative amount.
+    amount : numeric
+        Total amount of energy consumed by driving. The drive_power profile
+        will be scaled by this number.
+    efficiency_charging: numeric
+        Efficiency of charging the batteries, default: 1
+    efficiency_discharging: numeric
+        Efficiency of discharging the batteries, default: 1
+    efficiency_v2g: numeric
+        Efficiency of vehicle-to-grid, default: 1
+    min_storage_level : array-like
+        Profile of minimum storage level.
+    max_storage_level : array-like
+        Profile of maximum storage level.
     input_parameters: dict
-        Dictionary to specifiy parameters on the input edge. You can use
+        Dictionary to specify parameters on the input edge. You can use
         all keys that are available for the  oemof.solph.network.Flow class.
     output_parameters: dict
         see: input_parameters
 
 
-    The reservoir is modelled as a storage with a constant inflow:
+    The vehicle fleet is modelled as a storage together with an internal sink with
+    fixed flow:
 
     .. math::
 
         x^{level}(t) =
         x^{level}(t-1) \cdot (1 - c^{loss\_rate}(t))
-        + x^{profile}(t) - \frac{x^{flow, out}(t)}{c^{efficiency}(t)}
+        + c^{efficiency\_charging}(t) \cdot  x^{flow, in}(t)
+        - \frac{x^{drive\_power}(t)}{c^{efficiency\_discharging}(t)}
+        - \frac{x^{flow, v2g}(t)}
+               {c^{efficiency\_discharging}(t) \cdot c^{efficiency\_v2g}(t)}
         \qquad \forall t \in T
-
-    .. math::
-        x^{level}(0) = 0.5 \cdot c^{capacity}
-
-    The inflow is bounded by the exogenous inflow profile. Thus if the inflow
-    exceeds the maximum capacity of the storage, spillage is possible by
-    setting :math:`x^{profile}(t)` to lower values.
-
-    .. math::
-        0 \leq x^{profile}(t) \leq c^{profile}(t) \qquad \forall t \in T
-
-
-    The spillage of the reservoir is therefore defined by:
-    :math:`c^{profile}(t) - x^{profile}(t)`.
 
     Note
     ----
-    As the Reservoir is a sub-class of `oemof.solph.GenericStorage` you also
+    As the Bev is a sub-class of `oemof.solph.GenericStorage` you also
     pass all arguments of this class.
 
+    The concept is similar to the one described in the following publications with the difference
+    that uncontrolled charging is not (yet) considered.
+
+    Wulff, N., Steck, F., Gils, H. C., Hoyer-Klick, C., van den Adel, B., & Anderson, J. E. (2020).
+    Comparing power-system and user-oriented battery electric vehicle charging representation and
+    its implications on energy system modeling. Energies, 13(5). https://doi.org/10.3390/en13051093
+
+    Diego Luca de Tena Costales. (2014).
+    Large Scale Renewable Power Integration with Electric Vehicles. https://doi.org/10.04.2014
 
     Examples
     --------
-    Basic usage examples of the GenericStorage with a random selection of
-    attributes. See the Flow class for all Flow attributes.
+    Basic usage example of the Bev class with an arbitrary selection of
+    attributes.
 
     >>> from oemof import solph
     >>> from oemof.tabular import facades
@@ -235,8 +246,8 @@ class Bev(GenericStorage, Facade):
     ...     storage_capacity=1000,
     ...     capacity=50,
     ...     availability=[0.8, 0.7, 0.6],
-    ...     drive_power=[1, 2, 6],
-    ...     amount=1e9,
+    ...     drive_power=[0.3, 0.2, 0.5],
+    ...     amount=450,
     ...     loss_rate=0.01,
     ...     initial_storage_level=0,
     ...     min_storage_level=[0.1, 0.2, 0.15],
@@ -483,7 +494,11 @@ class ReservoirWithPump(GenericStorage, Facade):
         inflow = Source(
             label=self.label + "-inflow",
             outputs={
-                internal_bus: Flow(nominal_value=self.capacity_turbine, max=self.profile, fixed=False)
+                internal_bus: Flow(
+                    nominal_value=self.capacity_turbine,
+                    max=self.profile,
+                    fixed=False
+                )
             },
             carrier=self.carrier,
             tech=self.tech
@@ -506,4 +521,9 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.subnodes = (inflow, internal_bus, pump)
 
 
-TYPEMAP.update({"asymmetric storage": AsymmetricStorage, "reservoir": ReservoirWithPump, "bev": Bev})
+TYPEMAP.update(
+    {
+        "asymmetric storage": AsymmetricStorage,
+        "reservoir": ReservoirWithPump, "bev": Bev
+    }
+)
