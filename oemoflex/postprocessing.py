@@ -320,7 +320,7 @@ def get_sequences_by_tech(results):
             var_name = 'storage_content'
 
         # Ignore sequences FROM internal busses (concerns ReservoirWithPump, Bev)
-        if bus in internal_busses and not component in reservoir_inflows:
+        if bus in internal_busses and component not in reservoir_inflows:
             continue
 
         carrier_tech = component.carrier + '-' + component.tech
