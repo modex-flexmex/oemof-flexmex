@@ -1033,7 +1033,7 @@ def update_electricity_bev(data_preprocessed_path, scalars):
 
     electricity_bev['amount'] = get_parameter_values(
         scalars,
-        'Transport_AnnualDemand_Electricity_Cars') * 1e3 / 1780.43  # GWh to MWh
+        'Transport_AnnualDemand_Electricity_Cars') * 1e3  # GWh to MWh
 
     electricity_bev['marginal_cost'] = get_parameter_values(
         scalars,
@@ -1185,6 +1185,12 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
         path = os.path.join(raw_profile_paths, v)
 
         profile_df = combine_profiles(path, k + '-profile')
+
+        if k == 'drive_power':
+
+            yearly_amount = profile_df.sum(axis=0)
+
+            profile_df = profile_df.divide(yearly_amount)
 
         profile_df.to_csv(
             os.path.join(data_preprocessed_path, 'sequences', k + '_profile.csv')
