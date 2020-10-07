@@ -454,8 +454,6 @@ class ReservoirWithPump(GenericStorage, Facade):
 
         self.expandable = bool(kwargs.get("expandable", False))
 
-        self.initial_storage_level = kwargs.get("initial_storage_level")
-
         self.build_solph_components()
 
     def build_solph_components(self):
