@@ -331,9 +331,10 @@ def get_sequences_by_tech(results):
         #  Since a subnode has a name different from its main node we have to rename them
         #  to be merged properly along with the other parameters of the main node
         name = component.label.rsplit('-', 1)
-        if isinstance(component, Transformer) and name[1] == 'pump' \
-                or isinstance(component, Source) and name[1] == 'inflow' \
-                or isinstance(component, Transformer) and name[1] == 'vehicle_to_grid':
+        # pylint: disable=too-many-boolean-expressions
+        if (isinstance(component, Transformer) and name[1] == 'pump') \
+                or (isinstance(component, Source) and name[1] == 'inflow') \
+                or (isinstance(component, Transformer) and name[1] == 'vehicle_to_grid'):
             # Rename the subnode to the main node's name (drop the suffix)
             component.label = name[0]
 
@@ -366,7 +367,7 @@ def get_subnodes_by_type(sequences, cls):
 
     # Get a list of all the components
     to_nodes = []
-    for k, s in sequences.items():
+    for k in sequences.keys():
         # It's sufficient to look into one side of the flows ('to' node, k[1])
         to_nodes.append(k[1])
 

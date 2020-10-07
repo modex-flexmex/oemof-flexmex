@@ -296,8 +296,7 @@ class Bev(GenericStorage, Facade):
         self.build_solph_components()
 
     def build_solph_components(self):
-        """
-        """
+
         self.nominal_storage_capacity = self.storage_capacity
 
         self.inflow_conversion_factor = sequence(self.efficiency_charging)
