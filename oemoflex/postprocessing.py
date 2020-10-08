@@ -9,7 +9,7 @@ import yaml
 from oemof.solph import EnergySystem, Bus, Sink, Transformer, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
-from oemoflex.helpers import delete_empty_subdirs, load_elements
+from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data
 from oemoflex.preprocessing import get_parameter_values
 
 from oemoflex.facades import TYPEMAP
@@ -1035,7 +1035,7 @@ def run_postprocessing(year, name, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=',')
+    scalars_raw = load_scalar_input_data()
 
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))

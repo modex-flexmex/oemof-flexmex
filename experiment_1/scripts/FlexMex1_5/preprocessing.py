@@ -1,7 +1,5 @@
 import os
 
-import pandas as pd
-
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements,
@@ -12,14 +10,13 @@ from oemoflex.preprocessing import (
     create_electricity_demand_profiles, create_heat_demand_profiles,
     create_electricity_heatpump_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
-from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal
+from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
 
 
 name = 'FlexMex1_5'
 
 # Get paths
-basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-exp_paths = setup_experiment_paths(name, basepath)
+exp_paths = setup_experiment_paths(name)
 
 exp_paths.data_preprocessed = os.path.join(exp_paths.data_preprocessed, 'data')
 
@@ -35,12 +32,7 @@ if not os.path.exists(exp_paths.data_preprocessed):
 
 def main():
     # Load common input parameters
-    scalars = pd.read_csv(
-        os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
-        header=0,
-        na_values=['not considered', 'no value'],
-        sep=';',
-    )
+    scalars = load_scalar_input_data()
 
     # Filter out only scenario-related input parameters
     scalars = scalars.set_index(['Region', 'Parameter'])
