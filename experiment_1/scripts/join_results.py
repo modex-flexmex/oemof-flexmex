@@ -4,12 +4,11 @@ import sys
 
 import pandas as pd
 
-from oemoflex.helpers import setup_experiment_paths
+from oemoflex.helpers import get_experiment_paths
 
 
 # Get paths
-basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-exp_paths = setup_experiment_paths('', basepath)
+exp_paths = get_experiment_paths()
 
 exp_paths.results_comparison = os.path.join(exp_paths.results_comparison, 'oemof')
 
