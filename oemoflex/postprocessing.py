@@ -1021,7 +1021,7 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
                     dir,
                     subfolder,
                     subsubfolder,
-                    '_'.join(['FlexMex1', usecase, model, region, year]) + '.csv'
+                    '_'.join([usecase, model, region, year]) + '.csv'
                 )
 
                 single_column = df_var_value[column]
