@@ -132,8 +132,8 @@ def create_component_element(component_attrs_file):
     try:
         component_attrs = pd.read_csv(component_attrs_file, index_col=0)
 
-    except FileNotFoundError:
-        raise FileNotFoundError(f"There is no file {component_attrs_file}")
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"There is no file {component_attrs_file}") from e
 
     # Collect default values and suffices for the component
     defaults = component_attrs.loc[component_attrs['default'].notna(), 'default'].to_dict()
