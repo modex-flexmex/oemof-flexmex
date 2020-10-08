@@ -8,7 +8,7 @@ bus,str,n/a,,-electricity,The bus this component is connected to
 capacity_turbine,float,MW,n/a,,Installed turbine capacity
 capacity_pump,float,MW,n/a,,Installed pump capacity
 storage_capacity,float,MWh,n/a,,Installed storage capacity
-initial_filling_level,float,MWh,n/a,,Initial reservoir filling level
+initial_storage_level,float,MWh,n/a,,Initial reservoir filling level
 efficiency_turbine,float,unitless,n/a,,Turbine efficiency (discharging)
 efficiency_pump,float,unitless,n/a,,Pump efficiency (charging)
 marginal_cost,float,Eur/MWh,n/a,,Marginal cost of charging/discharging
