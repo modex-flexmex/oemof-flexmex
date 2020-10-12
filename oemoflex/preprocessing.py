@@ -1041,9 +1041,6 @@ def update_electricity_bev(data_preprocessed_path, scalars):
         scalars,
         'Transport_VarOMGridFeedIn_Electricity_Cars') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Use string representation of the dict
-    electricity_bev['input_parameters'] = dumps({"variable_costs": 0.00001})
-
     electricity_bev.to_csv(electricity_bev_file)
 
 
