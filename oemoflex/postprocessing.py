@@ -320,7 +320,7 @@ def get_sequences_by_tech(results):
             var_name = 'storage_content'
 
         # Ignore sequences FROM internal busses (concerns ReservoirWithPump, Bev)
-        if bus in internal_busses and component not in reservoir_inflows:
+        if bus in internal_busses and not component in reservoir_inflows:
             continue
 
         carrier_tech = component.carrier + '-' + component.tech
@@ -331,12 +331,9 @@ def get_sequences_by_tech(results):
         #  Since a subnode has a name different from its main node we have to rename them
         #  to be merged properly along with the other parameters of the main node
         name = component.label.rsplit('-', 1)
-
-        # pylint: disable=too-many-boolean-expressions # reason: for the workaround only
         if isinstance(component, Transformer) and name[1] == 'pump' \
                 or isinstance(component, Source) and name[1] == 'inflow' \
                 or isinstance(component, Transformer) and name[1] == 'vehicle_to_grid':
-
             # Rename the subnode to the main node's name (drop the suffix)
             component.label = name[0]
 
@@ -369,7 +366,7 @@ def get_subnodes_by_type(sequences, cls):
 
     # Get a list of all the components
     to_nodes = []
-    for k, _ in sequences.items():
+    for k, s in sequences.items():
         # It's sufficient to look into one side of the flows ('to' node, k[1])
         to_nodes.append(k[1])
 
@@ -839,9 +836,8 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
     invest_cost = pd.DataFrame()
 
     for _, prep_el in prep_elements.items():
-
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # Not 'is'! pandas overloads operators! # pylint: disable=singleton-comparison # noqa: E712,E501
-
+        # In the following line: Not 'is'! pandas overloads operators!
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
@@ -916,9 +912,8 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
     fixom_cost = pd.DataFrame()
 
     for _, prep_el in prep_elements.items():
-
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # Not 'is'! pandas overloads operators! # pylint: disable=singleton-comparison # noqa: E712,E501
-
+        # not 'is'! pandas overloads operators!
+        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
