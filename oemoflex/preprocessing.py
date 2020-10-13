@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 
-from json import dumps
+import yaml
 
 from oemof.tools.economics import annuity
 
@@ -1197,3 +1197,45 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
         profile_df.to_csv(
             os.path.join(data_preprocessed_path, 'sequences', k + '_profile.csv')
         )
+
+
+def create_profiles(exp_path, select_components):
+
+    mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.yml')
+    raw_path = exp_path.data_raw
+    preprocessed_path = exp_path.data_preprocessed
+
+    with open(mapping_filepath, 'r') as mapping_file:
+        map = yaml.safe_load(mapping_file)
+
+    for component in select_components:
+        profiles = map[component]['profiles']
+
+        for identifier, data in profiles.items():
+
+            profile_paths = os.path.join(raw_path, data['input-path'])
+
+            if identifier == 'default':
+                profile_name = component
+
+            else:
+                profile_name = identifier
+
+            profile_df = combine_profiles(profile_paths, profile_name + '-profile')
+
+            # Wohin damit?
+            # if k == 'drive_power':
+            #
+            #     yearly_amount = profile_df.sum(axis=0)
+            #
+            #     profile_df = profile_df.divide(yearly_amount)
+
+            try:
+                output_filename_base = data['output-name']
+
+            except KeyError:
+                output_filename_base = component
+
+            profile_df.to_csv(
+                os.path.join(preprocessed_path, 'sequences', output_filename_base + '_profile.csv')
+            )
