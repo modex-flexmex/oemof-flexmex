@@ -3,6 +3,8 @@ import os
 
 import pandas as pd
 
+from json import dumps
+
 from oemof.tools.economics import annuity
 
 module_path = os.path.dirname(os.path.abspath(__file__))
