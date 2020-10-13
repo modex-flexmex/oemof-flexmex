@@ -4,9 +4,8 @@ import pandas as pd
 from oemof.solph import (Sink, Source, Bus, Flow, Model,
                          EnergySystem)
 
-from oemoflex.facades import Bev
 from oemof.outputlib import views
-from oemoflex.facades import AsymmetricStorage, ReservoirWithPump
+from oemoflex.facades import (AsymmetricStorage, ReservoirWithPump, Bev)
 
 solver = 'cbc'
 
