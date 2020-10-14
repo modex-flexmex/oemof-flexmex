@@ -44,7 +44,7 @@ electricity-bev:
       input-path: OtherProfiles/Transport/DrivePower
 
     availability:
-      input-path: OtherProfiles/Transport/GridArrivalabilityRate,
+      input-path: OtherProfiles/Transport/GridArrivalabilityRate
 
     max_storage_level:
       input-path: OtherProfiles/Transport/MaxBatteryLevel
