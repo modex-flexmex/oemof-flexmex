@@ -1209,33 +1209,40 @@ def create_profiles(exp_path, select_components):
         map = yaml.safe_load(mapping_file)
 
     for component in select_components:
-        profiles = map[component]['profiles']
 
-        for identifier, data in profiles.items():
+        try:
+            profiles = map[component]['profiles']
 
-            profile_paths = os.path.join(raw_path, data['input-path'])
+            for identifier, data in profiles.items():
 
-            if identifier == 'default':
-                profile_name = component
+                profile_paths = os.path.join(raw_path, data['input-path'])
 
-            else:
-                profile_name = identifier
+                if identifier == 'default':
+                    profile_name = component
 
-            profile_df = combine_profiles(profile_paths, profile_name + '-profile')
+                else:
+                    profile_name = identifier
 
-            # Wohin damit?
-            # if k == 'drive_power':
-            #
-            #     yearly_amount = profile_df.sum(axis=0)
-            #
-            #     profile_df = profile_df.divide(yearly_amount)
+                logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
 
-            try:
-                output_filename_base = data['output-name']
+                profile_df = combine_profiles(profile_paths, profile_name + '-profile')
 
-            except KeyError:
-                output_filename_base = component
+                # Wohin damit?
+                # if k == 'drive_power':
+                #
+                #     yearly_amount = profile_df.sum(axis=0)
+                #
+                #     profile_df = profile_df.divide(yearly_amount)
 
-            profile_df.to_csv(
-                os.path.join(preprocessed_path, 'sequences', output_filename_base + '_profile.csv')
-            )
+                try:
+                    output_filename_base = data['output-name']
+
+                except KeyError:
+                    output_filename_base = component
+
+                profile_df.to_csv(
+                    os.path.join(preprocessed_path, 'sequences', output_filename_base + '_profile.csv')
+                )
+
+        except KeyError:
+            logging.info(f"No timeseries information found for '{component}'.")
