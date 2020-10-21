@@ -1031,6 +1031,34 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
     delete_empty_subdirs(dir)
 
 
+def save_as_elements(oemoflex_scalars, destination):
+    for group, df in oemoflex_scalars.groupby(['carrier', 'tech']):
+
+        element_filename = '-'.join(group) + '.csv'
+
+        element_destination = os.path.join(destination, element_filename)
+
+        # Format element dataframe
+        element_df = df.drop(
+            ['var_unit', 'usecase', 'year'],
+            axis=1
+         )
+
+        # TODO: Fix error with nan values in index
+
+        element_df = element_df.set_index(['region', 'name', 'type', 'carrier', 'tech'])
+
+        element_df = pd.pivot(
+            data=element_df,
+            columns='var_name',
+            values='var_value'
+        )
+
+        element_df.to_csv(element_destination)
+
+        print(f"Saved element results to {element_destination}")
+
+
 def run_postprocessing(year, name, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
@@ -1148,6 +1176,10 @@ def run_postprocessing(year, name, exp_paths):
             os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'),
             index=False
         )
+
+    save_results_as_elements = True
+    if save_results_as_elements:
+        save_as_elements(oemoflex_scalars, exp_paths.results_postprocessed)
 
     save_flexmex_timeseries(
         sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed
