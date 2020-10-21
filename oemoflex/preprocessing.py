@@ -1217,7 +1217,7 @@ def create_electricity_heatpump_profiles(data_raw_path, data_preprocessed_path):
         data_raw_path, 'OtherProfiles', 'COP'
     )
 
-    profile_df = combine_profiles(raw_profile_paths, 'cop-profile')
+    profile_df = combine_profiles(raw_profile_paths, 'efficiency-profile')
 
     profile_df.to_csv(
         os.path.join(data_preprocessed_path, 'sequences', 'efficiency_profile.csv')
