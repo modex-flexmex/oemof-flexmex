@@ -2,7 +2,7 @@ import os
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements, update_electricity_shortage, update_electricity_demand,
+    create_default_data, update_electricity_shortage, update_electricity_demand,
     update_ch4_gt, update_wind_onshore, update_wind_offshore, update_solar_pv,
     update_electricity_bev, create_electricity_bev_profiles,
     create_electricity_demand_profiles,
@@ -40,8 +40,8 @@ def main():
     scalars = scalars.reset_index()
 
     # Prepare oemof.tabular input CSV files
-    create_default_elements(
-        os.path.join(exp_paths.data_preprocessed, 'elements'),
+    create_default_data(
+        exp_paths.data_preprocessed,
         select_components=[
             'electricity-shortage',
             'electricity-curtailment',

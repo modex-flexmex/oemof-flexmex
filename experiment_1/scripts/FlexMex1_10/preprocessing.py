@@ -2,7 +2,7 @@ import os
 
 from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
-    create_default_elements, update_electricity_shortage, update_electricity_demand,
+    create_default_data, update_electricity_shortage, update_electricity_demand,
     update_link, update_wind_onshore, update_wind_offshore, update_solar_pv,
     create_electricity_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
@@ -34,8 +34,8 @@ def main():
     scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']), :]
 
     # Prepare oemof.tabular input CSV files
-    create_default_elements(
-        os.path.join(exp_paths.data_preprocessed, 'elements'),
+    create_default_data(
+        exp_paths.data_preprocessed,
         select_components=[
             'electricity-shortage',
             'electricity-curtailment',
