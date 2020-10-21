@@ -215,11 +215,11 @@ def create_component_sequences(component_attrs_file, destination):
 
         profile_df = pd.DataFrame(columns=profile_columns)
 
-        destination = os.path.join(destination, profile_filename)
+        profile_destination = os.path.join(destination, profile_filename)
 
-        profile_df.to_csv(destination, index=False)
+        profile_df.to_csv(profile_destination, index=False)
 
-        print(f"Saved empty profile to {destination}")
+        print(f"Saved empty profile to {profile_destination}")
 
 
 def get_parameter_values(scalars_df, parameter_name):
