@@ -1201,12 +1201,19 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
 
 def create_profiles(exp_path, select_components):
 
-    mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.csv')
-    raw_path = exp_path.data_raw
-    preprocessed_path = exp_path.data_preprocessed
+    oemof_tabular_settings_filepath = os.path.join(module_path, 'oemof-tabular-settings.yml')
+    with open(oemof_tabular_settings_filepath, 'r') as settings_file:
+        settings = yaml.safe_load(settings_file)
+        sequences_dir = settings['sequences-dir']
+        profile_file_suffix = settings['profile-file-suffix']
+        profile_name_suffix = settings['profile-name-suffix']
 
+    mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.csv')
     with open(mapping_filepath, 'r') as mapping_file:
         map_df = pd.read_csv(mapping_file)
+
+    raw_path = exp_path.data_raw
+    preprocessed_path = exp_path.data_preprocessed
 
     for component in select_components:
 
@@ -1226,7 +1233,7 @@ def create_profiles(exp_path, select_components):
 
                 logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
 
-                profile_df = combine_profiles(profile_paths, profile_name + '-profile')
+                profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
 
                 if profile.apply_function == 'normalize_year':
                     yearly_amount = profile_df.sum(axis=0)
@@ -1241,8 +1248,8 @@ def create_profiles(exp_path, select_components):
                 profile_df.to_csv(
                     os.path.join(
                         preprocessed_path,
-                        'sequences',
-                        output_filename_base + '_profile.csv')
+                        sequences_dir,
+                        output_filename_base + profile_file_suffix + '.csv')
                 )
 
         else:

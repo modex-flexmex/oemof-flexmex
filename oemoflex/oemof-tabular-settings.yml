@@ -1,0 +1,4 @@
+sequences-dir: data/sequences
+elements-dir: data/elements
+profile-file-suffix: _profile
+profile-name-suffix: -profile
