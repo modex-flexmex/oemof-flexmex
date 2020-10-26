@@ -1,7 +1,3 @@
-settings:
-  profile-file-suffix: _profile
-  profile-suffix: -profile
-
 electricity-demand:
   profiles:
     default:
