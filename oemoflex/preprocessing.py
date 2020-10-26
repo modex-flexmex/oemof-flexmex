@@ -1228,12 +1228,9 @@ def create_profiles(exp_path, select_components):
 
                 profile_df = combine_profiles(profile_paths, profile_name + '-profile')
 
-                # Wohin damit?
-                # if k == 'drive_power':
-                #
-                #     yearly_amount = profile_df.sum(axis=0)
-                #
-                #     profile_df = profile_df.divide(yearly_amount)
+                if profile.apply_function == 'normalize_year':
+                    yearly_amount = profile_df.sum(axis=0)
+                    profile_df = profile_df.divide(yearly_amount)
 
                 if pd.notnull(profile.output_name):
                     output_filename_base = profile.output_name
