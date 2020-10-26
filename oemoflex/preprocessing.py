@@ -1239,7 +1239,7 @@ def create_profiles(exp_path, select_components):
                     output_filename_base = profile.output_name
 
                 else:
-                    output_filename_base = component
+                    output_filename_base = profile_name
 
                 profile_df.to_csv(
                     os.path.join(
