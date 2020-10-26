@@ -1,0 +1,12 @@
+component,profile_name,input_data,output_name
+electricity-demand,,Energy/FinalEnergy/Electricity,
+heat-demand,,Energy/FinalEnergy/Heat,
+wind-onshore,,Energy/SecondaryEnergy/Wind/Onshore,
+wind-offshore,,Energy/SecondaryEnergy/Wind/Offshore,
+solar-pv,,Energy/SecondaryEnergy/Solar/PV,
+hydro-reservoir,,Energy/SecondaryEnergy/Hydro/Reservoir,
+electricity-heatpump,cop,OtherProfiles/COP,efficiency
+electricity-bev,drive_power,OtherProfiles/Transport/DrivePower,
+electricity-bev,availability,OtherProfiles/Transport/GridArrivalabilityRate,
+electricity-bev,max_storage_level,OtherProfiles/Transport/MaxBatteryLevel,
+electricity-bev,min_storage_level,OtherProfiles/Transport/MinBatteryLevel,
