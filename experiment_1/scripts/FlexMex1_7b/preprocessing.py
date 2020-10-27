@@ -4,9 +4,7 @@ from oemof.tools.logger import define_logging
 from oemoflex.preprocessing import (
     create_default_elements, update_electricity_shortage, update_electricity_demand,
     update_ch4_gt, update_wind_onshore, update_wind_offshore, update_solar_pv,
-    update_electricity_bev, create_electricity_bev_profiles,
-    create_electricity_demand_profiles,
-    create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
+    update_electricity_bev, create_profiles)
 from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
 
 
@@ -39,19 +37,21 @@ def main():
     scalars.update(overwrite_scalars)
     scalars = scalars.reset_index()
 
+    components = [
+        'electricity-shortage',
+        'electricity-curtailment',
+        'electricity-demand',
+        'electricity-bev',
+        'ch4-gt',
+        'wind-offshore',
+        'wind-onshore',
+        'solar-pv',
+    ]
+
     # Prepare oemof.tabular input CSV files
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
-        select_components=[
-            'electricity-shortage',
-            'electricity-curtailment',
-            'electricity-demand',
-            'electricity-bev',
-            'ch4-gt',
-            'wind-offshore',
-            'wind-onshore',
-            'solar-pv',
-        ]
+        select_components=components
     )
 
     # update elements
@@ -64,11 +64,7 @@ def main():
     update_ch4_gt(exp_paths.data_preprocessed, scalars)
 
     # create sequences
-    create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_wind_onshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_wind_offshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_electricity_bev_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
+    create_profiles(exp_paths, components)
 
     # compare with previous data
     previous_path = os.path.join(
