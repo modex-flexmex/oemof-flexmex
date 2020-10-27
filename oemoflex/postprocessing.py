@@ -1026,7 +1026,9 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
 
                 single_column = df_var_value[column]
                 single_column = single_column.reset_index(drop=True)
-                single_column.to_csv(filename, header=False)
+                single_column.name = 'value'
+                single_column.index.name = 'timeindex'
+                single_column.to_csv(filename, header=True)
 
     delete_empty_subdirs(dir)
 
