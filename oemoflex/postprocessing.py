@@ -510,7 +510,8 @@ def aggregate_storage_capacities(oemoflex_scalars):
 
 def aggregate_other_capacities(oemoflex_scalars):
     capacities = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'].isin(['capacity', 'invest'])]
+        oemoflex_scalars['var_name'].isin(['capacity', 'invest'])
+        ].copy()
 
     # Make sure that values in columns used to group on are strings and thus equatable
     capacities[basic_columns] = capacities[basic_columns].astype(str)
@@ -700,7 +701,7 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
         if 'carrier_cost' in prep_el.columns:
 
             # Set up a list of the current technology's elements
-            df = prep_el[basic_columns]
+            df = prep_el.loc[:, basic_columns]
 
             # Select carriers from the parameter map
             carrier_name = prep_el['carrier'][0]
@@ -757,7 +758,7 @@ def get_emission_cost(oemoflex_scalars, prep_elements, scalars_raw):
         if 'carrier_cost' in prep_el.columns:
 
             # Set up a list of the current technology's elements
-            df = prep_el[basic_columns]
+            df = prep_el.loc[:, basic_columns]
 
             # Select carriers from the parameter map
             carrier_name = prep_el['carrier'][0]
@@ -809,7 +810,7 @@ def get_calculated_parameters(df, oemoflex_scalars, parameter_name, factor):
 
     """
     calculated_parameters = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'] == parameter_name].copy()
+        oemoflex_scalars['var_name'] == parameter_name]
 
     if calculated_parameters.empty:
         logging.info("No key '{}' found.".format(parameter_name))
