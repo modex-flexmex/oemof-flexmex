@@ -810,7 +810,7 @@ def get_calculated_parameters(df, oemoflex_scalars, parameter_name, factor):
 
     """
     calculated_parameters = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'] == parameter_name]
+        oemoflex_scalars['var_name'] == parameter_name].copy()
 
     if calculated_parameters.empty:
         logging.info("No key '{}' found.".format(parameter_name))
