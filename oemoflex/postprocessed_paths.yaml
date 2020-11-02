@@ -1,88 +1,50 @@
-Boiler/Large:
-  component: ch4-boiler
-  sequences:
-    HeatGeneration: flow_out
-    
-CHP/BpCCGT:
-  component: ch4-bpchp
-  sequences:
-     HeatGeneration: flow_heat
-     ElectricityGeneration: flow_electricity
+ch4-boiler:
+  flow_out: Boiler/Large/HeatGeneration
 
-CHP/ExCCGT:
-  component: ch4-extchp
-  sequences:
-    HeatGeneration: flow_heat
-    ElectricityGeneration: flow_electricity
+ch4-bpchp:
+  flow_electricity: CHP/BpCCGT/ElectricityGeneration
+  flow_heat: CHP/BpCCGT/HeatGeneration
 
-ElectricBoiler/Large:
-  component: electricity-pth
-  sequences:
-    HeatGeneration: flow_out
+ch4-extchp:
+  flow_electricity: CHP/ExCCGT/ElectricityGeneration
+  flow_heat: CHP/ExCCGT/HeatGeneration
 
-Fossil/Gasturbine:
-  component: ch4-gt
-  sequences:
-    Generation: flow_out
+ch4-gt:
+  flow_out: Fossil/Gasturbine/Generation
 
-Fossil/Nuclear:
-  component:  uranium-nuclear-st
-  sequences:
-    Generation: flow_out
+electricity-bev:
+  flow_in: Transport/BEV/Charging
+  flow_out: Transport/BEV/FeedIn
 
-Heatpump/Large:
-  component: electricity-heatpump
-  sequences:
-    HeatGeneration: flow_out
+electricity-curtailment:
+  flow_in: RE/Curtailment
 
-Heatpump/Small:
-  component: electricity-heatpump
-  sequences:
-    HeatGeneration: flow_out
+electricity-h2_cavern:
+  flow_in: Storage/Electricity/H2Cavern/In
+  flow_out: Storage/Electricity/H2Cavern/Out
+  storage_content: Storage/Electricity/H2Cavern/Level
 
-RE:
-  component: electricity-curtailment
-  sequences:
-    Curtailment: flow_in #TODO probelm
+electricity-heatpump:
+  flow_out: Heatpump/Small/HeatGeneration
 
-Storage/Electricity/LiIonBattery:
-  component: electricity-liion_battery
-  sequences:
-    In: flow_in
-    Level: storage_content
-    Out: flow_out
+electricity-liion_battery:
+  flow_in: Storage/Electricity/LiIonBattery/In
+  flow_out: Storage/Electricity/LiIonBattery/Out
+  storage_content: Storage/Electricity/LiIonBattery/Level
 
-Storage/Electricity/H2Cavern:
-  component: electricity-h2_cavern
-  sequences:
-    In: flow_in
-    Level: storage_content
-    Out: flow_out
+electricity-pth:
+  flow_out: ElectricBoiler/Large/HeatGeneration
 
-Storage/Electricity/HydroRes:
-  component: hydro-reservoir
-  sequences:
-    Pump: flow_in
-    Level: storage_content
-    Turbine: flow_out
-    Inflow: flow_inflow
+heat-storage:
+  flow_in: Storage/Heat/Small/In
+  flow_out: Storage/Heat/Small/Out
+  storage_content: Storage/Heat/Small/Level
 
-Storage/Heat/Large:
-  component: heat-storage
-  sequences:
-    In: flow_in
-    Level: storage_content
-    Out: flow_out
+hydro-reservoir:
+  flow_in: Storage/Electricity/HydroRes/Pump
+  flow_inflow: Storage/Electricity/HydroRes/Inflow
+  flow_out: Storage/Electricity/HydroRes/Turbine
+  storage_content: Storage/Electricity/HydroRes/Level
 
-Storage/Heat/Small:
-  component: heat-storage  # TODO Missing distinction in oemoflex
-  sequences:
-    In: flow_in
-    Level: storage_content
-    Out: flow_out
-
-Transport/BEV:
-  component: electricity-bev
-  sequences:
-    FeedIn: flow_out
-    Charging: flow_in
+uranium-nuclear-st:
+  flow_out: Fossil/Nuclear/Generation
