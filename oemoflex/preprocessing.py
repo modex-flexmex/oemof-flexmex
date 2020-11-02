@@ -1209,48 +1209,49 @@ def create_profiles(exp_path, select_components):
         profile_name_suffix = settings['profile-name-suffix']
 
     mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.csv')
+
     with open(mapping_filepath, 'r') as mapping_file:
-        map_df = pd.read_csv(mapping_file)
+        map_df = pd.read_csv(mapping_file, index_col=0)
 
     raw_path = exp_path.data_raw
+
     preprocessed_path = exp_path.data_preprocessed
 
     for component in select_components:
 
-        profiles = map_df.loc[map_df['component'] == component]
+        try:
+            profiles = map_df.loc[component, :]
 
-        if not profiles.empty:
+        except:
+            logging.info(f"No mapping information found for timeseries of '{component}'.")
 
-            for profile in profiles.itertuples(index=False):
+            continue
 
-                profile_paths = os.path.join(raw_path, profile.input_data)
-
-                if pd.notnull(profile.profile_name):
-                    profile_name = profile.profile_name
-
-                else:
-                    profile_name = component
-
-                logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
-
-                profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
-
-                if profile.apply_function == 'normalize_year':
-                    yearly_amount = profile_df.sum(axis=0)
-                    profile_df = profile_df.divide(yearly_amount)
-
-                if pd.notnull(profile.output_name):
-                    output_filename_base = profile.output_name
-
-                else:
-                    output_filename_base = profile_name
-
-                profile_df.to_csv(
-                    os.path.join(
-                        preprocessed_path,
-                        sequences_dir,
-                        output_filename_base + profile_file_suffix + '.csv')
-                )
+        if pd.notnull(profiles.profile_name):
+            profile_name = profiles.profile_name
 
         else:
-            logging.info(f"No timeseries information found for '{component}'.")
+            profile_name = component
+
+        if pd.notnull(profiles.output_name):
+            output_filename_base = profiles.output_name
+
+        else:
+            output_filename_base = profile_name
+
+        profile_paths = os.path.join(raw_path, profiles.input_data)
+
+        logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
+
+        profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
+
+        if profiles.apply_function == 'normalize_year':
+            yearly_amount = profile_df.sum(axis=0)
+            profile_df = profile_df.divide(yearly_amount)
+
+        profile_df.to_csv(
+            os.path.join(
+                preprocessed_path,
+                sequences_dir,
+                output_filename_base + profile_file_suffix + '.csv')
+        )
