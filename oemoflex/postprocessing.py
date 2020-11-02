@@ -63,12 +63,11 @@ with open(path_config, 'r') as config_file:
 
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):
-    for subdir, value in pp_paths.items():
-        if value['sequences']:
-            for subsubdir in value['sequences']:
-                path = os.path.join(postprocessed_results_dir, subdir, subsubdir)
-                if not os.path.exists(path):
-                    os.makedirs(path)
+    for component, parameters in pp_paths.items():
+        for _, subdir in parameters.items():
+            path = os.path.join(postprocessed_results_dir, subdir)
+            if not os.path.exists(path):
+                os.makedirs(path)
 
 
 def get_capacities(es):
@@ -1002,25 +1001,22 @@ def get_total_system_cost(oemoflex_scalars):
 
 
 def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
-    path_by_carrier_tech = {value['component']: key for key, value in pp_paths.items()}
-    sequences = {value['component']: value['sequences'] for key, value in pp_paths.items()}
 
     for carrier_tech, df in sequences_by_tech.items():
         try:
-            subfolder = path_by_carrier_tech[carrier_tech]
+            components_paths = pp_paths[carrier_tech]
         except KeyError:
             print(f"Entry for {carrier_tech} does not exist in {path_config}.")
             continue
 
         idx = pd.IndexSlice
-        for subsubfolder, var_name in sequences[carrier_tech].items():
+        for var_name, subdir in components_paths.items():
             df_var_value = df.loc[:, idx[:, var_name]]
             for column in df_var_value.columns:
                 region = column[0].split('-')[0]
                 filename = os.path.join(
                     dir,
-                    subfolder,
-                    subsubfolder,
+                    subdir,
                     '_'.join([usecase, model, region, year]) + '.csv'
                 )
 
