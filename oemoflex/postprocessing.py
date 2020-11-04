@@ -1032,6 +1032,27 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
     delete_empty_subdirs(dir)
 
 
+def aggregate_re_generation_timeseries(sequences_by_tech):
+
+    idx = pd.IndexSlice
+
+    # Sum flow_out sequences from renewable energies
+    renewable_techs = ['wind-offshore', 'wind-onshore', 'solar-pv']
+    df_renewable = sequences_by_tech.loc[:, idx[:, renewable_techs, 'flow_out']]
+    df_renewable_sum = df_renewable.groupby(['region'],axis=1).sum()
+    df_renewable_sum.columns = pd.MultiIndex.from_product(
+        [list(df_renewable_sum.columns), ['energysystem'], ['re_generation']],
+        names=['region', 'carrier_tech', 'var_name']
+    )
+
+    # Substract Curtailment
+    df_curtailment = sequences_by_tech.loc[:, (slice(None), 'electricity-curtailment')]
+    df_curtailment.columns = df_renewable_sum.columns
+    df_re_generation = df_renewable_sum.sub(df_curtailment, axis=0)
+
+    return df_re_generation
+
+
 def run_postprocessing(year, name, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
@@ -1056,6 +1077,10 @@ def run_postprocessing(year, name, exp_paths):
 
     # format results sequences
     sequences_by_tech = get_sequences_by_tech(es.results)
+
+    df_re_generation = aggregate_re_generation_timeseries(sequences_by_tech)
+
+    sequences_by_tech = pd.concat([sequences_by_tech, df_re_generation], axis=1)
 
     oemoflex_scalars = pd.DataFrame(
         columns=[

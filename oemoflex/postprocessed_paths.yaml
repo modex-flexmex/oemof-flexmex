@@ -19,6 +19,9 @@ electricity-bev:
 electricity-curtailment:
   flow_in: RE/Curtailment
 
+energysystem:
+  re_generation: RE/Generation
+
 electricity-h2_cavern:
   flow_in: Storage/Electricity/H2Cavern/In
   flow_out: Storage/Electricity/H2Cavern/Out
