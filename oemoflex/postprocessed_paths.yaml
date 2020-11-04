@@ -38,6 +38,9 @@ electricity-liion_battery:
 electricity-pth:
   flow_out: ElectricBoiler/Large/HeatGeneration
 
+electricity-shortage:
+  flow_out: Slack/Electricity
+
 heat-storage:
   flow_in: Storage/Heat/Small/In
   flow_out: Storage/Heat/Small/Out
