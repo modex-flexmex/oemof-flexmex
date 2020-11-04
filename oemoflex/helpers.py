@@ -8,15 +8,13 @@ from pandas.testing import assert_frame_equal
 import yaml
 
 
-def get_experiment_paths(name, basepath):
+def get_experiment_paths():
     r"""
 
     Parameters
     ----------
-    name : str
-        Name of the scenario
-    path_config : str
-        Path to the config.yml containing the experiment's path structure
+    basepath : str
+        Path to experiment's root
 
     Returns
     -------
@@ -30,7 +28,34 @@ def get_experiment_paths(name, basepath):
     with open(path_config, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
+    # Use base path to make other paths absolute and drop it
+    basepath = os.path.realpath(os.path.join(module_path, config.pop('base')))
     experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
+
+    experiment_paths = Dict(experiment_paths)
+
+    return experiment_paths
+
+
+def add_usecase_paths(experiment_paths, name):
+    r"""
+    Add use case name to several paths.
+
+    NOTE: Can be dropped as soon as directory structure is reordered.
+
+    Parameters
+    ----------
+    experiment_paths : addict.Dict
+        experiment paths
+
+    name : str
+        Name of the usecase
+
+    Returns
+    -------
+    experiment_paths : addict.Dict
+        Dictionary containing the experiment's path structure
+    """
 
     experiment_paths['data_preprocessed'] = os.path.join(
         experiment_paths['data_preprocessed'], name)
@@ -41,12 +66,10 @@ def get_experiment_paths(name, basepath):
     experiment_paths['results_postprocessed'] = os.path.join(
         experiment_paths['results_postprocessed'], name)
 
-    experiment_paths = Dict(experiment_paths)
-
     return experiment_paths
 
 
-def setup_experiment_paths(name, basepath):
+def setup_experiment_paths(name):
     r"""
     Gets the experiment paths for a given experiment and
     a basepath. If they do not exist, they are created.
@@ -64,12 +87,28 @@ def setup_experiment_paths(name, basepath):
     experiment_paths : dict
         Dictionary listing all experiment paths
     """
-    experiment_paths = get_experiment_paths(name, basepath)
+    experiment_paths = get_experiment_paths()
+    experiment_paths = add_usecase_paths(experiment_paths, name)
+
     for path in experiment_paths.values():
         if not os.path.exists(path):
             os.makedirs(path)
 
     return experiment_paths
+
+
+def load_scalar_input_data():
+
+    exp_paths = get_experiment_paths()
+
+    scalars = pd.read_csv(
+        os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+        header=0,
+        na_values=['not considered', 'no value'],
+        sep=',',
+    )
+
+    return scalars
 
 
 def get_all_file_paths(dir):

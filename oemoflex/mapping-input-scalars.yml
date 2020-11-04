@@ -1,0 +1,32 @@
+carrier:
+  ch4:
+    carrier_price: Energy_Price_CH4
+    co2_price: Energy_Price_CO2
+    emission_factor: Energy_EmissionFactor_CH4
+  uranium:
+    carrier_price: Energy_Price_Uranium
+tech:
+  gt:
+    capex: EnergyConversion_Capex_Electricity_CH4_GT
+    fixom: EnergyConversion_FixOM_Electricity_CH4_GT
+    lifetime: EnergyConversion_LifeTime_Electricity_CH4_GT
+  h2_cavern:
+    charge_capex: Storage_Capex_H2_CavernCharge
+    charge_lifetime: Storage_LifeTime_H2_CavernCharge
+    discharge_capex: Storage_Capex_H2_CavernDischarge
+    discharge_lifetime: Storage_LifeTime_H2_CavernDischarge
+    fixom: Storage_FixOM_H2_Cavern
+    storage_capex: Storage_Capex_H2_CavernStorage
+    storage_lifetime: Storage_LifeTime_H2_CavernStorage
+  liion_battery:
+    charge_capex: Storage_Capex_Electricity_LiIonBatteryCharge
+    charge_lifetime: Storage_LifeTime_Electricity_LiIonBatteryCharge
+    discharge_capex: Storage_Capex_Electricity_LiIonBatteryDischarge
+    discharge_lifetime: Storage_LifeTime_Electricity_LiIonBatteryDischarge
+    fixom: Storage_FixOM_Electricity_LiIonBattery
+    storage_capex: Storage_Capex_Electricity_LiIonBatteryStorage
+    storage_lifetime: Storage_LifeTime_Electricity_LiIonBatteryStorage
+  nuclear-st:
+    capex: EnergyConversion_Capex_Electricity_Nuclear_ST
+    fixom: EnergyConversion_FixOM_Electricity_Nuclear_ST
+    lifetime: EnergyConversion_LifeTime_Electricity_Nuclear_ST

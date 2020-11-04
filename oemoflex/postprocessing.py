@@ -9,57 +9,22 @@ import yaml
 from oemof.solph import EnergySystem, Bus, Sink, Transformer, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
-from oemoflex.helpers import delete_empty_subdirs, load_elements
+from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data
 from oemoflex.preprocessing import get_parameter_values
 
 from oemoflex.facades import TYPEMAP
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
-FlexMex_Parameter_Map = {
-    'carrier':
-        {
-            'ch4':
-                {'carrier_price': 'Energy_Price_CH4',
-                 'co2_price': 'Energy_Price_CO2',
-                 'emission_factor': 'Energy_EmissionFactor_CH4'},
-            'uranium':
-                {'carrier_price': 'Energy_Price_Uranium'}
-        },
-    'tech':
-        {
-            'gt':
-                {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
-                 'lifetime': 'EnergyConversion_LifeTime_Electricity_CH4_GT',
-                 'fixom': 'EnergyConversion_FixOM_Electricity_CH4_GT'},
-            'nuclear-st':
-                {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
-                 'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST',
-                 'fixom': 'EnergyConversion_FixOM_Electricity_Nuclear_ST'},
-            'liion_battery':
-                {'charge_capex': 'Storage_Capex_Electricity_LiIonBatteryCharge',
-                 'discharge_capex': 'Storage_Capex_Electricity_LiIonBatteryDischarge',
-                 'storage_capex': 'Storage_Capex_Electricity_LiIonBatteryStorage',
-                 'charge_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryCharge',
-                 'discharge_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryDischarge',
-                 'storage_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryStorage',
-                 'fixom': 'Storage_FixOM_Electricity_LiIonBattery'},
-            'h2_cavern':
-                {'charge_capex': 'Storage_Capex_H2_CavernCharge',
-                 'discharge_capex': 'Storage_Capex_H2_CavernDischarge',
-                 'storage_capex': 'Storage_Capex_H2_CavernStorage',
-                 'charge_lifetime': 'Storage_LifeTime_H2_CavernCharge',
-                 'discharge_lifetime': 'Storage_LifeTime_H2_CavernDischarge',
-                 'storage_lifetime': 'Storage_LifeTime_H2_CavernStorage',
-                 'fixom': 'Storage_FixOM_H2_Cavern'},
-        }
-}
-
 module_path = os.path.abspath(os.path.dirname(__file__))
 path_config = os.path.join(module_path, 'postprocessed_paths.yaml')
+path_mapping = os.path.join(module_path, 'mapping-input-scalars.yml')
 
 with open(path_config, 'r') as config_file:
     pp_paths = yaml.safe_load(config_file)
+
+with open(path_config, 'r') as mapping_file:
+    FlexMex_Parameter_Map = yaml.safe_load(mapping_file)
 
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):
@@ -320,7 +285,7 @@ def get_sequences_by_tech(results):
             var_name = 'storage_content'
 
         # Ignore sequences FROM internal busses (concerns ReservoirWithPump, Bev)
-        if bus in internal_busses and not component in reservoir_inflows:
+        if bus in internal_busses and component not in reservoir_inflows:
             continue
 
         carrier_tech = component.carrier + '-' + component.tech
@@ -331,9 +296,10 @@ def get_sequences_by_tech(results):
         #  Since a subnode has a name different from its main node we have to rename them
         #  to be merged properly along with the other parameters of the main node
         name = component.label.rsplit('-', 1)
-        if isinstance(component, Transformer) and name[1] == 'pump' \
-                or isinstance(component, Source) and name[1] == 'inflow' \
-                or isinstance(component, Transformer) and name[1] == 'vehicle_to_grid':
+        # pylint: disable=too-many-boolean-expressions
+        if (isinstance(component, Transformer) and name[1] == 'pump') \
+                or (isinstance(component, Source) and name[1] == 'inflow') \
+                or (isinstance(component, Transformer) and name[1] == 'vehicle_to_grid'):
             # Rename the subnode to the main node's name (drop the suffix)
             component.label = name[0]
 
@@ -366,7 +332,7 @@ def get_subnodes_by_type(sequences, cls):
 
     # Get a list of all the components
     to_nodes = []
-    for k, s in sequences.items():
+    for k in sequences.keys():
         # It's sufficient to look into one side of the flows ('to' node, k[1])
         to_nodes.append(k[1])
 
@@ -1020,12 +986,14 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
                     dir,
                     subfolder,
                     subsubfolder,
-                    '_'.join(['FlexMex1', usecase, model, region, year]) + '.csv'
+                    '_'.join([usecase, model, region, year]) + '.csv'
                 )
 
                 single_column = df_var_value[column]
                 single_column = single_column.reset_index(drop=True)
-                single_column.to_csv(filename, header=False)
+                single_column.name = 'value'
+                single_column.index.name = 'timeindex'
+                single_column.to_csv(filename, header=True)
 
     delete_empty_subdirs(dir)
 
@@ -1034,7 +1002,7 @@ def run_postprocessing(year, name, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = pd.read_csv(os.path.join(exp_paths.data_raw, 'Scalars.csv'), sep=',')
+    scalars_raw = load_scalar_input_data()
 
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
