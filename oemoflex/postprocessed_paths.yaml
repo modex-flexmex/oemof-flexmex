@@ -46,6 +46,9 @@ heat-storage:
   flow_out: Storage/Heat/Small/Out
   storage_content: Storage/Heat/Small/Level
 
+heat-shortage:
+  flow_out: Slack/Heat
+
 hydro-reservoir:
   flow_in: Storage/Electricity/HydroRes/Pump
   flow_inflow: Storage/Electricity/HydroRes/Inflow
