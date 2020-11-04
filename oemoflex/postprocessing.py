@@ -266,7 +266,7 @@ def get_sequences_by_tech(results):
     # copy to avoid manipulating the data in es.results
     sequences = copy.deepcopy({key: value['sequences'] for key, value in results.items()})
 
-    sequences_by_tech = {}
+    sequences_by_tech = []
 
     # Get internal busses for all 'ReservoirWithPump' and 'Bev' nodes to be ignored later
     internal_busses = get_subnodes_by_type(sequences, Bus)
@@ -323,8 +323,6 @@ def get_sequences_by_tech(results):
             continue
 
         carrier_tech = component.carrier + '-' + component.tech
-        if carrier_tech not in sequences_by_tech:
-            sequences_by_tech[carrier_tech] = []
 
         # WORKAROUND for components with subnodes (ReservoirWithPump, Bev):
         #  Since a subnode has a name different from its main node we have to rename them
@@ -337,11 +335,13 @@ def get_sequences_by_tech(results):
             # Rename the subnode to the main node's name (drop the suffix)
             component.label = name[0]
 
-        df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
-        df.columns.names = ['name', 'var_name']
-        sequences_by_tech[carrier_tech].append(df)
+        region = component.label.split('-')[0]
 
-    sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
+        df.columns = pd.MultiIndex.from_tuples([(region, carrier_tech, var_name)])
+        df.columns.names = ['region', 'carrier_tech', 'var_name']
+        sequences_by_tech.append(df)
+
+    sequences_by_tech = pd.concat(sequences_by_tech, axis=1)
 
     return sequences_by_tech
 
