@@ -23,7 +23,7 @@ path_mapping = os.path.join(module_path, 'mapping-input-scalars.yml')
 with open(path_config, 'r') as config_file:
     pp_paths = yaml.safe_load(config_file)
 
-with open(path_config, 'r') as mapping_file:
+with open(path_mapping, 'r') as mapping_file:
     FlexMex_Parameter_Map = yaml.safe_load(mapping_file)
 
 
