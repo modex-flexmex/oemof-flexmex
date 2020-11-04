@@ -381,16 +381,18 @@ def get_subnodes_by_type(sequences, cls):
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):
-    summed_sequences = []
-    for tech_carrier, sequence in sequences_by_tech.items():
-        df = prep_elements[tech_carrier][basic_columns]
-        sum = sequence.sum()
-        sum.name = 'var_value'
-        sum = sum.reset_index()
-        df = pd.merge(df, sum, on='name')
-        summed_sequences.append(df)
+    # Put component definitions into one DataFrame - drops 'carrier_tech' information in the keys
+    base = pd.concat(prep_elements.values())
+    df = base.loc[:, basic_columns]
+    sum = sequences_by_tech.sum()
+    sum.name = 'var_value'
+    sum_df = sum.reset_index()
+    # Form helper column for proper merging with component definition
+    df['carrier_tech'] = df['carrier'] + '-' + df['tech']
+    summed_sequences = pd.merge(df, sum_df, on=['region', 'carrier_tech'])
+    # Drop helper column
+    summed_sequences.drop('carrier_tech', axis=1, inplace=True)
 
-    summed_sequences = pd.concat(summed_sequences, sort=True)
     summed_sequences = summed_sequences.loc[summed_sequences['var_name'] != 'storage_content']
     summed_sequences['var_unit'] = 'MWh'
 
