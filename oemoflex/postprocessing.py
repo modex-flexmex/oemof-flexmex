@@ -1004,7 +1004,7 @@ def get_total_system_cost(oemoflex_scalars):
 
 def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
 
-    for carrier_tech, df in sequences_by_tech.items():
+    for carrier_tech in sequences_by_tech.columns.unique(level='carrier_tech'):
         try:
             components_paths = pp_paths[carrier_tech]
         except KeyError:
@@ -1013,18 +1013,19 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
 
         idx = pd.IndexSlice
         for var_name, subdir in components_paths.items():
-            df_var_value = df.loc[:, idx[:, var_name]]
-            for column in df_var_value.columns:
-                region = column[0].split('-')[0]
+            df_var_value = sequences_by_tech.loc[:, idx[:, carrier_tech, var_name]]
+            for region in df_var_value.columns.get_level_values('region'):
                 filename = os.path.join(
                     dir,
                     subdir,
                     '_'.join([usecase, model, region, year]) + '.csv'
                 )
 
-                single_column = df_var_value[column]
+                single_column = df_var_value.loc[:, region]
                 single_column = single_column.reset_index(drop=True)
-                single_column.name = 'value'
+                single_column.columns = single_column.columns.droplevel('carrier_tech')
+                remaining_column_name = list(single_column)[0]
+                single_column.rename(columns={remaining_column_name: 'value'}, inplace=True)
                 single_column.index.name = 'timeindex'
                 single_column.to_csv(filename, header=True)
 
