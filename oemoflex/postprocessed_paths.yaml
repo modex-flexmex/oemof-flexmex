@@ -19,7 +19,7 @@ ch4-extchp:
   flow_heat: CHP/ExCCGT/HeatGeneration
 
 ch4-gt:
-  flow_out: Fossil/Gasturbine/Generation
+  flow_out: Fossil/GasTurbine/Generation
 
 electricity-bev:
   flow_in: Transport/BEV/Charging
@@ -37,7 +37,7 @@ electricity-h2_cavern:
   storage_content: Storage/Electricity/H2Cavern/Level
 
 electricity-heatpump:
-  flow_out: Heatpump/Small/HeatGeneration
+  flow_out: HeatPump/Small/HeatGeneration
 
 electricity-liion_battery:
   flow_in: Storage/Electricity/LiIonBattery/In
