@@ -1201,6 +1201,15 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
 
 def create_profiles(exp_path, select_components):
 
+    def normalize_year(profile_df):
+        yearly_amount = profile_df.sum(axis=0)
+        profile_df = profile_df.divide(yearly_amount)
+        return profile_df
+
+    recalculation_functions = {
+        'normalize_year': normalize_year
+    }
+
     oemof_tabular_settings_filepath = os.path.join(module_path, 'oemof-tabular-settings.yml')
     with open(oemof_tabular_settings_filepath, 'r') as settings_file:
         settings = yaml.safe_load(settings_file)
@@ -1235,9 +1244,9 @@ def create_profiles(exp_path, select_components):
 
                 profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
 
-                if profile.apply_function == 'normalize_year':
-                    yearly_amount = profile_df.sum(axis=0)
-                    profile_df = profile_df.divide(yearly_amount)
+                if pd.notnull(profile.apply_function):
+                    recalc = recalculation_functions[profile.apply_function]
+                    profile_df = recalc(profile_df)
 
                 if pd.notnull(profile.output_name):
                     output_filename_base = profile.output_name
