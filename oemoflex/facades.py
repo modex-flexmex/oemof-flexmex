@@ -320,6 +320,7 @@ class Bev(GenericStorage, Facade):
                     nominal_value=self.capacity,
                     max=self.availability,
                     variable_costs=self.marginal_cost,
+                    **self.output_parameters
                 )
             },
             conversion_factors={internal_bus: self.efficiency_v2g},
@@ -339,7 +340,6 @@ class Bev(GenericStorage, Facade):
                 self.bus: Flow(
                     nominal_value=self.capacity,
                     max=self.availability,
-                    variable_costs=0.00001,
                     **self.input_parameters
                 )
             }
@@ -481,7 +481,12 @@ class ReservoirWithPump(GenericStorage, Facade):
 
         pump = Transformer(
             label=self.label + '-pump',
-            inputs={self.bus: Flow(nominal_value=self.capacity_pump)},
+            inputs={
+                self.bus: Flow(
+                    nominal_value=self.capacity_pump,
+                    **self.input_parameters
+                )
+            },
             outputs={internal_bus: Flow()},
             conversion_factors={internal_bus: self.efficiency_pump},
             carrier=self.carrier,
@@ -510,7 +515,8 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.outputs.update(
             {
                 self.bus: Flow(
-                    nominal_value=self.capacity_turbine, **self.output_parameters
+                    nominal_value=self.capacity_turbine,
+                    **self.output_parameters
                 )
             }
         )
