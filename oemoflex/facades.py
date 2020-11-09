@@ -1,5 +1,5 @@
 from oemof.solph import sequence, Bus, Source, Sink, Transformer, Flow, Investment
-from oemof.solph.components import GenericStorage
+from oemof.solph.components import GenericStorage, ExtractionTurbineCHP
 
 from oemof.tabular.facades import Facade, TYPEMAP
 
@@ -518,9 +518,185 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.subnodes = (inflow, internal_bus, pump)
 
 
+class ExtractionTurbine(ExtractionTurbineCHP, Facade):
+    r""" Combined Heat and Power (extraction) unit with one input and
+    two outputs.
+
+    Parameters
+    ----------
+    electricity_bus: oemof.solph.Bus
+        An oemof bus instance where the chp unit is connected to with its
+        electrical output
+    heat_bus: oemof.solph.Bus
+        An oemof bus instance where the chp unit is connected to with its
+        thermal output
+    fuel_bus:  oemof.solph.Bus
+        An oemof bus instance where the chp unit is connected to with its
+        input
+    carrier_cost: numeric
+        Cost per unit of used input carrier
+    capacity: numeric
+        The electrical capacity of the chp unit (e.g. in MW) in full extraction
+        mode.
+    electric_efficiency:
+        Electrical efficiency of the chp unit in full backpressure mode
+    thermal_efficiency:
+        Thermal efficiency of the chp unit in full backpressure mode
+    condensing_efficiency:
+        Electrical efficiency if turbine operates in full extraction mode
+    marginal_cost: numeric
+        Marginal cost for one unit of produced electrical output
+        E.g. for a powerplant:
+        marginal cost =fuel cost + operational cost + co2 cost (in Euro / MWh)
+        if timestep length is one hour.
+    capacity_cost: numeric
+        Investment costs per unit of electrical capacity (e.g. Euro / MW) .
+        If capacity is not set, this value will be used for optimizing the
+        chp capacity.
+    expandable: boolean
+        True, if capacity can be expanded within optimization. Default: False.
+
+
+    The mathematical description is derived from the oemof base class
+    `ExtractionTurbineCHP <https://oemof.readthedocs.io/en/
+    stable/oemof_solph.html#extractionturbinechp-component>`_ :
+
+    .. math::
+        x^{flow, carrier}(t) =
+        \frac{x^{flow, electricity}(t) + x^{flow, heat}(t) \
+        \cdot c^{beta}(t)}{c^{condensing\_efficiency}(t)}
+        \qquad \forall t \in T
+
+    .. math::
+        x^{flow, electricity}(t)  \geq  x^{flow, thermal}(t) \cdot
+        \frac{c^{electrical\_efficiency}(t)}{c^{thermal\_efficiency}(t)}
+        \qquad \forall t \in T
+
+    where :math:`c^{beta}` is defined as:
+
+     .. math::
+        c^{beta}(t) = \frac{c^{condensing\_efficiency}(t) -
+        c^{electrical\_efficiency(t)}}{c^{thermal\_efficiency}(t)}
+        \qquad \forall t \in T
+
+    **Ojective expression** for operation includes marginal cost and/or
+    carrier costs:
+
+        .. math::
+
+            x^{opex} = \sum_t (x^{flow, out}(t) \cdot c^{marginal\_cost}(t)
+            + x^{flow, carrier}(t) \cdot c^{carrier\_cost}(t))
+
+
+    Examples
+    ---------
+
+    >>> from oemof import solph
+    >>> from oemof.tabular import facades
+    >>> my_elec_bus = solph.Bus('my_elec_bus')
+    >>> my_fuel_bus = solph.Bus('my_fuel_bus')
+    >>> my_heat_bus = solph.Bus('my_heat_bus')
+    >>> my_extraction = ExtractionTurbine(
+    ...     label='extraction',
+    ...     carrier='gas',
+    ...     tech='ext',
+    ...     electricity_bus=my_elec_bus,
+    ...     heat_bus=my_heat_bus,
+    ...     fuel_bus=my_fuel_bus,
+    ...     capacity=1000,
+    ...     condensing_efficiency=[0.5, 0.51, 0.55],
+    ...     electric_efficiency=0.4,
+    ...     thermal_efficiency=0.35)
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "_facade_requires_": [
+                    "fuel_bus",
+                    "carrier",
+                    "tech",
+                    "electricity_bus",
+                    "heat_bus",
+                    "thermal_efficiency",
+                    "electric_efficiency",
+                    "condensing_efficiency",
+                ]
+            }
+        )
+        super().__init__(
+            conversion_factor_full_condensation={}, *args, **kwargs
+        )
+
+        self.fuel_bus = kwargs.get("fuel_bus")
+
+        self.electricity_bus = kwargs.get("electricity_bus")
+
+        self.heat_bus = kwargs.get("heat_bus")
+
+        self.carrier = kwargs.get("carrier")
+
+        self.carrier_cost = kwargs.get("carrier_cost", 0)
+
+        self.capacity = kwargs.get("capacity")
+
+        self.fuel_capacity = self.capacity / self.condensing_efficiency
+
+        self.condensing_efficiency = sequence(self.condensing_efficiency)
+
+        self.marginal_cost = kwargs.get("marginal_cost", 0)
+
+        self.expandable = bool(kwargs.get("expandable", False))
+
+        self.input_parameters = kwargs.get("input_parameters", {})
+
+        self.build_solph_components()
+
+    def build_solph_components(self):
+        """
+        """
+        if self.expandable:
+            raise NotImplementedError(
+                "Investment for extraction class is not implemented."
+            )
+
+        self.conversion_factors.update(
+            {
+                self.fuel_bus: sequence(1),
+                self.electricity_bus: sequence(self.electric_efficiency),
+                self.heat_bus: sequence(self.thermal_efficiency),
+            }
+        )
+
+        self.inputs.update(
+            {
+                self.fuel_bus: Flow(
+                    variable_costs=self.carrier_cost,
+                    nominal_value=self.fuel_capacity,
+                    **self.input_parameters
+                )
+            }
+        )
+
+        self.outputs.update(
+            {
+                self.electricity_bus: Flow(
+                    variable_costs=self.marginal_cost,
+                ),
+                self.heat_bus: Flow(),
+            }
+        )
+
+        self.conversion_factor_full_condensation.update(
+            {self.electricity_bus: self.condensing_efficiency}
+        )
+
+
 TYPEMAP.update(
     {
         "asymmetric storage": AsymmetricStorage,
-        "reservoir": ReservoirWithPump, "bev": Bev
+        "reservoir": ReservoirWithPump, "bev": Bev,
+        "extraction": ExtractionTurbine,
     }
 )
