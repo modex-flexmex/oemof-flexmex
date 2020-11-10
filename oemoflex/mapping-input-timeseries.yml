@@ -1,31 +1,31 @@
 electricity-demand:
   profiles:
-    default:
+    electricity-demand:
       input-path: Energy/FinalEnergy/Electricity
 
 heat-demand:
   profiles:
-    default:
+    heat-demand:
       input-path: Energy/FinalEnergy/Heat
 
 wind-onshore:
   profiles:
-    default:
+    wind-onshore:
       input-path: Energy/SecondaryEnergy/Wind/Onshore
 
 wind-offshore:
   profiles:
-    default:
+    wind-offshore:
       input-path: Energy/SecondaryEnergy/Wind/Offshore
 
 solar-pv:
   profiles:
-    default:
+    solar-pv:
       input-path: Energy/SecondaryEnergy/Solar/PV
 
 hydro-reservoir:
   profiles:
-    default:
+    hydro-reservoir:
       input-path: Energy/SecondaryEnergy/Hydro/Reservoir
 
 electricity-heatpump:

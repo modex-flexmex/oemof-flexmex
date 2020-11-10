@@ -1233,12 +1233,6 @@ def create_profiles(exp_path, select_components):
 
                 profile_paths = os.path.join(raw_path, profile['input-path'])
 
-                if identifier == 'default':
-                    profile_name = component
-
-                else:
-                    profile_name = identifier
-
                 logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
 
                 profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
