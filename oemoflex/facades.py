@@ -641,9 +641,9 @@ class ExtractionTurbine(ExtractionTurbineCHP, Facade):
 
         self.capacity = kwargs.get("capacity")
 
-        self.condensing_efficiency = sequence(self.condensing_efficiency)
-
         self.fuel_capacity = self.capacity / self.condensing_efficiency
+
+        self.condensing_efficiency = sequence(self.condensing_efficiency)
 
         self.marginal_cost = kwargs.get("marginal_cost", 0)
 
