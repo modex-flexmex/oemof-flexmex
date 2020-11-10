@@ -323,18 +323,6 @@ def get_sequences_by_tech(results):
             continue
 
         carrier_tech = component.carrier + '-' + component.tech
-
-        # WORKAROUND for components with subnodes (ReservoirWithPump, Bev):
-        #  Since a subnode has a name different from its main node we have to rename them
-        #  to be merged properly along with the other parameters of the main node
-        name = component.label.rsplit('-', 1)
-        # pylint: disable=too-many-boolean-expressions
-        if (isinstance(component, Transformer) and name[1] == 'pump') \
-                or (isinstance(component, Source) and name[1] == 'inflow') \
-                or (isinstance(component, Transformer) and name[1] == 'vehicle_to_grid'):
-            # Rename the subnode to the main node's name (drop the suffix)
-            component.label = name[0]
-
         region = component.label.split('-')[0]
 
         df.columns = pd.MultiIndex.from_tuples([(region, carrier_tech, var_name)])
