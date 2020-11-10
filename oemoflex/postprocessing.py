@@ -637,7 +637,7 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
 
             varom_cost.append(df)
 
-    varom_cost = pd.concat(varom_cost, sort=True)
+    varom_cost = pd.concat(varom_cost)
     varom_cost['var_unit'] = 'Eur'
 
     return varom_cost
@@ -662,7 +662,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
             carrier_cost.append(df)
 
     if carrier_cost:
-        carrier_cost = pd.concat(carrier_cost, sort=True)
+        carrier_cost = pd.concat(carrier_cost)
     else:
         carrier_cost = pd.DataFrame(carrier_cost)
 
@@ -735,7 +735,7 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_unit'] = 'Eur'
 
             # Append current technology elements to the return DataFrame
-            fuel_cost = pd.concat([fuel_cost, df], sort=True)
+            fuel_cost = pd.concat([fuel_cost, df])
 
     return fuel_cost
 
@@ -799,7 +799,7 @@ def get_emission_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_unit'] = 'Eur'
 
             # Append current technology elements to the return DataFrame
-            emission_cost = pd.concat([emission_cost, df], sort=True)
+            emission_cost = pd.concat([emission_cost, df])
 
     return emission_cost
 
@@ -887,7 +887,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                                                        'storage_capacity_invest',
                                                        annualized_cost)
 
-                df = pd.concat([df_charge, df_discharge, df_storage], sort=True)
+                df = pd.concat([df_charge, df_discharge, df_storage])
 
                 # Sum the 3 amounts per storage, keep indexes as columns
                 df = df.groupby(by=basic_columns, as_index=False).sum()
@@ -904,7 +904,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_name'] = 'cost_invest'
             df['var_unit'] = 'Eur'
 
-            invest_cost = pd.concat([invest_cost, df], sort=True)
+            invest_cost = pd.concat([invest_cost, df])
 
     return invest_cost
 
@@ -949,7 +949,7 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
                                                        'storage_capacity_invest',
                                                        fix_cost_factor * capex)
 
-                df = pd.concat([df_charge, df_discharge, df_storage], sort=True)
+                df = pd.concat([df_charge, df_discharge, df_storage])
 
                 # Sum the 3 amounts per storage, keep indexes as columns
                 df = df.groupby(by=basic_columns, as_index=False).sum()
@@ -967,7 +967,7 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_name'] = 'cost_fixom'
             df['var_unit'] = 'Eur'
 
-            fixom_cost = pd.concat([fixom_cost, df], sort=True)
+            fixom_cost = pd.concat([fixom_cost, df])
 
     return fixom_cost
 
@@ -1097,11 +1097,11 @@ def run_postprocessing(year, name, exp_paths):
 
     # then sum the flows
     summed_sequences = get_summed_sequences(sequences_by_tech, prep_elements)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, summed_sequences], sort=True)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, summed_sequences])
 
     # get re_generation
     re_generation = get_re_generation(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation], sort=True)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation])
 
     # losses (storage, transmission)
     transmission_losses = get_transmission_losses(oemoflex_scalars)
@@ -1112,7 +1112,7 @@ def run_postprocessing(year, name, exp_paths):
         transmission_losses,
         storage_losses,
         reservoir_losses
-    ], sort=True)
+    ])
 
     # get capacities
     capacities = get_capacities(es)
@@ -1135,7 +1135,7 @@ def run_postprocessing(year, name, exp_paths):
         aggregated_emission_cost,
         invest_cost,
         fixom_cost
-    ], sort=True)
+    ])
 
     # emissions
     emissions = get_emissions(oemoflex_scalars, scalars_raw)
@@ -1143,10 +1143,10 @@ def run_postprocessing(year, name, exp_paths):
 
     storage = aggregate_storage_capacities(oemoflex_scalars)
     other = aggregate_other_capacities(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, storage, other], sort=True)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, storage, other])
 
     total_system_cost = get_total_system_cost(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost])
 
     # map direction of links
     oemoflex_scalars = map_link_direction(oemoflex_scalars)
