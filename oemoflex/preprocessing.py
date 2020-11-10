@@ -1217,41 +1217,41 @@ def create_profiles(exp_path, select_components):
         profile_file_suffix = settings['profile-file-suffix']
         profile_name_suffix = settings['profile-name-suffix']
 
-    mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.csv')
+    mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.yml')
     with open(mapping_filepath, 'r') as mapping_file:
-        map_df = pd.read_csv(mapping_file)
+        map = yaml.safe_load(mapping_file)
 
     raw_path = exp_path.data_raw
     preprocessed_path = exp_path.data_preprocessed
 
     for component in select_components:
 
-        profiles = map_df.loc[map_df['component'] == component]
+        try:
+            profiles = map[component]['profiles']
 
-        if not profiles.empty:
+            for identifier, data in profiles.items():
 
-            for profile in profiles.itertuples(index=False):
+                profile_paths = os.path.join(raw_path, data['input-path'])
 
-                profile_paths = os.path.join(raw_path, profile.input_data)
-
-                if pd.notnull(profile.profile_name):
-                    profile_name = profile.profile_name
+                if identifier == 'default':
+                    profile_name = component
 
                 else:
-                    profile_name = component
+                    profile_name = identifier
 
                 logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
 
                 profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
 
-                if pd.notnull(profile.apply_function):
-                    recalc = recalculation_functions[profile.apply_function]
+                if 'apply-function' in data.keys():
+                    function_name = data['apply-function']
+                    recalc = recalculation_functions[function_name]
                     profile_df = recalc(profile_df)
 
-                if pd.notnull(profile.output_name):
-                    output_filename_base = profile.output_name
+                try:
+                    output_filename_base = data['output-name']
 
-                else:
+                except KeyError:
                     output_filename_base = profile_name
 
                 profile_df.to_csv(
@@ -1261,5 +1261,5 @@ def create_profiles(exp_path, select_components):
                         output_filename_base + profile_file_suffix + '.csv')
                 )
 
-        else:
+        except KeyError:
             logging.info(f"No timeseries information found for '{component}'.")
