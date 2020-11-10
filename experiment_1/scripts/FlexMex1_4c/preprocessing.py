@@ -5,7 +5,7 @@ from oemoflex.preprocessing import (
     create_default_elements,
     update_electricity_shortage, update_heat_shortage,
     update_heat_demand, update_electricity_demand,
-    update_bpchp, update_boiler,
+    update_bpchp, update_boiler_small,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     create_electricity_demand_profiles, create_heat_demand_profiles,
     create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
@@ -61,7 +61,7 @@ def main():
     update_heat_demand(exp_paths.data_preprocessed, scalars)
     update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_bpchp(exp_paths.data_preprocessed, scalars)
-    update_boiler(exp_paths.data_preprocessed, scalars)
+    update_boiler_small(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)

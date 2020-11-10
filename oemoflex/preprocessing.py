@@ -382,6 +382,29 @@ def update_boiler(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
+def update_boiler_small(data_preprocessed_path, scalars):
+    logging.info("Updating ch4-boiler file")
+
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler.csv')
+
+    # Read prepared csv file
+    df = pd.read_csv(file_path, index_col='region')
+
+    df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Small')
+
+    df['efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_Eta_Heat_CH4_Small') * 0.01  # Percent to decimals
+
+    df['carrier_cost'] = get_parameter_values(
+        scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
+
+    df['marginal_cost'] = get_parameter_values(
+        scalars, 'EnergyConversion_VarOM_Heat_CH4_Small') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Write back to csv file
+    df.to_csv(file_path)
+
+
 def update_pth(data_preprocessed_path, scalars):
     logging.info("Updating electricity-pth file")
 
