@@ -1170,6 +1170,7 @@ def run_postprocessing(year, name, exp_paths):
 
     save_oemoflex_scalars = True
     if save_oemoflex_scalars:
+        oemoflex_scalars.sort_values(['carrier', 'tech', 'var_name'], axis=0, inplace=True)
         oemoflex_scalars.to_csv(
             os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'),
             index=False
