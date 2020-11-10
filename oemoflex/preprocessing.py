@@ -1229,9 +1229,9 @@ def create_profiles(exp_path, select_components):
         try:
             profiles = map[component]['profiles']
 
-            for identifier, data in profiles.items():
+            for profile_name, profile in profiles.items():
 
-                profile_paths = os.path.join(raw_path, data['input-path'])
+                profile_paths = os.path.join(raw_path, profile['input-path'])
 
                 if identifier == 'default':
                     profile_name = component
@@ -1243,13 +1243,13 @@ def create_profiles(exp_path, select_components):
 
                 profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
 
-                if 'apply-function' in data.keys():
-                    function_name = data['apply-function']
+                if 'apply-function' in profile.keys():
+                    function_name = profile['apply-function']
                     recalc = recalculation_functions[function_name]
                     profile_df = recalc(profile_df)
 
                 try:
-                    output_filename_base = data['output-name']
+                    output_filename_base = profile['output-name']
 
                 except KeyError:
                     output_filename_base = profile_name
