@@ -1224,10 +1224,10 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
 
 def create_profiles(exp_path, select_components):
 
-    def normalize_year(profile_df):
-        yearly_amount = profile_df.sum(axis=0)
-        profile_df = profile_df.divide(yearly_amount)
-        return profile_df
+    def normalize_year(timeseries):
+        yearly_amount = timeseries.sum(axis=0)
+        timeseries = timeseries.divide(yearly_amount)
+        return timeseries
 
     recalculation_functions = {
         'normalize_year': normalize_year
@@ -1242,19 +1242,16 @@ def create_profiles(exp_path, select_components):
 
     mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.yml')
     with open(mapping_filepath, 'r') as mapping_file:
-        map = yaml.safe_load(mapping_file)
-
-    raw_path = exp_path.data_raw
-    preprocessed_path = exp_path.data_preprocessed
+        mapping = yaml.safe_load(mapping_file)
 
     for component in select_components:
 
         try:
-            profiles = map[component]['profiles']
+            profiles = mapping[component]['profiles']
 
             for profile_name, profile in profiles.items():
 
-                profile_paths = os.path.join(raw_path, profile['input-path'])
+                profile_paths = os.path.join(exp_path.data_raw, profile['input-path'])
 
                 logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
 
@@ -1273,7 +1270,7 @@ def create_profiles(exp_path, select_components):
 
                 profile_df.to_csv(
                     os.path.join(
-                        preprocessed_path,
+                        exp_path.data_preprocessed,
                         sequences_dir,
                         output_filename_base + profile_file_suffix + '.csv')
                 )
