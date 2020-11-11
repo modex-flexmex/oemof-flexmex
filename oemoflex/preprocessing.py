@@ -1225,6 +1225,7 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
 def create_profiles(exp_path, select_components):
 
     def normalize_year(timeseries):
+        r"""Normalizes the DataFrame 'timeseries' to values that add up to 1.0."""
         yearly_amount = timeseries.sum(axis=0)
         timeseries = timeseries.divide(yearly_amount)
         return timeseries
@@ -1248,23 +1249,23 @@ def create_profiles(exp_path, select_components):
 
         try:
             profiles = mapping[component]['profiles']
-
+        except KeyError:
+            logging.info(f"No timeseries information found for '{component}'.")
+        else:
             for profile_name, profile in profiles.items():
+                logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
 
                 profile_paths = os.path.join(exp_path.data_raw, profile['input-path'])
 
-                logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
-
                 profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
 
-                if 'apply-function' in profile.keys():
+                if 'apply-function' in profile:
                     function_name = profile['apply-function']
                     recalc = recalculation_functions[function_name]
                     profile_df = recalc(profile_df)
 
                 try:
                     output_filename_base = profile['output-name']
-
                 except KeyError:
                     output_filename_base = profile_name
 
@@ -1275,5 +1276,3 @@ def create_profiles(exp_path, select_components):
                         output_filename_base + profile_file_suffix + '.csv')
                 )
 
-        except KeyError:
-            logging.info(f"No timeseries information found for '{component}'.")
