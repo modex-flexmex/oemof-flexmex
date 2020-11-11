@@ -16,50 +16,15 @@ from oemoflex.facades import TYPEMAP
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
-FlexMex_Parameter_Map = {
-    'carrier':
-        {
-            'ch4':
-                {'carrier_price': 'Energy_Price_CH4',
-                 'co2_price': 'Energy_Price_CO2',
-                 'emission_factor': 'Energy_EmissionFactor_CH4'},
-            'uranium':
-                {'carrier_price': 'Energy_Price_Uranium'}
-        },
-    'tech':
-        {
-            'gt':
-                {'capex': 'EnergyConversion_Capex_Electricity_CH4_GT',
-                 'lifetime': 'EnergyConversion_LifeTime_Electricity_CH4_GT',
-                 'fixom': 'EnergyConversion_FixOM_Electricity_CH4_GT'},
-            'nuclear-st':
-                {'capex': 'EnergyConversion_Capex_Electricity_Nuclear_ST',
-                 'lifetime': 'EnergyConversion_LifeTime_Electricity_Nuclear_ST',
-                 'fixom': 'EnergyConversion_FixOM_Electricity_Nuclear_ST'},
-            'liion_battery':
-                {'charge_capex': 'Storage_Capex_Electricity_LiIonBatteryCharge',
-                 'discharge_capex': 'Storage_Capex_Electricity_LiIonBatteryDischarge',
-                 'storage_capex': 'Storage_Capex_Electricity_LiIonBatteryStorage',
-                 'charge_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryCharge',
-                 'discharge_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryDischarge',
-                 'storage_lifetime': 'Storage_LifeTime_Electricity_LiIonBatteryStorage',
-                 'fixom': 'Storage_FixOM_Electricity_LiIonBattery'},
-            'h2_cavern':
-                {'charge_capex': 'Storage_Capex_H2_CavernCharge',
-                 'discharge_capex': 'Storage_Capex_H2_CavernDischarge',
-                 'storage_capex': 'Storage_Capex_H2_CavernStorage',
-                 'charge_lifetime': 'Storage_LifeTime_H2_CavernCharge',
-                 'discharge_lifetime': 'Storage_LifeTime_H2_CavernDischarge',
-                 'storage_lifetime': 'Storage_LifeTime_H2_CavernStorage',
-                 'fixom': 'Storage_FixOM_H2_Cavern'},
-        }
-}
-
 module_path = os.path.abspath(os.path.dirname(__file__))
 path_config = os.path.join(module_path, 'postprocessed_paths.yaml')
+path_mapping = os.path.join(module_path, 'mapping-input-scalars.yml')
 
 with open(path_config, 'r') as config_file:
     pp_paths = yaml.safe_load(config_file)
+
+with open(path_mapping, 'r') as mapping_file:
+    FlexMex_Parameter_Map = yaml.safe_load(mapping_file)
 
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):
