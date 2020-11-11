@@ -64,7 +64,7 @@ with open(path_config, 'r') as config_file:
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):
     for component, parameters in pp_paths.items():
-        for _, subdir in parameters.items():
+        for subdir in parameters.values():
             path = os.path.join(postprocessed_results_dir, subdir)
             if not os.path.exists(path):
                 os.makedirs(path)
