@@ -288,7 +288,13 @@ def get_sequences_by_tech(results):
             continue
 
         carrier_tech = component.carrier + '-' + component.tech
-        region = component.label.split('-')[0]
+
+        if isinstance(component, TYPEMAP["link"]):
+            # Replace AT-DE by AT_DE to be ready to be merged with DataFrames from preprocessing
+            region = component.label.replace('-','_')
+        else:
+            # Take AT from AT-ch4-gt, string op since sub-nodes lack of a 'region' attribute
+            region = component.label.split('-')[0]
 
         df.columns = pd.MultiIndex.from_tuples([(region, carrier_tech, var_name)])
         df.columns.names = ['region', 'carrier_tech', 'var_name']
