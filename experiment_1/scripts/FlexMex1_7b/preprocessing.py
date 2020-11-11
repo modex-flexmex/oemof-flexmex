@@ -64,7 +64,7 @@ def main():
     update_ch4_gt(exp_paths.data_preprocessed, scalars)
 
     # create sequences
-    create_profiles(exp_paths, components)
+    create_profiles(exp_paths, select_components=components)
 
     # compare with previous data
     previous_path = os.path.join(
