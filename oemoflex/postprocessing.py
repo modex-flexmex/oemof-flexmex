@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from oemof.solph import EnergySystem, Bus, Sink, Transformer, Source
+from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data
@@ -28,12 +28,11 @@ with open(path_mapping, 'r') as mapping_file:
 
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):
-    for subdir, value in pp_paths.items():
-        if value['sequences']:
-            for subsubdir in value['sequences']:
-                path = os.path.join(postprocessed_results_dir, subdir, subsubdir)
-                if not os.path.exists(path):
-                    os.makedirs(path)
+    for parameters in pp_paths.values():
+        for subdir in parameters.values():
+            path = os.path.join(postprocessed_results_dir, subdir)
+            if not os.path.exists(path):
+                os.makedirs(path)
 
 
 def get_capacities(es):
@@ -232,7 +231,7 @@ def get_sequences_by_tech(results):
     # copy to avoid manipulating the data in es.results
     sequences = copy.deepcopy({key: value['sequences'] for key, value in results.items()})
 
-    sequences_by_tech = {}
+    sequences_by_tech = []
 
     # Get internal busses for all 'ReservoirWithPump' and 'Bev' nodes to be ignored later
     internal_busses = get_subnodes_by_type(sequences, Bus)
@@ -289,25 +288,19 @@ def get_sequences_by_tech(results):
             continue
 
         carrier_tech = component.carrier + '-' + component.tech
-        if carrier_tech not in sequences_by_tech:
-            sequences_by_tech[carrier_tech] = []
 
-        # WORKAROUND for components with subnodes (ReservoirWithPump, Bev):
-        #  Since a subnode has a name different from its main node we have to rename them
-        #  to be merged properly along with the other parameters of the main node
-        name = component.label.rsplit('-', 1)
-        # pylint: disable=too-many-boolean-expressions
-        if (isinstance(component, Transformer) and name[1] == 'pump') \
-                or (isinstance(component, Source) and name[1] == 'inflow') \
-                or (isinstance(component, Transformer) and name[1] == 'vehicle_to_grid'):
-            # Rename the subnode to the main node's name (drop the suffix)
-            component.label = name[0]
+        if isinstance(component, TYPEMAP["link"]):
+            # Replace AT-DE by AT_DE to be ready to be merged with DataFrames from preprocessing
+            region = component.label.replace('-', '_')
+        else:
+            # Take AT from AT-ch4-gt, string op since sub-nodes lack of a 'region' attribute
+            region = component.label.split('-')[0]
 
-        df.columns = pd.MultiIndex.from_tuples([(component.label, var_name)])
-        df.columns.names = ['name', 'var_name']
-        sequences_by_tech[carrier_tech].append(df)
+        df.columns = pd.MultiIndex.from_tuples([(region, carrier_tech, var_name)])
+        df.columns.names = ['region', 'carrier_tech', 'var_name']
+        sequences_by_tech.append(df)
 
-    sequences_by_tech = {key: pd.concat(value, 1) for key, value in sequences_by_tech.items()}
+    sequences_by_tech = pd.concat(sequences_by_tech, axis=1)
 
     return sequences_by_tech
 
@@ -347,16 +340,18 @@ def get_subnodes_by_type(sequences, cls):
 
 
 def get_summed_sequences(sequences_by_tech, prep_elements):
-    summed_sequences = []
-    for tech_carrier, sequence in sequences_by_tech.items():
-        df = prep_elements[tech_carrier][basic_columns]
-        sum = sequence.sum()
-        sum.name = 'var_value'
-        sum = sum.reset_index()
-        df = pd.merge(df, sum, on='name')
-        summed_sequences.append(df)
+    # Put component definitions into one DataFrame - drops 'carrier_tech' information in the keys
+    base = pd.concat(prep_elements.values())
+    df = base.loc[:, basic_columns]
+    sum = sequences_by_tech.sum()
+    sum.name = 'var_value'
+    sum_df = sum.reset_index()
+    # Form helper column for proper merging with component definition
+    df['carrier_tech'] = df['carrier'] + '-' + df['tech']
+    summed_sequences = pd.merge(df, sum_df, on=['region', 'carrier_tech'])
+    # Drop helper column
+    summed_sequences.drop('carrier_tech', axis=1, inplace=True)
 
-    summed_sequences = pd.concat(summed_sequences, sort=True)
     summed_sequences = summed_sequences.loc[summed_sequences['var_name'] != 'storage_content']
     summed_sequences['var_unit'] = 'MWh'
 
@@ -601,7 +596,7 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
 
             varom_cost.append(df)
 
-    varom_cost = pd.concat(varom_cost, sort=True)
+    varom_cost = pd.concat(varom_cost)
     varom_cost['var_unit'] = 'Eur'
 
     return varom_cost
@@ -626,7 +621,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
             carrier_cost.append(df)
 
     if carrier_cost:
-        carrier_cost = pd.concat(carrier_cost, sort=True)
+        carrier_cost = pd.concat(carrier_cost)
     else:
         carrier_cost = pd.DataFrame(carrier_cost)
 
@@ -699,7 +694,7 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_unit'] = 'Eur'
 
             # Append current technology elements to the return DataFrame
-            fuel_cost = pd.concat([fuel_cost, df], sort=True)
+            fuel_cost = pd.concat([fuel_cost, df])
 
     return fuel_cost
 
@@ -763,7 +758,7 @@ def get_emission_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_unit'] = 'Eur'
 
             # Append current technology elements to the return DataFrame
-            emission_cost = pd.concat([emission_cost, df], sort=True)
+            emission_cost = pd.concat([emission_cost, df])
 
     return emission_cost
 
@@ -851,7 +846,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                                                        'storage_capacity_invest',
                                                        annualized_cost)
 
-                df = pd.concat([df_charge, df_discharge, df_storage], sort=True)
+                df = pd.concat([df_charge, df_discharge, df_storage])
 
                 # Sum the 3 amounts per storage, keep indexes as columns
                 df = df.groupby(by=basic_columns, as_index=False).sum()
@@ -868,7 +863,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_name'] = 'cost_invest'
             df['var_unit'] = 'Eur'
 
-            invest_cost = pd.concat([invest_cost, df], sort=True)
+            invest_cost = pd.concat([invest_cost, df])
 
     return invest_cost
 
@@ -913,7 +908,7 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
                                                        'storage_capacity_invest',
                                                        fix_cost_factor * capex)
 
-                df = pd.concat([df_charge, df_discharge, df_storage], sort=True)
+                df = pd.concat([df_charge, df_discharge, df_storage])
 
                 # Sum the 3 amounts per storage, keep indexes as columns
                 df = df.groupby(by=basic_columns, as_index=False).sum()
@@ -931,7 +926,7 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
             df['var_name'] = 'cost_fixom'
             df['var_unit'] = 'Eur'
 
-            fixom_cost = pd.concat([fixom_cost, df], sort=True)
+            fixom_cost = pd.concat([fixom_cost, df])
 
     return fixom_cost
 
@@ -967,35 +962,54 @@ def get_total_system_cost(oemoflex_scalars):
 
 
 def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
-    path_by_carrier_tech = {value['component']: key for key, value in pp_paths.items()}
-    sequences = {value['component']: value['sequences'] for key, value in pp_paths.items()}
 
-    for carrier_tech, df in sequences_by_tech.items():
+    for carrier_tech in sequences_by_tech.columns.unique(level='carrier_tech'):
         try:
-            subfolder = path_by_carrier_tech[carrier_tech]
+            components_paths = pp_paths[carrier_tech]
         except KeyError:
             print(f"Entry for {carrier_tech} does not exist in {path_config}.")
             continue
 
         idx = pd.IndexSlice
-        for subsubfolder, var_name in sequences[carrier_tech].items():
-            df_var_value = df.loc[:, idx[:, var_name]]
-            for column in df_var_value.columns:
-                region = column[0].split('-')[0]
+        for var_name, subdir in components_paths.items():
+            df_var_value = sequences_by_tech.loc[:, idx[:, carrier_tech, var_name]]
+            for region in df_var_value.columns.get_level_values('region'):
                 filename = os.path.join(
                     dir,
-                    subfolder,
-                    subsubfolder,
+                    subdir,
                     '_'.join([usecase, model, region, year]) + '.csv'
                 )
 
-                single_column = df_var_value[column]
+                single_column = df_var_value.loc[:, region]
                 single_column = single_column.reset_index(drop=True)
-                single_column.name = 'value'
+                single_column.columns = single_column.columns.droplevel('carrier_tech')
+                remaining_column_name = list(single_column)[0]
+                single_column.rename(columns={remaining_column_name: 'value'}, inplace=True)
                 single_column.index.name = 'timeindex'
                 single_column.to_csv(filename, header=True)
 
     delete_empty_subdirs(dir)
+
+
+def aggregate_re_generation_timeseries(sequences_by_tech):
+
+    idx = pd.IndexSlice
+
+    # Sum flow_out sequences from renewable energies
+    renewable_techs = ['wind-offshore', 'wind-onshore', 'solar-pv']
+    df_renewable = sequences_by_tech.loc[:, idx[:, renewable_techs, 'flow_out']]
+    df_renewable_sum = df_renewable.groupby(['region'], axis=1).sum()
+    df_renewable_sum.columns = pd.MultiIndex.from_product(
+        [list(df_renewable_sum.columns), ['energysystem'], ['re_generation']],
+        names=['region', 'carrier_tech', 'var_name']
+    )
+
+    # Substract Curtailment
+    df_curtailment = sequences_by_tech.loc[:, (slice(None), 'electricity-curtailment')]
+    df_curtailment.columns = df_renewable_sum.columns
+    df_re_generation = df_renewable_sum.sub(df_curtailment, axis=0)
+
+    return df_re_generation
 
 
 def run_postprocessing(year, name, exp_paths):
@@ -1023,6 +1037,10 @@ def run_postprocessing(year, name, exp_paths):
     # format results sequences
     sequences_by_tech = get_sequences_by_tech(es.results)
 
+    df_re_generation = aggregate_re_generation_timeseries(sequences_by_tech)
+
+    sequences_by_tech = pd.concat([sequences_by_tech, df_re_generation], axis=1)
+
     oemoflex_scalars = pd.DataFrame(
         columns=[
             'region',
@@ -1038,11 +1056,11 @@ def run_postprocessing(year, name, exp_paths):
 
     # then sum the flows
     summed_sequences = get_summed_sequences(sequences_by_tech, prep_elements)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, summed_sequences], sort=True)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, summed_sequences])
 
     # get re_generation
     re_generation = get_re_generation(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation], sort=True)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, re_generation])
 
     # losses (storage, transmission)
     transmission_losses = get_transmission_losses(oemoflex_scalars)
@@ -1053,7 +1071,7 @@ def run_postprocessing(year, name, exp_paths):
         transmission_losses,
         storage_losses,
         reservoir_losses
-    ], sort=True)
+    ])
 
     # get capacities
     capacities = get_capacities(es)
@@ -1076,7 +1094,7 @@ def run_postprocessing(year, name, exp_paths):
         aggregated_emission_cost,
         invest_cost,
         fixom_cost
-    ], sort=True)
+    ])
 
     # emissions
     emissions = get_emissions(oemoflex_scalars, scalars_raw)
@@ -1084,10 +1102,10 @@ def run_postprocessing(year, name, exp_paths):
 
     storage = aggregate_storage_capacities(oemoflex_scalars)
     other = aggregate_other_capacities(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, storage, other], sort=True)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, storage, other])
 
     total_system_cost = get_total_system_cost(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost], sort=True)
+    oemoflex_scalars = pd.concat([oemoflex_scalars, total_system_cost])
 
     # map direction of links
     oemoflex_scalars = map_link_direction(oemoflex_scalars)
@@ -1111,6 +1129,7 @@ def run_postprocessing(year, name, exp_paths):
 
     save_oemoflex_scalars = True
     if save_oemoflex_scalars:
+        oemoflex_scalars.sort_values(['carrier', 'tech', 'var_name'], axis=0, inplace=True)
         oemoflex_scalars.to_csv(
             os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'),
             index=False
