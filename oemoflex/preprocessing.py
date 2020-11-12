@@ -55,27 +55,27 @@ def create_default_elements(
     # TODO Better put this as another field into the components.csv as well?
     component_attrs_dir = os.path.join(module_path, component_attrs_dir)
 
-    components = pd.read_csv(components_file).name.values
+    defined_components = pd.read_csv(components_file).name.values
 
-    if select_components is not None:
-        undefined_components = set(select_components).difference(set(components))
+    if select_components is None:
+        select_components = defined_components
 
-        assert not undefined_components,\
-            f"Selected components {undefined_components} are not in components."
+    for component in select_components:
 
-        components = [c for c in components if c in select_components]
+        if component not in defined_components:
+            raise ValueError(
+                f"Selected component '{component}' not found in components definitions."
+            )
 
-    bus_df = create_bus_element(busses_file)
-
-    bus_df.to_csv(os.path.join(dir, 'bus.csv'))
-
-    for component in components:
         component_attrs_file = os.path.join(component_attrs_dir, component + '.csv')
 
         df = create_component_element(component_attrs_file)
 
         # Write to target directory
         df.to_csv(os.path.join(dir, component + '.csv'))
+
+    bus_df = create_bus_element(busses_file)
+    bus_df.to_csv(os.path.join(dir, 'bus.csv'))
 
 
 def create_bus_element(busses_file):
