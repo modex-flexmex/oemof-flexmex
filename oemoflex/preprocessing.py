@@ -49,13 +49,13 @@ def create_default_elements(
     -------
     None
     """
-    components_data = pd.read_csv(components_file)
+    components_data = pd.read_csv(components_file).set_index('name')
 
     components_dirname = os.path.dirname(components_file)
 
-    defined_components_names = components_data['name'].values
-    defined_components = components_data
+    defined_components_names = components_data.index
 
+    # If no component is selected, create all
     if select_components is None:
         select_components = defined_components_names
 
@@ -66,8 +66,9 @@ def create_default_elements(
                 f"Selected component '{component_name}' not found in components definitions."
             )
 
-        component_data = defined_components.loc[defined_components['name'] == component_name]
-        component_path = component_data['path'].values[0]
+        comp_data = components_data.loc[component_name, :]
+
+        component_path = comp_data['path']
 
         component_attrs_file = os.path.join(components_dirname, component_path)
 
