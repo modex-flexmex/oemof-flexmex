@@ -458,6 +458,8 @@ class ReservoirWithPump(GenericStorage, Facade):
         )
         super().__init__(*args, **kwargs)
 
+        self.marginal_cost = kwargs.get("marginal_cost", 0)
+
         self.input_parameters = kwargs.get("input_parameters", {})
 
         self.output_parameters = kwargs.get("output_parameters", {})
@@ -516,6 +518,7 @@ class ReservoirWithPump(GenericStorage, Facade):
             {
                 self.bus: Flow(
                     nominal_value=self.capacity_turbine,
+                    variable_costs=self.marginal_cost,
                     **self.output_parameters
                 )
             }

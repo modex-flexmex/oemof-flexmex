@@ -7,8 +7,7 @@ from oemoflex.preprocessing import (
     update_heat_demand, update_electricity_demand,
     update_bpchp, update_boiler_small,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    create_electricity_demand_profiles, create_heat_demand_profiles,
-    create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
+    create_profiles)
 from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
 
 
@@ -36,22 +35,24 @@ def main():
     # Filter out only scenario-related input parameters
     scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']), :]
 
+    components = [
+        'electricity-shortage',
+        'electricity-curtailment',
+        'electricity-demand',
+        'heat-demand',
+        'heat-excess',
+        'heat-shortage',
+        'wind-offshore',
+        'wind-onshore',
+        'solar-pv',
+        'ch4-bpchp',
+        'ch4-boiler',
+    ]
+
     # Prepare oemof.tabular input CSV files
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
-        select_components=[
-            'electricity-shortage',
-            'electricity-curtailment',
-            'electricity-demand',
-            'heat-demand',
-            'heat-excess',
-            'heat-shortage',
-            'wind-offshore',
-            'wind-onshore',
-            'solar-pv',
-            'ch4-bpchp',
-            'ch4-boiler',
-        ]
+        select_components=components
 
     )
 
@@ -67,11 +68,7 @@ def main():
     update_solar_pv(exp_paths.data_preprocessed, scalars)
 
     # create sequences
-    create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_heat_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_wind_onshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_wind_offshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
+    create_profiles(exp_paths, select_components=components)
 
     # compare with previous data
     previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')

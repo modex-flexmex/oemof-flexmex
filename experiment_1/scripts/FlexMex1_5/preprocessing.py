@@ -7,9 +7,7 @@ from oemoflex.preprocessing import (
     update_electricity_demand, update_heat_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     update_electricity_heatpump, update_heat_storage, update_ch4_gt,
-    create_electricity_demand_profiles, create_heat_demand_profiles,
-    create_electricity_heatpump_profiles,
-    create_wind_onshore_profiles, create_wind_offshore_profiles, create_solar_pv_profiles)
+    create_profiles)
 from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
 
 
@@ -42,22 +40,24 @@ def main():
     scalars.update(overwrite_scalars)
     scalars = scalars.reset_index()
 
+    components = [
+        'electricity-shortage',
+        'heat-shortage',
+        'electricity-curtailment',
+        'electricity-demand',
+        'heat-demand',
+        'wind-offshore',
+        'wind-onshore',
+        'solar-pv',
+        'electricity-heatpump',
+        'heat-storage',
+        'ch4-gt',
+    ]
+
     # Prepare oemof.tabular input CSV files
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
-        select_components=[
-            'electricity-shortage',
-            'heat-shortage',
-            'electricity-curtailment',
-            'electricity-demand',
-            'heat-demand',
-            'wind-offshore',
-            'wind-onshore',
-            'solar-pv',
-            'electricity-heatpump',
-            'heat-storage',
-            'ch4-gt',
-        ]
+        select_components=components
     )
 
     # update elements
@@ -73,12 +73,7 @@ def main():
     update_ch4_gt(exp_paths.data_preprocessed, scalars)
 
     # create sequences
-    create_electricity_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_heat_demand_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_electricity_heatpump_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_wind_onshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_wind_offshore_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
-    create_solar_pv_profiles(exp_paths.data_raw, exp_paths.data_preprocessed)
+    create_profiles(exp_paths, select_components=components)
 
     # compare with previous data
     previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')

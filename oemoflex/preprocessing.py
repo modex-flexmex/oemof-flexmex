@@ -3,6 +3,8 @@ import os
 
 import pandas as pd
 
+import yaml
+
 from oemof.tools.economics import annuity
 
 module_path = os.path.dirname(os.path.abspath(__file__))
@@ -1218,3 +1220,59 @@ def create_electricity_bev_profiles(data_raw_path, data_preprocessed_path):
         profile_df.to_csv(
             os.path.join(data_preprocessed_path, 'sequences', k + '_profile.csv')
         )
+
+
+def create_profiles(exp_path, select_components):
+
+    def normalize_year(timeseries):
+        r"""Normalizes the DataFrame 'timeseries' to values that add up to 1.0."""
+        yearly_amount = timeseries.sum(axis=0)
+        timeseries = timeseries.divide(yearly_amount)
+        return timeseries
+
+    recalculation_functions = {
+        'normalize_year': normalize_year
+    }
+
+    oemof_tabular_settings_filepath = os.path.join(module_path, 'oemof-tabular-settings.yml')
+    with open(oemof_tabular_settings_filepath, 'r') as settings_file:
+        settings = yaml.safe_load(settings_file)
+        sequences_dir = settings['sequences-dir']
+        profile_file_suffix = settings['profile-file-suffix']
+        profile_name_suffix = settings['profile-name-suffix']
+
+    mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.yml')
+    with open(mapping_filepath, 'r') as mapping_file:
+        mapping = yaml.safe_load(mapping_file)
+
+    for component in select_components:
+
+        try:
+            profiles = mapping[component]['profiles']
+        except KeyError:
+            logging.info(f"No timeseries information found for '{component}'.")
+        else:
+            for profile_name, profile in profiles.items():
+                logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
+
+                profile_paths = os.path.join(exp_path.data_raw, profile['input-path'])
+
+                profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
+
+                if 'apply-function' in profile:
+                    function_name = profile['apply-function']
+                    recalc = recalculation_functions[function_name]
+                    profile_df = recalc(profile_df)
+
+                try:
+                    output_filename_base = profile['output-name']
+                except KeyError:
+                    output_filename_base = profile_name
+
+                profile_df.to_csv(
+                    os.path.join(
+                        exp_path.data_preprocessed,
+                        sequences_dir,
+                        output_filename_base + profile_file_suffix + '.csv')
+                )
+
