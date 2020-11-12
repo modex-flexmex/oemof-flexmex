@@ -48,7 +48,7 @@ def main():
         'solar-pv',
         'ch4-extchp',
     ]
-    
+
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
         select_components=components

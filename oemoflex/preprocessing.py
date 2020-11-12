@@ -1278,4 +1278,3 @@ def create_profiles(exp_path, select_components):
                         sequences_dir,
                         output_filename_base + profile_file_suffix + '.csv')
                 )
-
