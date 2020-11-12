@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from oemof.solph import EnergySystem, Bus, Sink, Transformer, Source
+from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
 from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data
@@ -28,7 +28,7 @@ with open(path_mapping, 'r') as mapping_file:
 
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):
-    for component, parameters in pp_paths.items():
+    for parameters in pp_paths.values():
         for subdir in parameters.values():
             path = os.path.join(postprocessed_results_dir, subdir)
             if not os.path.exists(path):
@@ -291,7 +291,7 @@ def get_sequences_by_tech(results):
 
         if isinstance(component, TYPEMAP["link"]):
             # Replace AT-DE by AT_DE to be ready to be merged with DataFrames from preprocessing
-            region = component.label.replace('-','_')
+            region = component.label.replace('-', '_')
         else:
             # Take AT from AT-ch4-gt, string op since sub-nodes lack of a 'region' attribute
             region = component.label.split('-')[0]
@@ -998,7 +998,7 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
     # Sum flow_out sequences from renewable energies
     renewable_techs = ['wind-offshore', 'wind-onshore', 'solar-pv']
     df_renewable = sequences_by_tech.loc[:, idx[:, renewable_techs, 'flow_out']]
-    df_renewable_sum = df_renewable.groupby(['region'],axis=1).sum()
+    df_renewable_sum = df_renewable.groupby(['region'], axis=1).sum()
     df_renewable_sum.columns = pd.MultiIndex.from_product(
         [list(df_renewable_sum.columns), ['energysystem'], ['re_generation']],
         names=['region', 'carrier_tech', 'var_name']
