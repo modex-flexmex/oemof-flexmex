@@ -46,7 +46,7 @@ def main():
         'wind-onshore',
         'solar-pv',
         'ch4-bpchp',
-        'ch4-boiler',
+        'ch4-boiler-small',
     ]
 
     # Prepare oemof.tabular input CSV files

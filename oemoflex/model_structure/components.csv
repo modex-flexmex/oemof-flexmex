@@ -11,6 +11,7 @@ ch4-gt,component_attrs/ch4-gt.csv,Open cycle gas turbine gas turbine capacities 
 uranium-nuclear-st,component_attrs/uranium-nuclear-st.csv,Nuclear power plant capacities (steam turbine)
 ch4-bpchp,component_attrs/ch4-bpchp.csv,Backpressure turbine CHP
 ch4-boiler,component_attrs/ch4-boiler.csv,Peak load boiler
+ch4-boiler-small,component_attrs/ch4-boiler.csv,Peak load boiler
 ch4-extchp,component_attrs/ch4-extchp.csv,Extraction turbine CHP
 electricity-pth,component_attrs/electricity-pth.csv,Resistive heater (Power-to-Heat)
 heat-demand,component_attrs/heat-demand.csv,Heat demand

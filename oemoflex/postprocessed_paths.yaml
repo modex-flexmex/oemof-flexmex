@@ -10,6 +10,9 @@
 ch4-boiler:
   flow_out: Boiler/Large/HeatGeneration
 
+ch4-boiler-small:
+  flow_out: Boiler/Small/HeatGeneration
+
 ch4-bpchp:
   flow_electricity: CHP/BpCCGT/ElectricityGeneration
   flow_heat: CHP/BpCCGT/HeatGeneration

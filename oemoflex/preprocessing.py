@@ -389,10 +389,13 @@ def update_boiler(data_preprocessed_path, scalars):
 def update_boiler_small(data_preprocessed_path, scalars):
     logging.info("Updating ch4-boiler file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler-small.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
+
+    # Replace AT-ch4-boiler by AT-ch4-boiler-small
+    df['name'] = df['name'].str.replace('ch4-boiler', 'ch4-boiler-small', regex=False)
 
     df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Small')
 
