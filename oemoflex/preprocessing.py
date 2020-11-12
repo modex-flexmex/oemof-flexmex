@@ -24,7 +24,6 @@ def create_default_elements(
         dir,
         busses_file=os.path.join(module_path, 'model_structure', 'busses.csv'),
         components_file=os.path.join(module_path, 'model_structure', 'components.csv'),
-        component_attrs_dir=os.path.join(module_path, 'model_structure', 'component_attrs'),
         select_components=None,
 ):
     r"""
@@ -50,32 +49,36 @@ def create_default_elements(
     -------
     None
     """
-    components_file = os.path.join(module_path, components_file)
+    components_data = pd.read_csv(components_file).set_index('name')
 
-    # TODO Better put this as another field into the components.csv as well?
-    component_attrs_dir = os.path.join(module_path, component_attrs_dir)
+    components_dirname = os.path.dirname(components_file)
 
-    components = pd.read_csv(components_file).name.values
+    defined_components_names = components_data.index
 
-    if select_components is not None:
-        undefined_components = set(select_components).difference(set(components))
+    # If no component is selected, create all
+    if select_components is None:
+        select_components = defined_components_names
 
-        assert not undefined_components,\
-            f"Selected components {undefined_components} are not in components."
+    for component_name in select_components:
 
-        components = [c for c in components if c in select_components]
+        if component_name not in defined_components_names:
+            raise ValueError(
+                f"Selected component '{component_name}' not found in components definitions."
+            )
 
-    bus_df = create_bus_element(busses_file)
+        comp_data = components_data.loc[component_name, :]
 
-    bus_df.to_csv(os.path.join(dir, 'bus.csv'))
+        component_path = comp_data['path']
 
-    for component in components:
-        component_attrs_file = os.path.join(component_attrs_dir, component + '.csv')
+        component_attrs_file = os.path.join(components_dirname, component_path)
 
         df = create_component_element(component_attrs_file)
 
         # Write to target directory
-        df.to_csv(os.path.join(dir, component + '.csv'))
+        df.to_csv(os.path.join(dir, component_name + '.csv'))
+
+    bus_df = create_bus_element(busses_file)
+    bus_df.to_csv(os.path.join(dir, 'bus.csv'))
 
 
 def create_bus_element(busses_file):
@@ -1275,4 +1278,3 @@ def create_profiles(exp_path, select_components):
                         sequences_dir,
                         output_filename_base + profile_file_suffix + '.csv')
                 )
-
