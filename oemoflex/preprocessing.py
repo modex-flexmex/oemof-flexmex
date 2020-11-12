@@ -397,6 +397,8 @@ def update_boiler_small(data_preprocessed_path, scalars):
     # Replace AT-ch4-boiler by AT-ch4-boiler-small
     df['name'] = df['name'].str.replace('ch4-boiler', 'ch4-boiler-small', regex=False)
 
+    df['tech'] = 'boiler-small'
+
     df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Small')
 
     df['efficiency'] = get_parameter_values(
