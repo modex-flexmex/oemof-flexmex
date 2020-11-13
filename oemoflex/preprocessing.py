@@ -376,7 +376,7 @@ def update_boiler_large(data_preprocessed_path, scalars):
         'ch4-boiler', 'ch4-boiler-large', regex=False
     )
 
-    df['tech'] = 'ch4-boiler-large'
+    df['tech'] = 'boiler-large'
 
     df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Large')
 
@@ -405,7 +405,7 @@ def update_boiler_small(data_preprocessed_path, scalars):
         'ch4-boiler', 'ch4-boiler-small', regex=False
     )
 
-    df['tech'] = 'ch4-boiler-small'
+    df['tech'] = 'boiler-small'
 
     df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Small')
 
@@ -505,7 +505,7 @@ def update_heat_storage_small(data_preprocessed_path, scalars):
         'heat-storage', 'heat-storage-small', regex=False
     )
 
-    df['tech'] = 'heat-storage-small'
+    df['tech'] = 'storage-small'
 
     df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
 
@@ -537,7 +537,7 @@ def update_heat_storage_large(data_preprocessed_path, scalars):
         'heat-storage', 'heat-storage-large', regex=False
     )
 
-    df['tech'] = 'heat-storage-large'
+    df['tech'] = 'storage-large'
 
     df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
 
