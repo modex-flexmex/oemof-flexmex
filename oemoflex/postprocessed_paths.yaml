@@ -7,7 +7,10 @@
 #   one_oemoflex_parameter: output path
 #   another_oemoflex_parameter: output path
 
-ch4-boiler:
+ch4-boiler-small:
+  flow_out: Boiler/Small/HeatGeneration
+
+ch4-boiler-large:
   flow_out: Boiler/Large/HeatGeneration
 
 ch4-bpchp:
