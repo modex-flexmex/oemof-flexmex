@@ -34,7 +34,7 @@ def main():
                 'electricity-curtailment',
                 'electricity-demand',
                 'heat-demand',
-                'heat-storage',
+                'heat-storage-small',
             ],
             'profile': [
                 'wind-onshore',
@@ -44,10 +44,10 @@ def main():
                 'heat-demand',
             ],
             'from_to_bus': [
-                'electricity-heatpump',
+                'electricity-heatpump-small',
                 'ch4-gt',
             ],
-            'efficiency': ['electricity-heatpump'],
+            'efficiency': ['electricity-heatpump-small'],
         },
         path=exp_paths.data_preprocessed
     )
