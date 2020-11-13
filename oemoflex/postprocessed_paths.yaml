@@ -39,7 +39,7 @@ electricity-h2_cavern:
   flow_out: Storage/Electricity/H2Cavern/Out
   storage_content: Storage/Electricity/H2Cavern/Level
 
-electricity-heatpump:
+electricity-heatpump-small:
   flow_out: HeatPump/Small/HeatGeneration
 
 electricity-heatpump-large:
