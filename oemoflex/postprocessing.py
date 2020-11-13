@@ -995,9 +995,15 @@ def sum_transmission_flows(sequences_by_tech):
 
     idx = pd.IndexSlice
 
-    flow_net_fw = sequences_by_tech.loc[:, idx[:, 'electricity-transmission', 'flow_net_forward']]
+    try:
+        flow_net_fw = sequences_by_tech. \
+            loc[:, idx[:, 'electricity-transmission', 'flow_net_forward']]
 
-    flow_net_bw = sequences_by_tech.loc[:, idx[:, 'electricity-transmission', 'flow_net_backward']]
+        flow_net_bw = sequences_by_tech. \
+            loc[:, idx[:, 'electricity-transmission', 'flow_net_backward']]
+
+    except KeyError:
+        return None
 
     flow_net_fw.rename(columns={'flow_net_forward': 'flow_net_sum'}, inplace=True)
 
