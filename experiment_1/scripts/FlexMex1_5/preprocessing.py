@@ -6,7 +6,7 @@ from oemoflex.preprocessing import (
     update_electricity_shortage, update_heat_shortage,
     update_electricity_demand, update_heat_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    update_electricity_heatpump, update_heat_storage, update_ch4_gt,
+    update_electricity_heatpump_small, update_heat_storage_small, update_ch4_gt,
     create_profiles)
 from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
 
@@ -49,8 +49,8 @@ def main():
         'wind-offshore',
         'wind-onshore',
         'solar-pv',
-        'electricity-heatpump',
-        'heat-storage',
+        'electricity-heatpump-small',
+        'heat-storage-small',
         'ch4-gt',
     ]
 
@@ -68,8 +68,8 @@ def main():
     update_wind_onshore(exp_paths.data_preprocessed, scalars)
     update_wind_offshore(exp_paths.data_preprocessed, scalars)
     update_solar_pv(exp_paths.data_preprocessed, scalars)
-    update_electricity_heatpump(exp_paths.data_preprocessed, scalars)
-    update_heat_storage(exp_paths.data_preprocessed, scalars)
+    update_electricity_heatpump_small(exp_paths.data_preprocessed, scalars)
+    update_heat_storage_small(exp_paths.data_preprocessed, scalars)
     update_ch4_gt(exp_paths.data_preprocessed, scalars)
 
     # create sequences

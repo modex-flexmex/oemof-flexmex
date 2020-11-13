@@ -44,7 +44,7 @@ def main():
                 'heat-demand',
             ],
             'from_to_bus': [
-                'ch4-boiler',
+                'ch4-boiler-large',
             ],
             'chp': [
                 'ch4-extchp',

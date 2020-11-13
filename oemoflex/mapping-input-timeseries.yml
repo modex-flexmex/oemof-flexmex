@@ -28,7 +28,13 @@ hydro-reservoir:
     hydro-reservoir:
       input-path: Energy/SecondaryEnergy/Hydro/Reservoir
 
-electricity-heatpump:
+electricity-heatpump-small:
+  profiles:
+    cop:
+      input-path: OtherProfiles/COP
+      output-name: efficiency
+
+electricity-heatpump-large:
   profiles:
     cop:
       input-path: OtherProfiles/COP

@@ -5,7 +5,7 @@ from oemoflex.preprocessing import (
     create_default_elements,
     update_electricity_shortage, update_heat_shortage,
     update_heat_demand, update_electricity_demand, update_pth, update_heat_storage_large,
-    update_extchp, update_boiler, update_electricity_heatpump_large,
+    update_extchp, update_boiler_large, update_electricity_heatpump_large,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
     create_profiles)
 from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
@@ -46,10 +46,10 @@ def main():
                 'wind-onshore',
                 'solar-pv',
                 'ch4-extchp',
-                'ch4-boiler',
+                'ch4-boiler-large',
                 'electricity-pth',
-                'electricity-heatpump',
-                'heat-storage',
+                'electricity-heatpump-large',
+                'heat-storage-large',
             ]
 
     # Prepare oemof.tabular input CSV files
@@ -66,7 +66,7 @@ def main():
     update_heat_demand(exp_paths.data_preprocessed, scalars)
     update_electricity_demand(exp_paths.data_preprocessed, scalars)
     update_extchp(exp_paths.data_preprocessed, scalars)
-    update_boiler(exp_paths.data_preprocessed, scalars)
+    update_boiler_large(exp_paths.data_preprocessed, scalars)
     update_electricity_heatpump_large(exp_paths.data_preprocessed, scalars)
     update_pth(exp_paths.data_preprocessed, scalars)
     update_wind_onshore(exp_paths.data_preprocessed, scalars)

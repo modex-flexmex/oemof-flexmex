@@ -364,13 +364,19 @@ def update_extchp(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
-def update_boiler(data_preprocessed_path, scalars):
-    logging.info("Updating ch4-boiler file")
+def update_boiler_large(data_preprocessed_path, scalars):
+    logging.info("Updating ch4-boiler-large file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler-large.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
+
+    df['name'] = df['name'].str.replace(
+        'ch4-boiler', 'ch4-boiler-large', regex=False
+    )
+
+    df['tech'] = 'boiler-large'
 
     df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Large')
 
@@ -388,12 +394,18 @@ def update_boiler(data_preprocessed_path, scalars):
 
 
 def update_boiler_small(data_preprocessed_path, scalars):
-    logging.info("Updating ch4-boiler file")
+    logging.info("Updating ch4-boiler-small file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler-small.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
+
+    df['name'] = df['name'].str.replace(
+        'ch4-boiler', 'ch4-boiler-small', regex=False
+    )
+
+    df['tech'] = 'boiler-small'
 
     df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Small')
 
@@ -431,13 +443,19 @@ def update_pth(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
-def update_electricity_heatpump(data_preprocessed_path, scalars):
-    logging.info("Updating electricity-heatpump file")
+def update_electricity_heatpump_small(data_preprocessed_path, scalars):
+    logging.info("Updating electricity-heatpump-small file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump-small.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
+
+    df['name'] = df['name'].str.replace(
+        'electricity-heatpump', 'electricity-heatpump-small', regex=False
+    )
+
+    df['tech'] = 'heatpump-small'
 
     df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Small'
@@ -451,12 +469,18 @@ def update_electricity_heatpump(data_preprocessed_path, scalars):
 
 
 def update_electricity_heatpump_large(data_preprocessed_path, scalars):
-    logging.info("Updating electricity-heatpump file")
+    logging.info("Updating electricity-heatpump-large file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump-large.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
+
+    df['name'] = df['name'].str.replace(
+        'electricity-heatpump', 'electricity-heatpump-large', regex=False
+    )
+
+    df['tech'] = 'heatpump-large'
 
     df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Large'
@@ -469,13 +493,19 @@ def update_electricity_heatpump_large(data_preprocessed_path, scalars):
     df.to_csv(file_path)
 
 
-def update_heat_storage(data_preprocessed_path, scalars):
-    logging.info("Updating heat-storage file")
+def update_heat_storage_small(data_preprocessed_path, scalars):
+    logging.info("Updating heat-storage-large file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage-small.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
+
+    df['name'] = df['name'].str.replace(
+        'heat-storage', 'heat-storage-small', regex=False
+    )
+
+    df['tech'] = 'storage-small'
 
     df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
 
@@ -496,12 +526,18 @@ def update_heat_storage(data_preprocessed_path, scalars):
 
 
 def update_heat_storage_large(data_preprocessed_path, scalars):
-    logging.info("Updating heat-storage file")
+    logging.info("Updating heat-storage-large file")
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage.csv')
+    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage-large.csv')
 
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
+
+    df['name'] = df['name'].str.replace(
+        'heat-storage', 'heat-storage-large', regex=False
+    )
+
+    df['tech'] = 'storage-large'
 
     df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
 
