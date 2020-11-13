@@ -56,10 +56,15 @@ electricity-pth:
 electricity-shortage:
   flow_out: Slack/Electricity
 
-heat-storage:
+heat-storage-small:
   flow_in: Storage/Heat/Small/In
   flow_out: Storage/Heat/Small/Out
   storage_content: Storage/Heat/Small/Level
+
+heat-storage-large:
+  flow_in: Storage/Heat/Large/In
+  flow_out: Storage/Heat/Large/Out
+  storage_content: Storage/Heat/Large/Level
 
 heat-shortage:
   flow_out: Slack/Heat
