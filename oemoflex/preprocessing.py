@@ -1274,14 +1274,16 @@ def create_profiles(exp_path, select_components):
         'normalize_year': normalize_year
     }
 
-    oemof_tabular_settings_filepath = os.path.join(module_path, 'oemof-tabular-settings.yml')
+    oemof_tabular_settings_filepath = os.path.join(
+        module_path, 'model_config', 'oemof-tabular-settings.yml')
+
     with open(oemof_tabular_settings_filepath, 'r') as settings_file:
         settings = yaml.safe_load(settings_file)
         sequences_dir = settings['sequences-dir']
         profile_file_suffix = settings['profile-file-suffix']
         profile_name_suffix = settings['profile-name-suffix']
 
-    mapping_filepath = os.path.join(module_path, 'mapping-input-timeseries.yml')
+    mapping_filepath = os.path.join(module_path, 'flexmex_config', 'mapping-input-timeseries.yml')
     with open(mapping_filepath, 'r') as mapping_file:
         mapping = yaml.safe_load(mapping_file)
 

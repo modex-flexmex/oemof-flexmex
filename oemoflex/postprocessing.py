@@ -17,8 +17,8 @@ from oemoflex.facades import TYPEMAP
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
 module_path = os.path.abspath(os.path.dirname(__file__))
-path_config = os.path.join(module_path, 'postprocessed_paths.yaml')
-path_mapping = os.path.join(module_path, 'mapping-input-scalars.yml')
+path_config = os.path.join(module_path, 'flexmex_config', 'postprocessed_paths.yaml')
+path_mapping = os.path.join(module_path, 'flexmex_config', 'mapping-input-scalars.yml')
 
 with open(path_config, 'r') as config_file:
     pp_paths = yaml.safe_load(config_file)
