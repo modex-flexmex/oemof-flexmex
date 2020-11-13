@@ -35,7 +35,7 @@ def main():
                 'heat-demand',
                 'heat-excess',
                 'heat-shortage',
-                'heat-storage',
+                'heat-storage-large',
             ],
             'profile': [
                 'wind-onshore',
@@ -45,7 +45,7 @@ def main():
                 'heat-demand',
             ],
             'from_to_bus': [
-                'ch4-boiler',
+                'ch4-boiler-large',
                 'electricity-pth',
                 'electricity-heatpump-large',
             ],
