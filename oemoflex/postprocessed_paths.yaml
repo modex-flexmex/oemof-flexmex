@@ -7,7 +7,10 @@
 #   one_oemoflex_parameter: output path
 #   another_oemoflex_parameter: output path
 
-ch4-boiler:
+ch4-boiler-small:
+  flow_out: Boiler/Small/HeatGeneration
+
+ch4-boiler-large:
   flow_out: Boiler/Large/HeatGeneration
 
 ch4-boiler-small:
@@ -39,8 +42,11 @@ electricity-h2_cavern:
   flow_out: Storage/Electricity/H2Cavern/Out
   storage_content: Storage/Electricity/H2Cavern/Level
 
-electricity-heatpump:
+electricity-heatpump-small:
   flow_out: HeatPump/Small/HeatGeneration
+
+electricity-heatpump-large:
+  flow_out: HeatPump/Large/HeatGeneration
 
 electricity-liion_battery:
   flow_in: Storage/Electricity/LiIonBattery/In
@@ -53,10 +59,15 @@ electricity-pth:
 electricity-shortage:
   flow_out: Slack/Electricity
 
-heat-storage:
+heat-storage-small:
   flow_in: Storage/Heat/Small/In
   flow_out: Storage/Heat/Small/Out
   storage_content: Storage/Heat/Small/Level
+
+heat-storage-large:
+  flow_in: Storage/Heat/Large/In
+  flow_out: Storage/Heat/Large/Out
+  storage_content: Storage/Heat/Large/Level
 
 heat-shortage:
   flow_out: Slack/Heat
