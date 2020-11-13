@@ -17,6 +17,7 @@ heat-demand,component_attrs/heat-demand.csv,Heat demand
 electricity-h2_cavern,component_attrs/electricity-h2_cavern.csv,Large scale H2 storage
 electricity-liion_battery,component_attrs/electricity-liion_battery.csv,Li-ion battery storage
 electricity-heatpump,component_attrs/electricity-heatpump.csv,Airsource compression heatpump
+electricity-heatpump-large,component_attrs/electricity-heatpump.csv,Airsource compression heatpump
 heat-storage,component_attrs/heat-storage.csv,Large scale sensible heat storage
 heat-excess,component_attrs/heat-excess.csv,Heat excess
 hydro-reservoir,component_attrs/hydro-reservoir.csv,Hydro reservoir

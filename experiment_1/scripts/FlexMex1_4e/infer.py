@@ -47,12 +47,12 @@ def main():
             'from_to_bus': [
                 'ch4-boiler',
                 'electricity-pth',
-                'electricity-heatpump',
+                'electricity-heatpump-large',
             ],
             'chp': [
                 'ch4-extchp',
             ],
-            'efficiency': ['electricity-heatpump'],
+            'efficiency': ['electricity-heatpump-large'],
         },
         path=exp_paths.data_preprocessed
     )

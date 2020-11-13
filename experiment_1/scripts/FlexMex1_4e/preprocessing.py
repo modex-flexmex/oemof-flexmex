@@ -48,7 +48,7 @@ def main():
                 'ch4-extchp',
                 'ch4-boiler',
                 'electricity-pth',
-                'electricity-heatpump',
+                'electricity-heatpump-large',
                 'heat-storage',
             ]
 

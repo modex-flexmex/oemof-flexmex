@@ -39,6 +39,9 @@ electricity-h2_cavern:
 electricity-heatpump:
   flow_out: HeatPump/Small/HeatGeneration
 
+electricity-heatpump-large:
+  flow_out: HeatPump/Large/HeatGeneration
+
 electricity-liion_battery:
   flow_in: Storage/Electricity/LiIonBattery/In
   flow_out: Storage/Electricity/LiIonBattery/Out
