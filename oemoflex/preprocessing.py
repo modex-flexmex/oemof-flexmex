@@ -401,6 +401,7 @@ def update_boiler_small(data_preprocessed_path, scalars):
     # Read prepared csv file
     df = pd.read_csv(file_path, index_col='region')
 
+    # Replace AT-ch4-boiler by AT-ch4-boiler-small
     df['name'] = df['name'].str.replace(
         'ch4-boiler', 'ch4-boiler-small', regex=False
     )
