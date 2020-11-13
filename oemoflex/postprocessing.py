@@ -991,6 +991,23 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
     delete_empty_subdirs(dir)
 
 
+def sum_transmission_flows(sequences_by_tech):
+
+    idx = pd.IndexSlice
+
+    flow_net_fw = sequences_by_tech.loc[:, idx[:, 'electricity-transmission', 'flow_net_forward']]
+
+    flow_net_bw = sequences_by_tech.loc[:, idx[:, 'electricity-transmission', 'flow_net_backward']]
+
+    flow_net_fw.rename(columns={'flow_net_forward': 'flow_net_sum'}, inplace=True)
+
+    flow_net_bw.rename(columns={'flow_net_backward': 'flow_net_sum'}, inplace=True)
+
+    flow_net_sum = flow_net_fw - flow_net_bw
+
+    return flow_net_sum
+
+
 def aggregate_re_generation_timeseries(sequences_by_tech):
 
     idx = pd.IndexSlice
@@ -1036,6 +1053,10 @@ def run_postprocessing(year, name, exp_paths):
 
     # format results sequences
     sequences_by_tech = get_sequences_by_tech(es.results)
+
+    flow_net_sum = sum_transmission_flows(sequences_by_tech)
+
+    sequences_by_tech = pd.concat([sequences_by_tech, flow_net_sum], axis=1)
 
     df_re_generation = aggregate_re_generation_timeseries(sequences_by_tech)
 
