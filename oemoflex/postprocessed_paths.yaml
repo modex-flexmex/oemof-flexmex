@@ -28,6 +28,10 @@ electricity-bev:
   flow_in: Transport/BEV/Charging
   flow_out: Transport/BEV/FeedIn
 
+electricity-transmission:
+  flow_net_backward: Transmission/Flows/Backward
+  flow_net_forward: Transmission/Flows/Forward
+
 electricity-curtailment:
   flow_in: RE/Curtailment
 
