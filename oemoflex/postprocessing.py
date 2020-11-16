@@ -21,13 +21,12 @@ module_path = os.path.abspath(os.path.dirname(__file__))
 path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
 
 with open(path_config, 'r') as config_file:
-    config_path = yaml.safe_load(config_file)['mapping']
+    config_path_rel = yaml.safe_load(config_file)['mapping']
+    config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
 
-path_map_output_timeseries = os.path.join(
-    module_path, config_path, 'mapping-output-timeseries.yaml'
-)
+path_map_output_timeseries = os.path.join(config_path, 'mapping-output-timeseries.yaml')
 
-path_map_input_scalars = os.path.join(module_path, config_path, 'mapping-input-scalars.yml')
+path_map_input_scalars = os.path.join(config_path, 'mapping-input-scalars.yml')
 
 with open(path_map_output_timeseries, 'r') as config_file:
     map_output_timeseries = yaml.safe_load(config_file)
@@ -1051,7 +1050,7 @@ def run_postprocessing(year, name, exp_paths):
     ]
 
     # load mapping
-    mapping = pd.read_csv(os.path.join(module_path, config_path, 'mapping-output-scalars.csv'))
+    mapping = pd.read_csv(os.path.join(config_path, 'mapping-output-scalars.csv'))
 
     # Load preprocessed elements
     prep_elements = load_elements(os.path.join(exp_paths.data_preprocessed, 'data', 'elements'))

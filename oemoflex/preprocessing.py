@@ -1285,9 +1285,10 @@ def create_profiles(exp_path, select_components):
 
     path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
     with open(path_config, 'r') as config_file:
-        config_path = yaml.safe_load(config_file)['mapping']
+        config_path_rel = yaml.safe_load(config_file)['mapping']
+        config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
 
-    mapping_filepath = os.path.join(module_path, config_path, 'mapping-input-timeseries.yml')
+    mapping_filepath = os.path.join(config_path, 'mapping-input-timeseries.yml')
     with open(mapping_filepath, 'r') as mapping_file:
         mapping = yaml.safe_load(mapping_file)
 
