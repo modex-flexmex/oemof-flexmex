@@ -8,8 +8,28 @@ from oemof.tools.economics import annuity
 from oemoflex.helpers import load_yaml
 
 
+# Path definitions
 module_path = os.path.dirname(os.path.abspath(__file__))
 
+MODEL_CONFIG = 'model_config'
+
+PATH_MAPPINGS_REL = '../flexmex_config'
+
+path_oemof_tabular_settings = os.path.join(
+    module_path, MODEL_CONFIG, 'oemof-tabular-settings.yml')
+
+path_mappings = os.path.abspath(os.path.join(module_path, PATH_MAPPINGS_REL))
+
+path_mapping_input_timeseries = os.path.join(path_mappings, 'mapping-input-timeseries.yml')
+
+
+# Load configs
+oemof_tabular_settings = load_yaml(path_oemof_tabular_settings)
+
+mapping = load_yaml(path_mapping_input_timeseries)
+
+
+# Define time index and regions
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
 regions_list = list(
@@ -1277,24 +1297,9 @@ def create_profiles(exp_path, select_components):
         'normalize_year': normalize_year
     }
 
-    oemof_tabular_settings_filepath = os.path.join(
-        module_path, 'model_config', 'oemof-tabular-settings.yml')
-
-    settings = load_yaml(oemof_tabular_settings_filepath)
-
-    sequences_dir = settings['sequences-dir']
-    profile_file_suffix = settings['profile-file-suffix']
-    profile_name_suffix = settings['profile-name-suffix']
-
-    path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
-
-    config_path_rel = load_yaml(path_config)['mapping']
-
-    config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
-
-    mapping_filepath = os.path.join(config_path, 'mapping-input-timeseries.yml')
-
-    mapping = load_yaml(mapping_filepath)
+    sequences_dir = oemof_tabular_settings['sequences-dir']
+    profile_file_suffix = oemof_tabular_settings['profile-file-suffix']
+    profile_name_suffix = oemof_tabular_settings['profile-name-suffix']
 
     for component in select_components:
 
