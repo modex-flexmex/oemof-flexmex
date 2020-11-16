@@ -1,5 +1,6 @@
 # This part will be in the module oemoflex/model.py
 
+
 class ModelPipeline():
     def __init__(self, sc_name, sc_specs, root_dir):
         self.sc_name = sc_name
@@ -20,11 +21,21 @@ class ModelPipeline():
 
         self.postprocessed = None
 
+    def setup_logging(self):
+        pass
+
+    def setup_experiment_dirs(self):
+        pass
+
+    def setup_model_structure(self):
+        pass
+
     def load_raw(self):
         print(f"Load raw data from '{self.sc_name}'")
 
-    def preprocess(self):
-        print(f"Preprocess scenario '{self.sc_name}'")
+    def parametrize(self):
+        # Here, the update functions and create timeseries are called
+        print(f"Parametrize scenario '{self.sc_name}'")
 
     def infer(self):
         print(f"Infer metadata for scenario '{self.sc_name}'")
@@ -34,6 +45,10 @@ class ModelPipeline():
 
     def postprocess(self):
         print(f"Postprocess scenario '{self.sc_name}'")
+
+    def map_results(self):
+        # This maps the results to the projects data format.
+        print(f"Mapping results for scenario '{self.sc_name}'")
 
     def run_all(self):
         print(f"Run scenario '{self.sc_name}'")
