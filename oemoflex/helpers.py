@@ -37,7 +37,7 @@ def get_experiment_paths():
 
     # Use base path to make other paths absolute and drop it
     basepath = os.path.realpath(os.path.join(module_path, config.pop('base')))
-    config.pop('mapping')
+
     experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
 
     experiment_paths = Dict(experiment_paths)
