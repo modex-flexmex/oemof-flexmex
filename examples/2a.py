@@ -9,7 +9,9 @@ class ModelPipeline():
 
         self.root_dir = root_dir
 
-        self.exp_dirs = None
+        self.logging = self.setup_logging()
+
+        self.exp_dirs = self.setup_experiment_dirs()
 
         self.raw = None
 
@@ -25,7 +27,8 @@ class ModelPipeline():
         pass
 
     def setup_experiment_dirs(self):
-        pass
+        experiment_dirs = None
+        return experiment_dirs
 
     def setup_model_structure(self):
         pass
@@ -53,10 +56,12 @@ class ModelPipeline():
     def run_all(self):
         print(f"Run scenario '{self.sc_name}'")
         self.load_raw()
-        self.preprocess()
-        self.optimize()
+        self.setup_model_structure()
+        self.parametrize()
         self.infer()
+        self.optimize()
         self.postprocess()
+        self.map_results()
 
 
 def run_processing_step(mp):
