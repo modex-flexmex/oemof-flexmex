@@ -13,20 +13,23 @@ from oemoflex.preprocessing import get_parameter_values
 
 from oemoflex.facades import TYPEMAP
 
+
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
+# Path definitions
 module_path = os.path.abspath(os.path.dirname(__file__))
 
-path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
+MODEL_CONFIG = 'model_config'
 
-config_path_rel = load_yaml(path_config)['mapping']
+PATH_MAPPINGS_REL = '../flexmex_config'
 
-config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
+path_mappings = os.path.abspath(os.path.join(module_path, PATH_MAPPINGS_REL))
 
-path_map_output_timeseries = os.path.join(config_path, 'mapping-output-timeseries.yml')
+path_map_output_timeseries = os.path.join(path_mappings, 'mapping-output-timeseries.yml')
 
-path_map_input_scalars = os.path.join(config_path, 'mapping-input-scalars.yml')
+path_map_input_scalars = os.path.join(path_mappings, 'mapping-input-scalars.yml')
 
+# Load mappings
 map_output_timeseries = load_yaml(path_map_output_timeseries)
 
 FlexMex_Parameter_Map = load_yaml(path_map_input_scalars)
@@ -1051,7 +1054,7 @@ def run_postprocessing(year, name, exp_paths):
     ]
 
     # load mapping
-    mapping = pd.read_csv(os.path.join(config_path, 'mapping-output-scalars.csv'))
+    mapping = pd.read_csv(os.path.join(path_mappings, 'mapping-output-scalars.csv'))
 
     # Load preprocessed elements
     prep_elements = load_elements(os.path.join(exp_paths.data_preprocessed, 'data', 'elements'))
