@@ -8,6 +8,16 @@ from pandas.testing import assert_frame_equal
 import yaml
 
 
+MODEL_CONFIG = 'model_config'
+
+
+def load_yaml(file_path):
+    with open(file_path, 'r') as yaml_file:
+        yaml_data = yaml.safe_load(yaml_file)
+
+    return yaml_data
+
+
 def get_experiment_paths():
     r"""
 
@@ -23,13 +33,14 @@ def get_experiment_paths():
 
     """
     module_path = os.path.abspath(os.path.dirname(__file__))
-    path_config = os.path.join(module_path, 'experiment_paths.yml')
+    path_config = os.path.join(module_path, MODEL_CONFIG, 'experiment_paths.yml')
 
     with open(path_config, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
     # Use base path to make other paths absolute and drop it
     basepath = os.path.realpath(os.path.join(module_path, config.pop('base')))
+
     experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
 
     experiment_paths = Dict(experiment_paths)

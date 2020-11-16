@@ -4,31 +4,39 @@ import copy
 
 import numpy as np
 import pandas as pd
-import yaml
 
 from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
-from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data
+from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data, load_yaml
 from oemoflex.preprocessing import get_parameter_values
 
 from oemoflex.facades import TYPEMAP
 
+
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
+# Path definitions
 module_path = os.path.abspath(os.path.dirname(__file__))
-path_config = os.path.join(module_path, 'postprocessed_paths.yaml')
-path_mapping = os.path.join(module_path, 'mapping-input-scalars.yml')
 
-with open(path_config, 'r') as config_file:
-    pp_paths = yaml.safe_load(config_file)
+MODEL_CONFIG = 'model_config'
 
-with open(path_mapping, 'r') as mapping_file:
-    FlexMex_Parameter_Map = yaml.safe_load(mapping_file)
+PATH_MAPPINGS_REL = '../flexmex_config'
+
+path_mappings = os.path.abspath(os.path.join(module_path, PATH_MAPPINGS_REL))
+
+path_map_output_timeseries = os.path.join(path_mappings, 'mapping-output-timeseries.yml')
+
+path_map_input_scalars = os.path.join(path_mappings, 'mapping-input-scalars.yml')
+
+# Load mappings
+map_output_timeseries = load_yaml(path_map_output_timeseries)
+
+FlexMex_Parameter_Map = load_yaml(path_map_input_scalars)
 
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):
-    for parameters in pp_paths.values():
+    for parameters in map_output_timeseries.values():
         for subdir in parameters.values():
             path = os.path.join(postprocessed_results_dir, subdir)
             if not os.path.exists(path):
@@ -963,9 +971,9 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
 
     for carrier_tech in sequences_by_tech.columns.unique(level='carrier_tech'):
         try:
-            components_paths = pp_paths[carrier_tech]
+            components_paths = map_output_timeseries[carrier_tech]
         except KeyError:
-            print(f"Entry for {carrier_tech} does not exist in {path_config}.")
+            print(f"Entry for {carrier_tech} does not exist in {path_map_output_timeseries}.")
             continue
 
         idx = pd.IndexSlice
@@ -1046,7 +1054,7 @@ def run_postprocessing(year, name, exp_paths):
     ]
 
     # load mapping
-    mapping = pd.read_csv(os.path.join(exp_paths.results_mapping, 'mapping.csv'))
+    mapping = pd.read_csv(os.path.join(path_mappings, 'mapping-output-scalars.csv'))
 
     # Load preprocessed elements
     prep_elements = load_elements(os.path.join(exp_paths.data_preprocessed, 'data', 'elements'))
