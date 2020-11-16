@@ -4,12 +4,11 @@ import copy
 
 import numpy as np
 import pandas as pd
-import yaml
 
 from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
-from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data
+from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data, load_yaml
 from oemoflex.preprocessing import get_parameter_values
 
 from oemoflex.facades import TYPEMAP
@@ -20,19 +19,17 @@ module_path = os.path.abspath(os.path.dirname(__file__))
 
 path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
 
-with open(path_config, 'r') as config_file:
-    config_path_rel = yaml.safe_load(config_file)['mapping']
-    config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
+config_path_rel = load_yaml(path_config)['mapping']
+
+config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
 
 path_map_output_timeseries = os.path.join(config_path, 'mapping-output-timeseries.yml')
 
 path_map_input_scalars = os.path.join(config_path, 'mapping-input-scalars.yml')
 
-with open(path_map_output_timeseries, 'r') as config_file:
-    map_output_timeseries = yaml.safe_load(config_file)
+map_output_timeseries = load_yaml(path_map_output_timeseries)
 
-with open(path_map_input_scalars, 'r') as config_file:
-    FlexMex_Parameter_Map = yaml.safe_load(config_file)
+FlexMex_Parameter_Map = load_yaml(path_map_input_scalars)
 
 
 def create_postprocessed_results_subdirs(postprocessed_results_dir):

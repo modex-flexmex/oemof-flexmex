@@ -3,9 +3,10 @@ import os
 
 import pandas as pd
 
-import yaml
-
 from oemof.tools.economics import annuity
+
+from oemoflex.helpers import load_yaml
+
 
 module_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -1279,20 +1280,21 @@ def create_profiles(exp_path, select_components):
     oemof_tabular_settings_filepath = os.path.join(
         module_path, 'model_config', 'oemof-tabular-settings.yml')
 
-    with open(oemof_tabular_settings_filepath, 'r') as settings_file:
-        settings = yaml.safe_load(settings_file)
-        sequences_dir = settings['sequences-dir']
-        profile_file_suffix = settings['profile-file-suffix']
-        profile_name_suffix = settings['profile-name-suffix']
+    settings = load_yaml(oemof_tabular_settings_filepath)
+
+    sequences_dir = settings['sequences-dir']
+    profile_file_suffix = settings['profile-file-suffix']
+    profile_name_suffix = settings['profile-name-suffix']
 
     path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
-    with open(path_config, 'r') as config_file:
-        config_path_rel = yaml.safe_load(config_file)['mapping']
-        config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
+
+    config_path_rel = load_yaml(path_config)['mapping']
+
+    config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
 
     mapping_filepath = os.path.join(config_path, 'mapping-input-timeseries.yml')
-    with open(mapping_filepath, 'r') as mapping_file:
-        mapping = yaml.safe_load(mapping_file)
+
+    mapping = load_yaml(mapping_filepath)
 
     for component in select_components:
 
