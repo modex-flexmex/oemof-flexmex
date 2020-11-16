@@ -451,7 +451,7 @@ def get_reservoir_losses(oemoflex_scalars):
 
 def aggregate_storage_capacities(oemoflex_scalars):
     storage = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'].isin(['storage_capacity', 'storage_capacity_invest'])]
+        oemoflex_scalars['var_name'].isin(['storage_capacity', 'storage_capacity_invest'])].copy()
 
     # Make sure that values in columns used to group on are strings and thus equatable
     storage[basic_columns] = storage[basic_columns].astype(str)
@@ -1011,9 +1011,9 @@ def sum_transmission_flows(sequences_by_tech):
     except KeyError:
         return None
 
-    flow_net_fw.rename(columns={'flow_net_forward': 'flow_net_sum'}, inplace=True)
+    flow_net_fw = flow_net_fw.rename(columns={'flow_net_forward': 'flow_net_sum'})
 
-    flow_net_bw.rename(columns={'flow_net_backward': 'flow_net_sum'}, inplace=True)
+    flow_net_bw = flow_net_bw.rename(columns={'flow_net_backward': 'flow_net_sum'})
 
     flow_net_sum = flow_net_fw - flow_net_bw
 
