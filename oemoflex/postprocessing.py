@@ -21,7 +21,7 @@ module_path = os.path.abspath(os.path.dirname(__file__))
 path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
 
 with open(path_config, 'r') as config_file:
-    config_path = yaml.safe_load(config_file)['config']
+    config_path = yaml.safe_load(config_file)['mapping']
 
 path_map_output_timeseries = os.path.join(
     module_path, config_path, 'mapping-output-timeseries.yaml'
