@@ -1283,7 +1283,11 @@ def create_profiles(exp_path, select_components):
         profile_file_suffix = settings['profile-file-suffix']
         profile_name_suffix = settings['profile-name-suffix']
 
-    mapping_filepath = os.path.join(module_path, 'flexmex_config', 'mapping-input-timeseries.yml')
+    path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
+    with open(path_config, 'r') as config_file:
+        config_path = yaml.safe_load(config_file)['config']
+
+    mapping_filepath = os.path.join(module_path, config_path, 'mapping-input-timeseries.yml')
     with open(mapping_filepath, 'r') as mapping_file:
         mapping = yaml.safe_load(mapping_file)
 
