@@ -8,6 +8,9 @@ from pandas.testing import assert_frame_equal
 import yaml
 
 
+MODEL_CONFIG = 'model_config'
+
+
 def load_yaml(file_path):
     with open(file_path, 'r') as yaml_file:
         yaml_data = yaml.safe_load(yaml_file)
@@ -30,7 +33,7 @@ def get_experiment_paths():
 
     """
     module_path = os.path.abspath(os.path.dirname(__file__))
-    path_config = os.path.join(module_path, 'model_config', 'experiment_paths.yml')
+    path_config = os.path.join(module_path, MODEL_CONFIG, 'experiment_paths.yml')
 
     with open(path_config, 'r') as config_file:
         config = yaml.safe_load(config_file)
