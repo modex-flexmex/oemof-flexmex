@@ -24,7 +24,7 @@ with open(path_config, 'r') as config_file:
     config_path_rel = yaml.safe_load(config_file)['mapping']
     config_path = os.path.abspath(os.path.join(module_path, config_path_rel))
 
-path_map_output_timeseries = os.path.join(config_path, 'mapping-output-timeseries.yaml')
+path_map_output_timeseries = os.path.join(config_path, 'mapping-output-timeseries.yml')
 
 path_map_input_scalars = os.path.join(config_path, 'mapping-input-scalars.yml')
 
