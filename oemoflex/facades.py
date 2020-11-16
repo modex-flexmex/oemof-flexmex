@@ -1,7 +1,7 @@
 from oemof.solph import sequence, Bus, Source, Sink, Transformer, Flow, Investment
 from oemof.solph.components import GenericStorage, ExtractionTurbineCHP
 
-from oemof.tabular.facades import Facade, TYPEMAP
+from oemof.tabular.facades import Facade, Link, TYPEMAP
 
 
 class Source(Source):  # pylint: disable=E0102
@@ -43,6 +43,11 @@ class Facade(Facade):  # pylint: disable=E0102
         """
         if self.expandable is True:
             return None
+
+        if isinstance(self, Link):
+            return {
+                "from_to": self.from_to_capacity,
+                "to_from": self.to_from_capacity}
 
         if isinstance(self, AsymmetricStorage):
             return {

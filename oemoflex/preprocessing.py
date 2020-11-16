@@ -580,7 +580,9 @@ def update_link(data_preprocessed_path, scalars):
         scalars,
         'Transmission_Capacity_Electricity_Grid')
 
-    link['capacity'] = transmission_capacity
+    link['from_to_capacity'] = transmission_capacity
+
+    link['to_from_capacity'] = transmission_capacity
 
     # Calculation with pandas series
     link['loss'] = (
