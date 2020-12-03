@@ -44,8 +44,11 @@ def filter_by_usecase(sc_in, usecase):
     return sc
 
 
-def prepare_scalars(model, usecase, index=['UseCase', 'Region', 'Year', 'Parameter']):
+def prepare_scalars(model, usecase, index=None):
     r""" Load scalars, filter for usecase, sort and set name of pd.Series. """
+
+    if index is None:
+        index = ['UseCase', 'Region', 'Year', 'Parameter']
 
     sc = load_scalars(model)
 
