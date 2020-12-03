@@ -34,17 +34,17 @@ def load_scalars(model, base_path=comparison_path):
     return sc
 
 
-def filter_by_usecase(sc_in, usecase):
+def filter_by_usecase(sc_in, uc):
     r""" Filter scalars for UseCase """
 
     sc = sc_in.copy()  # copy to avoid unintended overwriting
 
-    sc = sc.loc[sc['UseCase'] == usecase]
+    sc = sc.loc[sc['UseCase'] == uc]
 
     return sc
 
 
-def prepare_scalars(model, usecase, index=None):
+def prepare_scalars(model, uc, index=None):
     r""" Load scalars, filter for usecase, sort and set name of pd.Series. """
 
     if index is None:
@@ -52,7 +52,7 @@ def prepare_scalars(model, usecase, index=None):
 
     sc = load_scalars(model)
 
-    sc = filter_by_usecase(sc, usecase)
+    sc = filter_by_usecase(sc, uc)
 
     sc.set_index(index, inplace=True)  # set index to the columns that are common
 
@@ -85,15 +85,15 @@ def calculate_diff_and_relative_deviation(a, b):
 def average_per_region(diff_in):
     r""" Takes the regional average of a pd.DataFrame. """
 
-    mean_diff = diff_in.copy()
+    mean_region = diff_in.copy()
 
-    by = list(mean_diff.index.names)
+    by = list(mean_region.index.names)
 
     by.remove('Region')  # groupby all index levels apart from 'Region'
 
-    mean_diff = mean_diff.groupby(by=by).mean()
+    mean_region = mean_region.groupby(by=by).mean()
 
-    return mean_diff
+    return mean_region
 
 
 for usecase in usecases:
