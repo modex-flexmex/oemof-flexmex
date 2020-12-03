@@ -37,8 +37,8 @@ def main():
     # one for 'FlexMex1' and one for 'FlexMex1UC2'
     # Drop the second one, only keep "Energy_SlackCost_Electricity" for use case 2b
     rows_to_drop = scalars.loc[
-          (scalars['Parameter'] == 'Energy_SlackCost_Electricity')
-          & (scalars['Scenario'] == 'FlexMex1'), :].index
+        (scalars['Parameter'] == 'Energy_SlackCost_Electricity')
+        & (scalars['Scenario'] == 'FlexMex1'), :].index
 
     scalars = scalars.drop(rows_to_drop)
 
