@@ -10,6 +10,11 @@ python:
 #  apt:
 #    update: true
 
+addons:
+ apt:
+   packages:
+     - coinor-cbc
+
 # command to install dependencies
 install:
   - pip install -e .
