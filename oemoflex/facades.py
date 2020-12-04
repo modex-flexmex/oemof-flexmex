@@ -538,7 +538,7 @@ class ReservoirWithPump(GenericStorage, Facade):
         self.subnodes = (inflow, internal_bus, pump)
 
 
-class ExtractionTurbine(ExtractionTurbineCHP, Facade):
+class ExtractionTurbine(ExtractionTurbineCHP, Facade):  # pylint: disable=too-many-ancestors
     r""" Combined Heat and Power (extraction) unit with one input and
     two outputs.
 
