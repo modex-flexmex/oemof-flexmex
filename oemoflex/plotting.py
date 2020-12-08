@@ -1,13 +1,40 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from oemoflex import helpers
+
+idx = pd.IndexSlice
 
 
-def dispatch_plot(df, **kwargs):
-    if not fig in kwargs:
-        fig, ax = plt.subplots
-    return fig, ax
+def stack_plot_with_negative_values(timeseries, ax):
+    timeseries_pos = timeseries.copy()
+    timeseries_pos[timeseries_pos < 0] = 0
+    timeseries_pos = timeseries_pos.loc[:, (timeseries_pos != 0).any(axis=0)]
+
+    timeseries_neg = timeseries.copy()
+    timeseries_neg[timeseries_neg >= 0] = 0
+    timeseries_neg = timeseries_neg.loc[:, (timeseries_neg != 0).any(axis=0)]
+
+    if not timeseries_pos.empty:
+        timeseries_pos.plot.area(ax=ax)
+    if not timeseries_neg.empty:
+        timeseries_neg.plot.area(ax=ax)
+    return ax
 
 
+def dispatch_plot(df_in, bus, ax=None):
 
+    if not ax:
+        fig, ax = plt.subplots()
+
+    df = df_in.copy()
+
+    df.loc[:, idx[bus, :]] *= -1
+
+    df.plot.area(ax=ax)
+
+    ax.legend(
+        loc='center left',
+        bbox_to_anchor=(1.0, 0.5)
+    )
+
+    return ax
