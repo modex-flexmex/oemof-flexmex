@@ -19,10 +19,29 @@ if __name__ == '__main__':
         'DE-electricity.csv'
     )
 
+    def plot(start, end, bus='DE-electricity'):
+        fig, ax = plt.subplots(figsize=(12, 5))
+
+        dispatch_plot(df.iloc[start:end, :], bus=bus, demand=bus + '-demand', ax=ax)
+
+        plt.tight_layout()
+
+        plt.savefig(os.path.join(exp_paths.plots, f'{bus}-{start}-{end}.png'))
+
     df = pd.read_csv(path_df, index_col=0, header=[0, 1, 2])
 
-    ax = dispatch_plot(df.head(168), 'DE-electricity')
+    plot(0, 168, 'DE-electricity')
 
-    plt.tight_layout()
+    plot(860, 1008, 'DE-electricity')
 
-    plt.show()
+    path_df = os.path.join(
+        exp_paths.results_postprocessed,
+        'oemoflex-timeseries',
+        'DE-heat.csv'
+    )
+
+    df = pd.read_csv(path_df, index_col=0, header=[0, 1, 2])
+
+    plot(0, 168, 'DE-heat')
+
+    plot(860, 1008, 'DE-heat')

@@ -21,12 +21,18 @@ def stack_plot_with_negative_values(timeseries, ax):
     return ax
 
 
-def dispatch_plot(df_in, bus, ax=None):
+def dispatch_plot(df_in, bus, demand, ax=None):
 
     if not ax:
         fig, ax = plt.subplots()
 
     df = df_in.copy()
+
+    df_demand = df.pop((bus, demand))
+
+    # df = df.drop(('DE-ch4-extchp', bus), axis=1)
+
+    df_demand.plot.line(ax=ax)
 
     df.loc[:, idx[bus, :]] *= -1
 
