@@ -36,21 +36,21 @@ def main():
     scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex1', 'ALL']), :]
 
     components = [
-                'electricity-shortage',
-                'electricity-curtailment',
-                'electricity-demand',
-                'heat-demand',
-                'heat-excess',
-                'heat-shortage',
-                'wind-offshore',
-                'wind-onshore',
-                'solar-pv',
-                'ch4-extchp',
-                'ch4-boiler-large',
-                'electricity-pth',
-                'electricity-heatpump-large',
-                'heat-storage-large',
-            ]
+        'electricity-shortage',
+        'electricity-curtailment',
+        'electricity-demand',
+        'heat-demand',
+        'heat-excess',
+        'heat-shortage',
+        'wind-offshore',
+        'wind-onshore',
+        'solar-pv',
+        'ch4-extchp',
+        'ch4-boiler-large',
+        'electricity-pth',
+        'electricity-heatpump-large',
+        'heat-storage-large',
+    ]
 
     # Prepare oemof.tabular input CSV files
     create_default_elements(

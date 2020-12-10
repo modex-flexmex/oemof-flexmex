@@ -25,7 +25,7 @@ if os.path.exists(exp_paths.results_comparison):
 
 os.makedirs(exp_paths.results_comparison)
 
-experiments = [
+usecases = [
     'FlexMex1_2a',
     'FlexMex1_2b',
     'FlexMex1_2c',
@@ -43,15 +43,15 @@ experiments = [
 
 
 def join_scalars(experiments):
-    all_scalars = []
+    scalars = []
     for subdir in experiments:
         scalar = pd.read_csv(
             os.path.join('../005_results_postprocessed', subdir, 'Scalars.csv'), index_col=[0])
-        all_scalars.append(scalar)
+        scalars.append(scalar)
 
-    all_scalars = pd.concat(all_scalars)
+    scalars = pd.concat(scalars)
 
-    return all_scalars
+    return scalars
 
 
 def copy_timeseries(experiments, fro, to):
@@ -65,7 +65,7 @@ def copy_timeseries(experiments, fro, to):
         ))
 
 
-all_scalars = join_scalars(experiments)
+all_scalars = join_scalars(usecases)
 all_scalars.to_csv('../006_results_comparison/oemof/Scalars.csv')
 
-copy_timeseries(experiments, exp_paths.results_postprocessed, exp_paths.results_comparison)
+copy_timeseries(usecases, exp_paths.results_postprocessed, exp_paths.results_comparison)
