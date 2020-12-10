@@ -711,7 +711,8 @@ class ExtractionTurbine(ExtractionTurbineCHP, Facade):  # pylint: disable=too-ma
 TYPEMAP.update(
     {
         "asymmetric storage": AsymmetricStorage,
-        "reservoir": ReservoirWithPump, "bev": Bev,
+        "reservoir": ReservoirWithPump,
+        "bev": Bev,
         "extraction": ExtractionTurbine,
     }
 )
