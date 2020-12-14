@@ -1,55 +1,18 @@
+import os
+
 from oemof.tabular.datapackage import building
+from oemoflex.helpers import load_yaml
 
 
-all_foreign_keys = {
-    'bus': [
-        'heat-shortage',
-        'heat-excess',
-        'heat-demand',
-        'heat-storage-large',
-        'heat-storage-small',
-        'wind-onshore',
-        'wind-offshore',
-        'solar-pv',
-        'electricity-shortage',
-        'electricity-curtailment',
-        'electricity-demand',
-        'electricity-h2_cavern',
-        'electricity-liion_battery',
-        'hydro-reservoir',
-        'electricity-bev',
-    ],
-    'profile': [
-        'wind-onshore',
-        'wind-offshore',
-        'solar-pv',
-        'electricity-demand',
-        'hydro-reservoir',
-        'heat-demand',
-    ],
-    'from_to_bus': [
-        'electricity-transmission',
-        'ch4-gt',
-        'uranium-nuclear-st',
-        'ch4-boiler-small',
-        'ch4-boiler-large',
-        'electricity-pth',
-        'electricity-heatpump-small',
-        'electricity-heatpump-large',
-    ],
-    'chp': [
-        'ch4-bpchp',
-        'ch4-extchp',
-    ],
-    'efficiency': [
-        'electricity-heatpump-large',
-        'electricity-heatpump-small',
-    ],
-    'availability': ['electricity-bev'],
-    'drive_power': ['electricity-bev'],
-    'min_storage_level': ['electricity-bev'],
-    'max_storage_level': ['electricity-bev'],
-}
+# Path definitions
+module_path = os.path.dirname(os.path.abspath(__file__))
+
+MODEL_STRUCTURE = 'model_structure'
+
+FOREIGN_KEYS = 'foreign_keys.yml'
+
+
+all_foreign_keys = load_yaml(os.path.join(module_path, MODEL_STRUCTURE, FOREIGN_KEYS))
 
 
 def infer(select_components, package_name, path):
