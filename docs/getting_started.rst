@@ -66,6 +66,7 @@ Required data
 * Raw input data, see ...
 * Output template data, see ...
 
+This data will be provided on github in the future.
 
 Contributing to oemoflex
 ========================
