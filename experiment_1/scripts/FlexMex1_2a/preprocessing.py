@@ -1,11 +1,12 @@
 import os
 
 from oemof.tools.logger import define_logging
-from oemoflex.preprocessing import (
-    create_default_elements, update_electricity_shortage, update_electricity_demand,
+from oemoflex.model_structure import create_default_elements
+from oemoflex.parametrization_scalars import (
+    update_electricity_shortage, update_electricity_demand,
     update_wind_onshore, update_wind_offshore, update_solar_pv,
-    update_nuclear_st, update_ch4_gt,
-    create_profiles)
+    update_nuclear_st, update_ch4_gt)
+from oemoflex.parametrization_sequences import create_profiles
 from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
 
 
