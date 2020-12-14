@@ -19,6 +19,9 @@ The data each step is provided with is held in different forms:
 
 .. Todo Simple Diagram?
 
+
+.. _input data format:
+
 Raw data
 ========
 

@@ -63,7 +63,7 @@ Required data
 
 **Not** provided with the github repository:
 
-* Raw input data, see ...
+* Raw input data, see :ref:`input data format`.
 * Output template data, see ...
 
 This data will be provided on github in the future.
