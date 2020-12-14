@@ -13,7 +13,7 @@ Use cases
 In oemoflex, scenarios are called **use cases**.
 Each use case defines its own energy system consisting of different types of energy supply, transport and demand.
 All use cases are provided with the same set of timeseries, e.g. for energy demand and renewable energy supply.
-Thus, oemoflex helps to modell different flexibility options within a given (or future) energy system.
+Thus, oemoflex helps to model different flexibility options within a given (or future) energy system.
 
 
 Energy system
