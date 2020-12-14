@@ -34,13 +34,23 @@ Now you can install it your local version of oemoflex using pip:
 
 Requirements
 ------------
-To use `oemof-solph`, the core of oemoflex, a LP/MILP solver must be installed.
+1. To use `oemof-solph`, the core of oemoflex, a LP/MILP solver must be installed.
 
-To use the CBC solver install the `coinor-cbc` package
+2. To use the CBC solver install the `coinor-cbc` package:
 
 ::
 
     apt-get install coinor-cbc
+
+3. oemoflex needs `oemof-tabular` for data preprocessing.
+   Please install the dev version from github rather than installing from PyPi/pip.
+
+::
+
+    git clone https://github.com/oemof/oemof-tabular.git
+    cd oemof-tabular/
+    git checkout dev
+    pip install -e ./
 
 
 .. for the moment, as a todo:
