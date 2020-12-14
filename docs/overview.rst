@@ -7,12 +7,12 @@ Overview
 `oemoflex` provides a framework to perform a set of energy system scenarios with `oemof-solph <https://oemof-solph.readthedocs.io/>`_.
 
 
-Use cases
+Scenario
 =========
 
-In oemoflex, scenarios are called **use cases**.
-Each use case defines its own energy system consisting of different types of energy supply, transport and demand.
-All use cases are provided with the same set of timeseries, e.g. for energy demand and renewable energy supply.
+In oemoflex, each scenario (called *use case* in the first part of FlexMex project) defines its own energy system
+consisting of different types of energy supply, transport and demand.
+All scenarios are provided with the same set of timeseries, e.g. for energy demand and renewable energy supply.
 Thus, oemoflex helps to model different flexibility options within a given (or future) energy system.
 
 
