@@ -10,9 +10,9 @@ Welcome to oemoflex's documentation!
    :maxdepth: 2
    :caption: Getting started
 
-   getting_started
    overview
-
+   getting_started
+   
 .. toctree::
    :maxdepth: 2
    :caption: User's guide
