@@ -105,14 +105,23 @@ In this step, scalars belonging to a component are mapped to the components mode
 Timeseries are attached in a similar way.
 The so formed input data is held in a `datapackage` format comprising a JSON schema file (meta data) and the CSV files containing the actual data.
 
-Extra parameter format
-----------------------
+Extra parameter
+---------------
 
-tabular supports handing over extra ``output_parameters`` and ``input_parameters`` to the component’s classes.
-These have to be given as ``dict``’s in the corresponding CSV field.
-If you want to pass more than two parameters, turn the CSV file into semicolon-separated and separate the output_parameters and/or input_parameters with commas.
-More over, all component ``read_csv()`` function calls in ``preprocessing.csv`` must be adapted to the new seperator (``sep=';'``).
-See https://github.com/modex-flexmex/oemo-flex/issues/57 for details.
+tabular supports handing over extra ``output_parameters`` and ``input_parameters`` to the components’ classes.
+These have to be given as ``dict``'s in the corresponding CSV field.
+If you want to pass more than two parameters:
+
+A) Enclose the ``dict`` with quotes and use double-quotes in it (*less readable*).
+
+*OR*
+
+B) Make the CSV file semicolon-separated and separate the output_parameters and/or
+   input_parameters with commas (*better readable*).
+
+   More over, all component ``read_csv()`` function calls in ``preprocessing.csv`` must be adapted to the new separator (``sep=';'``).
+
+   See https://github.com/modex-flexmex/oemo-flex/issues/57 for details.
 
 Optimisation
 ============
