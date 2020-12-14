@@ -1,4 +1,4 @@
-from oemof.tabular.tools import building
+from oemof.tabular.datapackage import building
 
 
 all_foreign_keys = {
@@ -23,9 +23,11 @@ all_foreign_keys = {
 }
 
 
-def inferring(select_components, package_name, path):
+def infer(select_components, package_name, path):
 
-    foreign_keys = {key: value for key, value in all_foreign_keys if value in select_components}
+    foreign_keys = {
+        key: value for key, value in all_foreign_keys.items() if value in select_components
+    }
 
     building.infer_metadata(
         package_name=package_name,
