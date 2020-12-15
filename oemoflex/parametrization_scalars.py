@@ -970,10 +970,11 @@ update_dict = {
 }
 
 
-def update_scalars(select_components):
-    for component, function in update_dict:
+def update_scalars(select_components, destination, scalars):
+    for component, function in update_dict.items():
+
         if component in select_components:
 
-            logging.INFO(f"Updating {component}")
+            print(f"Updating {component}")
 
-            function()
+            function(destination, scalars)
