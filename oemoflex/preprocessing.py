@@ -607,10 +607,8 @@ def update_link(data_preprocessed_path, scalars):
 
     # Calculation with pandas series
     link['loss'] = (
-        transmission_length
-        * 0.01
-        * transmission_loss_per_100km
-        / transmission_capacity
+        transmission_length * 0.01  # km -> 100 km
+        * transmission_loss_per_100km * 0.01  # percent -> 0..1
     )
 
     varom = get_parameter_values(scalars, 'Transmission_VarOM_Electricity_Grid')
