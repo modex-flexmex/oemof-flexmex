@@ -122,6 +122,33 @@ def load_scalar_input_data():
     return scalars
 
 
+def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
+
+    scalars = scalars_in.copy()
+
+    scalars_overwrite = scalars_in.copy()
+
+    scalars_overwrite = scalars_overwrite.loc[scalars_overwrite['Scenario'] == scenario_overwrite]
+
+    scalars = scalars.loc[scalars['Scenario'].isin(scenario_select), :]
+
+    # Save column order before setting and resetting index
+    columns = scalars.columns
+
+    scalars.set_index(['Region', 'Parameter'], inplace=True)
+
+    scalars_overwrite.set_index(['Region', 'Parameter'], inplace=True)
+
+    scalars.update(scalars_overwrite)
+
+    scalars = scalars.reset_index()
+
+    # Restore column order
+    scalars = scalars[columns]
+
+    return scalars
+
+
 def get_all_file_paths(dir):
     r"""
     Finds all paths of files in a directory.
