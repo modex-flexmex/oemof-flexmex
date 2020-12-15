@@ -22,5 +22,7 @@ setup(
         'oemof.tabular',
         'pyyaml',
         'addict',
+        'Pyomo==5.6.7',
+        'PyUtilib==5.7.2'
     ],
 )

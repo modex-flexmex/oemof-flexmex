@@ -1,0 +1,56 @@
+electricity-demand:
+  profiles:
+    electricity-demand:
+      input-path: Energy/FinalEnergy/Electricity
+
+heat-demand:
+  profiles:
+    heat-demand:
+      input-path: Energy/FinalEnergy/Heat
+
+wind-onshore:
+  profiles:
+    wind-onshore:
+      input-path: Energy/SecondaryEnergy/Wind/Onshore
+
+wind-offshore:
+  profiles:
+    wind-offshore:
+      input-path: Energy/SecondaryEnergy/Wind/Offshore
+
+solar-pv:
+  profiles:
+    solar-pv:
+      input-path: Energy/SecondaryEnergy/Solar/PV
+
+hydro-reservoir:
+  profiles:
+    hydro-reservoir:
+      input-path: Energy/SecondaryEnergy/Hydro/Reservoir
+
+electricity-heatpump-small:
+  profiles:
+    cop:
+      input-path: OtherProfiles/COP
+      output-name: efficiency
+
+electricity-heatpump-large:
+  profiles:
+    cop:
+      input-path: OtherProfiles/COP
+      output-name: efficiency
+
+electricity-bev:
+  profiles:
+    drive_power:
+      input-path: OtherProfiles/Transport/DrivePower
+      apply-function: normalize_year
+
+    availability:
+      input-path: OtherProfiles/Transport/GridArrivalabilityRate
+
+    max_storage_level:
+      input-path: OtherProfiles/Transport/MaxBatteryLevel
+
+    min_storage_level:
+      input-path: OtherProfiles/Transport/MinBatteryLevel

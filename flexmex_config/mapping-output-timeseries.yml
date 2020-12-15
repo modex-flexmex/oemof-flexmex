@@ -1,0 +1,82 @@
+---
+# Defines timeseries output paths
+#
+# Paths relative to postprocessed dir
+#
+# component_name:
+#   one_oemoflex_parameter: output path
+#   another_oemoflex_parameter: output path
+
+ch4-boiler-small:
+  flow_out: Boiler/Small/HeatGeneration
+
+ch4-boiler-large:
+  flow_out: Boiler/Large/HeatGeneration
+
+ch4-bpchp:
+  flow_electricity: CHP/BpCCGT/ElectricityGeneration
+  flow_heat: CHP/BpCCGT/HeatGeneration
+
+ch4-extchp:
+  flow_electricity: CHP/ExCCGT/ElectricityGeneration
+  flow_heat: CHP/ExCCGT/HeatGeneration
+
+ch4-gt:
+  flow_out: Fossil/GasTurbine/Generation
+
+electricity-bev:
+  flow_in: Transport/BEV/Charging
+  flow_out: Transport/BEV/FeedIn
+
+electricity-transmission:
+  flow_net_sum: Transmission/Flows
+
+electricity-curtailment:
+  flow_in: RE/Curtailment
+
+energysystem:
+  re_generation: RE/Generation
+
+electricity-h2_cavern:
+  flow_in: Storage/Electricity/H2Cavern/In
+  flow_out: Storage/Electricity/H2Cavern/Out
+  storage_content: Storage/Electricity/H2Cavern/Level
+
+electricity-heatpump-small:
+  flow_out: HeatPump/Small/HeatGeneration
+
+electricity-heatpump-large:
+  flow_out: HeatPump/Large/HeatGeneration
+
+electricity-liion_battery:
+  flow_in: Storage/Electricity/LiIonBattery/In
+  flow_out: Storage/Electricity/LiIonBattery/Out
+  storage_content: Storage/Electricity/LiIonBattery/Level
+
+electricity-pth:
+  flow_out: ElectricBoiler/Large/HeatGeneration
+
+electricity-shortage:
+  flow_out: Slack/Electricity
+
+heat-storage-small:
+  flow_in: Storage/Heat/Small/In
+  flow_out: Storage/Heat/Small/Out
+  storage_content: Storage/Heat/Small/Level
+
+heat-storage-large:
+  flow_in: Storage/Heat/Large/In
+  flow_out: Storage/Heat/Large/Out
+  storage_content: Storage/Heat/Large/Level
+
+heat-shortage:
+  flow_out: Slack/Heat
+
+hydro-reservoir:
+  flow_in: Storage/Electricity/HydroRes/Pump
+  flow_inflow: Storage/Electricity/HydroRes/Inflow
+  flow_out: Storage/Electricity/HydroRes/Turbine
+  storage_content: Storage/Electricity/HydroRes/Level
+
+uranium-nuclear-st:
+  flow_out: Fossil/Nuclear/Generation

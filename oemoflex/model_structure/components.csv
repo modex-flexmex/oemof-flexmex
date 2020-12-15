@@ -1,0 +1,26 @@
+name,path,description
+electricity-demand,component_attrs/electricity-demand.csv,Electricity demand
+heat-shortage,component_attrs/heat-shortage.csv,Shortage backup to keep model solvable
+electricity-shortage,component_attrs/electricity-shortage.csv,Shortage backup to keep model solvable
+electricity-transmission,component_attrs/electricity-transmission.csv,Electrical transmission between regions
+solar-pv,component_attrs/solar-pv.csv,Solar pv capacities
+wind-offshore,component_attrs/wind-offshore.csv,Offshore wind capacities
+wind-onshore,component_attrs/wind-onshore.csv,Onshore wind capacities
+electricity-curtailment,component_attrs/electricity-curtailment.csv,Curtailment of non-dispatchable electricity
+ch4-gt,component_attrs/ch4-gt.csv,Open cycle gas turbine gas turbine capacities (natural gas driven)
+uranium-nuclear-st,component_attrs/uranium-nuclear-st.csv,Nuclear power plant capacities (steam turbine)
+ch4-bpchp,component_attrs/ch4-bpchp.csv,Backpressure turbine CHP
+ch4-boiler-small,component_attrs/ch4-boiler.csv,Peak load boiler
+ch4-boiler-large,component_attrs/ch4-boiler.csv,Peak load boiler
+ch4-extchp,component_attrs/ch4-extchp.csv,Extraction turbine CHP
+electricity-pth,component_attrs/electricity-pth.csv,Resistive heater (Power-to-Heat)
+heat-demand,component_attrs/heat-demand.csv,Heat demand
+electricity-h2_cavern,component_attrs/electricity-h2_cavern.csv,Large scale H2 storage
+electricity-liion_battery,component_attrs/electricity-liion_battery.csv,Li-ion battery storage
+electricity-heatpump-small,component_attrs/electricity-heatpump.csv,Airsource compression heatpump
+electricity-heatpump-large,component_attrs/electricity-heatpump.csv,Airsource compression heatpump
+heat-storage-small,component_attrs/heat-storage.csv,Small sensible heat storage
+heat-storage-large,component_attrs/heat-storage.csv,Large scale sensible heat storage
+heat-excess,component_attrs/heat-excess.csv,Heat excess
+hydro-reservoir,component_attrs/hydro-reservoir.csv,Hydro reservoir
+electricity-bev,component_attrs/electricity-bev.csv,Battery electric vehicle

@@ -4,19 +4,27 @@ import subprocess
 
 from addict import Dict
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 import yaml
 
 
-def get_experiment_paths(name, basepath):
+MODEL_CONFIG = 'model_config'
+
+
+def load_yaml(file_path):
+    with open(file_path, 'r') as yaml_file:
+        yaml_data = yaml.safe_load(yaml_file)
+
+    return yaml_data
+
+
+def get_experiment_paths():
     r"""
 
     Parameters
     ----------
-    name : str
-        Name of the scenario
-    path_config : str
-        Path to the config.yml containing the experiment's path structure
+    basepath : str
+        Path to experiment's root
 
     Returns
     -------
@@ -25,12 +33,40 @@ def get_experiment_paths(name, basepath):
 
     """
     module_path = os.path.abspath(os.path.dirname(__file__))
-    path_config = os.path.join(module_path, 'experiment_paths.yml')
+    path_config = os.path.join(module_path, MODEL_CONFIG, 'experiment_paths.yml')
 
     with open(path_config, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
+    # Use base path to make other paths absolute and drop it
+    basepath = os.path.realpath(os.path.join(module_path, config.pop('base')))
+
     experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
+
+    experiment_paths = Dict(experiment_paths)
+
+    return experiment_paths
+
+
+def add_usecase_paths(experiment_paths, name):
+    r"""
+    Add use case name to several paths.
+
+    NOTE: Can be dropped as soon as directory structure is reordered.
+
+    Parameters
+    ----------
+    experiment_paths : addict.Dict
+        experiment paths
+
+    name : str
+        Name of the usecase
+
+    Returns
+    -------
+    experiment_paths : addict.Dict
+        Dictionary containing the experiment's path structure
+    """
 
     experiment_paths['data_preprocessed'] = os.path.join(
         experiment_paths['data_preprocessed'], name)
@@ -41,12 +77,10 @@ def get_experiment_paths(name, basepath):
     experiment_paths['results_postprocessed'] = os.path.join(
         experiment_paths['results_postprocessed'], name)
 
-    experiment_paths = Dict(experiment_paths)
-
     return experiment_paths
 
 
-def setup_experiment_paths(name, basepath):
+def setup_experiment_paths(name):
     r"""
     Gets the experiment paths for a given experiment and
     a basepath. If they do not exist, they are created.
@@ -64,12 +98,28 @@ def setup_experiment_paths(name, basepath):
     experiment_paths : dict
         Dictionary listing all experiment paths
     """
-    experiment_paths = get_experiment_paths(name, basepath)
+    experiment_paths = get_experiment_paths()
+    experiment_paths = add_usecase_paths(experiment_paths, name)
+
     for path in experiment_paths.values():
         if not os.path.exists(path):
             os.makedirs(path)
 
     return experiment_paths
+
+
+def load_scalar_input_data():
+
+    exp_paths = get_experiment_paths()
+
+    scalars = pd.read_csv(
+        os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+        header=0,
+        na_values=['not considered', 'no value'],
+        sep=',',
+    )
+
+    return scalars
 
 
 def get_all_file_paths(dir):
@@ -222,7 +272,49 @@ def delete_empty_subdirs(path):
 
         if to_delete:
             for p in to_delete:
-                print(p)
                 shutil.rmtree(p)
         else:
             break
+
+
+def get_name_path_dict(dir):
+    r"""
+    Returns a dictionary with all the csv files in
+    a given directory as keys and their paths as
+    values.
+
+    Parameters
+    ----------
+    dir : path
+
+    Returns
+    -------
+    name_path_dict : dict
+    """
+    name_path_dict = {
+        file.split('.')[0]: os.path.join(dir, file)
+        for file in os.listdir(dir)
+        if file.endswith('.csv')
+    }
+
+    return name_path_dict
+
+
+def load_elements(dir):
+    r"""
+
+    Parameters
+    ----------
+    dir : path
+
+    Returns
+    -------
+    name_dataframe_dict : dict
+    """
+    name_path_dict = get_name_path_dict(dir)
+
+    name_dataframe_dict = {}
+    for name, path in name_path_dict.items():
+        name_dataframe_dict[name] = pd.read_csv(path)
+
+    return name_dataframe_dict
