@@ -944,37 +944,41 @@ def update_electricity_bev(data_preprocessed_path, scalars):
 
 
 update_dict = {
-    'electricity-shortage': update_electricity_shortage,
-    'heat-shortage': update_heat_shortage,
-    'electricity-demand': update_electricity_demand,
-    'heat-demand': update_heat_demand,
-    'ch4-extchp': update_bpchp,
-    'ch4-bpchp': update_extchp,
     'ch4-boiler-large': update_boiler_large,
     'ch4-boiler-small': update_boiler_small,
-    'electricity-pth': update_pth,
-    'electricity-heatpump_small': update_electricity_heatpump_small,
-    'electricity-heatpump_large': update_electricity_heatpump_large,
-    'heat-storage-small': update_heat_storage_small,
-    'heat-storage-large': update_heat_storage_large,
-    'electricity-transmission': update_link,
-    'wind-onshore': update_wind_onshore,
-    'wind-offshore': update_wind_offshore,
-    'solar-pv': update_solar_pv,
-    'h2-cavern': update_h2_cavern,
-    'liion-battery': update_liion_battery,
-    'nuclear-st': update_nuclear_st,
+    'ch4-bpchp': update_extchp,
+    'ch4-extchp': update_bpchp,
     'ch4-gt': update_ch4_gt,
-    'hydro-reservoir': update_hydro_reservoir,
     'electricity-bev': update_electricity_bev,
+    'electricity-demand': update_electricity_demand,
+    'electricity-heatpump_large': update_electricity_heatpump_large,
+    'electricity-heatpump_small': update_electricity_heatpump_small,
+    'electricity-pth': update_pth,
+    'electricity-shortage': update_electricity_shortage,
+    'electricity-transmission': update_link,
+    'h2-cavern': update_h2_cavern,
+    'heat-demand': update_heat_demand,
+    'heat-shortage': update_heat_shortage,
+    'heat-storage-large': update_heat_storage_large,
+    'heat-storage-small': update_heat_storage_small,
+    'hydro-reservoir': update_hydro_reservoir,
+    'liion-battery': update_liion_battery,
+    'uranium-nuclear-st': update_nuclear_st,
+    'solar-pv': update_solar_pv,
+    'wind-offshore': update_wind_offshore,
+    'wind-onshore': update_wind_onshore,
 }
 
 
 def update_scalars(select_components, destination, scalars):
-    for component, function in update_dict.items():
+    for component, kwargs in select_components.items():
+        print(f"Updating {component}")
 
-        if component in select_components:
+        try:
+            function = update_dict[component]
 
-            print(f"Updating {component}")
+        except KeyError:
+            print(f"There is no update function for component {component}!")
+            continue
 
-            function(destination, scalars)
+        function(data_preprocessed_path=destination, scalars=scalars, **kwargs)

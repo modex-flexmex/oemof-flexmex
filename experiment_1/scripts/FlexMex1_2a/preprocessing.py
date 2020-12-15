@@ -40,16 +40,16 @@ def main():
 
     scalars = scalars.drop(rows_to_drop)
 
-    components = [
-        'electricity-shortage',
-        'electricity-curtailment',
-        'electricity-demand',
-        'wind-offshore',
-        'wind-onshore',
-        'solar-pv',
-        'uranium-nuclear-st',
-        'ch4-gt'
-    ]
+    components = {
+        'electricity-shortage': {},
+        'electricity-curtailment': {},
+        'electricity-demand': {},
+        'wind-offshore': {},
+        'wind-onshore': {},
+        'solar-pv': {},
+        'uranium-nuclear-st': {'expandable': True, 'from_green_field': True},
+        'ch4-gt': {'expandable': True, 'from_green_field': True},
+    }
 
     # Prepare oemof.tabular input CSV files
     create_default_elements(
