@@ -1,0 +1,101 @@
+# load experiment config
+
+raw = ""
+preprocessed = ""
+optimized = ""
+postprocessed = ""
+
+
+rule all:
+    message:
+        "Run entire analysis."
+    input:
+        "results/{scenario}/postprocessed"
+
+
+rule preprocess:
+    message:
+        "Preprocess input data for scenario {wildcards.scenario}."
+    input:
+        "raw"
+        "usecase.yml"
+        "scripts/preprocessing.py"
+    output:
+        "results/{scenario}/preprocessed"
+    script:
+        "scripts/preprocessing.py usecase raw"
+
+
+rule optimize:
+    message:
+        "Optimize scenario {wildcards.scenario}."
+    input:
+        "results/{scenario}/preprocessed/"
+        "scripts/optimization.py"
+    output:
+        "results/{scenario}/optimized"
+    script:
+        "scripts/optimization.py results/{scenario}/preprocessed/"
+
+
+rule postprocess:
+    message:
+        "Postprocess results for scenario {wildcards.scenario}."
+    input:
+        "results/{scenario}/optimized/"
+        "scripts/postprocessing.py"
+    output:
+        "results/{scenario}/postprocessed"
+    script:
+        "scripts/postprocessing.py results/{scenario}/optimized/"
+
+
+rule join_results:
+    message:
+        "Join results."
+    input:
+        "results/{scenario}/preprocessed/"
+        "scripts/joining.py"
+    output:
+        "results/joined"
+    script:
+        "scripts/joining.py results/{scenario}/postprocessed/"
+
+
+rule check_against_default:
+    message:
+        "Check against default"
+    input:
+        "results/{scenario}/{processing_step}/"
+        "scripts/check.py"
+    script:
+        "scripts/check.py results/{wildcards.scenario}/{wildcards.processing_step}/"
+
+
+rule plot_scenario:
+    message:
+        "Plot scenario {wildcards.scenario}."
+    input:
+        "results/{scenario}/postprocessed"
+    output:
+        "results/{scenario}/plotted"
+    script:
+        "scripts/plot_scenario.py"
+
+
+rule plot_joined:
+    message:
+        "Plot."
+    input:
+        "results/{scenario}/joined"
+    output:
+        "results/joined_plotted"
+    script:
+        "scripts/plot_joined.py"
+
+
+rule clean:
+    message:
+        "Delete results."
+    shell:
+        "rm results/{scenario}"
