@@ -657,7 +657,7 @@ class ExtractionTurbine(ExtractionTurbineCHP, Facade):  # pylint: disable=too-ma
 
         self.capacity = kwargs.get("capacity")
 
-        self.fuel_capacity = self.capacity / self.condensing_efficiency
+        self.fuel_capacity = self.capacity / self.condensing_efficiency  # noqa: E501  # pylint: disable=access-member-before-definition  # done with kwargs.update()
 
         self.condensing_efficiency = sequence(self.condensing_efficiency)
 
