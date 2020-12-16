@@ -1,0 +1,24 @@
+name: FlexMex1_2a
+
+year: 2050
+
+components:
+  electricity-shortage:
+  electricity-curtailment:
+  electricity-demand:
+  wind-offshore:
+  wind-onshore:
+  solar-pv:
+  uranium-nuclear-st:
+    expandable: True
+    from_green_field: True
+  ch4-gt:
+    expandable: True
+    from_green_field: True
+  
+scenario_select:
+  FlexMex1
+  ALL
+
+scenario_overwrite:
+  FlexMex1UC2
