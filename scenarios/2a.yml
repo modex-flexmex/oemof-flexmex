@@ -17,8 +17,8 @@ components:
     from_green_field: True
   
 scenario_select:
-  FlexMex1
-  ALL
+  - FlexMex1
+  - ALL
 
 scenario_overwrite:
   FlexMex1UC2
