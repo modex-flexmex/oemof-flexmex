@@ -981,4 +981,7 @@ def update_scalars(select_components, destination, scalars):
             print(f"There is no update function for component {component}!")
             continue
 
+        if not kwargs:
+            kwargs = {}
+
         function(data_preprocessed_path=destination, scalars=scalars, **kwargs)
