@@ -11,10 +11,10 @@ components:
   solar-pv:
   uranium-nuclear-st:
     expandable: True
-    from_green_field: True
+    greenfield: True
   ch4-gt:
     expandable: True
-    from_green_field: True
+    greenfield: True
   
 scenario_select:
   - FlexMex1

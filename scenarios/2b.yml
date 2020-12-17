@@ -8,10 +8,10 @@ components:
   electricity-demand:
   electricity-h2_cavern:
     expandable: True
-    from_green_field: True
+    greenfield: True
   electricity-liion_battery:
     expandable: True
-    from_green_field: True
+    greenfield: True
   wind-offshore:
   wind-onshore:
   solar-pv:

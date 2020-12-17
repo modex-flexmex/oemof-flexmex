@@ -476,7 +476,7 @@ def update_h2_cavern(
         data_preprocessed_path,
         scalars,
         expandable=False,
-        from_greenfield=False
+        greenfield=False
 ):
     r"""
     Parameterization of a electricity H2 storage as asymmetrical storage.
@@ -494,7 +494,7 @@ def update_h2_cavern(
     expandable : bool
     Determines whether capacity (discharge/charge and storage) is expandable
 
-    from_greenfield : bool
+    greenfield : bool
     If true initial capacity is 0.
 
     Returns
@@ -577,7 +577,7 @@ def update_h2_cavern(
     # Actual assignments
     df['expandable'] = expandable
 
-    if expandable and from_greenfield:
+    if expandable and greenfield:
         df['capacity_charge'] = 0
         df['capacity_discharge'] = 0
         df['storage_capacity'] = 0
@@ -607,7 +607,7 @@ def update_liion_battery(
         data_preprocessed_path,
         scalars,
         expandable=False,
-        from_greenfield=False
+        greenfield=False
 ):
     r"""
     Parameterization of a Li-ion battery storage.
@@ -630,7 +630,7 @@ def update_liion_battery(
     expandable : bool
     Determines whether capacity is expandable
 
-    from_greenfield : bool
+    greenfield : bool
     If true initial capacity is 0.
 
     Returns
@@ -710,7 +710,7 @@ def update_liion_battery(
     # Actual assignments
     df['expandable'] = expandable
 
-    if expandable and from_greenfield:
+    if expandable and greenfield:
         df['capacity'] = 0
         df['storage_capacity'] = 0
     else:
@@ -732,7 +732,7 @@ def update_liion_battery(
     df.to_csv(file_path)
 
 
-def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
+def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, greenfield=False):
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
 
@@ -780,7 +780,7 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
 
     # Actual assignments
     df['expandable'] = expandable
-    df['capacity'] = 0 if expandable and from_green_field else capacity * availability
+    df['capacity'] = 0 if expandable and greenfield else capacity * availability
 
     if expandable:
         df['capacity_cost'] = annualized_cost + fix_cost * capex
@@ -794,7 +794,7 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, from_gr
     df.to_csv(file_path)
 
 
-def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_field=False):
+def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, greenfield=False):
     logging.info("Updating ch4-gt file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
@@ -849,7 +849,7 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, from_green_
 
     # Actual assignments
     df['expandable'] = expandable
-    df['capacity'] = 0 if expandable and from_green_field else capacity * availability
+    df['capacity'] = 0 if expandable and greenfield else capacity * availability
 
     if expandable:
         df['capacity_cost'] = annualized_cost + fix_cost * capex
