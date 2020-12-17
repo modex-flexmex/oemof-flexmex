@@ -946,8 +946,8 @@ def update_electricity_bev(data_preprocessed_path, scalars):
 update_dict = {
     'ch4-boiler-large': update_boiler_large,
     'ch4-boiler-small': update_boiler_small,
-    'ch4-bpchp': update_extchp,
-    'ch4-extchp': update_bpchp,
+    'ch4-bpchp': update_bpchp,
+    'ch4-extchp': update_extchp,
     'ch4-gt': update_ch4_gt,
     'electricity-bev': update_electricity_bev,
     'electricity-demand': update_electricity_demand,
