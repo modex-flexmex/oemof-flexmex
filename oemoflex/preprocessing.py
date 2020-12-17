@@ -1189,14 +1189,9 @@ def create_profiles(exp_path, select_components):
                     recalc = recalculation_functions[function_name]
                     profile_df = recalc(profile_df)
 
-                try:
-                    output_filename_base = profile['output-name']
-                except KeyError:
-                    output_filename_base = profile_name
-
                 profile_df.to_csv(
                     os.path.join(
                         exp_path.data_preprocessed,
                         sequences_dir,
-                        output_filename_base + profile_file_suffix + '.csv')
+                        profile_name + profile_file_suffix + '.csv')
                 )
