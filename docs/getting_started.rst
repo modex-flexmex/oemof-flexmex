@@ -4,8 +4,6 @@
 Getting started
 ~~~~~~~~~~~~~~~
 
-oemoflex is a model of the integrated European energy system, featuring many flexibility options.
-
 .. contents:: `Contents`
     :depth: 1
     :local:
