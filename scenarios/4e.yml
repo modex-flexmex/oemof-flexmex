@@ -1,0 +1,25 @@
+name: FlexMex1_4e
+
+year: 2050
+
+components:
+  electricity-shortage:
+  electricity-curtailment:
+  electricity-demand:
+  wind-offshore:
+  wind-onshore:
+  solar-pv:
+  ch4-extchp:
+  ch4-boiler-large:
+  electricity-pth:
+  electricity-heatpump-large:
+  heat-storage-large:
+  heat-demand:
+  heat-shortage:
+  heat-excess:
+  
+scenario_select:
+  - FlexMex1
+  - ALL
+
+scenario_overwrite:

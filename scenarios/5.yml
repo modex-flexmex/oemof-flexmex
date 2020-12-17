@@ -1,0 +1,22 @@
+name: FlexMex1_5
+
+year: 2050
+
+components:
+  electricity-shortage:
+  electricity-curtailment:
+  electricity-demand:
+  wind-offshore:
+  wind-onshore:
+  solar-pv:
+  electricity-heatpump-small:
+  heat-storage-small:
+  heat-demand:
+  heat-shortage:
+
+scenario_select:
+  - FlexMex1
+  - ALL
+
+scenario_overwrite:
+  FlexMex1UC5_7_8

@@ -1,0 +1,21 @@
+name: FlexMex1_4a
+
+year: 2050
+
+components:
+  electricity-shortage:
+  electricity-curtailment:
+  electricity-demand:
+  wind-offshore:
+  wind-onshore:
+  solar-pv:
+  ch4-bpchp:
+  heat-demand:
+  heat-shortage:
+  heat-excess:
+  
+scenario_select:
+  - FlexMex1
+  - ALL
+
+scenario_overwrite:

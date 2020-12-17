@@ -1,0 +1,18 @@
+name: FlexMex1_3
+
+year: 2050
+
+components:
+  electricity-shortage:
+  electricity-curtailment:
+  electricity-demand:
+  wind-offshore:
+  wind-onshore:
+  solar-pv:
+  hydro-reservoir:
+  
+scenario_select:
+  - FlexMex1
+  - ALL
+
+scenario_overwrite:
