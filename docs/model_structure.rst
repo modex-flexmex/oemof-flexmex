@@ -43,7 +43,7 @@ These components are available in oemoflex.
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/components.csv
+   :file: ../oemoflex/model_structure/components.csv
 
 Component attributes
 ====================
@@ -55,28 +55,28 @@ Bus
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/component_attrs/bus.csv
+   :file: ../oemoflex/model_structure/busses.csv
 
 Shortage
 --------
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/component_attrs/shortage.csv
+   :file: ../oemoflex/model_structure/component_attrs/electricity-shortage.csv
 
 Curtailment
 -----------
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/component_attrs/curtailment.csv
+   :file: ../oemoflex/model_structure/component_attrs/electricity-curtailment.csv
 
 PV
 --
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/component_attrs/pv.csv
+   :file: ../oemoflex/model_structure/component_attrs/solar-pv.csv
 
 Wind onshore
 ------------
@@ -85,11 +85,11 @@ Wind offshore is identical apart from onshore replaced by offshore.
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/component_attrs/wind-onshore.csv
+   :file: ../oemoflex/model_structure/component_attrs/wind-onshore.csv
 
 Link
 ----
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/component_attrs/link.csv
+   :file: ../oemoflex/model_structure/component_attrs/electricity-transmission.csv
