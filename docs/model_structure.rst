@@ -4,8 +4,6 @@
 Model structure
 ~~~~~~~~~~~~~~~
 
-oemoflex is sector-integrated multi-node energy system model featuring a lot of flexibility options. Its region, interconnections and components can be adapted flexibly.
-
 .. contents:: `Contents`
     :depth: 1
     :local:

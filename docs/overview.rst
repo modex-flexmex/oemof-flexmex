@@ -4,7 +4,8 @@
 Overview
 ~~~~~~~~
 
-`oemoflex` provides a framework to perform a set of energy system scenarios with `oemof-solph <https://oemof-solph.readthedocs.io/>`_.
+oemoflex is sector-integrated multi-node energy system model featuring a lot of flexibility options.
+Its region, interconnections and components can be adapted flexibly.
 
 
 Scenario
@@ -25,8 +26,10 @@ In oemoflex an energy system can be composed of
 * a variety of energy transformers and storages (such as power plants, batteries, renewable energy plants)
 * transmission lines, pipelines
 
-Just as oemof-solph, oemoflex is flexible in modelling different energy carriers, such as electricity, heat, gas or hydrogen.
-This core also allows for defining your own components with the help of `oemof.tabular.facades <https://oemof-tabular.readthedocs.io/en/latest/tutorials/facade-usage.html>`_.
+Just as its core, `oemof-solph <https://oemof-solph.readthedocs.io/>`_, oemoflex is flexible in modelling
+different energy carriers, such as electricity, heat, gas or hydrogen.
+It also allows for defining your own components with
+the help of `oemof.tabular.facades <https://oemof-tabular.readthedocs.io/en/latest/tutorials/facade-usage.html>`_.
 
 
 Regions
