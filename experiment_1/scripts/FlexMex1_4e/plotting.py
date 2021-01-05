@@ -28,7 +28,12 @@ if __name__ == '__main__':
 
         plt.savefig(os.path.join(exp_paths.plots, f'{bus}-{start}-{end}.png'))
 
-    df = pd.read_csv(path_df, index_col=0, header=[0, 1, 2])
+    df = pd.read_csv(
+        path_df,
+        index_col=0,
+        header=[0, 1, 2],
+        parse_dates=True,
+    )
 
     plot(0, 168, 'DE-electricity')
 

@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import EngFormatter
+
 import pandas as pd
 
 
@@ -32,6 +34,10 @@ def dispatch_plot(df_in, bus, demand, ax=None):
 
     # df = df.drop(('DE-ch4-extchp', bus), axis=1)
 
+    df *= 1e6  # MW to W
+
+    df_demand *= 1e6  # MW to W
+
     df_demand.plot.line(ax=ax)
 
     df.loc[:, idx[bus, :]] *= -1
@@ -42,5 +48,13 @@ def dispatch_plot(df_in, bus, demand, ax=None):
         loc='center left',
         bbox_to_anchor=(1.0, 0.5)
     )
+
+    ax.set_ylabel('Power')
+
+    ax.yaxis.set_major_formatter(
+        EngFormatter(unit='W')
+    )
+
+    ax.grid()
 
     return ax
