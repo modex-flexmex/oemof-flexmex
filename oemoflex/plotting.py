@@ -1,8 +1,11 @@
+import os
+
 import matplotlib.pyplot as plt
 from matplotlib.ticker import EngFormatter
 
 import pandas as pd
 
+from oemoflex.helpers import load_yaml
 
 idx = pd.IndexSlice
 
@@ -57,4 +60,30 @@ def dispatch_plot(df_in, bus, demand, ax=None):
 
     ax.grid()
 
+    handles, labels = map_handles_labels()
+    ax.legend(
+        handles=handles,
+        labels=labels,
+        loc='center left',
+        bbox_to_anchor=(1.0, 0.5))
+
     return ax
+
+
+module_path = os.path.dirname(os.path.abspath(__file__))
+
+map = load_yaml(os.path.join(module_path, 'model_config/plot_labels.yml'))
+
+
+def map_labels(labels, map=map):
+    return [map[label] for label in labels]
+
+
+def map_handles_labels(map_funtion=map_labels, handles=None, labels=None):
+    if labels is None:
+        current_axis = plt.gca()
+        handles, labels = current_axis.get_legend_handles_labels()
+
+    mapped_labels = map_funtion(labels)
+
+    return handles, mapped_labels

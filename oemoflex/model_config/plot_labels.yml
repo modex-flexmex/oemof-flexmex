@@ -1,0 +1,12 @@
+flow: Demand
+(DE-ch4-extchp, DE-electricity, flow): Extraction CHP
+(DE-electricity, DE-electricity-curtailment, flow): Curtailment
+(DE-electricity, DE-electricity-heatpump-large, flow): Heatpump
+(DE-electricity, DE-electricity-pth, flow): PtH
+(DE-electricity-shortage, DE-electricity, flow): Shortage
+(DE-solar-pv, DE-electricity, flow): PV
+(DE-wind-offshore, DE-electricity, flow): Wind
+(DE-wind-onshore, DE-electricity, flow): Wind
+(DE-ch4-boiler-large, DE-heat, flow): Boiler
+(DE-ch4-extchp, DE-heat, flow): CHP
+(DE-electricity-heatpump-large, DE-heat, flow): HP
