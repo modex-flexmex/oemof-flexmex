@@ -1,3 +1,5 @@
 [flake8]
 exclude = meta/migrations/
+per-file-ignores =
+    docs/conf.py: E265
 max-line-length=100

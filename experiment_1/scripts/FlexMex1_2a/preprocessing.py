@@ -5,6 +5,7 @@ from oemoflex.model_structure import create_default_elements
 from oemoflex.parametrization_scalars import update_scalars
 from oemoflex.parametrization_sequences import create_profiles
 from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
+from oemoflex.inferring import infer
 
 
 name = 'FlexMex1_2a'
@@ -67,6 +68,12 @@ def main():
     previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
     new_path = exp_paths.data_preprocessed
     check_if_csv_dirs_equal(new_path, previous_path)
+
+    # this becomes necessary because 'data' is manually added some lines above. Needs to be cleaned
+    # up.
+    exp_paths.data_preprocessed = exp_paths.data_preprocessed.strip('data')
+
+    infer(select_components=components, package_name=name, path=exp_paths.data_preprocessed)
 
 
 if __name__ == '__main__':

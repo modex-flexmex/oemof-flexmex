@@ -1041,6 +1041,22 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
     return df_re_generation
 
 
+def export_bus_sequences(es, destination):
+
+    if not os.path.exists(destination):
+        os.mkdir(destination)
+
+    bus_results = pp.bus_results(es, es.results)
+
+    for key, value in bus_results.items():
+        if value.empty:
+            continue
+
+        file_path = os.path.join(destination, key + '.csv')
+
+        value.to_csv(file_path)
+
+
 def run_postprocessing(year, name, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
@@ -1166,6 +1182,13 @@ def run_postprocessing(year, name, exp_paths):
         oemoflex_scalars.to_csv(
             os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'),
             index=False
+        )
+
+    save_oemoflex_timeseries = False
+    if save_oemoflex_timeseries:
+        export_bus_sequences(
+            es,
+            os.path.join(exp_paths.results_postprocessed, 'oemoflex-timeseries')
         )
 
     save_flexmex_timeseries(
