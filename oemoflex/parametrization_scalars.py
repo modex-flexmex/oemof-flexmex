@@ -44,78 +44,49 @@ def get_parameter_values(scalars_df, parameter_name):
     return parameter_value
 
 
-def update_electricity_shortage(data_preprocessed_path, scalars):
-
-    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-shortage.csv')
-
-    # Read prepared CSV file
-    shortage = pd.read_csv(shortage_file, index_col='region')
+def update_electricity_shortage(component_df, scalars):
 
     # Fill column 'marginal_cost' with a fixed value for ALL the elements
-    shortage['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars,
         'Energy_SlackCost_Electricity') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to the CSV file
-    shortage.to_csv(shortage_file)
+    return component_df
 
 
-def update_heat_shortage(data_preprocessed_path, scalars):
-
-    shortage_file = os.path.join(data_preprocessed_path, 'elements', 'heat-shortage.csv')
-
-    # Read prepared CSV file
-    shortage = pd.read_csv(shortage_file, index_col='region')
+def update_heat_shortage(component_df, scalars):
 
     # Fill column 'marginal_cost' with a fixed value for ALL the elements
-    shortage['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars,
         'Energy_SlackCost_Heat') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to the CSV file
-    shortage.to_csv(shortage_file)
+    return component_df
 
 
-def update_electricity_demand(data_preprocessed_path, scalars):
-
-    load_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-demand.csv')
-
-    # Read prepared CSV file
-    load = pd.read_csv(load_file, index_col='region')
+def update_electricity_demand(component_df, scalars):
 
     # Fill column for ALL the elements
-    load['amount'] = get_parameter_values(
+    component_df['amount'] = get_parameter_values(
         scalars,
         'Energy_FinalEnergy_Electricity') * 1e3  # GWh to MWh
 
-    # Write back to the CSV file
-    load.to_csv(load_file)
+    return component_df
 
 
-def update_heat_demand(data_preprocessed_path, scalars):
-
-    load_file = os.path.join(data_preprocessed_path, 'elements', 'heat-demand.csv')
-
-    # Read prepared CSV file
-    load = pd.read_csv(load_file, index_col='region')
+def update_heat_demand(component_df, scalars):
 
     # Fill column for ALL the elements
-    load['amount'] = get_parameter_values(
+    component_df['amount'] = get_parameter_values(
         scalars,
         'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
 
-    # Write back to the CSV file
-    load.to_csv(load_file)
+    return component_df
 
 
-def update_bpchp(data_preprocessed_path, scalars):
+def update_bpchp(component_df, scalars):
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-bpchp.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_BpCCGT'
     ) * get_parameter_values(
         scalars, 'EnergyConversion_Availability_ElectricityHeat_CH4_BpCCGT'
@@ -125,35 +96,29 @@ def update_bpchp(data_preprocessed_path, scalars):
         scalars, 'EnergyConversion_Power2HeatRatio_ElectricityHeat_CH4_BpCCGT')
 
     # eta_el = eta_total / (1 + 1 / electricity_per_heat)
-    df['electric_efficiency'] = get_parameter_values(
+    component_df['electric_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
     ) / (1 + 1/electricity_per_heat) * 1e-2  # percent to decimal
 
     # eta_th = eta_total / (1 + electricity_per_heat)
-    df['thermal_efficiency'] = get_parameter_values(
+    component_df['thermal_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_BpCCGT'
     ) / (1 + electricity_per_heat) * 1e-2  # percent to decimal
 
-    df['carrier_cost'] = (
+    component_df['carrier_cost'] = (
         get_parameter_values(scalars, 'Energy_Price_CH4')
         + get_parameter_values(scalars, 'Energy_Price_CO2')
         * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_BpCCGT') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_extchp(data_preprocessed_path, scalars):
+def update_extchp(component_df, scalars):
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-extchp.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_ElectricityHeat_CH4_ExCCGT'
     ) * get_parameter_values(
         scalars, 'EnergyConversion_Availability_ElectricityHeat_CH4_ExCCGT'
@@ -167,225 +132,182 @@ def update_extchp(data_preprocessed_path, scalars):
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
     ) / (1 + 1/electricity_per_heat) * 1e-2  # percent to decimal
 
-    df['electric_efficiency'] = electric_efficiency
+    component_df['electric_efficiency'] = electric_efficiency
 
     # eta_th = eta_total / (1 + electricity_per_heat)
     thermal_efficiency = get_parameter_values(
         scalars, 'EnergyConversion_EtaNominal_ElectricityHeat_CH4_ExCCGT'
     ) / (1 + electricity_per_heat) * 1e-2  # percent to decimal
 
-    df['thermal_efficiency'] = thermal_efficiency
+    component_df['thermal_efficiency'] = thermal_efficiency
 
     # eta_condensing = beta * eta_th + eta_el
-    df['condensing_efficiency'] = get_parameter_values(
+    component_df['condensing_efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_PowerLossIndex_ElectricityHeat_CH4_ExCCGT')\
         * thermal_efficiency\
         + electric_efficiency
 
-    df['carrier_cost'] = (
+    component_df['carrier_cost'] = (
         get_parameter_values(scalars, 'Energy_Price_CH4')
         + get_parameter_values(scalars, 'Energy_Price_CO2')
         * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_boiler_large(data_preprocessed_path, scalars):
+def update_boiler_large(component_df, scalars):
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler-large.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['name'] = df['name'].str.replace(
+    component_df['name'] = component_df['name'].str.replace(
         'ch4-boiler', 'ch4-boiler-large', regex=False
     )
 
-    df['tech'] = 'boiler-large'
+    component_df['tech'] = 'boiler-large'
 
-    df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Large')
+    component_df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Heat_CH4_Large'
+    )
 
-    df['efficiency'] = get_parameter_values(
+    component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_CH4_Large') * 0.01  # Percent to decimals
 
-    df['carrier_cost'] = get_parameter_values(
+    component_df['carrier_cost'] = get_parameter_values(
         scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_CH4_Large') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_boiler_small(data_preprocessed_path, scalars):
-
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler-small.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
+def update_boiler_small(component_df, scalars):
 
     # Replace AT-ch4-boiler by AT-ch4-boiler-small
-    df['name'] = df['name'].str.replace(
+    component_df['name'] = component_df['name'].str.replace(
         'ch4-boiler', 'ch4-boiler-small', regex=False
     )
 
-    df['tech'] = 'boiler-small'
+    component_df['tech'] = 'boiler-small'
 
-    df['capacity'] = get_parameter_values(scalars, 'EnergyConversion_Capacity_Heat_CH4_Small')
+    component_df['capacity'] = get_parameter_values(
+        scalars, 'EnergyConversion_Capacity_Heat_CH4_Small'
+    )
 
-    df['efficiency'] = get_parameter_values(
+    component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_CH4_Small') * 0.01  # Percent to decimals
 
-    df['carrier_cost'] = get_parameter_values(
+    component_df['carrier_cost'] = get_parameter_values(
         scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_CH4_Small') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_pth(data_preprocessed_path, scalars):
+def update_pth(component_df, scalars):
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-pth.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_Electricity_Large')
 
-    df['efficiency'] = get_parameter_values(
+    component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_Electricity_Large') * 0.01  # Percent to decimals
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_Electricity_Large') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_electricity_heatpump_small(data_preprocessed_path, scalars):
+def update_electricity_heatpump_small(component_df, scalars):
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump-small.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['name'] = df['name'].str.replace(
+    component_df['name'] = component_df['name'].str.replace(
         'electricity-heatpump', 'electricity-heatpump-small', regex=False
     )
 
-    df['tech'] = 'heatpump-small'
+    component_df['tech'] = 'heatpump-small'
 
-    df['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Small'
     )
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Small') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_electricity_heatpump_large(data_preprocessed_path, scalars):
+def update_electricity_heatpump_large(component_df, scalars):
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump-large.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['name'] = df['name'].str.replace(
+    component_df['name'] = component_df['name'].str.replace(
         'electricity-heatpump', 'electricity-heatpump-large', regex=False
     )
 
-    df['tech'] = 'heatpump-large'
+    component_df['tech'] = 'heatpump-large'
 
-    df['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Large'
     )
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Large') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_heat_storage_small(data_preprocessed_path, scalars):
+def update_heat_storage_small(component_df, scalars):
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage-small.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['name'] = df['name'].str.replace(
+    component_df['name'] = component_df['name'].str.replace(
         'heat-storage', 'heat-storage-small', regex=False
     )
 
-    df['tech'] = 'storage-small'
+    component_df['tech'] = 'storage-small'
 
-    df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
+    component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
 
-    df['storage_capacity'] = get_parameter_values(
+    component_df['storage_capacity'] = get_parameter_values(
         scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
 
-    df['loss_rate'] = get_parameter_values(
+    component_df['loss_rate'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
 
-    df['efficiency'] = get_parameter_values(
+    component_df['efficiency'] = get_parameter_values(
         scalars, 'Storage_Eta_Heat_SmallCharge') * 0.01  # Percent to decimals
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'Storage_VarOM_Heat_Small') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_heat_storage_large(data_preprocessed_path, scalars):
+def update_heat_storage_large(component_df, scalars):
 
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage-large.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
-    df['name'] = df['name'].str.replace(
+    component_df['name'] = component_df['name'].str.replace(
         'heat-storage', 'heat-storage-large', regex=False
     )
 
-    df['tech'] = 'storage-large'
+    component_df['tech'] = 'storage-large'
 
-    df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
+    component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
 
-    df['storage_capacity'] = get_parameter_values(
+    component_df['storage_capacity'] = get_parameter_values(
         scalars, 'Storage_Capacity_Heat_LargeStorage') * 1e3  # GWh to MWh
 
-    df['loss_rate'] = get_parameter_values(
+    component_df['loss_rate'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Large') * 0.01  # Percent to decimals
 
-    df['efficiency'] = get_parameter_values(
+    component_df['efficiency'] = get_parameter_values(
         scalars, 'Storage_Eta_Heat_LargeCharge') * 0.01  # Percent to decimals
 
-    df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars, 'Storage_VarOM_Heat_Large') * 1e-3  # Eur/GWh to Eur/MWh
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_link(data_preprocessed_path, scalars):
-
-    link_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-transmission.csv')
-
-    link = pd.read_csv(link_file, index_col='region')
+def update_link(component_df, scalars):
 
     # Scalars.csv has only one line of 'Transmission_Losses_Electricity_Grid' for all Regions.
     # 'Region' value of that line is 'ALL'. So mapping by index doesn't work anymore.
@@ -402,64 +324,55 @@ def update_link(data_preprocessed_path, scalars):
         scalars,
         'Transmission_Capacity_Electricity_Grid')
 
-    link['from_to_capacity'] = transmission_capacity
+    component_df['from_to_capacity'] = transmission_capacity
 
-    link['to_from_capacity'] = transmission_capacity
+    component_df['to_from_capacity'] = transmission_capacity
 
     # Calculation with pandas series
-    link['loss'] = (
+    component_df['loss'] = (
         transmission_length * 0.01  # km -> 100 km
         * transmission_loss_per_100km * 0.01  # percent -> 0..1
     )
 
     varom = get_parameter_values(scalars, 'Transmission_VarOM_Electricity_Grid')
 
-    link['marginal_cost'] = (
+    component_df['marginal_cost'] = (
         varom *
         transmission_length
     )
 
-    link.to_csv(link_file)
+    return component_df
 
 
-def update_wind_onshore(data_preprocessed_path, scalars):
-    wind_onshore_file = os.path.join(data_preprocessed_path, 'elements', 'wind-onshore.csv')
+def update_wind_onshore(component_df, scalars):
 
-    wind_onshore = pd.read_csv(wind_onshore_file, index_col='region')
-
-    wind_onshore['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars,
         'EnergyConversion_Capacity_Electricity_Wind_Onshore')
 
-    wind_onshore.to_csv(wind_onshore_file)
+    return component_df
 
 
-def update_wind_offshore(data_preprocessed_path, scalars):
-    wind_offshore_file = os.path.join(data_preprocessed_path, 'elements', 'wind-offshore.csv')
+def update_wind_offshore(component_df, scalars):
 
-    wind_offshore = pd.read_csv(wind_offshore_file, index_col='region')
-
-    wind_offshore['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars,
         'EnergyConversion_Capacity_Electricity_Wind_Offshore')
 
-    wind_offshore.to_csv(wind_offshore_file)
+    return component_df
 
 
-def update_solar_pv(data_preprocessed_path, scalars):
-    solar_pv_file = os.path.join(data_preprocessed_path, 'elements', 'solar-pv.csv')
+def update_solar_pv(component_df, scalars):
 
-    solarpv = pd.read_csv(solar_pv_file, index_col='region')
-
-    solarpv['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars,
         'EnergyConversion_Capacity_Electricity_Solar_PV')
 
-    solarpv.to_csv(solar_pv_file)
+    return component_df
 
 
 def update_h2_cavern(
-        data_preprocessed_path,
+        component_df,
         scalars,
         expandable=False,
         greenfield=False
@@ -474,7 +387,7 @@ def update_h2_cavern(
 
     Parameters
     ----------
-    data_preprocessed_path
+    component_df
     scalars
 
     expandable : bool
@@ -487,11 +400,6 @@ def update_h2_cavern(
     -------
 
     """
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-h2_cavern.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
     # Operation parameters
     availability = get_parameter_values(
         scalars,
@@ -561,36 +469,36 @@ def update_h2_cavern(
         wacc=interest)
 
     # Actual assignments
-    df['expandable'] = expandable
+    component_df['expandable'] = expandable
 
     if expandable and greenfield:
-        df['capacity_charge'] = 0
-        df['capacity_discharge'] = 0
-        df['storage_capacity'] = 0
+        component_df['capacity_charge'] = 0
+        component_df['capacity_discharge'] = 0
+        component_df['storage_capacity'] = 0
     else:
-        df['capacity_charge'] = capacity_charge * availability
-        df['capacity_discharge'] = capacity_discharge * availability
-        df['storage_capacity'] = storage_capacity * availability
+        component_df['capacity_charge'] = capacity_charge * availability
+        component_df['capacity_discharge'] = capacity_discharge * availability
+        component_df['storage_capacity'] = storage_capacity * availability
 
-    df['loss_rate'] = self_discharge
+    component_df['loss_rate'] = self_discharge
 
-    df['efficiency_charge'] = eta_charge
-    df['efficiency_discharge'] = eta_discharge
+    component_df['efficiency_charge'] = eta_charge
+    component_df['efficiency_discharge'] = eta_discharge
 
     if expandable:
-        df['capacity_cost_charge'] = annualized_cost_charge + fix_cost * capex_charge
-        df['capacity_cost_discharge'] = annualized_cost_discharge + fix_cost * capex_discharge
+        component_df['capacity_cost_charge'] = annualized_cost_charge + fix_cost * capex_charge
+        component_df['capacity_cost_discharge'] = \
+            annualized_cost_discharge + fix_cost * capex_discharge
 
-        df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+        component_df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
 
-    df['marginal_cost'] = operation_cost
+    component_df['marginal_cost'] = operation_cost
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
 def update_liion_battery(
-        data_preprocessed_path,
+        component_df,
         scalars,
         expandable=False,
         greenfield=False
@@ -623,11 +531,6 @@ def update_liion_battery(
     -------
 
     """
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-liion_battery.csv')
-
-    # Read prepared csv file
-    df = pd.read_csv(file_path, index_col='region')
-
     # Operation parameters
     availability = get_parameter_values(
         scalars,
@@ -694,36 +597,31 @@ def update_liion_battery(
         wacc=interest)
 
     # Actual assignments
-    df['expandable'] = expandable
+    component_df['expandable'] = expandable
 
     if expandable and greenfield:
-        df['capacity'] = 0
-        df['storage_capacity'] = 0
+        component_df['capacity'] = 0
+        component_df['storage_capacity'] = 0
     else:
-        df['capacity'] = (capacity_charge + capacity_discharge) / 2 * availability
-        df['storage_capacity'] = storage_capacity * availability
+        component_df['capacity'] = (capacity_charge + capacity_discharge) / 2 * availability
+        component_df['storage_capacity'] = storage_capacity * availability
 
-    df['loss_rate'] = self_discharge
+    component_df['loss_rate'] = self_discharge
 
-    df['efficiency'] = (eta_charge + eta_discharge) / 2
+    component_df['efficiency'] = (eta_charge + eta_discharge) / 2
 
     if expandable:
-        df['capacity_cost'] = annualized_cost_charge + fix_cost * (capex_charge + capex_discharge)
+        component_df['capacity_cost'] = annualized_cost_charge \
+                                        + fix_cost * (capex_charge + capex_discharge)
 
-        df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+        component_df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
 
-    df['marginal_cost'] = operation_cost
+    component_df['marginal_cost'] = operation_cost
 
-    # Write back to csv file
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, greenfield=False):
-
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'uranium-nuclear-st.csv')
-
-    df = pd.read_csv(file_path, index_col='region')
-
+def update_nuclear_st(component_df, scalars, expandable=False, greenfield=False):
     # Operation parameters
     capacity = get_parameter_values(
         scalars,
@@ -765,27 +663,22 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, greenfi
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    df['expandable'] = expandable
-    df['capacity'] = 0 if expandable and greenfield else capacity * availability
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity * availability
 
     if expandable:
-        df['capacity_cost'] = annualized_cost + fix_cost * capex
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
-    df['marginal_cost'] = operation_cost
+    component_df['marginal_cost'] = operation_cost
 
-    df['carrier_cost'] = carrier_price
+    component_df['carrier_cost'] = carrier_price
 
-    df['efficiency'] = eta
+    component_df['efficiency'] = eta
 
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, greenfield=False):
-
-    file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
-
-    df = pd.read_csv(file_path, index_col='region')
-
+def update_ch4_gt(component_df, scalars, expandable=False, greenfield=False):
     # Operation parameters
     capacity = get_parameter_values(
         scalars,
@@ -833,34 +726,28 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, greenfield=
     annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
     # Actual assignments
-    df['expandable'] = expandable
-    df['capacity'] = 0 if expandable and greenfield else capacity * availability
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity * availability
 
     if expandable:
-        df['capacity_cost'] = annualized_cost + fix_cost * capex
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
-    df['marginal_cost'] = operation_cost
+    component_df['marginal_cost'] = operation_cost
 
-    df['carrier_cost'] = carrier_price + emission_factor * co2_price
+    component_df['carrier_cost'] = carrier_price + emission_factor * co2_price
 
-    df['efficiency'] = eta
+    component_df['efficiency'] = eta
 
-    df.to_csv(file_path)
+    return component_df
 
 
-def update_hydro_reservoir(data_preprocessed_path, scalars):
-    component = 'hydro-reservoir'
+def update_hydro_reservoir(component_df, scalars):
 
-    # TODO: This filepath should be moved to components.csv
-    file_path = os.path.join(data_preprocessed_path, 'elements', component + '.csv')
-
-    element_df = pd.read_csv(file_path, index_col='region')
-
-    element_df['capacity_turbine'] = get_parameter_values(
+    component_df['capacity_turbine'] = get_parameter_values(
         scalars,
         'EnergyConversion_Capacity_Electricity_Hydro_ReservoirTurbine')
 
-    element_df['capacity_pump'] = get_parameter_values(
+    component_df['capacity_pump'] = get_parameter_values(
         scalars,
         'EnergyConversion_Capacity_Electricity_Hydro_ReservoirPump')
 
@@ -872,58 +759,55 @@ def update_hydro_reservoir(data_preprocessed_path, scalars):
         scalars,
         'Energy_PrimaryEnergy_Hydro_Reservoir_FillingLevelStart')
 
-    element_df['storage_capacity'] = storage_capacity
+    component_df['storage_capacity'] = storage_capacity
 
     # Recalculate filling level as a ratio of storage capacity (refer oemof.solph.components)
-    element_df['initial_storage_level'] = initial_storage_level / storage_capacity
+    component_df['initial_storage_level'] = initial_storage_level / storage_capacity
 
-    element_df['efficiency_turbine'] = get_parameter_values(
+    component_df['efficiency_turbine'] = get_parameter_values(
         scalars,
         'EnergyConversion_Eta_Electricity_Hydro_ReservoirTurbine') * 1e-2  # percent -> 0...1
 
-    element_df['efficiency_pump'] = get_parameter_values(
+    component_df['efficiency_pump'] = get_parameter_values(
         scalars,
         'EnergyConversion_Eta_Electricity_Hydro_ReservoirPump') * 1e-2  # percent -> 0...1
 
-    element_df['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars,
         'EnergyConversion_VarOM_Electricity_Hydro_Reservoir') * 1e-3  # Eur/GWh -> Eur/MWh
 
-    element_df.to_csv(file_path)
+    return component_df
 
 
-def update_electricity_bev(data_preprocessed_path, scalars):
-    electricity_bev_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-bev.csv')
+def update_electricity_bev(component_df, scalars):
 
-    electricity_bev = pd.read_csv(electricity_bev_file, index_col='region')
-
-    electricity_bev['capacity'] = get_parameter_values(
+    component_df['capacity'] = get_parameter_values(
         scalars,
         'Transport_CarNumber_Electricity_Cars'
     ) * get_parameter_values(
         scalars,
         'Transport_ConnecPower_Electricity_Cars')
 
-    electricity_bev['storage_capacity'] = get_parameter_values(
+    component_df['storage_capacity'] = get_parameter_values(
         scalars,
         'Transport_CarNumber_Electricity_Cars'
     ) * get_parameter_values(
         scalars,
         'Transport_BatteryCap_Electricity_Cars') * 1e3  # GWh to MWh
 
-    electricity_bev['efficiency_v2g'] = get_parameter_values(
+    component_df['efficiency_v2g'] = get_parameter_values(
         scalars,
         'Transport_EtaFeedIn_Electricity_Cars') * 1e-2  # percentage to decimal
 
-    electricity_bev['amount'] = get_parameter_values(
+    component_df['amount'] = get_parameter_values(
         scalars,
         'Transport_AnnualDemand_Electricity_Cars') * 1e3  # GWh to MWh
 
-    electricity_bev['marginal_cost'] = get_parameter_values(
+    component_df['marginal_cost'] = get_parameter_values(
         scalars,
         'Transport_VarOMGridFeedIn_Electricity_Cars') * 1e-3  # Eur/GWh to Eur/MWh
 
-    electricity_bev.to_csv(electricity_bev_file)
+    return component_df
 
 
 update_dict = {
@@ -967,4 +851,14 @@ def update_scalars(select_components, destination, scalars):
         if not kwargs:
             kwargs = {}
 
-        function(data_preprocessed_path=destination, scalars=scalars, **kwargs)
+        component_df_path = os.path.join(
+            destination,
+            'elements',
+            component + '.csv'
+        )
+
+        component_df = pd.read_csv(component_df_path, index_col='region')
+
+        component_df = function(component_df, scalars=scalars, **kwargs)
+
+        component_df.to_csv(component_df_path)
