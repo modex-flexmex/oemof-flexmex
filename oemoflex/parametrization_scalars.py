@@ -45,7 +45,6 @@ def get_parameter_values(scalars_df, parameter_name):
 
 
 def update_electricity_shortage(data_preprocessed_path, scalars):
-    logging.info("Updating electricity shortage file")
 
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-shortage.csv')
 
@@ -62,7 +61,6 @@ def update_electricity_shortage(data_preprocessed_path, scalars):
 
 
 def update_heat_shortage(data_preprocessed_path, scalars):
-    logging.info("Updating heat shortage file")
 
     shortage_file = os.path.join(data_preprocessed_path, 'elements', 'heat-shortage.csv')
 
@@ -79,7 +77,6 @@ def update_heat_shortage(data_preprocessed_path, scalars):
 
 
 def update_electricity_demand(data_preprocessed_path, scalars):
-    logging.info("Updating electricity-demand file")
 
     load_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-demand.csv')
 
@@ -96,7 +93,6 @@ def update_electricity_demand(data_preprocessed_path, scalars):
 
 
 def update_heat_demand(data_preprocessed_path, scalars):
-    logging.info("Updating heat-demand file")
 
     load_file = os.path.join(data_preprocessed_path, 'elements', 'heat-demand.csv')
 
@@ -113,7 +109,6 @@ def update_heat_demand(data_preprocessed_path, scalars):
 
 
 def update_bpchp(data_preprocessed_path, scalars):
-    logging.info("Updating ch4-bpchp file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-bpchp.csv')
 
@@ -152,7 +147,6 @@ def update_bpchp(data_preprocessed_path, scalars):
 
 
 def update_extchp(data_preprocessed_path, scalars):
-    logging.info("Updating ch4-extchp file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-extchp.csv')
 
@@ -201,7 +195,6 @@ def update_extchp(data_preprocessed_path, scalars):
 
 
 def update_boiler_large(data_preprocessed_path, scalars):
-    logging.info("Updating ch4-boiler-large file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler-large.csv')
 
@@ -230,7 +223,6 @@ def update_boiler_large(data_preprocessed_path, scalars):
 
 
 def update_boiler_small(data_preprocessed_path, scalars):
-    logging.info("Updating ch4-boiler-small file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-boiler-small.csv')
 
@@ -260,7 +252,6 @@ def update_boiler_small(data_preprocessed_path, scalars):
 
 
 def update_pth(data_preprocessed_path, scalars):
-    logging.info("Updating electricity-pth file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-pth.csv')
 
@@ -281,7 +272,6 @@ def update_pth(data_preprocessed_path, scalars):
 
 
 def update_electricity_heatpump_small(data_preprocessed_path, scalars):
-    logging.info("Updating electricity-heatpump-small file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump-small.csv')
 
@@ -306,7 +296,6 @@ def update_electricity_heatpump_small(data_preprocessed_path, scalars):
 
 
 def update_electricity_heatpump_large(data_preprocessed_path, scalars):
-    logging.info("Updating electricity-heatpump-large file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'electricity-heatpump-large.csv')
 
@@ -331,7 +320,6 @@ def update_electricity_heatpump_large(data_preprocessed_path, scalars):
 
 
 def update_heat_storage_small(data_preprocessed_path, scalars):
-    logging.info("Updating heat-storage-large file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage-small.csv')
 
@@ -363,7 +351,6 @@ def update_heat_storage_small(data_preprocessed_path, scalars):
 
 
 def update_heat_storage_large(data_preprocessed_path, scalars):
-    logging.info("Updating heat-storage-large file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'heat-storage-large.csv')
 
@@ -395,7 +382,6 @@ def update_heat_storage_large(data_preprocessed_path, scalars):
 
 
 def update_link(data_preprocessed_path, scalars):
-    logging.info("Updating link file")
 
     link_file = os.path.join(data_preprocessed_path, 'elements', 'electricity-transmission.csv')
 
@@ -795,7 +781,6 @@ def update_nuclear_st(data_preprocessed_path, scalars, expandable=False, greenfi
 
 
 def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, greenfield=False):
-    logging.info("Updating ch4-gt file")
 
     file_path = os.path.join(data_preprocessed_path, 'elements', 'ch4-gt.csv')
 
@@ -865,8 +850,6 @@ def update_ch4_gt(data_preprocessed_path, scalars, expandable=False, greenfield=
 
 def update_hydro_reservoir(data_preprocessed_path, scalars):
     component = 'hydro-reservoir'
-
-    logging.info(f"Updating {component} file")
 
     # TODO: This filepath should be moved to components.csv
     file_path = os.path.join(data_preprocessed_path, 'elements', component + '.csv')
@@ -972,7 +955,7 @@ update_dict = {
 
 def update_scalars(select_components, destination, scalars):
     for component, kwargs in select_components.items():
-        print(f"Updating {component}")
+        logging.info(f"Updating {component}")
 
         try:
             function = update_dict[component]
