@@ -6,6 +6,7 @@ from oemoflex.preprocessing import (
     update_ch4_gt, update_wind_onshore, update_wind_offshore, update_solar_pv,
     update_electricity_bev, create_profiles)
 from oemoflex.helpers import setup_experiment_paths, load_scalar_input_data, check_if_csv_dirs_equal
+from oemoflex.inferring import infer
 
 
 name = 'FlexMex1_7b'
@@ -72,6 +73,12 @@ def main():
     )
     new_path = exp_paths.data_preprocessed
     check_if_csv_dirs_equal(new_path, previous_path)
+
+    # this becomes necessary because 'data' is manually added some lines above. Needs to be cleaned
+    # up.
+    exp_paths.data_preprocessed = exp_paths.data_preprocessed.strip('data')
+
+    infer(select_components=components, package_name=name, path=exp_paths.data_preprocessed)
 
 
 if __name__ == '__main__':
