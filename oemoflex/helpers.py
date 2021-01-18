@@ -108,16 +108,53 @@ def setup_experiment_paths(name):
     return experiment_paths
 
 
-def load_scalar_input_data():
+def read_scalar_input_file(filepath):
+    r"""
+    Reads a CSV file into a DataFrame.
 
-    exp_paths = get_experiment_paths()
+    Parameters
+    ----------
+    filepath : str
+    Path to the CSV file
+
+    Returns
+    -------
+    DataFrame
+    """
 
     scalars = pd.read_csv(
-        os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+        filepath,
         header=0,
         na_values=['not considered', 'no value'],
         sep=',',
     )
+
+    return scalars
+
+
+def load_scalar_input_data(*filepath_list):
+    r"""
+    Reads one or multiple Scalars.csv files and concatenates them into a DataFrame.
+    No check for duplicates.
+
+    Accepts one str `func(one)` or a tuple of str `func(one, two, three)` with path to the
+    CSV files to be read.
+
+    Parameters
+    ----------
+    filepath_list : str
+    Path to the CSV file to be read.
+
+    Returns
+    -------
+    DataFrame
+    """
+
+    scalars = pd.DataFrame()
+
+    for filepath in filepath_list:
+        another_scalars = read_scalar_input_file(filepath)
+        scalars = pd.concat([scalars, another_scalars])
 
     return scalars
 
