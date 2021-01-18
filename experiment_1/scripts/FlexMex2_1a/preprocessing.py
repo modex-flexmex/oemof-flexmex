@@ -28,17 +28,23 @@ if not os.path.exists(exp_paths.data_preprocessed):
 
 def main():
     # Load common input parameters
-    scalars = load_scalar_input_data(name)
+    scalars_common = os.path.join(exp_paths['data_raw'], 'FlexMex2_Scalars_ALL.csv')
+    scenario_code = name.split('_')[1]
+    scalars_specific = os.path.join(exp_paths['data_raw'], f'FlexMex2_Scalars_{scenario_code}.csv')
+
+    scalars = load_scalar_input_data(scalars_common, scalars_specific)
 
     # Filter out only scenario-related input parameters
-    scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex2', 'ALL']), :]
+    scalars = scalars.loc[scalars['Scenario'].isin([name, 'FlexMex2-1a', 'ALL']), :]
+    # NO MORE EFFORT NEEDED - WILL BE OVERWRITTEN WITH MERGE
 
     # There are two values for "Energy_SlackCost_Electricity"
     # one for 'FlexMex1' and one for 'FlexMex1UC2'
     # Drop the second one, only keep "Energy_SlackCost_Electricity" for use case 2b
     rows_to_drop = scalars.loc[
         (scalars['Parameter'] == 'Energy_SlackCost_Electricity')
-        & (scalars['Scenario'] == 'FlexMex2'), :].index
+        & (scalars['Scenario'] == 'FlexMex2-1a'), :].index
+    # NO MORE EFFORT NEEDED - WILL BE OVERWRITTEN WITH MERGE
 
     scalars = scalars.drop(rows_to_drop)
 
