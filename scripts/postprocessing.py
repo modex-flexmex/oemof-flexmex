@@ -1,7 +1,7 @@
 import os
 import sys
 
-from oemoflex.postprocessing_flexmex import run_postprocessing
+from oemoflex.postprocessing import run_postprocessing
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal, load_yaml
 
 
