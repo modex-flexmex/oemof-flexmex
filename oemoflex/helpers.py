@@ -48,9 +48,9 @@ def get_experiment_paths():
     return experiment_paths
 
 
-def add_usecase_paths(experiment_paths, name):
+def add_scenario_paths(experiment_paths, name):
     r"""
-    Add use case name to several paths.
+    Add scenario name to several paths.
 
     NOTE: Can be dropped as soon as directory structure is reordered.
 
@@ -88,7 +88,7 @@ def setup_experiment_paths(name):
     Parameters
     ----------
     name : str
-        Name of the use case.
+        Name of the scenario.
 
     basepath : path
         basepath of the experiment paths.
@@ -99,7 +99,7 @@ def setup_experiment_paths(name):
         Dictionary listing all experiment paths
     """
     experiment_paths = get_experiment_paths()
-    experiment_paths = add_usecase_paths(experiment_paths, name)
+    experiment_paths = add_scenario_paths(experiment_paths, name)
 
     for path in experiment_paths.values():
         if not os.path.exists(path):
