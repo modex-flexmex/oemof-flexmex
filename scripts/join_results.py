@@ -25,7 +25,7 @@ if os.path.exists(exp_paths.results_comparison):
 
 os.makedirs(exp_paths.results_comparison)
 
-usecases = [
+scenarios = [
     'FlexMex1_2a',
     'FlexMex1_2b',
     'FlexMex1_2c',
@@ -65,7 +65,7 @@ def copy_timeseries(experiments, fro, to):
         ))
 
 
-all_scalars = join_scalars(usecases)
+all_scalars = join_scalars(scenarios)
 all_scalars.to_csv('../006_results_comparison/oemof/Scalars.csv')
 
-copy_timeseries(usecases, exp_paths.results_postprocessed, exp_paths.results_comparison)
+copy_timeseries(scenarios, exp_paths.results_postprocessed, exp_paths.results_comparison)

@@ -11,12 +11,12 @@ if __name__ == '__main__':
     scenario_specs = load_yaml(sys.argv[1])
 
     # Get paths
-    exp_paths = setup_experiment_paths(scenario_specs['name'])
+    exp_paths = setup_experiment_paths(scenario_specs['scenario'])
 
     exp_paths.data_preprocessed = os.path.join(exp_paths.data_preprocessed)
 
     infer(
         select_components=scenario_specs['components'],
-        package_name=scenario_specs['name'],
+        package_name=scenario_specs['scenario'],
         path=exp_paths.data_preprocessed,
     )
