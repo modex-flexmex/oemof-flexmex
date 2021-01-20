@@ -48,7 +48,7 @@ def get_experiment_paths():
     return experiment_paths
 
 
-def add_scenario_paths(experiment_paths, name):
+def add_scenario_paths(experiment_paths, scenario):
     r"""
     Add scenario name to several paths.
 
@@ -59,8 +59,8 @@ def add_scenario_paths(experiment_paths, name):
     experiment_paths : addict.Dict
         experiment paths
 
-    name : str
-        Name of the usecase
+    scenario : str
+        Name of the scenario
 
     Returns
     -------
@@ -69,25 +69,25 @@ def add_scenario_paths(experiment_paths, name):
     """
 
     experiment_paths['data_preprocessed'] = os.path.join(
-        experiment_paths['data_preprocessed'], name)
+        experiment_paths['data_preprocessed'], scenario)
 
     experiment_paths['results_optimization'] = os.path.join(
-        experiment_paths['results_optimization'], name)
+        experiment_paths['results_optimization'], scenario)
 
     experiment_paths['results_postprocessed'] = os.path.join(
-        experiment_paths['results_postprocessed'], name)
+        experiment_paths['results_postprocessed'], scenario)
 
     return experiment_paths
 
 
-def setup_experiment_paths(name):
+def setup_experiment_paths(scenario):
     r"""
     Gets the experiment paths for a given experiment and
     a basepath. If they do not exist, they are created.
 
     Parameters
     ----------
-    name : str
+    scenario : str
         Name of the scenario.
 
     basepath : path
@@ -99,7 +99,7 @@ def setup_experiment_paths(name):
         Dictionary listing all experiment paths
     """
     experiment_paths = get_experiment_paths()
-    experiment_paths = add_scenario_paths(experiment_paths, name)
+    experiment_paths = add_scenario_paths(experiment_paths, scenario)
 
     for path in experiment_paths.values():
         if not os.path.exists(path):

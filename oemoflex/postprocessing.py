@@ -532,13 +532,13 @@ def map_link_direction(oemoflex_scalars):
     return oemoflex_scalars
 
 
-def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, usecase):
+def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, scenario):
     mapping = mapping.set_index('Parameter')
     flexmex_scalars = flexmex_scalars_template.copy()
     oemoflex_scalars = oemoflex_scalars.set_index(['region', 'carrier', 'tech', 'var_name'])
     oemoflex_scalars.loc[oemoflex_scalars['var_unit'] == 'MWh', 'var_value'] *= 1e-3  # MWh to GWh
 
-    for i, row in flexmex_scalars.loc[flexmex_scalars['UseCase'] == usecase].iterrows():
+    for i, row in flexmex_scalars.loc[flexmex_scalars['UseCase'] == scenario].iterrows():
         try:
             select = mapping.loc[row['Parameter'], :]
         except KeyError:
@@ -967,7 +967,7 @@ def get_total_system_cost(oemoflex_scalars):
     return total_system_cost
 
 
-def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
+def save_flexmex_timeseries(sequences_by_tech, scenario, model, year, dir):
 
     for carrier_tech in sequences_by_tech.columns.unique(level='carrier_tech'):
         try:
@@ -983,7 +983,7 @@ def save_flexmex_timeseries(sequences_by_tech, usecase, model, year, dir):
                 filename = os.path.join(
                     dir,
                     subdir,
-                    '_'.join([usecase, model, region, year]) + '.csv'
+                    '_'.join([scenario, model, region, year]) + '.csv'
                 )
 
                 single_column = df_var_value.loc[:, region]
@@ -1057,7 +1057,7 @@ def export_bus_sequences(es, destination):
         value.to_csv(file_path)
 
 
-def run_postprocessing(year, name, exp_paths):
+def run_postprocessing(year, scenario, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
@@ -1066,7 +1066,7 @@ def run_postprocessing(year, name, exp_paths):
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
     flexmex_scalars_template = flexmex_scalars_template.loc[
-        flexmex_scalars_template['UseCase'] == name
+        flexmex_scalars_template['UseCase'] == scenario
     ]
 
     # load mapping
@@ -1160,14 +1160,14 @@ def run_postprocessing(year, name, exp_paths):
     oemoflex_scalars = map_link_direction(oemoflex_scalars)
 
     # set experiment info
-    oemoflex_scalars['usecase'] = name
+    oemoflex_scalars['usecase'] = scenario
     oemoflex_scalars['year'] = year
 
     # oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
 
     # map to FlexMex data format
     flexmex_scalar_results = map_to_flexmex_results(
-        oemoflex_scalars, flexmex_scalars_template, mapping, name
+        oemoflex_scalars, flexmex_scalars_template, mapping, scenario
     )
 
     # save results
@@ -1192,5 +1192,5 @@ def run_postprocessing(year, name, exp_paths):
         )
 
     save_flexmex_timeseries(
-        sequences_by_tech, name, 'oemof', '2050', exp_paths.results_postprocessed
+        sequences_by_tech, scenario, 'oemof', '2050', exp_paths.results_postprocessed
     )
