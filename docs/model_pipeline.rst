@@ -25,7 +25,7 @@ The data each step is provided with is held in different forms:
 Raw data
 ========
 
-The raw data holds the energy system model definition for every scenario.
+The raw data holds the energy system model definition for all scenarios.
 It consists of a parameter database (parameters are called `scalars`) and a bunch of timeseries (`sequences` or `profiles`).
 
 Scalars
