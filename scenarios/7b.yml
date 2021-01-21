@@ -1,0 +1,19 @@
+scenario: FlexMex1_7b
+
+year: 2050
+
+components:
+  electricity-shortage:
+  electricity-curtailment:
+  electricity-demand:
+  wind-offshore:
+  wind-onshore:
+  solar-pv:
+  electricity-bev:
+  
+scenario_select:
+  - FlexMex1
+  - ALL
+
+scenario_overwrite:
+  FlexMex1UC5_7_8

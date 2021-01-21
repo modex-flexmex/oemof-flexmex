@@ -25,13 +25,13 @@ The data each step is provided with is held in different forms:
 Raw data
 ========
 
-The raw data holds the energy system model definition for every use case.
+The raw data holds the energy system model definition for all scenarios.
 It consists of a parameter database (parameters are called `scalars`) and a bunch of timeseries (`sequences` or `profiles`).
 
 Scalars
 -------
 
-The scalars database defines parameters for all use cases and regions.
+The scalars database defines parameters for all scenarios and regions.
 It is held in a CSV file called ``Scalars.csv``.
 
 .. Path needs to be added
@@ -63,7 +63,7 @@ FlexMex1  CZ      2050  DemandResponse_Capacity_Electricity_HVAC       MW (el)  
 ========  ======  ====  =============================================  =======  =========
 
 Scenario: `string`
-    Special identifier to address use case or group of use cases ('experiment')
+    Special identifier to address scenario or group of scenarios ('experiment')
 
     .. note:: The keyword ``ALL`` can be used as a universal quantifier to avoid repetition.
 
@@ -132,4 +132,4 @@ Postprocessing
 ==============
 
 Postprocessing translates the results into an exchange-friendly format defined by the FlexMex project partners.
-For that, a result template defines the parameters to be output for each use case.
+For that, a result template defines the parameters to be output for each scenario.

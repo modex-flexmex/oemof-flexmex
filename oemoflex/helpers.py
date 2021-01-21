@@ -48,9 +48,9 @@ def get_experiment_paths():
     return experiment_paths
 
 
-def add_usecase_paths(experiment_paths, name):
+def add_scenario_paths(experiment_paths, scenario):
     r"""
-    Add use case name to several paths.
+    Add scenario name to several paths.
 
     NOTE: Can be dropped as soon as directory structure is reordered.
 
@@ -59,8 +59,8 @@ def add_usecase_paths(experiment_paths, name):
     experiment_paths : addict.Dict
         experiment paths
 
-    name : str
-        Name of the usecase
+    scenario : str
+        Name of the scenario
 
     Returns
     -------
@@ -69,26 +69,26 @@ def add_usecase_paths(experiment_paths, name):
     """
 
     experiment_paths['data_preprocessed'] = os.path.join(
-        experiment_paths['data_preprocessed'], name)
+        experiment_paths['data_preprocessed'], scenario)
 
     experiment_paths['results_optimization'] = os.path.join(
-        experiment_paths['results_optimization'], name)
+        experiment_paths['results_optimization'], scenario)
 
     experiment_paths['results_postprocessed'] = os.path.join(
-        experiment_paths['results_postprocessed'], name)
+        experiment_paths['results_postprocessed'], scenario)
 
     return experiment_paths
 
 
-def setup_experiment_paths(name):
+def setup_experiment_paths(scenario):
     r"""
     Gets the experiment paths for a given experiment and
     a basepath. If they do not exist, they are created.
 
     Parameters
     ----------
-    name : str
-        Name of the use case.
+    scenario : str
+        Name of the scenario.
 
     basepath : path
         basepath of the experiment paths.
@@ -99,7 +99,7 @@ def setup_experiment_paths(name):
         Dictionary listing all experiment paths
     """
     experiment_paths = get_experiment_paths()
-    experiment_paths = add_usecase_paths(experiment_paths, name)
+    experiment_paths = add_scenario_paths(experiment_paths, scenario)
 
     for path in experiment_paths.values():
         if not os.path.exists(path):
@@ -155,6 +155,33 @@ def load_scalar_input_data(*filepath_list):
     for filepath in filepath_list:
         another_scalars = read_scalar_input_file(filepath)
         scalars = pd.concat([scalars, another_scalars])
+
+    return scalars
+
+
+def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
+
+    scalars = scalars_in.copy()
+
+    scalars_overwrite = scalars_in.copy()
+
+    scalars_overwrite = scalars_overwrite.loc[scalars_overwrite['Scenario'] == scenario_overwrite]
+
+    scalars = scalars.loc[scalars['Scenario'].isin(scenario_select), :]
+
+    # Save column order before setting and resetting index
+    columns = scalars.columns
+
+    scalars.set_index(['Region', 'Parameter'], inplace=True)
+
+    scalars_overwrite.set_index(['Region', 'Parameter'], inplace=True)
+
+    scalars.update(scalars_overwrite)
+
+    scalars = scalars.reset_index()
+
+    # Restore column order
+    scalars = scalars[columns]
 
     return scalars
 
