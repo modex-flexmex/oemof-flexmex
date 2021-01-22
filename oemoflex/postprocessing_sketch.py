@@ -2,8 +2,10 @@ import copy
 
 import pandas as pd
 
-from oemof.solph import Bus
+from oemof.solph import Bus, EnergySystem
 from oemof.outputlib import processing
+
+from oemoflex.postprocessing import create_postprocessed_results_subdirs
 
 
 def get_flow_by_oemof_tuple(oemof_tuple):
@@ -95,3 +97,22 @@ def multiply_param_with_variable(params, results, param_name, var_name):
             product.update({k: prod})
 
     return product
+
+
+def restore_es(path):
+    r"""
+    Restore EnergySystem with results
+    """
+    es = EnergySystem()
+
+    es.restore(path)
+
+    return es
+
+
+def run_postprocessing_sketch(year, scenario, exp_paths):
+
+    create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
+
+    # restore EnergySystem with results
+    es = restore_es(exp_paths.results_optimization)
