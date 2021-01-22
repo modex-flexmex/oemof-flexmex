@@ -195,6 +195,18 @@ def find_csv_filenames(path_to_dir, pattern, suffix=".csv"):
     return csv_filepaths
 
 
+def has_duplicates(df, columns):
+    r"""
+    Checks DataFrame for duplicates in a given column subset.
+    """
+    duplicates = df.duplicated(columns)
+
+    if any(duplicates):
+        return True
+
+    return False
+
+
 def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
 
     scalars = scalars_in.copy()
