@@ -8,7 +8,7 @@ from oemof.outputlib import processing
 from oemoflex.postprocessing import create_postprocessed_results_subdirs
 
 
-def get_flow_by_oemof_tuple(oemof_tuple):
+def get_flow_from_oemof_tuple(oemof_tuple):
     r"""
     Returns the flow object for a given oemof tuple.
 
