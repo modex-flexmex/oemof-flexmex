@@ -149,6 +149,68 @@ def filter_components_by_attr(sequences, **kwargs):
     return filtered_seqs
 
 
+def get_inputs(dict):
+
+    inputs = {
+        key: value
+        for key, value in dict.items()
+        if isinstance(key[0], Bus)
+    }
+
+    return inputs
+
+
+def get_outputs(dict):
+
+    outputs = {
+        key: value
+        for key, value in dict.items()
+        if isinstance(key[1], Bus)
+    }
+
+    return outputs
+
+
+def substract_output_from_input(inputs, outputs):
+
+    idx = pd.IndexSlice
+
+    components_input = [key[1] for key in inputs.keys()]
+
+    result = {}
+
+    for component in components_input:
+
+        input = pd.DataFrame.from_dict(inputs).loc[:, idx[:, component]]
+
+        output = pd.DataFrame.from_dict(outputs).loc[:, idx[component, :]]
+
+        result[(component, None)] = input - output
+
+    return result
+
+
+def get_losses(summed_flows):
+    r"""
+
+
+    Parameters
+    ----------
+    results
+
+    Returns
+    -------
+
+    """
+    inputs = get_inputs(summed_flows)
+
+    outputs = get_outputs(summed_flows)
+
+    losses = substract_output_from_input(inputs, outputs)
+
+    return losses
+
+
 def restore_es(path):
     r"""
     Restore EnergySystem with results
@@ -173,5 +235,6 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     summed_flows_re = filter_components_by_attr(summed_flows, carrier=['wind', 'solar'])
 
-    for key in summed_flows_re.keys():
-        print(key)
+    summed_flows_storage = filter_components_by_attr(summed_flows, type='storage')
+
+    storage_losses = get_losses(summed_flows_storage)
