@@ -208,6 +208,28 @@ def has_duplicates(df, columns):
 
 
 def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
+    r"""
+    Updates Scalars.csv DataFrame to contain only scenario-specific values of parameters.
+
+    Needed to properly process Scalars.csv rows starting with something like 'FlexMex1UC2'.
+
+    (FlexMex-specific function)
+
+    Parameters
+    ----------
+    scalars_in : pandas.DataFrame
+        Scalars.csv DataFrame from input data
+
+    scenario_select : list of str
+        'Scenario' values of parameters to keep, drop everything else
+
+    scenario_overwrite : list of str
+        'Scenario' values who's parameter values will overwrite those in 'scenario_select'
+
+    Returns
+    -------
+    Scalars.csv DataFrame
+    """
 
     scalars = scalars_in.copy()
 
