@@ -108,55 +108,91 @@ def setup_experiment_paths(scenario):
     return experiment_paths
 
 
-def read_scalar_input_file(filepath):
+def read_csv_file(filepath):
     r"""
-    Reads a CSV file into a DataFrame.
+    Reads a CSV file into a DataFrame. Considers some codes for NA values.
+
+    (FlexMex-specific function)
 
     Parameters
     ----------
     filepath : str
-    Path to the CSV file
+        Path to the CSV file
 
     Returns
     -------
     DataFrame
     """
 
-    scalars = pd.read_csv(
+    dataframe = pd.read_csv(
         filepath,
         header=0,
         na_values=['not considered', 'no value'],
         sep=',',
+        encoding='unicode_escape'  # for TimeSeries.csv (ISO-8859-1 encoded)
     )
 
-    return scalars
+    return dataframe
 
 
-def load_scalar_input_data(*filepath_list):
+def load_scalar_input_data(path_to_dir, experiment_name, identifier_columns=None):
     r"""
-    Reads one or multiple Scalars.csv files and concatenates them into a DataFrame.
+    Reads all CSV files resembling a Scalars.csv file and concatenates them into a DataFrame.
     No check for duplicates.
 
-    Accepts one str `func(one)` or a tuple of str `func(one, two, three)` with path to the
-    CSV files to be read.
+    (FlexMex-specific function)
 
     Parameters
     ----------
-    filepath_list : str
-    Path to the CSV file to be read.
+    path : str
+        Path to the CSV-file-containing directory.
+
+    experiment_name : str
+        File name part to pre-filter the files (e.g. 'FlexMex1' or 'FlexMex2')
+        TODO: Necessary as long as FlexMex "Data_In" contains two versions of Scalars.csv
+
+    identifier_columns : str
+        List of column names to filter the proper type of CSV file
 
     Returns
     -------
     DataFrame
     """
 
-    scalars = pd.DataFrame()
+    if identifier_columns is None:
+        identifier_columns = ['Scenario', 'Region', 'Year', 'Parameter', 'Unit', 'Value']
 
-    for filepath in filepath_list:
-        another_scalars = read_scalar_input_file(filepath)
-        scalars = pd.concat([scalars, another_scalars])
+    def is_scalars_data(df):
+        r"""
+        Checks if 'df' has a number of indentifier columns that show it as a
+        FlexMex Scalars.csv input file.
+        """
+        return set(identifier_columns).issubset(df.columns)
 
-    return scalars
+    scalars_df = pd.DataFrame()
+
+    for filepath in find_csv_filenames(path_to_dir, pattern=experiment_name):
+        next_csv_df = read_csv_file(filepath)
+        if is_scalars_data(next_csv_df):
+            scalars_df = pd.concat([scalars_df, next_csv_df])
+
+    return scalars_df
+
+
+def find_csv_filenames(path_to_dir, pattern, suffix=".csv"):
+    r"""
+    Reads all CSV (or other) files in a directory (non-recursive)
+
+    TODO: 'pattern' necessary as long as FlexMex "Data_In" contains two versions of Scalars.csv
+    """
+    filenames = os.listdir(path_to_dir)
+
+    csv_filepaths = []
+    for filename in filenames:
+        if filename.endswith(suffix) and pattern in filename:
+            csv_filepaths.append(os.path.join(path_to_dir, filename))
+
+    return csv_filepaths
 
 
 def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
