@@ -258,7 +258,7 @@ def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
 
 def load_scalar_input_data(scenario_specs, exp_paths):
     r"""
-    Read, filters and checks FlexMex Scalars.csv input data
+    Reads, filters and checks FlexMex Scalars.csv input data
 
     (FlexMex-specific function)
 
