@@ -135,7 +135,7 @@ def read_csv_file(filepath):
     return dataframe
 
 
-def load_scalar_input_data(path_to_dir, experiment_name, identifier_columns=None):
+def read_scalar_input_data(path_to_dir, experiment_name, identifier_columns=None):
     r"""
     Reads all CSV files resembling a Scalars.csv file and concatenates them into a DataFrame.
     No check for duplicates.
@@ -252,6 +252,45 @@ def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
 
     # Restore column order
     scalars = scalars[columns]
+
+    return scalars
+
+
+def load_scalar_input_data(scenario_specs, exp_paths):
+    r"""
+    Read, filters and checks FlexMex Scalars.csv input data
+
+    (FlexMex-specific function)
+
+    Parameters
+    ----------
+    scenario_specs : dict
+        Special dict with scenario settings
+
+    exp_paths : dict
+        Special dict of paths
+
+    Returns
+    -------
+    Scalars.csv DataFrame
+    """
+
+    # Get experiment name - necessary as long as "Data_In" contains two versions of Scalars.csv
+    experiment_name = scenario_specs['scenario'].split('_')[0]
+
+    # Load common input parameters
+    scalars = read_scalar_input_data(exp_paths.data_raw, experiment_name)
+
+    # Filter out only scenario-related input parameters
+    scalars = filter_scalar_input_data(
+        scalars,
+        scenario_select=scenario_specs['scenario_select'],
+        scenario_overwrite=scenario_specs['scenario_overwrite']
+    )
+
+    # After filtering there musn't be any duplicates left.
+    if has_duplicates(scalars, ['Scenario', 'Region', 'Parameter']):
+        raise ValueError('Found duplicates in Scalars data. Check input data and filtering.')
 
     return scalars
 
