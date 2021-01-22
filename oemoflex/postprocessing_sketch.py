@@ -99,6 +99,26 @@ def multiply_param_with_variable(params, results, param_name, var_name):
     return product
 
 
+def filter_sequences(dict):
+
+    _dict = copy.deepcopy(dict)
+
+    seq = {key: value['sequences'] for key, value in _dict.items() if 'sequences' in value}
+
+    return seq
+
+
+def sum_sequences(sequences):
+
+    _sequences = copy.deepcopy(sequences)
+
+    for oemof_tuple, value in _sequences.items():
+
+        _sequences[oemof_tuple] = value.sum()
+
+    return _sequences
+
+
 def restore_es(path):
     r"""
     Restore EnergySystem with results
@@ -116,3 +136,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     # restore EnergySystem with results
     es = restore_es(exp_paths.results_optimization)
+
+    seq = filter_sequences(es.results)
+
+    summed_flows = sum_sequences(seq)
