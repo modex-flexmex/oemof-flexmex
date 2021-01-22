@@ -7,7 +7,7 @@ from oemoflex.parametrization_scalars import update_scalars
 from oemoflex.parametrization_sequences import create_profiles
 from oemoflex.helpers import (
     setup_experiment_paths, load_scalar_input_data, filter_scalar_input_data,
-    check_if_csv_dirs_equal, load_yaml
+    check_if_csv_dirs_equal, load_yaml, has_duplicates
 )
 
 
@@ -42,6 +42,10 @@ if __name__ == '__main__':
         scenario_overwrite=scenario_specs['scenario_overwrite']
     )
 
+    # After filtering there musn't be any duplicates left.
+    if has_duplicates(scalars, ['Scenario', 'Region', 'Parameter']):
+        raise ValueError('Found duplicates in Scalars data. Check input data and filtering.')
+
     # Prepare oemof.tabular input CSV files
     create_default_elements(
         os.path.join(exp_paths.data_preprocessed, 'elements'),
@@ -57,4 +61,4 @@ if __name__ == '__main__':
     # compare with previous data
     previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
     new_path = exp_paths.data_preprocessed
-    check_if_csv_dirs_equal(new_path, previous_path)
+    # check_if_csv_dirs_equal(new_path, previous_path)
