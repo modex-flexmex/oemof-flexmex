@@ -119,6 +119,36 @@ def sum_sequences(sequences):
     return _sequences
 
 
+def get_component_from_oemof_tuple(oemof_tuple):
+    if isinstance(oemof_tuple[1], Bus):
+        component = oemof_tuple[0]
+
+    elif oemof_tuple[1] is None:
+        component = oemof_tuple[0]
+
+    elif isinstance(oemof_tuple[0], Bus):
+        component = oemof_tuple[1]
+
+    return component
+
+
+def filter_components_by_attr(sequences, **kwargs):
+
+    filtered_seqs = {}
+
+    for oemof_tuple, data in sequences.items():
+        component = get_component_from_oemof_tuple(oemof_tuple)
+
+        for key, value in kwargs.items():
+            if not hasattr(component, key):
+                continue
+
+            if getattr(component, key) in value:
+                filtered_seqs[oemof_tuple] = data
+
+    return filtered_seqs
+
+
 def restore_es(path):
     r"""
     Restore EnergySystem with results
@@ -140,3 +170,8 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     seq = get_sequences(es.results)
 
     summed_flows = sum_sequences(seq)
+
+    summed_flows_re = filter_components_by_attr(summed_flows, tech='onshore')
+
+    for key in summed_flows_re.keys():
+        print(key)
