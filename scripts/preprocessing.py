@@ -29,8 +29,11 @@ if __name__ == '__main__':
         for subdir in ['elements', 'sequences']:
             os.makedirs(os.path.join(exp_paths.data_preprocessed, subdir))
 
+    # Get experiment name - necessary as long as "Data_In" contains two versions of Scalars.csv
+    experiment_name = scenario_specs['scenario'].split('_')[0]
+
     # Load common input parameters
-    scalars = load_scalar_input_data()
+    scalars = load_scalar_input_data(exp_paths.data_raw, experiment_name)
 
     # Filter out only scenario-related input parameters
     scalars = filter_scalar_input_data(
