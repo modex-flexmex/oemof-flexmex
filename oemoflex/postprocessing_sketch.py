@@ -99,7 +99,7 @@ def multiply_param_with_variable(params, results, param_name, var_name):
     return product
 
 
-def filter_sequences(dict):
+def get_sequences(dict):
 
     _dict = copy.deepcopy(dict)
 
@@ -137,6 +137,6 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     # restore EnergySystem with results
     es = restore_es(exp_paths.results_optimization)
 
-    seq = filter_sequences(es.results)
+    seq = get_sequences(es.results)
 
     summed_flows = sum_sequences(seq)
