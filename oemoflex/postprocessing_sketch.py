@@ -171,7 +171,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     summed_flows = sum_sequences(seq)
 
-    summed_flows_re = filter_components_by_attr(summed_flows, tech='onshore')
+    summed_flows_re = filter_components_by_attr(summed_flows, carrier=['wind', 'solar'])
 
     for key in summed_flows_re.keys():
         print(key)
