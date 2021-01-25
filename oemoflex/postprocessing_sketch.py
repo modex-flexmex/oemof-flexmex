@@ -162,7 +162,7 @@ def filter_components_by_attr(sequences, **kwargs):
     return filtered_seqs
 
 
-def filter_serries_by_component_attr(df, **kwargs):
+def filter_series_by_component_attr(df, **kwargs):
 
     filtered_index = []
     for id in df.index:
@@ -180,24 +180,20 @@ def filter_serries_by_component_attr(df, **kwargs):
     return filtered_df
 
 
-def get_inputs(dict):
+def get_inputs(series):
 
-    inputs = {
-        key: value
-        for key, value in dict.items()
-        if isinstance(key[0], Bus)
-    }
+    input_ids = [id for id in series.index if isinstance(id[0], Bus)]
+
+    inputs = series.loc[input_ids]
 
     return inputs
 
 
-def get_outputs(dict):
+def get_outputs(series):
 
-    outputs = {
-        key: value
-        for key, value in dict.items()
-        if isinstance(key[1], Bus)
-    }
+    output_ids = [id for id in series.index if isinstance(id[1], Bus)]
+
+    outputs = series.loc[output_ids]
 
     return outputs
 
@@ -248,21 +244,39 @@ def sum_sequences_df(df):
 
 def substract_output_from_input(inputs, outputs):
 
-    idx = pd.IndexSlice
+    def reduce_component_index(series, level):
 
-    components_input = [key[1] for key in inputs.keys()]
+        _series = series.copy()
 
-    result = {}
+        _series.name = 'var_value'
 
-    for component in components_input:
+        _series = pd.DataFrame(_series)
 
-        input = pd.DataFrame.from_dict(inputs).loc[:, idx[:, component]]
+        _series.reset_index(inplace=True)
 
-        output = pd.DataFrame.from_dict(outputs).loc[:, idx[component, :]]
+        _series = _series[[level, 'var_value']]
 
-        result[(component, None)] = input - output
+        _series.set_index(level, inplace=True)
 
-    return result
+        return _series
+
+    _inputs = reduce_component_index(inputs, 'level_1')
+
+    _outputs = reduce_component_index(outputs, 'level_0')
+
+    losses = _inputs - _outputs
+
+    losses.index.name = 'level_0'
+
+    losses.reset_index(inplace=True)
+
+    losses['level_1'] = np.nan
+
+    losses['level_2'] = 'losses'
+
+    losses.set_index(['level_0', 'level_1', 'level_2'], inplace=True)
+
+    return losses
 
 
 def get_losses(summed_flows):
@@ -314,4 +328,8 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     summed_flows = sum_sequences_df(sequences)
 
-    summed_flows_re = filter_serries_by_component_attr(summed_flows, tech=['wind', 'solar'])
+    summed_flows_re = filter_series_by_component_attr(summed_flows, tech=['wind', 'solar'])
+
+    summed_flows_storage = filter_series_by_component_attr(summed_flows, type='storage')
+
+    storage_losses = get_losses(summed_flows_storage)
