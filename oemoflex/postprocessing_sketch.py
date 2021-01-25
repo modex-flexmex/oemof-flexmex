@@ -221,6 +221,9 @@ def scalars_to_df(dict):
 
     result = pd.concat(dict.values(), 0)
 
+    if result.empty:
+        return None
+
     # adapted from oemof.solph.views' node() function
     tuples = {
         key: [c for c in value.index]
@@ -333,3 +336,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     summed_flows_storage = filter_series_by_component_attr(summed_flows, type='storage')
 
     storage_losses = get_losses(summed_flows_storage)
+
+    summed_flows_transmission = filter_series_by_component_attr(summed_flows, type='link')
+
+    transmission_losses = get_losses(summed_flows_transmission)
