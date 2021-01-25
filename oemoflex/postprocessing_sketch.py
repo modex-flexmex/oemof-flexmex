@@ -171,6 +171,25 @@ def get_outputs(dict):
     return outputs
 
 
+def dict_to_df(dict):
+
+    result = pd.concat(dict.values(), 1)
+
+    # adapted from oemof.solph.views' node() function
+    tuples = {
+        key: [c for c in value.columns]
+        for key, value in dict.items()
+    }
+
+    tuples = [tuple((*k, m) for m in v) for k, v in tuples.items()]
+
+    tuples = [c for sublist in tuples for c in sublist]
+
+    result.columns = pd.MultiIndex.from_tuples(tuples)
+
+    return result
+
+
 def substract_output_from_input(inputs, outputs):
 
     idx = pd.IndexSlice
