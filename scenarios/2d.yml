@@ -12,8 +12,10 @@ components:
   uranium-nuclear-st:
     expandable: True
     greenfield: True
-  electricity-transmission:
-
+  ch4-gt:
+    expandable: True
+    greenfield: True
+  
 scenario_select:
   - FlexMex1
   - ALL

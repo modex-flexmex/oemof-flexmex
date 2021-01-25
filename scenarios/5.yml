@@ -13,7 +13,6 @@ components:
   heat-storage-small:
   heat-demand:
   heat-shortage:
-  ch4-gt:
 
 scenario_select:
   - FlexMex1
