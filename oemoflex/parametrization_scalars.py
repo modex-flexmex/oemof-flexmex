@@ -251,6 +251,10 @@ def update_electricity_heatpump_large(component_df, scalars):
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Large'
     )
 
+    component_df['efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_COP_Heat_ElectricityHeat_Large'
+    )
+
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Large') * 1e-3  # Eur/GWh to Eur/MWh
 
