@@ -1,5 +1,6 @@
 import copy
 
+import numpy as np
 import pandas as pd
 
 from oemof.solph import Bus, EnergySystem
@@ -135,6 +136,9 @@ def get_component_from_oemof_tuple(oemof_tuple):
     elif oemof_tuple[1] is None:
         component = oemof_tuple[0]
 
+    elif oemof_tuple[1] is np.nan:
+        component = oemof_tuple[0]
+
     elif isinstance(oemof_tuple[0], Bus):
         component = oemof_tuple[1]
 
@@ -156,6 +160,24 @@ def filter_components_by_attr(sequences, **kwargs):
                 filtered_seqs[oemof_tuple] = data
 
     return filtered_seqs
+
+
+def filter_serries_by_component_attr(df, **kwargs):
+
+    filtered_index = []
+    for id in df.index:
+        component = get_component_from_oemof_tuple(id[:2])
+
+        for key, value in kwargs.items():
+            if not hasattr(component, key):
+                continue
+
+            if getattr(component, key) in value:
+                filtered_index.append(id)
+
+    filtered_df = df.loc[filtered_index]
+
+    return filtered_df
 
 
 def get_inputs(dict):
@@ -292,6 +314,4 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     summed_flows = sum_sequences_df(sequences)
 
-    print(summed_flows)
-
-    print(scalars)
+    summed_flows_re = filter_serries_by_component_attr(summed_flows, tech=['wind', 'solar'])
