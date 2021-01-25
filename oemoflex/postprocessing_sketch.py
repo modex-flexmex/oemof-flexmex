@@ -108,6 +108,15 @@ def get_sequences(dict):
     return seq
 
 
+def get_scalars(dict):
+
+    _dict = copy.deepcopy(dict)
+
+    scalars = {key: value['scalars'] for key, value in _dict.items() if 'scalars' in value}
+
+    return scalars
+
+
 def sum_sequences(sequences):
 
     _sequences = copy.deepcopy(sequences)
@@ -171,7 +180,7 @@ def get_outputs(dict):
     return outputs
 
 
-def dict_to_df(dict):
+def sequences_to_df(dict):
 
     result = pd.concat(dict.values(), 1)
 
@@ -188,6 +197,31 @@ def dict_to_df(dict):
     result.columns = pd.MultiIndex.from_tuples(tuples)
 
     return result
+
+
+def scalars_to_df(dict):
+
+    result = pd.concat(dict.values(), 0)
+
+    # adapted from oemof.solph.views' node() function
+    tuples = {
+        key: [c for c in value.index]
+        for key, value in dict.items()
+    }
+
+    tuples = [tuple((*k, m) for m in v) for k, v in tuples.items()]
+
+    tuples = [c for sublist in tuples for c in sublist]
+
+    result.index = pd.MultiIndex.from_tuples(tuples)
+
+    return result
+
+
+def sum_sequences_df(df):
+    df = df.sum()
+
+    return df
 
 
 def substract_output_from_input(inputs, outputs):
@@ -248,12 +282,16 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     # restore EnergySystem with results
     es = restore_es(exp_paths.results_optimization)
 
-    seq = get_sequences(es.results)
+    scalars = get_scalars(es.results)
 
-    summed_flows = sum_sequences(seq)
+    scalars = scalars_to_df(scalars)
 
-    summed_flows_re = filter_components_by_attr(summed_flows, carrier=['wind', 'solar'])
+    sequences = get_sequences(es.results)
 
-    summed_flows_storage = filter_components_by_attr(summed_flows, type='storage')
+    sequences = sequences_to_df(sequences)
 
-    storage_losses = get_losses(summed_flows_storage)
+    summed_flows = sum_sequences_df(sequences)
+
+    print(summed_flows)
+
+    print(scalars)
