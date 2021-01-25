@@ -1,4 +1,4 @@
-scenario: FlexMex1_2a
+scenario: FlexMex1_2c
 
 year: 2050
 
@@ -6,16 +6,16 @@ components:
   electricity-shortage:
   electricity-curtailment:
   electricity-demand:
+  electricity-liion_battery:
+    expandable: True
+    greenfield: True
   wind-offshore:
   wind-onshore:
   solar-pv:
   uranium-nuclear-st:
     expandable: True
     greenfield: True
-  ch4-gt:
-    expandable: True
-    greenfield: True
-  
+
 scenario_select:
   - FlexMex1
   - ALL
