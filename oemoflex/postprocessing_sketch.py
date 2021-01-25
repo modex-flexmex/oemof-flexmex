@@ -303,6 +303,15 @@ def get_losses(summed_flows):
     return losses
 
 
+def filter_by_var_name(series, var_name):
+
+    filtered_ids = series.index.get_level_values(2) == var_name
+
+    filtered_series = series.loc[filtered_ids]
+
+    return filtered_series
+
+
 def restore_es(path):
     r"""
     Restore EnergySystem with results
@@ -340,3 +349,8 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     summed_flows_transmission = filter_series_by_component_attr(summed_flows, type='link')
 
     transmission_losses = get_losses(summed_flows_transmission)
+
+    # capacity = filter_by_var_name(es.params, 'capacity')
+
+    if scalars:
+        invested_capacity = filter_by_var_name(scalars, 'invest')
