@@ -330,6 +330,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     # restore EnergySystem with results
     es = restore_es(exp_paths.results_optimization)
 
+    # separate scalar and sequences in results
     scalars = get_scalars(es.results)
 
     scalars = scalars_to_df(scalars)
@@ -338,19 +339,38 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     sequences = sequences_to_df(sequences)
 
+    # separate scalars and sequences in parameters
+    scalar_params = get_scalars(es.params)
+
+    scalar_params = scalars_to_df(scalar_params)
+
+    sequences_params = get_sequences(es.params)
+
+    sequences_params = sequences_to_df(sequences_params)
+
+    # Take the annual sum of the sequences
     summed_flows = sum_sequences_df(sequences)
 
+    # Collect the annual sum of renewable energy
     summed_flows_re = filter_series_by_component_attr(summed_flows, tech=['wind', 'solar'])
 
+    # Calculate storage losses
     summed_flows_storage = filter_series_by_component_attr(summed_flows, type='storage')
 
     storage_losses = get_losses(summed_flows_storage)
 
+    # Calculate transmission losses
     summed_flows_transmission = filter_series_by_component_attr(summed_flows, type='link')
 
     transmission_losses = get_losses(summed_flows_transmission)
 
-    # capacity = filter_by_var_name(es.params, 'capacity')
+    # Collect existing (exogenous) capacity (units of power) and storage capacity (units of energy)
+    capacity = filter_by_var_name(scalar_params, 'capacity')
 
-    if scalars:
+    storage_capacity = filter_by_var_name(scalar_params, 'storage_capacity')
+
+    # Collect invested (endogenous) capacity (units of power) and storage capacity (units of energy)
+    if not (scalars is None or scalars.empty):
         invested_capacity = filter_by_var_name(scalars, 'invest')
+
+        storage_storage_capacity = None
