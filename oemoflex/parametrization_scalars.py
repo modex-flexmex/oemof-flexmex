@@ -839,7 +839,7 @@ update_dict = {
 
 def update_scalars(select_components, destination, scalars):
     for component, kwargs in select_components.items():
-        logging.info(f"Updating {component}")
+        logging.info(f"Updating '{component}'")
 
         try:
             function = update_dict[component]
