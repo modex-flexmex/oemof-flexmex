@@ -1,5 +1,10 @@
 scenario: FlexMex2_1a
 
+# Properties:
+#   Dispatch scenario
+#   Basic set of technologies
+#   Renewable capacites 1x
+
 year: 2050
 
 components:
