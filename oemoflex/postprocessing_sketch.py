@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from oemof.solph import Bus, EnergySystem
+from oemof.outputlib import views
 
 from oemoflex.postprocessing import create_postprocessed_results_subdirs
 
@@ -119,7 +120,12 @@ def scalars_to_df(dict):
     return result
 
 
-def sum_sequences_df(df):
+def sum_flows(df):
+
+    is_flow = df.columns.get_level_values(2) == 'flow'
+
+    df = df.loc[:, is_flow]
+
     df = df.sum()
 
     return df
@@ -183,6 +189,71 @@ def get_losses(summed_flows):
     return losses
 
 
+def index_to_str(index):
+    r"""
+    Converts multiindex labels to string.
+    """
+    index = index.map(lambda tupl: tuple(str(node) for node in tupl))
+
+    return index
+
+
+def reindex_series_on_index(series, index_b):
+    r"""
+    Reindexes series on new index containing objects that have the same string
+    representation. A workaround necessary because oemof.solph results and params
+    have differences in the objects of the indices, even if their label is the same.
+    """
+    _index_b = index_b.copy()
+
+    _series = series.copy()
+
+    _index_b = index_to_str(_index_b)
+
+    _series.index = index_to_str(_series.index)
+
+    _series = _series.reindex(_index_b)
+
+    _series.index = index_b
+
+    _series = _series.loc[~_series.isna()]
+
+    return _series
+
+
+def multiply_var_with_param(var, param, name):
+    param = reindex_series_on_index(param, var.index)
+
+    result = param * var
+
+    result = result.loc[~result.isna()]
+
+    result.name = name
+
+    return result
+
+
+def get_summed_variable_costs(summed_flows, scalar_params):
+
+    variable_costs = (
+        filter_by_var_name(scalar_params, 'variable_costs')
+            .unstack(2)['variable_costs']
+    )
+
+    variable_costs = variable_costs.loc[variable_costs != 0]
+
+    summed_flows = (
+        summed_flows
+            .unstack(2)
+            .loc[:, 'flow']
+    )
+
+    summed_variable_costs = multiply_var_with_param(summed_flows, variable_costs,
+                                                    'summed_variable_costs')
+
+    return summed_variable_costs
+
+
 def filter_by_var_name(series, var_name):
 
     filtered_ids = series.index.get_level_values(2) == var_name
@@ -229,7 +300,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     sequences_params = sequences_to_df(sequences_params)
 
     # Take the annual sum of the sequences
-    summed_flows = sum_sequences_df(sequences)
+    summed_flows = sum_flows(sequences)
 
     # Collect the annual sum of renewable energy
     summed_flows_re = filter_series_by_component_attr(summed_flows, tech=['wind', 'solar'])
@@ -258,3 +329,6 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
         invested_capacity = invest.loc[~target_is_none]
 
         invested_storage_capacity = invest.loc[target_is_none]
+
+    # Calculate summed variable costs
+    summed_variable_costs = get_summed_variable_costs(summed_flows, scalar_params)
