@@ -338,6 +338,11 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     # Calculate summed variable costs
     summed_variable_costs = get_summed_variable_costs(summed_flows, scalar_params)
 
+    # An oemof.tabular convention: Carrier costs are on inputs, marginal costs on output
+    summed_carrier_costs = get_inputs(summed_variable_costs)
+
+    summed_marginal_costs = get_outputs(summed_variable_costs)
+
     # Get flows with emissions
     carriers_with_emissions = 'ch4'
 
