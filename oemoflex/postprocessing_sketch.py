@@ -321,6 +321,11 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     storage_capacity = filter_by_var_name(scalar_params, 'storage_capacity')
 
     # Collect invested (endogenous) capacity (units of power) and storage capacity (units of energy)
+
+    invested_capacity = None
+
+    invested_storage_capacity = None
+
     if not (scalars is None or scalars.empty):
         invest = filter_by_var_name(scalars, 'invest')
 
