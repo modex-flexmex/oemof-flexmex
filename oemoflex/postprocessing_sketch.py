@@ -344,3 +344,8 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     inputs = get_inputs(summed_flows)
 
     flows_with_emissions = filter_series_by_component_attr(inputs, carrier=carriers_with_emissions)
+
+    # Get emission costs
+    emission_costs = 1  # TODO: Replace this with real data
+
+    summed_emission_costs = flows_with_emissions * emission_costs
