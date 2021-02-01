@@ -18,7 +18,7 @@ def load_yaml(file_path):
     return yaml_data
 
 
-def get_experiment_paths():
+def get_experiment_paths(scenario):
     r"""
 
     Parameters
@@ -44,9 +44,9 @@ def get_experiment_paths():
     for k, v in config['paths'].items():
         experiment_paths[k] = os.path.realpath(os.path.join(module_path, v))
 
-    experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
-
-    experiment_paths = Dict(experiment_paths)
+    # Use scenario name to get scenario subdirs
+    for k, v in config['scenario_subdirs'].items():
+        experiment_paths[k] = os.path.realpath(os.path.join(experiment_paths['base'], scenario, v))
 
     return experiment_paths
 
@@ -101,8 +101,7 @@ def setup_experiment_paths(scenario):
     experiment_paths : dict
         Dictionary listing all experiment paths
     """
-    experiment_paths = get_experiment_paths()
-    experiment_paths = add_scenario_paths(experiment_paths, scenario)
+    experiment_paths = get_experiment_paths(scenario)
 
     for path in experiment_paths.values():
         if not os.path.exists(path):

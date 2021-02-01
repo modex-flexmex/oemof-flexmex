@@ -5,8 +5,8 @@ paths:
   results_template: ../flexmex_config/output_template/v0.06/Template
   results_comparison: 006_results_comparison
 
-data_preprocessed: 002_data_preprocessed
+scenario_subdirs:
 
-results_optimization: 003_results_optimization
-
-results_postprocessed: 005_results_postprocessed
+  data_preprocessed: 002_data_preprocessed
+  results_optimization: 003_results_optimization
+  results_postprocessed: 005_results_postprocessed
