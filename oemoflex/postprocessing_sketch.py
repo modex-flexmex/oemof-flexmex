@@ -358,3 +358,22 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     emission_costs = 1  # TODO: Replace this with real data
 
     summed_emission_costs = summed_emissions * emission_costs
+
+    # Combine all results
+    all_scalars = [
+        summed_flows,
+        # storage_losses,
+        # transmission_losses, # TODO: Non unique index when combining with summed flows
+        capacity,
+        storage_capacity,
+        invested_capacity,
+        invested_storage_capacity,
+        # summed_carrier_costs,
+        # summed_marginal_costs
+        # summed_emissions,
+        # summed_emission_costs,
+        # total system cost,
+        # total system emissions,
+    ]
+
+    all_scalars = pd.concat(all_scalars, 1)
