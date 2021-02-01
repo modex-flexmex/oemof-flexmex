@@ -7,7 +7,7 @@ datapackage.json
 001_data_raw/
 002_data_preprocessed/
 003_results_optimization/
-004_results_data_template/
+flexmex_config/output_template
 005_results_postprocessed/
 006_results_comparison/
 _archiv/
