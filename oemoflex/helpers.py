@@ -18,13 +18,14 @@ def load_yaml(file_path):
     return yaml_data
 
 
-def get_experiment_paths(scenario):
+def setup_experiment_paths(scenario):
     r"""
+    Gets the experiment paths for a given experiment. If they do not exist, they are created.
 
     Parameters
     ----------
-    basepath : str
-        Path to experiment's root
+    scenario : str
+        Name of the scenario.
 
     Returns
     -------
@@ -50,29 +51,6 @@ def get_experiment_paths(scenario):
 
         if not os.path.exists(experiment_paths[k]):
             os.makedirs(experiment_paths[k])
-
-    return experiment_paths
-
-
-def setup_experiment_paths(scenario):
-    r"""
-    Gets the experiment paths for a given experiment and
-    a basepath. If they do not exist, they are created.
-
-    Parameters
-    ----------
-    scenario : str
-        Name of the scenario.
-
-    basepath : path
-        basepath of the experiment paths.
-
-    Returns
-    -------
-    experiment_paths : dict
-        Dictionary listing all experiment paths
-    """
-    experiment_paths = get_experiment_paths(scenario)
 
     return experiment_paths
 
