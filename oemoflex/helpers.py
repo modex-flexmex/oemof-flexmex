@@ -55,9 +55,7 @@ def setup_experiment_paths(scenario):
     return experiment_paths
 
 
-def load_scalar_input_data():
-
-    exp_paths = get_experiment_paths()
+def load_scalar_input_data(exp_paths):
 
     scalars = pd.read_csv(
         os.path.join(exp_paths['data_raw'], 'Scalars.csv'),

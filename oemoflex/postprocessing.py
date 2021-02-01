@@ -1061,7 +1061,7 @@ def run_postprocessing(year, scenario, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = load_scalar_input_data()
+    scalars_raw = load_scalar_input_data(exp_paths)
 
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))

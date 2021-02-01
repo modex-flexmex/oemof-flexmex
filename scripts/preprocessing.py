@@ -30,7 +30,7 @@ if __name__ == '__main__':
             os.makedirs(os.path.join(exp_paths.data_preprocessed, subdir))
 
     # Load common input parameters
-    scalars = load_scalar_input_data()
+    scalars = load_scalar_input_data(exp_paths)
 
     # Filter out only scenario-related input parameters
     scalars = filter_scalar_input_data(
