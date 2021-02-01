@@ -48,6 +48,9 @@ def get_experiment_paths(scenario):
     for k, v in config['scenario_subdirs'].items():
         experiment_paths[k] = os.path.realpath(os.path.join(experiment_paths['base'], scenario, v))
 
+        if not os.path.exists(experiment_paths[k]):
+            os.makedirs(experiment_paths[k])
+
     return experiment_paths
 
 
@@ -102,10 +105,6 @@ def setup_experiment_paths(scenario):
         Dictionary listing all experiment paths
     """
     experiment_paths = get_experiment_paths(scenario)
-
-    for path in experiment_paths.values():
-        if not os.path.exists(path):
-            os.makedirs(path)
 
     return experiment_paths
 
