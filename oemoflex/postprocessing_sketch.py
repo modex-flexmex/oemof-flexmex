@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 
 from oemof.solph import Bus, EnergySystem
-from oemof.outputlib import views
 
 from oemoflex.postprocessing import create_postprocessed_results_subdirs
 
@@ -237,15 +236,15 @@ def get_summed_variable_costs(summed_flows, scalar_params):
 
     variable_costs = (
         filter_by_var_name(scalar_params, 'variable_costs')
-            .unstack(2)['variable_costs']
+        .unstack(2)['variable_costs']
     )
 
     variable_costs = variable_costs.loc[variable_costs != 0]
 
     summed_flows = (
         summed_flows
-            .unstack(2)
-            .loc[:, 'flow']
+        .unstack(2)
+        .loc[:, 'flow']
     )
 
     summed_variable_costs = multiply_var_with_param(summed_flows, variable_costs,
