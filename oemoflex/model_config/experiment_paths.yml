@@ -1,6 +1,6 @@
 base: ../experiment_1
 
-data_raw: 001_data_raw/2020-07-27_Data_In/v0.05
+data_raw: data/In/v0.05
 
 data_preprocessed: 002_data_preprocessed
 
