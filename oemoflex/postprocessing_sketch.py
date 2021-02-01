@@ -131,7 +131,7 @@ def sum_flows(df):
     return df
 
 
-def substract_output_from_input(inputs, outputs):
+def substract_output_from_input(inputs, outputs, var_name):
 
     def reduce_component_index(series, level):
 
@@ -161,14 +161,14 @@ def substract_output_from_input(inputs, outputs):
 
     losses['level_1'] = np.nan
 
-    losses['level_2'] = 'losses'
+    losses['level_2'] = var_name
 
     losses.set_index(['level_0', 'level_1', 'level_2'], inplace=True)
 
     return losses
 
 
-def get_losses(summed_flows):
+def get_losses(summed_flows, var_name):
     r"""
 
 
@@ -184,7 +184,7 @@ def get_losses(summed_flows):
 
     outputs = get_outputs(summed_flows)
 
-    losses = substract_output_from_input(inputs, outputs)
+    losses = substract_output_from_input(inputs, outputs, var_name)
 
     return losses
 
@@ -308,12 +308,12 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     # Calculate storage losses
     summed_flows_storage = filter_series_by_component_attr(summed_flows, type='storage')
 
-    storage_losses = get_losses(summed_flows_storage)
+    storage_losses = get_losses(summed_flows_storage, var_name='storage_losses')
 
     # Calculate transmission losses
     summed_flows_transmission = filter_series_by_component_attr(summed_flows, type='link')
 
-    transmission_losses = get_losses(summed_flows_transmission)
+    transmission_losses = get_losses(summed_flows_transmission, var_name='transmission_losses')
 
     # Collect existing (exogenous) capacity (units of power) and storage capacity (units of energy)
     capacity = filter_by_var_name(scalar_params, 'capacity')
