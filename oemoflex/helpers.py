@@ -54,38 +54,6 @@ def get_experiment_paths(scenario):
     return experiment_paths
 
 
-def add_scenario_paths(experiment_paths, scenario):
-    r"""
-    Add scenario name to several paths.
-
-    NOTE: Can be dropped as soon as directory structure is reordered.
-
-    Parameters
-    ----------
-    experiment_paths : addict.Dict
-        experiment paths
-
-    scenario : str
-        Name of the scenario
-
-    Returns
-    -------
-    experiment_paths : addict.Dict
-        Dictionary containing the experiment's path structure
-    """
-
-    experiment_paths['data_preprocessed'] = os.path.join(
-        experiment_paths['data_preprocessed'], scenario)
-
-    experiment_paths['results_optimization'] = os.path.join(
-        experiment_paths['results_optimization'], scenario)
-
-    experiment_paths['results_postprocessed'] = os.path.join(
-        experiment_paths['results_postprocessed'], scenario)
-
-    return experiment_paths
-
-
 def setup_experiment_paths(scenario):
     r"""
     Gets the experiment paths for a given experiment and
