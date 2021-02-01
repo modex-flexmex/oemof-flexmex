@@ -337,3 +337,10 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     # Calculate summed variable costs
     summed_variable_costs = get_summed_variable_costs(summed_flows, scalar_params)
+
+    # Get flows with emissions
+    carriers_with_emissions = 'ch4'
+
+    inputs = get_inputs(summed_flows)
+
+    flows_with_emissions = filter_series_by_component_attr(inputs, carrier=carriers_with_emissions)
