@@ -38,8 +38,11 @@ def get_experiment_paths():
     with open(config_path, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
-    # Use base path to make other paths absolute and drop it
-    basepath = os.path.realpath(os.path.join(module_path, config.pop('base')))
+    experiment_paths = Dict()
+
+    # Use module path to make all paths absolute
+    for k, v in config['paths'].items():
+        experiment_paths[k] = os.path.realpath(os.path.join(module_path, v))
 
     experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
 
