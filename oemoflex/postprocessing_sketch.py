@@ -138,15 +138,15 @@ def substract_output_from_input(inputs, outputs, var_name):
 
         _series.name = 'var_value'
 
-        _series = pd.DataFrame(_series)
+        _df = pd.DataFrame(_series)
 
-        _series.reset_index(inplace=True)
+        _df.reset_index(inplace=True)
 
-        _series = _series[[level, 'var_value']]
+        _df = _df[[level, 'var_value']]
 
-        _series.set_index(level, inplace=True)
+        _df.set_index(level, inplace=True)
 
-        return _series
+        return _df
 
     _inputs = reduce_component_index(inputs, 'level_1')
 
@@ -163,6 +163,9 @@ def substract_output_from_input(inputs, outputs, var_name):
     losses['level_2'] = var_name
 
     losses.set_index(['level_0', 'level_1', 'level_2'], inplace=True)
+
+    losses = losses['var_value']  # Switching back to series.
+    # TODO: Use DataFrame or Series more consistently.
 
     return losses
 
@@ -417,8 +420,8 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     # Combine all results
     all_scalars = [
         summed_flows,
-        # storage_losses,
-        # transmission_losses, # TODO: Non unique index when combining with summed flows
+        storage_losses,
+        transmission_losses,
         capacity,
         storage_capacity,
         invested_capacity,
