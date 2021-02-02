@@ -253,6 +253,26 @@ def get_summed_variable_costs(summed_flows, scalar_params):
     return summed_variable_costs
 
 
+def set_index_level(series, level, label):
+
+    level_names = series.index.names
+
+    if all(name is None for name in level_names):
+        level_names = [f"level_{i}" for i in range(len(level_names))]
+
+    df = pd.DataFrame(series)
+
+    df.reset_index(inplace=True)
+
+    df[level] = label
+
+    df.set_index(level_names, inplace=True)
+
+    series = df.loc[:, 0]
+
+    return series
+
+
 def filter_by_var_name(series, var_name):
 
     filtered_ids = series.index.get_level_values(2) == var_name
@@ -354,10 +374,22 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     summed_emissions = flows_with_emissions * specific_emissions
 
+    summed_emissions = set_index_level(
+        summed_emissions,
+        level='level_2',
+        label='summed_emissions'
+    )
+
     # Get emission costs
     emission_costs = 1  # TODO: Replace this with real data
 
     summed_emission_costs = summed_emissions * emission_costs
+
+    summed_emission_costs = set_index_level(
+        summed_emission_costs,
+        level='level_2',
+        label='summed_emission_costs'
+    )
 
     # Combine all results
     all_scalars = [
@@ -369,11 +401,11 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
         invested_capacity,
         invested_storage_capacity,
         # summed_carrier_costs,
-        # summed_marginal_costs
-        # summed_emissions,
-        # summed_emission_costs,
+        # summed_marginal_costs,
+        summed_emissions,
+        summed_emission_costs,
         # total system cost,
         # total system emissions,
     ]
 
-    all_scalars = pd.concat(all_scalars, 1)
+    all_scalars = pd.concat(all_scalars, 0)
