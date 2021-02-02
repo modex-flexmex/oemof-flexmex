@@ -220,14 +220,12 @@ def reindex_series_on_index(series, index_b):
     return _series
 
 
-def multiply_var_with_param(var, param, name):
+def multiply_var_with_param(var, param):
     param = reindex_series_on_index(param, var.index)
 
     result = param * var
 
     result = result.loc[~result.isna()]
-
-    result.name = name
 
     return result
 
@@ -247,24 +245,49 @@ def get_summed_variable_costs(summed_flows, scalar_params):
         .loc[:, 'flow']
     )
 
-    summed_variable_costs = multiply_var_with_param(summed_flows, variable_costs,
-                                                    'summed_variable_costs')
+    summed_variable_costs = multiply_var_with_param(summed_flows, variable_costs)
+
+    summed_variable_costs = set_index_level(
+        summed_variable_costs,
+        level='level_2',
+        value='summed_variable_costs'
+    )
 
     return summed_variable_costs
 
 
-def set_index_level(series, level, label):
+def set_index_level(series, level, value):
+    r"""
+    Sets a value to a multiindex level. If the level does not exist, it
+    is appended.
 
-    level_names = series.index.names
+    Parameters
+    ----------
+    series : pd.Series
 
-    if all(name is None for name in level_names):
-        level_names = [f"level_{i}" for i in range(len(level_names))]
+    level : str
+        Name of the level
+
+    value : str
+        Value to set
+
+    Returns
+    -------
+    series : pd.Series
+        Series with level set to value or appended level with value.
+    """
+    level_names = [f"level_{i}" for i in range(len(series.index.names))]
+
+    series.index.names = level_names
 
     df = pd.DataFrame(series)
 
     df.reset_index(inplace=True)
 
-    df[level] = label
+    df[level] = value
+
+    if level not in level_names:
+        level_names.append(level)
 
     df.set_index(level_names, inplace=True)
 
@@ -377,7 +400,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     summed_emissions = set_index_level(
         summed_emissions,
         level='level_2',
-        label='summed_emissions'
+        value='summed_emissions'
     )
 
     # Get emission costs
@@ -388,7 +411,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     summed_emission_costs = set_index_level(
         summed_emission_costs,
         level='level_2',
-        label='summed_emission_costs'
+        value='summed_emission_costs'
     )
 
     # Combine all results
@@ -400,8 +423,8 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
         storage_capacity,
         invested_capacity,
         invested_storage_capacity,
-        # summed_carrier_costs,
-        # summed_marginal_costs,
+        summed_carrier_costs,
+        summed_marginal_costs,
         summed_emissions,
         summed_emission_costs,
         # total system cost,
