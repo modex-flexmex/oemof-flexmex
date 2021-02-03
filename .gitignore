@@ -1,9 +1,7 @@
 .idea/
 *.egg-info/
 __pycache__/
-00_raw/
 data/
-datapackage.json
 results/
 flexmex_config/output_template
 006_results_comparison/
