@@ -3,7 +3,6 @@ paths:
   base: ../results
   data_raw: ../data/In/v0.05
   results_template: ../flexmex_config/output_template/v0.06/Template
-  results_comparison: 006_results_comparison
 
 scenario_subdirs:
 

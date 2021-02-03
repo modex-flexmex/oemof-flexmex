@@ -4,6 +4,6 @@ __pycache__/
 data/
 results/
 flexmex_config/output_template
-006_results_comparison/
+comparison/
 _archiv/
 *.zip
