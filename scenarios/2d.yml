@@ -1,4 +1,4 @@
-scenario: FlexMex1_2a
+scenario: FlexMex1_2d
 
 year: 2050
 
@@ -12,10 +12,8 @@ components:
   uranium-nuclear-st:
     expandable: True
     greenfield: True
-  ch4-gt:
-    expandable: True
-    greenfield: True
-  
+  electricity-transmission:
+
 scenario_select:
   - FlexMex1
   - ALL

@@ -10,6 +10,7 @@ components:
   wind-onshore:
   solar-pv:
   electricity-bev:
+  ch4-gt:
   
 scenario_select:
   - FlexMex1
