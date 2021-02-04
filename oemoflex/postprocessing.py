@@ -552,9 +552,11 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
                  select['var_name']), 'var_value']
 
         except KeyError:
-            logging.info(f"No key "
-                  f"{(row['Region'], select['carrier'], select['tech'], select['var_name'])}"
-                  f"found to be mapped to FlexMex.")
+            logging.info(
+                f"No key "
+                f"{(row['Region'], select['carrier'], select['tech'], select['var_name'])}"
+                f"found to be mapped to FlexMex."
+            )
 
             continue
 
