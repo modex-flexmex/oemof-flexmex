@@ -843,13 +843,13 @@ update_dict = {
 
 def update_scalars(select_components, destination, scalars):
     for component, kwargs in select_components.items():
-        logging.info(f"Updating {component}")
+        logging.info(f"Updating '{component}'")
 
         try:
             function = update_dict[component]
 
         except KeyError:
-            print(f"There is no update function for component {component}!")
+            logging.info(f"No update function defined for '{component}'.")
             continue
 
         if not kwargs:

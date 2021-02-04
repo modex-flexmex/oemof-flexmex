@@ -552,9 +552,11 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
                  select['var_name']), 'var_value']
 
         except KeyError:
-            print(f"Key "
-                  f"{(row['Region'], select['carrier'], select['tech'], select['var_name'])}"
-                  f" not found")
+            logging.info(
+                f"No key "
+                f"{(row['Region'], select['carrier'], select['tech'], select['var_name'])}"
+                f"found to be mapped to FlexMex."
+            )
 
             continue
 
@@ -781,7 +783,8 @@ def get_calculated_parameters(df, oemoflex_scalars, parameter_name, factor):
         oemoflex_scalars['var_name'] == parameter_name].copy()
 
     if calculated_parameters.empty:
-        logging.info("No key '{}' found.".format(parameter_name))
+        logging.info("No key '{}' found as input"
+                     "for postprocessing calculation.".format(parameter_name))
 
     # Make sure that values in columns to merge on are strings
     # See here:
@@ -973,7 +976,7 @@ def save_flexmex_timeseries(sequences_by_tech, scenario, model, year, dir):
         try:
             components_paths = map_output_timeseries[carrier_tech]
         except KeyError:
-            print(f"Entry for {carrier_tech} does not exist in {path_map_output_timeseries}.")
+            logging.info(f"No entry found in {path_map_output_timeseries} for '{carrier_tech}'.")
             continue
 
         idx = pd.IndexSlice
