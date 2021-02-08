@@ -160,3 +160,15 @@ Postprocessing
 
 Postprocessing translates the results into an exchange-friendly format defined by the FlexMex project partners.
 For that, a result template defines the parameters to be output for each scenario.
+The oemoflex-internal parameters are recalculated and mapped to the FlexMex parameter names.
+
+The results template is provided by the FlexMex project partners.
+It consists of an output directory structure and a scaffold Scalars.csv output file (with no values).
+It should be placed in the path::
+
+    flexmex_config/output_template/
+
+The mapping is read from the two CSV files::
+
+    flexmex_config/mapping-output-scalars.csv
+    flexmex_config/mapping-output-timeseries.yml
