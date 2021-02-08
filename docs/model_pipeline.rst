@@ -7,14 +7,14 @@ Model pipeline
 Data processing in oemoflex is divided in 3 main steps:
 
 * preprocessing
-* optimisation
+* optimization
 * postprocessing
 
 The data each step is provided with is held in different forms:
 
 * raw data
 * preprocessed data
-* optimisation results
+* optimization results
 * postprocessed results
 
 .. Todo Simple Diagram?
@@ -123,7 +123,7 @@ Preprocessing
 Preprocessing brings the raw data into the `oemof.tabular format <https://oemof-tabular.readthedocs.io/en/latest/usage.html>`_.
 In this step, scalars belonging to a component are mapped to the components model parameters and saved within an input CSV file.
 Timeseries are attached in a similar way.
-The so formed input data is held in a `datapackage` format comprising a JSON schema file (meta data) and the CSV files containing the actual data.
+The so formed input data is held in a ``datapackage`` format comprising a JSON schema file (meta data) and the CSV files containing the actual data.
 
 The found timeseries are combined into a new set of CSV files, with one file per technology and ``{region code}-{component}-profile`` as column names.
 They are stored in ::
@@ -132,8 +132,8 @@ They are stored in ::
 
 for the optimization step.
 
-Extra parameter
----------------
+Extra parameters
+----------------
 
 tabular supports handing over extra ``output_parameters`` and ``input_parameters`` to the components’ classes.
 These have to be given as ``dict``'s in the corresponding CSV field.
@@ -150,10 +150,10 @@ B) Make the CSV file semicolon-separated and separate the output_parameters and/
 
    See https://github.com/modex-flexmex/oemo-flex/issues/57 for details.
 
-Optimisation
+Optimization
 ============
 
-Optimisation is performed by oemof-solph.
+Optimization is performed by oemof-solph.
 
 Postprocessing
 ==============
