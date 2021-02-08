@@ -33,11 +33,6 @@ electricity-heatpump-small:
     efficiency:
       input-path: OtherProfiles/COP
 
-electricity-heatpump-large:
-  profiles:
-    efficiency:
-      input-path: OtherProfiles/COP
-
 electricity-bev:
   profiles:
     drive_power:
