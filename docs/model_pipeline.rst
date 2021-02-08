@@ -28,6 +28,11 @@ Raw data
 The raw data holds the energy system model definition for all scenarios.
 It consists of a parameter database (parameters are called `scalars`) and a bunch of timeseries (`sequences` or `profiles`).
 
+The data is expected to be CSV-formatted and is read from ``data/In``.
+The format of timeseries and scalars is described below.
+
+.. note:: Raw data for FlexMex is not part of the oemoflex github repository but can be provided by the FlexMex project partners.
+
 Scalars
 -------
 
