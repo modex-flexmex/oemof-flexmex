@@ -6,10 +6,7 @@ from oemoflex.model_structure import create_default_elements
 from oemoflex.parametrization_scalars import update_scalars
 from oemoflex.parametrization_sequences import create_profiles
 from oemoflex.helpers import (
-    setup_experiment_paths, load_scalar_input_data, filter_scalar_input_data,
-    check_if_csv_dirs_equal, load_yaml
-)
-
+    setup_experiment_paths, check_if_csv_dirs_equal, load_yaml, load_scalar_input_data)
 
 if __name__ == '__main__':
     # load scenario specifications
@@ -29,15 +26,7 @@ if __name__ == '__main__':
         for subdir in ['elements', 'sequences']:
             os.makedirs(os.path.join(exp_paths.data_preprocessed, subdir))
 
-    # Load common input parameters
-    scalars = load_scalar_input_data()
-
-    # Filter out only scenario-related input parameters
-    scalars = filter_scalar_input_data(
-        scalars,
-        scenario_select=scenario_specs['scenario_select'],
-        scenario_overwrite=scenario_specs['scenario_overwrite']
-    )
+    scalars = load_scalar_input_data(scenario_specs, exp_paths)
 
     # Prepare oemof.tabular input CSV files
     create_default_elements(

@@ -1,0 +1,35 @@
+scenario: FlexMex2_2b
+
+# Properties:
+#   Dispatch scenario
+#   Full set of technologies
+#   Renewable capacites 2x
+
+year: 2050
+
+components:
+  electricity-shortage:
+  electricity-curtailment:
+  electricity-demand:
+  wind-offshore:
+  wind-onshore:
+  solar-pv:
+  hydro-reservoir:
+  electricity-transmission:
+  electricity-liion_battery:
+  electricity-bev:
+  ch4-gt:
+  ch4-extchp:
+  ch4-boiler-large:
+  electricity-pth:
+  electricity-heatpump-large:
+  heat-storage-large:
+  heat-demand:
+  heat-shortage:
+  heat-excess:
+
+scenario_select:
+  - FlexMex2-2b
+  - ALL
+
+scenario_overwrite:

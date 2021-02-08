@@ -18,7 +18,7 @@ if __name__ == '__main__':
         logfile='oemoflex.log'
     )
 
-    run_postprocessing(scenario_specs['year'], scenario_specs['scenario'], exp_paths)
+    run_postprocessing(scenario_specs, exp_paths)
 
     # compare with previous data
     previous_path = os.path.join(exp_paths.results_postprocessed + '_default')

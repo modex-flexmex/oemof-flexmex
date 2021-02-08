@@ -1060,16 +1060,16 @@ def export_bus_sequences(es, destination):
         value.to_csv(file_path)
 
 
-def run_postprocessing(year, scenario, exp_paths):
+def run_postprocessing(scenario_specs, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = load_scalar_input_data()
+    scalars_raw = load_scalar_input_data(scenario_specs, exp_paths)
 
     # load scalars templates
     flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
     flexmex_scalars_template = flexmex_scalars_template.loc[
-        flexmex_scalars_template['UseCase'] == scenario
+        flexmex_scalars_template['UseCase'] == scenario_specs['scenario']
     ]
 
     # load mapping
@@ -1163,14 +1163,14 @@ def run_postprocessing(year, scenario, exp_paths):
     oemoflex_scalars = map_link_direction(oemoflex_scalars)
 
     # set experiment info
-    oemoflex_scalars['usecase'] = scenario
-    oemoflex_scalars['year'] = year
+    oemoflex_scalars['usecase'] = scenario_specs['scenario']
+    oemoflex_scalars['year'] = scenario_specs['year']
 
     # oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
 
     # map to FlexMex data format
     flexmex_scalar_results = map_to_flexmex_results(
-        oemoflex_scalars, flexmex_scalars_template, mapping, scenario
+        oemoflex_scalars, flexmex_scalars_template, mapping, scenario_specs['scenario']
     )
 
     # save results
@@ -1195,5 +1195,6 @@ def run_postprocessing(year, scenario, exp_paths):
         )
 
     save_flexmex_timeseries(
-        sequences_by_tech, scenario, 'oemof', '2050', exp_paths.results_postprocessed
+        sequences_by_tech, scenario_specs['scenario'], 'oemof', '2050',
+        exp_paths.results_postprocessed
     )
