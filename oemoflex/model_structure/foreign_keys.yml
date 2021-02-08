@@ -42,7 +42,6 @@
 ]
 
 'efficiency': [
-    'electricity-heatpump-large',
     'electricity-heatpump-small',
 ]
 

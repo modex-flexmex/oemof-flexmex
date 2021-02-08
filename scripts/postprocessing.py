@@ -1,5 +1,8 @@
 import os
+import logging
 import sys
+
+from oemof.tools.logger import define_logging
 
 from oemoflex.postprocessing import run_postprocessing
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal, load_yaml
@@ -10,7 +13,12 @@ if __name__ == '__main__':
 
     exp_paths = setup_experiment_paths(scenario_specs['scenario'])
 
-    run_postprocessing(scenario_specs['year'], scenario_specs['scenario'], exp_paths)
+    logpath = define_logging(
+        logpath=exp_paths.results_postprocessed,
+        logfile='oemoflex.log'
+    )
+
+    run_postprocessing(scenario_specs, exp_paths)
 
     # compare with previous data
     previous_path = os.path.join(exp_paths.results_postprocessed + '_default')
@@ -18,4 +26,4 @@ if __name__ == '__main__':
     try:
         check_if_csv_dirs_equal(new_path, previous_path)
     except AssertionError as e:
-        print(e)
+        logging.error(e)

@@ -251,6 +251,10 @@ def update_electricity_heatpump_large(component_df, scalars):
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Large'
     )
 
+    component_df['efficiency'] = get_parameter_values(
+        scalars, 'EnergyConversion_COP_Heat_ElectricityHeat_Large'
+    )
+
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Large') * 1e-3  # Eur/GWh to Eur/MWh
 
@@ -839,13 +843,13 @@ update_dict = {
 
 def update_scalars(select_components, destination, scalars):
     for component, kwargs in select_components.items():
-        logging.info(f"Updating {component}")
+        logging.info(f"Updating '{component}'")
 
         try:
             function = update_dict[component]
 
         except KeyError:
-            print(f"There is no update function for component {component}!")
+            logging.info(f"No update function defined for '{component}'.")
             continue
 
         if not kwargs:
