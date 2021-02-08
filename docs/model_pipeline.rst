@@ -102,6 +102,21 @@ Value: `float`
 Timeseries
 ----------
 
+Timeseries in oemoflex assign a value to every hour of the year (1...8760).
+They are hold in CSV files with time index-value pairs per line and one timeseries per file.
+
+.. warning:: The time index is ignored at the moment. It will be overwritten by a ``pandas`` ``datetimeindex``.
+
+The paths to the timeseries are defined in ``flexmex_config/mapping-input-timeseries.yml`` per component.
+If a component has no timeseries defined here, an info line is added to the log output.
+
+The found filenames are interpreted according to the following pattern::
+
+    {experiment name}_{region code}_{year}.csv
+
+.. note:: ``Experiment name`` and ``year`` are ignored at the moment.
+
+
 Preprocessing
 =============
 
@@ -109,6 +124,13 @@ Preprocessing brings the raw data into the `oemof.tabular format <https://oemof-
 In this step, scalars belonging to a component are mapped to the components model parameters and saved within an input CSV file.
 Timeseries are attached in a similar way.
 The so formed input data is held in a `datapackage` format comprising a JSON schema file (meta data) and the CSV files containing the actual data.
+
+The found timeseries are combined into a new set of CSV files, with one file per technology and ``{region code}-{component}-profile`` as column names.
+They are stored in ::
+
+    results/{scenario name}/001_preprocessed/data/sequences/{technology}_profile.csv
+
+for the optimization step.
 
 Extra parameter
 ---------------
