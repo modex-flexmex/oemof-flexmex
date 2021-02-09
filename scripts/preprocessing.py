@@ -41,6 +41,6 @@ if __name__ == '__main__':
     create_profiles(exp_paths, select_components=scenario_specs['components'])
 
     # compare with previous data
-    previous_path = os.path.join(os.path.split(exp_paths.data_preprocessed)[0] + '_default', 'data')
+    previous_path = exp_paths.data_preprocessed.replace('results', 'defaults')
     new_path = exp_paths.data_preprocessed
     check_if_csv_dirs_equal(new_path, previous_path)

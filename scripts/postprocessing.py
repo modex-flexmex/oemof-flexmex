@@ -1,4 +1,3 @@
-import os
 import logging
 import sys
 
@@ -21,7 +20,7 @@ if __name__ == '__main__':
     run_postprocessing(scenario_specs, exp_paths)
 
     # compare with previous data
-    previous_path = os.path.join(exp_paths.results_postprocessed + '_default')
+    previous_path = exp_paths.results_postprocessed.replace('results', 'defaults')
     new_path = exp_paths.results_postprocessed
     try:
         check_if_csv_dirs_equal(new_path, previous_path)
