@@ -10,20 +10,20 @@ rule all:
     message:
         "Run entire analysis."
     input:
-        "results/{scenario}/postprocessed"
+        "results/{scenario}/003_postprocessed"
 
 
 rule preprocess:
     message:
         "Preprocess input data for scenario {wildcards.scenario}."
     input:
-        "raw"
-        "usecase.yml"
-        "scripts/preprocessing.py"
+        raw="raw",
+        scenario="scenarios/{scenario}.yml",
+        script="scripts/preprocessing.py",  # re-run if updated
     output:
-        "results/{scenario}/preprocessed"
-    script:
-        "scripts/preprocessing.py usecase raw"
+        "results/{scenario}/001_preprocessed"
+    shell:
+        "scripts/preprocessing.py {input.scenario} {input.raw} {output}"
 
 
 rule optimize:
@@ -31,10 +31,10 @@ rule optimize:
         "Optimize scenario {wildcards.scenario}."
     input:
         "results/{scenario}/preprocessed/"
-        "scripts/optimization.py"
+        "scripts/optimization.py"  # re-run if updated
     output:
-        "results/{scenario}/optimized"
-    script:
+        "results/{scenario}/002_optimized"
+    shell:
         "scripts/optimization.py results/{scenario}/preprocessed/"
 
 
@@ -43,10 +43,10 @@ rule postprocess:
         "Postprocess results for scenario {wildcards.scenario}."
     input:
         "results/{scenario}/optimized/"
-        "scripts/postprocessing.py"
+        "scripts/postprocessing.py"  # re-run if updated
     output:
         "results/{scenario}/postprocessed"
-    script:
+    shell:
         "scripts/postprocessing.py results/{scenario}/optimized/"
 
 
@@ -55,10 +55,10 @@ rule join_results:
         "Join results."
     input:
         "results/{scenario}/preprocessed/"
-        "scripts/joining.py"
+        "scripts/joining.py"  # re-run if updated
     output:
         "results/joined"
-    script:
+    shell:
         "scripts/joining.py results/{scenario}/postprocessed/"
 
 
@@ -67,8 +67,8 @@ rule check_against_default:
         "Check against default"
     input:
         "results/{scenario}/{processing_step}/"
-        "scripts/check.py"
-    script:
+        "scripts/check.py"  # re-run if updated
+    shell:
         "scripts/check.py results/{wildcards.scenario}/{wildcards.processing_step}/"
 
 
@@ -79,7 +79,7 @@ rule plot_scenario:
         "results/{scenario}/postprocessed"
     output:
         "results/{scenario}/plotted"
-    script:
+    shell:
         "scripts/plot_scenario.py"
 
 
@@ -90,7 +90,7 @@ rule plot_joined:
         "results/{scenario}/joined"
     output:
         "results/joined_plotted"
-    script:
+    shell:
         "scripts/plot_joined.py"
 
 
