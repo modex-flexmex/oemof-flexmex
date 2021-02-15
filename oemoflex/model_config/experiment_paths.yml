@@ -1,7 +1,7 @@
 paths:
 
   base: ../results
-  data_raw: ../data/In/v0.07
+  data_raw: ../data/In/v0.06
   results_template: ../flexmex_config/output_template/v0.06/Template
 
 scenario_subdirs:
