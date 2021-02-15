@@ -128,7 +128,7 @@ The so formed input data is held in a ``datapackage`` format comprising a JSON s
 The found timeseries are combined into a new set of CSV files, with one file per technology and ``{region code}-{component}-profile`` as column names.
 They are stored in ::
 
-    results/{scenario name}/001_preprocessed/data/sequences/{technology}_profile.csv
+    results/{scenario name}/01_preprocessed/data/sequences/{technology}_profile.csv
 
 for the optimization step.
 

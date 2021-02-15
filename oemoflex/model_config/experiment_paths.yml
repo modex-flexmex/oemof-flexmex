@@ -6,6 +6,6 @@ paths:
 
 scenario_subdirs:
 
-  data_preprocessed: 001_preprocessed
-  results_optimization: 002_optimized
-  results_postprocessed: 003_postprocessed
+  data_preprocessed: 01_preprocessed
+  results_optimization: 02_optimized
+  results_postprocessed: 03_postprocessed
