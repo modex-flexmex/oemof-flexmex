@@ -26,20 +26,42 @@ def get_scalars(dict):
     return scalars
 
 
-def get_component_from_oemof_tuple(oemof_tuple):
+def get_component_id_in_tuple(oemof_tuple):
     if isinstance(oemof_tuple[1], Bus):
-        component = oemof_tuple[0]
+        component_id = 0
 
     elif oemof_tuple[1] is None:
-        component = oemof_tuple[0]
+        component_id = 0
 
     elif oemof_tuple[1] is np.nan:
-        component = oemof_tuple[0]
+        component_id = 0
 
     elif isinstance(oemof_tuple[0], Bus):
-        component = oemof_tuple[1]
+        component_id = 1
+
+    return component_id
+
+
+def get_component_from_oemof_tuple(oemof_tuple):
+
+    component_id = get_component_id_in_tuple(oemof_tuple)
+
+    component = oemof_tuple[component_id]
 
     return component
+
+
+def get_bus_from_oemof_tuple(oemof_tuple):
+    if isinstance(oemof_tuple[0], Bus):
+        bus = oemof_tuple[0]
+
+    elif isinstance(oemof_tuple[1], Bus):
+        bus = oemof_tuple[1]
+
+    else:
+        bus = None
+
+    return bus
 
 
 def filter_series_by_component_attr(df, **kwargs):
@@ -308,6 +330,46 @@ def filter_by_var_name(series, var_name):
     return filtered_series
 
 
+def map_var_names(scalars):
+
+    def map_index(id):
+        component_id = get_component_id_in_tuple((id[0], id[1]))
+
+        component = id[component_id]
+
+        bus = get_bus_from_oemof_tuple((id[0], id[1]))
+
+        carrier = ''
+
+        if bus:
+            carrier = str.split(bus.label, '-')[1]
+
+        in_out = ['in', 'out'][component_id]
+
+        return (component, id[1], f"{id[2]}_{in_out}_{carrier}")
+
+    scalars.index = scalars.index.map(map_index)
+
+    scalars.index = scalars.index.droplevel(1)
+
+    return scalars
+
+
+def add_component_info(scalars):
+
+    scalars.name = 'var_name'
+
+    scalars = pd.DataFrame(scalars)
+
+    scalars['type'] = scalars.index.get_level_values(0).map(lambda x: x.type)
+
+    scalars['carrier'] = scalars.index.get_level_values(0).map(lambda x: x.carrier)
+
+    scalars['tech'] = scalars.index.get_level_values(0).map(lambda x: x.tech)
+
+    return scalars
+
+
 def restore_es(path):
     r"""
     Restore EnergySystem with results
@@ -435,3 +497,9 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     ]
 
     all_scalars = pd.concat(all_scalars, 0)
+
+    all_scalars = map_var_names(all_scalars)
+
+    # all_scalars = set_component_as_index(all_scalars)
+
+    all_scalars = add_component_info(all_scalars)
