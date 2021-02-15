@@ -155,6 +155,8 @@ Optimization
 
 Optimization is performed by oemof-solph.
 
+.. _postprocessing:
+
 Postprocessing
 ==============
 
