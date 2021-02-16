@@ -558,8 +558,10 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     transmission_losses = get_losses(summed_flows_transmission, var_name='transmission_losses')
 
     # Collect existing (exogenous) capacity (units of power) and storage capacity (units of energy)
+    # Keep in mind - this has an index of the form (component, None). It is not attributed to a flow
     capacity = filter_by_var_name(scalar_params, 'capacity')
 
+    # Keep in mind - this has an index of the form (component, None). It is not attributed to a flow
     storage_capacity = filter_by_var_name(scalar_params, 'storage_capacity')
 
     # Collect invested (endogenous) capacity (units of power) and storage capacity (units of energy)
