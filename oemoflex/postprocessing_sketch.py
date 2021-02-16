@@ -116,6 +116,8 @@ def sequences_to_df(dict):
 
     result.columns = pd.MultiIndex.from_tuples(tuples)
 
+    result.columns.names = ('source', 'target', 'var_name')
+
     return result
 
 
@@ -137,6 +139,8 @@ def scalars_to_df(dict):
     tuples = [c for sublist in tuples for c in sublist]
 
     result.index = pd.MultiIndex.from_tuples(tuples)
+
+    result.index.names = ('source', 'target', 'var_name')
 
     return result
 
@@ -170,21 +174,21 @@ def substract_output_from_input(inputs, outputs, var_name):
 
         return _df
 
-    _inputs = reduce_component_index(inputs, 'level_1')
+    _inputs = reduce_component_index(inputs, 'target')
 
-    _outputs = reduce_component_index(outputs, 'level_0')
+    _outputs = reduce_component_index(outputs, 'source')
 
     losses = _inputs - _outputs
 
-    losses.index.name = 'level_0'
+    losses.index.name = 'source'
 
     losses.reset_index(inplace=True)
 
-    losses['level_1'] = np.nan
+    losses['target'] = np.nan
 
-    losses['level_2'] = var_name
+    losses['var_name'] = var_name
 
-    losses.set_index(['level_0', 'level_1', 'level_2'], inplace=True)
+    losses.set_index(['source', 'target', 'var_name'], inplace=True)
 
     losses = losses['var_value']  # Switching back to series.
     # TODO: Use DataFrame or Series more consistently.
@@ -274,7 +278,7 @@ def get_summed_variable_costs(summed_flows, scalar_params):
 
     summed_variable_costs = set_index_level(
         summed_variable_costs,
-        level='level_2',
+        level='var_name',
         value='summed_variable_costs'
     )
 
@@ -301,7 +305,7 @@ def set_index_level(series, level, value):
     series : pd.Series
         Series with level set to value or appended level with value.
     """
-    level_names = [f"level_{i}" for i in range(len(series.index.names))]
+    level_names = list(series.index.names)
 
     series.index.names = level_names
 
@@ -357,7 +361,7 @@ def map_var_names(scalars):
 
 def add_component_info(scalars):
 
-    scalars.name = 'var_name'
+    scalars.name = 'var_value'
 
     scalars = pd.DataFrame(scalars)
 
@@ -464,7 +468,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     summed_emissions = set_index_level(
         summed_emissions,
-        level='level_2',
+        level='var_name',
         value='summed_emissions'
     )
 
@@ -475,7 +479,7 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     summed_emission_costs = set_index_level(
         summed_emission_costs,
-        level='level_2',
+        level='var_name',
         value='summed_emission_costs'
     )
 
