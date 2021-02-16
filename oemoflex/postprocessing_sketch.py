@@ -1,4 +1,5 @@
 import copy
+import os
 
 import numpy as np
 import pandas as pd
@@ -356,6 +357,8 @@ def map_var_names(scalars):
 
     scalars.index = scalars.index.droplevel(1)
 
+    scalars.index.names = ('name', 'var_name')
+
     return scalars
 
 
@@ -372,6 +375,39 @@ def add_component_info(scalars):
     scalars['tech'] = scalars.index.get_level_values(0).map(lambda x: x.tech)
 
     return scalars
+
+
+def group_by_element(scalars):
+    elements = {}
+    for group, df in scalars.groupby(['carrier', 'tech']):
+        name = '-'.join(group)
+
+        df = df.reset_index()
+
+        df = df.pivot(
+            index=['name', 'type', 'carrier', 'tech'],
+            columns='var_name',
+            values='var_value'
+        )
+
+        elements[name] = df
+
+    return elements
+
+
+def save_dataframes_to(dict, destination):
+    r"""
+    Saves a dictionary containing pandas.DataFrames to
+    destination. The keys of the dictionary are used
+    as the filenames.
+    """
+    if not os.path.exists(destination):
+        os.makedirs(destination)
+
+    for key, value in dict.items():
+        path = os.path.join(destination, key + '.csv')
+
+        value.to_csv(path)
 
 
 def restore_es(path):
@@ -507,3 +543,9 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
     # all_scalars = set_component_as_index(all_scalars)
 
     all_scalars = add_component_info(all_scalars)
+
+    elements = group_by_element(all_scalars)
+
+    all_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'scalars.csv'))
+
+    save_dataframes_to(elements, os.path.join(exp_paths.results_postprocessed, 'elements'))
