@@ -17,7 +17,7 @@ rule preprocess:
     message:
         "Preprocess input data for scenario {wildcards.scenario}."
     input:
-        raw="raw",
+        raw="data/In/v0.06",
         scenario="scenarios/{scenario}.yml",
         script="scripts/preprocessing.py",  # re-run if updated
     output:
