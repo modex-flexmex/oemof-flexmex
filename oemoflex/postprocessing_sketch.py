@@ -10,7 +10,19 @@ from oemoflex.postprocessing import create_postprocessed_results_subdirs
 
 
 def get_sequences(dict):
+    r"""
+    Gets sequences from oemof.solph's parameter or results dictionary.
 
+    Parameters
+    ----------
+    dict : dict
+        oemof.solph's parameter or results dictionary
+
+    Returns
+    -------
+    seq : dict
+        dictionary containing sequences.
+    """
     _dict = copy.deepcopy(dict)
 
     seq = {key: value['sequences'] for key, value in _dict.items() if 'sequences' in value}
@@ -19,7 +31,19 @@ def get_sequences(dict):
 
 
 def get_scalars(dict):
+    r"""
+    Gets scalars from oemof.solph's parameter or results dictionary.
 
+    Parameters
+    ----------
+    dict : dict
+        oemof.solph's parameter or results dictionary
+
+    Returns
+    -------
+    seq : dict
+        dictionary containing scalars.
+    """
     _dict = copy.deepcopy(dict)
 
     scalars = {key: value['scalars'] for key, value in _dict.items() if 'scalars' in value}
@@ -28,6 +52,21 @@ def get_scalars(dict):
 
 
 def get_component_id_in_tuple(oemof_tuple):
+    r"""
+    Returns the id of the component in an oemof tuple.
+    If the component is first in the tuple, will return 0,
+    if it is second, 1.
+
+    Parameters
+    ----------
+    oemof_tuple : tuple
+        tuple of the form (node, node) or (node, None).
+
+    Returns
+    -------
+    component_id : int
+        Position of the component in the tuple
+    """
     if isinstance(oemof_tuple[1], Bus):
         component_id = 0
 
@@ -44,7 +83,17 @@ def get_component_id_in_tuple(oemof_tuple):
 
 
 def get_component_from_oemof_tuple(oemof_tuple):
+    r"""
+    Gets the component from an oemof_tuple.
 
+    Parameters
+    ----------
+    oemof_tuple : tuple
+
+    Returns
+    -------
+    component : oemof.solph component
+    """
     component_id = get_component_id_in_tuple(oemof_tuple)
 
     component = oemof_tuple[component_id]
@@ -53,6 +102,17 @@ def get_component_from_oemof_tuple(oemof_tuple):
 
 
 def get_bus_from_oemof_tuple(oemof_tuple):
+    r"""
+    Gets the bus from an oemof_tuple.
+
+    Parameters
+    ----------
+    oemof_tuple : tuple
+
+    Returns
+    -------
+    bus : oemof.solph bus
+    """
     if isinstance(oemof_tuple[0], Bus):
         bus = oemof_tuple[0]
 
@@ -66,7 +126,21 @@ def get_bus_from_oemof_tuple(oemof_tuple):
 
 
 def filter_series_by_component_attr(df, **kwargs):
+    r"""
+    Filter a series by components attributes.
 
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame with oemof_tuple as index.
+
+    kwargs : keyword arguments
+        One or more component attributes
+
+    Returns
+    -------
+    filtered_df : pd.DataFrame
+    """
     filtered_index = []
     for id in df.index:
         component = get_component_from_oemof_tuple(id[:2])
@@ -84,7 +158,10 @@ def filter_series_by_component_attr(df, **kwargs):
 
 
 def get_inputs(series):
-
+    r"""
+    Gets those entries of an oemof_tuple indexed DataFrame
+    where the component is the target.
+    """
     input_ids = [id for id in series.index if isinstance(id[0], Bus)]
 
     inputs = series.loc[input_ids]
@@ -93,7 +170,10 @@ def get_inputs(series):
 
 
 def get_outputs(series):
-
+    r"""
+    Gets those entries of an oemof_tuple indexed DataFrame
+    where the component is the source.
+    """
     output_ids = [id for id in series.index if isinstance(id[1], Bus)]
 
     outputs = series.loc[output_ids]
@@ -102,7 +182,10 @@ def get_outputs(series):
 
 
 def sequences_to_df(dict):
-
+    r"""
+    Converts sequences dictionary to a multi-indexed
+    DataFrame.
+    """
     result = pd.concat(dict.values(), 1)
 
     # adapted from oemof.solph.views' node() function
@@ -123,7 +206,10 @@ def sequences_to_df(dict):
 
 
 def scalars_to_df(dict):
-
+    r"""
+    Converts scalars dictionary to a multi-indexed
+    DataFrame.
+    """
     result = pd.concat(dict.values(), 0)
 
     if result.empty:
@@ -147,7 +233,10 @@ def scalars_to_df(dict):
 
 
 def sum_flows(df):
-
+    r"""
+    Takes a multi-indexed DataFrame and returns the sum of
+    the flows.
+    """
     is_flow = df.columns.get_level_values(2) == 'flow'
 
     df = df.loc[:, is_flow]
@@ -158,7 +247,9 @@ def sum_flows(df):
 
 
 def substract_output_from_input(inputs, outputs, var_name):
-
+    r"""
+    Calculates the differences of output from input.
+    """
     def reduce_component_index(series, level):
 
         _series = series.copy()
@@ -199,15 +290,8 @@ def substract_output_from_input(inputs, outputs, var_name):
 
 def get_losses(summed_flows, var_name):
     r"""
-
-
-    Parameters
-    ----------
-    results
-
-    Returns
-    -------
-
+    Calculate losses within components as the difference of summed input
+    to output.
     """
     inputs = get_inputs(summed_flows)
 
@@ -251,6 +335,10 @@ def reindex_series_on_index(series, index_b):
 
 
 def multiply_var_with_param(var, param):
+    r"""
+    Multiplies a variable (a result from oemof) with a
+    parameter.
+    """
     param = reindex_series_on_index(param, var.index)
 
     result = param * var
