@@ -18,12 +18,12 @@ rule preprocess:
         "Preprocess input data for scenario {wildcards.scenario}."
     input:
         raw="data/In/v0.06",
-        scenario="scenarios/{scenario}.yml",
+        scenario_yml="scenarios/{scenario}.yml",
         script="scripts/preprocessing.py",  # re-run if updated
     output:
         directory("results/{scenario}/01_preprocessed")
     shell:
-        "scripts/preprocessing.py {input.scenario} {input.raw} {output}"
+        "scripts/preprocessing.py {input.scenario_yml} {input.raw} {output}"
 
 
 rule optimize:
