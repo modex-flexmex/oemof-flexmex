@@ -36,6 +36,12 @@ def map_to_flexmex_results(
         flexmex_scalars_template['UseCase'] == scenario,
     ]
 
+    # set correct index for mapping
+    # TODO: Decide if this can be done outside of this function.
+    oemoflex_scalars = oemoflex_scalars.reset_index()
+
+    oemoflex_scalars = oemoflex_scalars.set_index(['region', 'carrier', 'tech', 'var_name'])
+
     # oemoflex_scalars.loc[oemoflex_scalars['var_unit'] == 'MWh', 'var_value'] *= 1e-3  # MWh to GWh
 
     for i, row in flexmex_scalars.loc[flexmex_scalars['UseCase'] == scenario].iterrows():

@@ -481,6 +481,8 @@ def add_component_info(scalars):
 
     scalars = pd.DataFrame(scalars)
 
+    scalars['region'] = scalars.index.get_level_values(0).map(lambda x: x.region)
+
     scalars['type'] = scalars.index.get_level_values(0).map(lambda x: x.type)
 
     scalars['carrier'] = scalars.index.get_level_values(0).map(lambda x: x.carrier)
