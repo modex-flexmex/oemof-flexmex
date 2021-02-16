@@ -8,7 +8,7 @@ from pandas.testing import assert_frame_equal
 import yaml
 
 
-MODEL_CONFIG = 'model_config'
+MODEL_CONFIG_YAML = 'model_config/experiment_paths.yml'
 
 
 def load_yaml(file_path):
@@ -18,13 +18,14 @@ def load_yaml(file_path):
     return yaml_data
 
 
-def get_experiment_paths():
+def setup_experiment_paths(scenario):
     r"""
+    Gets the experiment paths for a given experiment. If they do not exist, they are created.
 
     Parameters
     ----------
-    basepath : str
-        Path to experiment's root
+    scenario : str
+        Name of the scenario.
 
     Returns
     -------
@@ -33,96 +34,149 @@ def get_experiment_paths():
 
     """
     module_path = os.path.abspath(os.path.dirname(__file__))
-    path_config = os.path.join(module_path, MODEL_CONFIG, 'experiment_paths.yml')
+    config_path = os.path.join(module_path, MODEL_CONFIG_YAML)
 
-    with open(path_config, 'r') as config_file:
+    with open(config_path, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
-    # Use base path to make other paths absolute and drop it
-    basepath = os.path.realpath(os.path.join(module_path, config.pop('base')))
+    experiment_paths = Dict()
 
-    experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
+    # Use module path to make all paths absolute
+    for k, v in config['paths'].items():
+        experiment_paths[k] = os.path.realpath(os.path.join(module_path, v))
 
-    experiment_paths = Dict(experiment_paths)
+    # Use scenario name to get scenario subdirs
+    for k, v in config['scenario_subdirs'].items():
+        experiment_paths[k] = os.path.realpath(os.path.join(experiment_paths['base'], scenario, v))
+
+        if not os.path.exists(experiment_paths[k]):
+            os.makedirs(experiment_paths[k])
 
     return experiment_paths
 
 
-def add_scenario_paths(experiment_paths, scenario):
+def read_csv_file(filepath):
     r"""
-    Add scenario name to several paths.
+    Reads a CSV file into a DataFrame. Considers some codes for NA values.
 
-    NOTE: Can be dropped as soon as directory structure is reordered.
+    (FlexMex-specific function)
 
     Parameters
     ----------
-    experiment_paths : addict.Dict
-        experiment paths
-
-    scenario : str
-        Name of the scenario
+    filepath : str
+        Path to the CSV file
 
     Returns
     -------
-    experiment_paths : addict.Dict
-        Dictionary containing the experiment's path structure
+    DataFrame
     """
 
-    experiment_paths['data_preprocessed'] = os.path.join(
-        experiment_paths['data_preprocessed'], scenario)
-
-    experiment_paths['results_optimization'] = os.path.join(
-        experiment_paths['results_optimization'], scenario)
-
-    experiment_paths['results_postprocessed'] = os.path.join(
-        experiment_paths['results_postprocessed'], scenario)
-
-    return experiment_paths
-
-
-def setup_experiment_paths(scenario):
-    r"""
-    Gets the experiment paths for a given experiment and
-    a basepath. If they do not exist, they are created.
-
-    Parameters
-    ----------
-    scenario : str
-        Name of the scenario.
-
-    basepath : path
-        basepath of the experiment paths.
-
-    Returns
-    -------
-    experiment_paths : dict
-        Dictionary listing all experiment paths
-    """
-    experiment_paths = get_experiment_paths()
-    experiment_paths = add_scenario_paths(experiment_paths, scenario)
-
-    for path in experiment_paths.values():
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-    return experiment_paths
-
-
-def load_scalar_input_data():
-
-    exp_paths = get_experiment_paths()
-
-    scalars = pd.read_csv(
-        os.path.join(exp_paths['data_raw'], 'Scalars.csv'),
+    dataframe = pd.read_csv(
+        filepath,
         header=0,
         na_values=['not considered', 'no value'],
         sep=',',
+        encoding='unicode_escape'  # for TimeSeries.csv (ISO-8859-1 encoded)
     )
 
-    return scalars
+    return dataframe
+
+
+def read_scalar_input_data(path_to_dir, experiment_name, identifier_columns=None):
+    r"""
+    Reads all CSV files resembling a Scalars.csv file and concatenates them into a DataFrame.
+    No check for duplicates.
+
+    (FlexMex-specific function)
+
+    Parameters
+    ----------
+    path : str
+        Path to the CSV-file-containing directory.
+
+    experiment_name : str
+        File name part to pre-filter the files (e.g. 'FlexMex1' or 'FlexMex2')
+        TODO: Necessary as long as FlexMex "Data_In" contains two versions of Scalars.csv
+
+    identifier_columns : str
+        List of column names to filter the proper type of CSV file
+
+    Returns
+    -------
+    DataFrame
+    """
+
+    if identifier_columns is None:
+        identifier_columns = ['Scenario', 'Region', 'Year', 'Parameter', 'Unit', 'Value']
+
+    def is_scalars_data(df):
+        r"""
+        Checks if 'df' has a number of indentifier columns that show it as a
+        FlexMex Scalars.csv input file.
+        """
+        return set(identifier_columns).issubset(df.columns)
+
+    scalars_df = pd.DataFrame()
+
+    for filepath in find_csv_filenames(path_to_dir, pattern=experiment_name):
+        next_csv_df = read_csv_file(filepath)
+        if is_scalars_data(next_csv_df):
+            scalars_df = pd.concat([scalars_df, next_csv_df])
+
+    return scalars_df
+
+
+def find_csv_filenames(path_to_dir, pattern, suffix=".csv"):
+    r"""
+    Reads all CSV (or other) files in a directory (non-recursive)
+
+    TODO: 'pattern' necessary as long as FlexMex "Data_In" contains two versions of Scalars.csv
+    """
+    filenames = os.listdir(path_to_dir)
+
+    csv_filepaths = []
+    for filename in filenames:
+        if filename.endswith(suffix) and pattern in filename:
+            csv_filepaths.append(os.path.join(path_to_dir, filename))
+
+    return csv_filepaths
+
+
+def has_duplicates(df, columns):
+    r"""
+    Checks DataFrame for duplicates in a given column subset.
+    """
+    duplicates = df.duplicated(columns)
+
+    if any(duplicates):
+        return True
+
+    return False
 
 
 def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
+    r"""
+    Updates Scalars.csv DataFrame to contain only scenario-specific values of parameters.
+
+    Needed to properly process Scalars.csv rows starting with something like 'FlexMex1UC2'.
+
+    (FlexMex-specific function)
+
+    Parameters
+    ----------
+    scalars_in : pandas.DataFrame
+        Scalars.csv DataFrame from input data
+
+    scenario_select : list of str
+        'Scenario' values of parameters to keep, drop everything else
+
+    scenario_overwrite : list of str
+        'Scenario' values who's parameter values will overwrite those in 'scenario_select'
+
+    Returns
+    -------
+    Scalars.csv DataFrame
+    """
 
     scalars = scalars_in.copy()
 
@@ -145,6 +199,45 @@ def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
 
     # Restore column order
     scalars = scalars[columns]
+
+    return scalars
+
+
+def load_scalar_input_data(scenario_specs, exp_paths):
+    r"""
+    Reads, filters and checks FlexMex Scalars.csv input data
+
+    (FlexMex-specific function)
+
+    Parameters
+    ----------
+    scenario_specs : dict
+        Special dict with scenario settings
+
+    exp_paths : dict
+        Special dict of paths
+
+    Returns
+    -------
+    Scalars.csv DataFrame
+    """
+
+    # Get experiment name - necessary as long as "Data_In" contains two versions of Scalars.csv
+    experiment_name = scenario_specs['scenario'].split('_')[0]
+
+    # Load common input parameters
+    scalars = read_scalar_input_data(exp_paths.data_raw, experiment_name)
+
+    # Filter out only scenario-related input parameters
+    scalars = filter_scalar_input_data(
+        scalars,
+        scenario_select=scenario_specs['scenario_select'],
+        scenario_overwrite=scenario_specs['scenario_overwrite']
+    )
+
+    # After filtering there musn't be any duplicates left.
+    if has_duplicates(scalars, ['Scenario', 'Region', 'Parameter']):
+        raise ValueError('Found duplicates in Scalars data. Check input data and filtering.')
 
     return scalars
 
