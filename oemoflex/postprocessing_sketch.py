@@ -665,6 +665,12 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     all_scalars = sort_scalars(all_scalars)
 
+    # Set index to string
+    # TODO: Check if this can be done far earlier, also for performance reasons.
+    # TODO: To do so, the information drawn from the components in add_component_info has
+    # TODO: to be provided differently.
+    all_scalars.index = all_scalars.index.map(lambda x: (x[0].label, x[1]))
+
     elements = group_by_element(all_scalars)
 
     all_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'scalars.csv'))
