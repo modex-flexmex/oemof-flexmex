@@ -442,7 +442,7 @@ def map_var_names(scalars):
     def get_in_out(id, component_id):
 
         if not id[1] is np.nan:
-            in_out = ['in', 'out'][component_id]
+            in_out = ['out', 'in'][component_id]
 
             return in_out
 
