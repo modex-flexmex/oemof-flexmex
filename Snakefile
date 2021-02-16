@@ -15,7 +15,7 @@ rule all:
 
 rule preprocess:
     message:
-        "Preprocess input data for scenario {wildcards.scenario}."
+        "Preprocess input data for scenario '{wildcards.scenario}'."
     input:
         raw="data/In/v0.06",
         scenario_yml="scenarios/{scenario}.yml",
@@ -23,7 +23,9 @@ rule preprocess:
     output:
         directory("results/{scenario}/01_preprocessed")
     shell:
-        "scripts/preprocessing.py {input.scenario_yml} {input.raw} {output}"
+        "python --version & "
+        "echo \"Virtualenv:\" $VIRTUAL_ENV &"
+        "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output}"
 
 
 rule optimize:
