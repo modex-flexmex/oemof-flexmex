@@ -21,7 +21,7 @@ rule preprocess:
         scenario="scenarios/{scenario}.yml",
         script="scripts/preprocessing.py",  # re-run if updated
     output:
-        "results/{scenario}/01_preprocessed"
+        directory("results/{scenario}/01_preprocessed")
     shell:
         "scripts/preprocessing.py {input.scenario} {input.raw} {output}"
 
