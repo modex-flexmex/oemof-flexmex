@@ -395,6 +395,13 @@ def group_by_element(scalars):
     return elements
 
 
+def sort_scalars(scalars):
+
+    scalars = scalars.sort_values(by=['carrier', 'tech', 'var_name'])
+
+    return scalars
+
+
 def save_dataframes_to(dict, destination):
     r"""
     Saves a dictionary containing pandas.DataFrames to
@@ -540,9 +547,9 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     all_scalars = map_var_names(all_scalars)
 
-    # all_scalars = set_component_as_index(all_scalars)
-
     all_scalars = add_component_info(all_scalars)
+
+    all_scalars = sort_scalars(all_scalars)
 
     elements = group_by_element(all_scalars)
 
