@@ -203,7 +203,7 @@ def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
     return scalars
 
 
-def load_scalar_input_data(scenario_specs, exp_paths):
+def load_scalar_input_data(scenario_specs, path_to_input_data):
     r"""
     Reads, filters and checks FlexMex Scalars.csv input data
 
@@ -214,8 +214,8 @@ def load_scalar_input_data(scenario_specs, exp_paths):
     scenario_specs : dict
         Special dict with scenario settings
 
-    exp_paths : dict
-        Special dict of paths
+    path_to_input_data : str
+        Path to scalar input data
 
     Returns
     -------
@@ -226,7 +226,7 @@ def load_scalar_input_data(scenario_specs, exp_paths):
     experiment_name = scenario_specs['scenario'].split('_')[0]
 
     # Load common input parameters
-    scalars = read_scalar_input_data(exp_paths.data_raw, experiment_name)
+    scalars = read_scalar_input_data(path_to_input_data, experiment_name)
 
     # Filter out only scenario-related input parameters
     scalars = filter_scalar_input_data(

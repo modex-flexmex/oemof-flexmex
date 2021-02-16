@@ -26,7 +26,7 @@ if __name__ == '__main__':
         for subdir in ['elements', 'sequences']:
             os.makedirs(os.path.join(exp_paths.data_preprocessed, subdir))
 
-    scalars = load_scalar_input_data(scenario_specs, exp_paths)
+    scalars = load_scalar_input_data(scenario_specs, exp_paths.data_raw)
 
     # Prepare oemof.tabular input CSV files
     create_default_elements(
