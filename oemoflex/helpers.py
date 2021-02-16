@@ -8,7 +8,7 @@ from pandas.testing import assert_frame_equal
 import yaml
 
 
-MODEL_CONFIG = 'model_config'
+MODEL_CONFIG_YAML = 'model_config/experiment_paths.yml'
 
 
 def load_yaml(file_path):
@@ -18,13 +18,14 @@ def load_yaml(file_path):
     return yaml_data
 
 
-def get_experiment_paths():
+def setup_experiment_paths(scenario):
     r"""
+    Gets the experiment paths for a given experiment. If they do not exist, they are created.
 
     Parameters
     ----------
-    basepath : str
-        Path to experiment's root
+    scenario : str
+        Name of the scenario.
 
     Returns
     -------
@@ -33,77 +34,23 @@ def get_experiment_paths():
 
     """
     module_path = os.path.abspath(os.path.dirname(__file__))
-    path_config = os.path.join(module_path, MODEL_CONFIG, 'experiment_paths.yml')
+    config_path = os.path.join(module_path, MODEL_CONFIG_YAML)
 
-    with open(path_config, 'r') as config_file:
+    with open(config_path, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
-    # Use base path to make other paths absolute and drop it
-    basepath = os.path.realpath(os.path.join(module_path, config.pop('base')))
+    experiment_paths = Dict()
 
-    experiment_paths = {k: os.path.join(basepath, v) for k, v in config.items()}
+    # Use module path to make all paths absolute
+    for k, v in config['paths'].items():
+        experiment_paths[k] = os.path.realpath(os.path.join(module_path, v))
 
-    experiment_paths = Dict(experiment_paths)
+    # Use scenario name to get scenario subdirs
+    for k, v in config['scenario_subdirs'].items():
+        experiment_paths[k] = os.path.realpath(os.path.join(experiment_paths['base'], scenario, v))
 
-    return experiment_paths
-
-
-def add_scenario_paths(experiment_paths, scenario):
-    r"""
-    Add scenario name to several paths.
-
-    NOTE: Can be dropped as soon as directory structure is reordered.
-
-    Parameters
-    ----------
-    experiment_paths : addict.Dict
-        experiment paths
-
-    scenario : str
-        Name of the scenario
-
-    Returns
-    -------
-    experiment_paths : addict.Dict
-        Dictionary containing the experiment's path structure
-    """
-
-    experiment_paths['data_preprocessed'] = os.path.join(
-        experiment_paths['data_preprocessed'], scenario)
-
-    experiment_paths['results_optimization'] = os.path.join(
-        experiment_paths['results_optimization'], scenario)
-
-    experiment_paths['results_postprocessed'] = os.path.join(
-        experiment_paths['results_postprocessed'], scenario)
-
-    return experiment_paths
-
-
-def setup_experiment_paths(scenario):
-    r"""
-    Gets the experiment paths for a given experiment and
-    a basepath. If they do not exist, they are created.
-
-    Parameters
-    ----------
-    scenario : str
-        Name of the scenario.
-
-    basepath : path
-        basepath of the experiment paths.
-
-    Returns
-    -------
-    experiment_paths : dict
-        Dictionary listing all experiment paths
-    """
-    experiment_paths = get_experiment_paths()
-    experiment_paths = add_scenario_paths(experiment_paths, scenario)
-
-    for path in experiment_paths.values():
-        if not os.path.exists(path):
-            os.makedirs(path)
+        if not os.path.exists(experiment_paths[k]):
+            os.makedirs(experiment_paths[k])
 
     return experiment_paths
 
