@@ -425,21 +425,45 @@ def filter_by_var_name(series, var_name):
 
 def map_var_names(scalars):
 
-    def map_index(id):
+    def get_component_id(id):
+
         component_id = get_component_id_in_tuple((id[0], id[1]))
 
-        component = id[component_id]
+        return component_id
 
+    def get_carrier(id):
         bus = get_bus_from_oemof_tuple((id[0], id[1]))
-
-        carrier = ''
 
         if bus:
             carrier = str.split(bus.label, '-')[1]
 
-        in_out = ['in', 'out'][component_id]
+            return carrier
 
-        return (component, id[1], f"{id[2]}_{in_out}_{carrier}")
+    def get_in_out(id, component_id):
+
+        if not id[1] is np.nan:
+            in_out = ['in', 'out'][component_id]
+
+            return in_out
+
+    def map_index(id):
+        component_id = get_component_id(id)
+
+        component = id[component_id]
+
+        carrier = get_carrier(id)
+
+        in_out = get_in_out(id, component_id)
+
+        var_name = [id[2], in_out, carrier]
+        print(var_name)
+        var_name = [item for item in var_name if item is not None]
+
+        var_name = '_'.join(var_name)
+
+        index = (component, None, var_name)
+
+        return index
 
     scalars.index = scalars.index.map(map_index)
 
