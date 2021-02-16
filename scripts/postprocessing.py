@@ -3,7 +3,7 @@ import sys
 
 from oemof.tools.logger import define_logging
 
-from oemoflex.postprocessing import run_postprocessing
+from oemoflex.postprocessing_sketch import run_postprocessing_sketch
 from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal, load_yaml
 
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
         logfile='oemoflex.log'
     )
 
-    run_postprocessing(scenario_specs, exp_paths)
+    run_postprocessing_sketch(2020, scenario_specs['scenario'], exp_paths)
 
     # compare with previous data
     previous_path = exp_paths.results_postprocessed.replace('results', 'defaults')

@@ -7,6 +7,7 @@ import pandas as pd
 from oemof.solph import Bus, EnergySystem
 
 from oemoflex.postprocessing import create_postprocessed_results_subdirs
+from oemoflex.mapping_flexmex_results import map_to_flexmex_results
 
 
 def get_sequences(dict):
@@ -456,7 +457,7 @@ def map_var_names(scalars):
         in_out = get_in_out(id, component_id)
 
         var_name = [id[2], in_out, carrier]
-        print(var_name)
+
         var_name = [item for item in var_name if item is not None]
 
         var_name = '_'.join(var_name)
@@ -673,6 +674,10 @@ def run_postprocessing_sketch(year, scenario, exp_paths):
 
     elements = group_by_element(all_scalars)
 
-    all_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'scalars.csv'))
+    flexmex_scalars = map_to_flexmex_results(all_scalars, scenario)
+
+    flexmex_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'flexmex_scalars.csv'))
+
+    all_scalars.to_csv(os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'))
 
     save_dataframes_to(elements, os.path.join(exp_paths.results_postprocessed, 'elements'))
