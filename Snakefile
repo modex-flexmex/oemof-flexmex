@@ -10,7 +10,7 @@ rule all:
     message:
         "Run entire analysis."
     input:
-        "results/{scenario}/003_postprocessed"
+        "results/{scenario}/03_postprocessed"
 
 
 rule preprocess:
@@ -21,7 +21,7 @@ rule preprocess:
         scenario="scenarios/{scenario}.yml",
         script="scripts/preprocessing.py",  # re-run if updated
     output:
-        "results/{scenario}/001_preprocessed"
+        "results/{scenario}/01_preprocessed"
     shell:
         "scripts/preprocessing.py {input.scenario} {input.raw} {output}"
 
@@ -30,10 +30,10 @@ rule optimize:
     message:
         "Optimize scenario {wildcards.scenario}."
     input:
-        "results/{scenario}/preprocessed/"
+        "results/{scenario}/01_preprocessed/"
         "scripts/optimization.py"  # re-run if updated
     output:
-        "results/{scenario}/002_optimized"
+        "results/{scenario}/02_optimized"
     shell:
         "scripts/optimization.py results/{scenario}/preprocessed/"
 
@@ -42,10 +42,10 @@ rule postprocess:
     message:
         "Postprocess results for scenario {wildcards.scenario}."
     input:
-        "results/{scenario}/optimized/"
+        "results/{scenario}/02_optimized/"
         "scripts/postprocessing.py"  # re-run if updated
     output:
-        "results/{scenario}/postprocessed"
+        "results/{scenario}/03_postprocessed"
     shell:
         "scripts/postprocessing.py results/{scenario}/optimized/"
 
@@ -54,12 +54,12 @@ rule join_results:
     message:
         "Join results."
     input:
-        "results/{scenario}/preprocessed/"
+        "results/{scenario}/01_preprocessed/"
         "scripts/joining.py"  # re-run if updated
     output:
         "results/joined"
     shell:
-        "scripts/joining.py results/{scenario}/postprocessed/"
+        "scripts/joining.py results/{scenario}/03_postprocessed/"
 
 
 rule check_against_default:
@@ -76,7 +76,7 @@ rule plot_scenario:
     message:
         "Plot scenario {wildcards.scenario}."
     input:
-        "results/{scenario}/postprocessed"
+        "results/{scenario}/03_postprocessed"
     output:
         "results/{scenario}/plotted"
     shell:
