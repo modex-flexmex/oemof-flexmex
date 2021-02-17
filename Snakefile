@@ -4,10 +4,12 @@ scenario_yml = "scenarios/{scenario}.yml"
 
 raw = "data/In/v0.06"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
-preprocessed_data = "results/{scenario}/01_preprocessed/data"
-inferred_datapackage = "results/{scenario}/01_preprocessed/datapackage.json"
-optimized = ""
+optimized = "results/{scenario}/02_optimized"
 postprocessed = ""
+
+# Set oemof.tabular sub-paths
+preprocessed_data = preprocessed_dir + "/data"
+inferred_datapackage = preprocessed_dir + "/datapackage.json"
 
 
 rule all:
