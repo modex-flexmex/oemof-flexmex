@@ -37,14 +37,15 @@ rule infer:
         "Infer meta-data from preprcoessed data for scenario '{wildcards.scenario}'."
     input:
         preprocessed_data,  # for monitoring only
-        # tabular's infer_metadata() expects the datapackage base dir as input:
-        preprocessed_dir=preprocessed_dir,
         scenario_yml=scenario_yml,
         script="scripts/infer.py",  # re-run if updated
     output:
         inferred_datapackage
+    params:
+        # tabular's infer_metadata() expects the datapackage base dir as input:
+        preprocessed_dir=preprocessed_dir,
     shell:
-        "python scripts/infer.py {input.scenario_yml} {input.preprocessed_dir}"
+        "python scripts/infer.py {input.scenario_yml} {params.preprocessed_dir}"
 
 
 rule optimize:
