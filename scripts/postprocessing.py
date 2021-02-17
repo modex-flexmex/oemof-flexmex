@@ -34,4 +34,4 @@ if __name__ == '__main__':
     try:
         check_if_csv_dirs_equal(new_path, previous_path)
     except AssertionError as e:
-        logging.error(e)
+        logging.warning(e)

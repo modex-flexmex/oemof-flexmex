@@ -1,4 +1,5 @@
 import os
+import logging
 import sys
 
 from oemof.tools.logger import define_logging
@@ -47,4 +48,7 @@ if __name__ == '__main__':
     # compare with previous data
     previous_path = preprocessed_output_path.replace('results', 'defaults')
     new_path = preprocessed_output_path
-    check_if_csv_dirs_equal(new_path, previous_path)
+    try:
+        check_if_csv_dirs_equal(new_path, previous_path)
+    except AssertionError as e:
+        logging.warning(e)
