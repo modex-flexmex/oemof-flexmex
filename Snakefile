@@ -5,7 +5,9 @@ scenario_yml = "scenarios/{scenario}.yml"
 raw = "data/In/v0.06"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized = "results/{scenario}/02_optimized"
-postprocessed = ""
+postprocessed = "results/{scenario}/03_postprocessed"
+
+results_template = "flexmex_config/output_template/v0.06/Template"
 
 # Set oemof.tabular sub-paths
 preprocessed_data = preprocessed_dir + "/data"
@@ -69,14 +71,25 @@ rule optimize:
 
 rule postprocess:
     message:
-        "Postprocess results for scenario {wildcards.scenario}."
+        "Postprocess results for scenario '{wildcards.scenario}'."
     input:
-        "results/{scenario}/02_optimized/"
-        "scripts/postprocessing.py"  # re-run if updated
+        preprocessed_data,  # for monitoring only
+        scenario_yml=scenario_yml,
+        optimized=optimized,
+        results_template=results_template,
+        script="scripts/postprocessing.py"  # re-run if updated
     output:
-        "results/{scenario}/03_postprocessed"
+        directory(postprocessed)
+    params:
+        # Not necessarily as input, whole pipeline must be re-run anyway if this changes:
+        raw=raw,
+        # postprocessing load_elements() expects the datapackage base dir as input:
+        preprocessed_dir=preprocessed_dir,
     shell:
-        "scripts/postprocessing.py results/{scenario}/optimized/"
+        "python scripts/postprocessing.py {input.scenario_yml}"
+        " {params.raw} {params.preprocessed_dir}"
+        " {input.optimized} {input.results_template}"
+        " {output}"
 
 
 rule join_results:
