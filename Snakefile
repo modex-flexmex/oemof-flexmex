@@ -31,8 +31,6 @@ rule preprocess:
     output:
         directory(preprocessed_data)
     shell:
-        "python --version & "
-        "echo \"Virtualenv:\" $VIRTUAL_ENV &"
         "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output}"
 
 
