@@ -9,6 +9,8 @@ from oemoflex.optimization import optimize
 
 if __name__ == '__main__':
     scenario_specs = load_yaml(sys.argv[1])
+    data_preprocessed = sys.argv[2]
+    results_optimization = sys.argv[3]
 
     exp_paths = setup_experiment_paths(scenario_specs['scenario'])
 
@@ -17,4 +19,4 @@ if __name__ == '__main__':
         logfile='oemoflex.log'
     )
 
-    optimize(exp_paths.data_preprocessed, exp_paths.results_optimization)
+    optimize(data_preprocessed, results_optimization)
