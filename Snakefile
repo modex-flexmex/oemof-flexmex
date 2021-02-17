@@ -52,14 +52,19 @@ rule infer:
 
 rule optimize:
     message:
-        "Optimize scenario {wildcards.scenario}."
+        "Optimize scenario '{wildcards.scenario}'."
     input:
-        "results/{scenario}/01_preprocessed/"
-        "scripts/optimization.py"  # re-run if updated
+        preprocessed_data,  # for monitoring only
+        inferred_datapackage,  # for monitoring only
+        scenario_yml=scenario_yml,
+        script="scripts/optimization.py"  # re-run if updated
     output:
-        "results/{scenario}/02_optimized"
+        directory(optimized)
+    params:
+        # oemoflex's optimize() expects the datapackage base dir as input:
+        preprocessed_dir=preprocessed_dir,
     shell:
-        "scripts/optimization.py results/{scenario}/preprocessed/"
+        "python scripts/optimization.py {input.scenario_yml} {params.preprocessed_dir} {output}"
 
 
 rule postprocess:
