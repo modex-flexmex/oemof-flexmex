@@ -38,7 +38,11 @@ if __name__ == '__main__':
     update_scalars(scenario_specs['components'], preprocessed_output_path, scalars)
 
     # create sequences
-    create_profiles(data_raw_path, preprocessed_output_path, select_components=scenario_specs['components'])
+    create_profiles(
+        data_raw_path,
+        preprocessed_output_path,
+        select_components=scenario_specs['components']
+    )
 
     # compare with previous data
     previous_path = preprocessed_output_path.replace('results', 'defaults')
