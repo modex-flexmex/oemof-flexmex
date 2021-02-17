@@ -3,8 +3,9 @@
 scenario_yml = "scenarios/{scenario}.yml"
 
 raw = "data/In/v0.06"
-preprocessed = "results/{scenario}/01_preprocessed/data"
-inferred = "results/{scenario}/01_preprocessed/datapackage.json"
+preprocessed_dir = "results/{scenario}/01_preprocessed"
+preprocessed_data = "results/{scenario}/01_preprocessed/data"
+inferred_datapackage = "results/{scenario}/01_preprocessed/datapackage.json"
 optimized = ""
 postprocessed = ""
 
@@ -24,7 +25,7 @@ rule preprocess:
         scenario_yml=scenario_yml,
         script="scripts/preprocessing.py",  # re-run if updated
     output:
-        directory(preprocessed)
+        directory(preprocessed_data)
     shell:
         "python --version & "
         "echo \"Virtualenv:\" $VIRTUAL_ENV &"
@@ -35,13 +36,15 @@ rule infer:
     message:
         "Infer meta-data from preprcoessed data for scenario '{wildcards.scenario}'."
     input:
-        preprocessed=preprocessed,
+        preprocessed_data,  # for monitoring only
+        # tabular's infer_metadata() expects the datapackage base dir as input:
+        preprocessed_dir=preprocessed_dir,
         scenario_yml=scenario_yml,
         script="scripts/infer.py",  # re-run if updated
     output:
-        inferred
+        inferred_datapackage
     shell:
-        "python scripts/infer.py {input.scenario_yml} {input.preprocessed}"
+        "python scripts/infer.py {input.scenario_yml} {input.preprocessed_dir}"
 
 
 rule optimize:
