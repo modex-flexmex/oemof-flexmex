@@ -17,8 +17,6 @@ if __name__ == '__main__':
     # Get paths
     exp_paths = setup_experiment_paths(scenario_specs['scenario'])
 
-    preprocessed_output_path = os.path.join(preprocessed_output_path, 'data')
-
     logpath = define_logging(
         logpath=exp_paths.results_postprocessed,
         logfile='oemoflex.log'

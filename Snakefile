@@ -3,7 +3,7 @@
 scenario_yml = "scenarios/{scenario}.yml"
 
 raw = "data/In/v0.06"
-preprocessed = "results/{scenario}/01_preprocessed"
+preprocessed = "results/{scenario}/01_preprocessed/data"
 inferred = "results/{scenario}/01_preprocessed/datapackage.json"
 optimized = ""
 postprocessed = ""
