@@ -4,6 +4,7 @@ scenario_yml = "scenarios/{scenario}.yml"
 
 raw = "data/In/v0.06"
 preprocessed = "results/{scenario}/01_preprocessed"
+inferred = "results/{scenario}/01_preprocessed/datapackage.json"
 optimized = ""
 postprocessed = ""
 
@@ -28,6 +29,19 @@ rule preprocess:
         "python --version & "
         "echo \"Virtualenv:\" $VIRTUAL_ENV &"
         "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output}"
+
+
+rule infer:
+    message:
+        "Infer meta-data from preprcoessed data for scenario '{wildcards.scenario}'."
+    input:
+        preprocessed=preprocessed,
+        scenario_yml=scenario_yml,
+        script="scripts/infer.py",  # re-run if updated
+    output:
+        inferred
+    shell:
+        "python scripts/infer.py {input.scenario_yml} {input.preprocessed}"
 
 
 rule optimize:
