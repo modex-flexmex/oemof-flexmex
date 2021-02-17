@@ -1,7 +1,9 @@
 # load experiment config
 
-raw = ""
-preprocessed = ""
+scenario_yml = "scenarios/{scenario}.yml"
+
+raw = "data/In/v0.06"
+preprocessed = "results/{scenario}/01_preprocessed"
 optimized = ""
 postprocessed = ""
 
@@ -17,11 +19,11 @@ rule preprocess:
     message:
         "Preprocess input data for scenario '{wildcards.scenario}'."
     input:
-        raw="data/In/v0.06",
-        scenario_yml="scenarios/{scenario}.yml",
+        raw=raw,
+        scenario_yml=scenario_yml,
         script="scripts/preprocessing.py",  # re-run if updated
     output:
-        directory("results/{scenario}/01_preprocessed")
+        directory(preprocessed)
     shell:
         "python --version & "
         "echo \"Virtualenv:\" $VIRTUAL_ENV &"
