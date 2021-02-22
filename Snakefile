@@ -31,10 +31,10 @@ rule preprocess:
         script="scripts/preprocessing.py",  # re-run if updated
     output:
         directory(preprocessed_data)
-    log:
-        results_dir
+    params:
+        log=results_dir
     shell:
-        "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output} {log}"
+        "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output} {params.log}"
 
 
 rule infer:
@@ -66,11 +66,10 @@ rule optimize:
     params:
         # oemoflex's optimize() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
-    log:
-        results_dir
+        log=results_dir,
     shell:
         "python scripts/optimization.py {input.scenario_yml} {params.preprocessed_dir}"
-        " {output} {log}"
+        " {output} {params.log}"
 
 
 rule postprocess:
@@ -89,13 +88,12 @@ rule postprocess:
         raw=raw,
         # postprocessing load_elements() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
-    log:
-        results_dir
+        log=results_dir,
     shell:
         "python scripts/postprocessing.py {input.scenario_yml}"
         " {params.raw} {params.preprocessed_dir}"
         " {input.optimized} {input.results_template}"
-        " {output} {log}"
+        " {output} {params.log}"
 
 
 rule join_results:
