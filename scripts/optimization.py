@@ -11,11 +11,10 @@ if __name__ == '__main__':
     scenario_specs = load_yaml(sys.argv[1])
     data_preprocessed = sys.argv[2]
     results_optimization = sys.argv[3]
-
-    exp_paths = setup_experiment_paths(scenario_specs['scenario'])
+    logging_path = sys.argv[4]
 
     logpath = define_logging(
-        logpath=exp_paths.results_postprocessed,
+        logpath=logging_path,
         logfile='oemoflex.log'
     )
 

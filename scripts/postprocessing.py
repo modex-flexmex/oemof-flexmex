@@ -18,11 +18,10 @@ if __name__ == '__main__':
     paths.results_optimization = sys.argv[4]
     paths.results_template = sys.argv[5]
     paths.results_postprocessed = sys.argv[6]
-
-    exp_paths = setup_experiment_paths(scenario_specs['scenario'])
+    logging_path = sys.argv[7]
 
     logpath = define_logging(
-        logpath=exp_paths.results_postprocessed,
+        logpath=logging_path,
         logfile='oemoflex.log'
     )
 
