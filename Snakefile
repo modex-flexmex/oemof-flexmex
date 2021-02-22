@@ -3,6 +3,7 @@
 scenario_yml = "scenarios/{scenario}.yml"
 
 raw = "data/In/v0.06"
+results_dir = "results/{scenario}"  # for logging
 preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized = "results/{scenario}/02_optimized"
 postprocessed = "results/{scenario}/03_postprocessed"
@@ -30,8 +31,10 @@ rule preprocess:
         script="scripts/preprocessing.py",  # re-run if updated
     output:
         directory(preprocessed_data)
+    log:
+        results_dir
     shell:
-        "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output}"
+        "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output} {log}"
 
 
 rule infer:
@@ -63,8 +66,11 @@ rule optimize:
     params:
         # oemoflex's optimize() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
+    log:
+        results_dir
     shell:
-        "python scripts/optimization.py {input.scenario_yml} {params.preprocessed_dir} {output}"
+        "python scripts/optimization.py {input.scenario_yml} {params.preprocessed_dir}"
+        " {output} {log}"
 
 
 rule postprocess:
@@ -83,11 +89,13 @@ rule postprocess:
         raw=raw,
         # postprocessing load_elements() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
+    log:
+        results_dir
     shell:
         "python scripts/postprocessing.py {input.scenario_yml}"
         " {params.raw} {params.preprocessed_dir}"
         " {input.optimized} {input.results_template}"
-        " {output}"
+        " {output} {log}"
 
 
 rule join_results:
