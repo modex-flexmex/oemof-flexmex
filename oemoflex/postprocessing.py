@@ -1067,7 +1067,18 @@ def run_postprocessing(scenario_specs, exp_paths):
     scalars_raw = load_scalar_input_data(scenario_specs, exp_paths)
 
     # load scalars templates
-    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
+    exp, case = scenario_specs['scenario'].split('_')
+
+    if exp == 'FlexMex1':
+        flexmex_scalars_template = pd.read_csv(
+            os.path.join(exp_paths.results_template, 'Scalars_FlexMex1.csv')
+        )
+
+    elif exp == 'FlexMex2':
+        flexmex_scalars_template = pd.read_csv(
+            os.path.join(exp_paths.results_template, 'Scalars_FlexMex2.csv')
+        )
+
     flexmex_scalars_template = flexmex_scalars_template.loc[
         flexmex_scalars_template['UseCase'] == scenario_specs['scenario']
     ]
