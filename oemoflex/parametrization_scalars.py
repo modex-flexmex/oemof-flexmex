@@ -768,6 +768,9 @@ def update_hydro_reservoir(component_df, scalars):
     # Recalculate filling level as a ratio of storage capacity (refer oemof.solph.components)
     component_df['initial_storage_level'] = initial_storage_level / storage_capacity
 
+    # make sure that this is not nan for zero capacity
+    component_df['initial_storage_level'].loc[storage_capacity == 0] = 0
+
     component_df['efficiency_turbine'] = get_parameter_values(
         scalars,
         'EnergyConversion_Eta_Electricity_Hydro_ReservoirTurbine') * 1e-2  # percent -> 0...1
