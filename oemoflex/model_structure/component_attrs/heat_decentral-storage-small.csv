@@ -1,10 +1,10 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-heat-storage-small,Name
+name,str,n/a,,-heat_decentral-storage-small,Name
 type,str,n/a,storage,,Type
-carrier,str,n/a,heat,,Energy carrier
+carrier,str,n/a,heat_decentral,,Energy carrier
 tech,str,n/a,storage-small,,Technology
-bus,str,n/a,,-heat,The bus this component is connected to
+bus,str,n/a,,-heat_decentral,The bus this component is connected to
 capacity,float,MW,n/a,,Installed capacity
 storage_capacity,float,MWh,n/a,,Installed storage capacity
 efficiency,float,unitless,n/a,,Efficiency of charging/discharging

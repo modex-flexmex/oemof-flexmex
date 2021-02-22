@@ -1,6 +1,7 @@
 name,path,description
 electricity-demand,component_attrs/electricity-demand.csv,Electricity demand
-heat-shortage,component_attrs/heat-shortage.csv,Shortage backup to keep model solvable
+heat_central-shortage,component_attrs/heat_central-shortage.csv,Shortage backup to keep model solvable
+heat_decentral-shortage,component_attrs/heat_decentral-shortage.csv,Shortage backup to keep model solvable
 electricity-shortage,component_attrs/electricity-shortage.csv,Shortage backup to keep model solvable
 electricity-transmission,component_attrs/electricity-transmission.csv,Electrical transmission between regions
 solar-pv,component_attrs/solar-pv.csv,Solar pv capacities
@@ -14,13 +15,15 @@ ch4-boiler-small,component_attrs/ch4-boiler-small.csv,Small peak load boiler
 ch4-boiler-large,component_attrs/ch4-boiler-large.csv,Large peak load boiler
 ch4-extchp,component_attrs/ch4-extchp.csv,Extraction turbine CHP
 electricity-pth,component_attrs/electricity-pth.csv,Resistive heater (Power-to-Heat)
-heat-demand,component_attrs/heat-demand.csv,Heat demand
+heat_central-demand,component_attrs/heat_central-demand.csv,Central heat demand
+heat_decentral-demand,component_attrs/heat_decentral-demand.csv,Decentral eat demand
 electricity-h2_cavern,component_attrs/electricity-h2_cavern.csv,Large scale H2 storage
 electricity-liion_battery,component_attrs/electricity-liion_battery.csv,Li-ion battery storage
 electricity-heatpump-small,component_attrs/electricity-heatpump-small.csv,Airsource compression heatpump
 electricity-heatpump-large,component_attrs/electricity-heatpump-large.csv,Airsource compression heatpump
-heat-storage-small,component_attrs/heat-storage-small.csv,Small sensible heat storage
-heat-storage-large,component_attrs/heat-storage-large.csv,Large scale sensible heat storage
-heat-excess,component_attrs/heat-excess.csv,Heat excess
+heat_central-storage-large,component_attrs/heat_central-storage-large.csv,Large scale sensible heat storage
+heat_central-excess,component_attrs/heat_central-excess.csv,Central heat excess
+heat_decentral-storage-small,component_attrs/heat_decentral-storage-small.csv,Small sensible heat storage
+heat_decentral-excess,component_attrs/heat_decentral-excess.csv,Decentral heat excess
 hydro-reservoir,component_attrs/hydro-reservoir.csv,Hydro reservoir
 electricity-bev,component_attrs/electricity-bev.csv,Battery electric vehicle

@@ -1,9 +1,12 @@
 'bus': [
-    'heat-shortage',
-    'heat-excess',
-    'heat-demand',
-    'heat-storage-large',
-    'heat-storage-small',
+    'heat_central-shortage',
+    'heat_central-excess',
+    'heat_central-demand',
+    'heat_central-storage-large',
+    'heat_decentral-shortage',
+    'heat_decentral-excess',
+    'heat_decentral-demand',
+    'heat_decentral-storage-small',
     'wind-onshore',
     'wind-offshore',
     'solar-pv',
@@ -22,7 +25,8 @@
     'solar-pv',
     'electricity-demand',
     'hydro-reservoir',
-    'heat-demand',
+    'heat_central-demand',
+    'heat_decentral-demand',
 ]
 
 'from_to_bus': [
