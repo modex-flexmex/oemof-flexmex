@@ -1,9 +1,9 @@
 attribute,type,unit,default,suffix,description
 region,str,n/a,n/a,,Country code
-name,str,n/a,,-electricity-heatpump,Name
+name,str,n/a,,-electricity-heatpump-large,Name
 type,str,n/a,conversion,,Type
 carrier,str,n/a,electricity,,Energy carrier
-tech,str,n/a,heatpump,,Technology
+tech,str,n/a,heatpump-large,,Technology
 from_bus,str,n/a,,-electricity,The bus this component is connected to
 to_bus,str,n/a,,-heat,The bus this component is connected to
 capacity,float,MW,n/a,,Installed capacity

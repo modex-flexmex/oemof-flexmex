@@ -160,12 +160,6 @@ def update_extchp(component_df, scalars):
 
 def update_boiler_large(component_df, scalars):
 
-    component_df['name'] = component_df['name'].str.replace(
-        'ch4-boiler', 'ch4-boiler-large', regex=False
-    )
-
-    component_df['tech'] = 'boiler-large'
-
     component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_CH4_Large'
     )
@@ -183,13 +177,6 @@ def update_boiler_large(component_df, scalars):
 
 
 def update_boiler_small(component_df, scalars):
-
-    # Replace AT-ch4-boiler by AT-ch4-boiler-small
-    component_df['name'] = component_df['name'].str.replace(
-        'ch4-boiler', 'ch4-boiler-small', regex=False
-    )
-
-    component_df['tech'] = 'boiler-small'
 
     component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_CH4_Small'
@@ -223,12 +210,6 @@ def update_pth(component_df, scalars):
 
 def update_electricity_heatpump_small(component_df, scalars):
 
-    component_df['name'] = component_df['name'].str.replace(
-        'electricity-heatpump', 'electricity-heatpump-small', regex=False
-    )
-
-    component_df['tech'] = 'heatpump-small'
-
     component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Small'
     )
@@ -240,12 +221,6 @@ def update_electricity_heatpump_small(component_df, scalars):
 
 
 def update_electricity_heatpump_large(component_df, scalars):
-
-    component_df['name'] = component_df['name'].str.replace(
-        'electricity-heatpump', 'electricity-heatpump-large', regex=False
-    )
-
-    component_df['tech'] = 'heatpump-large'
 
     component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Large'
@@ -262,12 +237,6 @@ def update_electricity_heatpump_large(component_df, scalars):
 
 
 def update_heat_storage_small(component_df, scalars):
-
-    component_df['name'] = component_df['name'].str.replace(
-        'heat-storage', 'heat-storage-small', regex=False
-    )
-
-    component_df['tech'] = 'storage-small'
 
     component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
 
@@ -287,12 +256,6 @@ def update_heat_storage_small(component_df, scalars):
 
 
 def update_heat_storage_large(component_df, scalars):
-
-    component_df['name'] = component_df['name'].str.replace(
-        'heat-storage', 'heat-storage-large', regex=False
-    )
-
-    component_df['tech'] = 'storage-large'
 
     component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
 
