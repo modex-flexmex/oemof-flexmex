@@ -1,3 +1,4 @@
+import os
 import sys
 
 from oemof.tools.logger import define_logging
@@ -17,5 +18,8 @@ if __name__ == '__main__':
         logpath=logging_path,
         logfile='oemoflex.log'
     )
+
+    if not os.path.exists(results_optimization):
+        os.makedirs(results_optimization)
 
     optimize(data_preprocessed, results_optimization)

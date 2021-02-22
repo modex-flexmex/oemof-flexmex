@@ -1,3 +1,4 @@
+import os
 import logging
 import sys
 
@@ -24,6 +25,9 @@ if __name__ == '__main__':
         logpath=logging_path,
         logfile='oemoflex.log'
     )
+
+    if not os.path.exists(paths.results_postprocessed):
+        os.makedirs(paths.results_postprocessed)
 
     run_postprocessing(scenario_specs, paths)
 
