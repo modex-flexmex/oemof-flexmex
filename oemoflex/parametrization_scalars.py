@@ -74,12 +74,40 @@ def update_electricity_demand(component_df, scalars):
     return component_df
 
 
-def update_heat_demand(component_df, scalars):
+def update_heat_central_demand(component_df, scalars):
+
+    amount = get_parameter_values(
+        scalars,
+        'Energy_FinalEnergy_Heat_CHP') * 1e3  # GWh to MWh
+
+    # The suffix _CHP means central heat.
+    # For experiment 1, there is no distinction between central/decentral heat.
+    if amount.empty:
+        amount = get_parameter_values(
+            scalars,
+            'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
 
     # Fill column for ALL the elements
-    component_df['amount'] = get_parameter_values(
+    component_df['amount'] = amount
+
+    return component_df
+
+
+def update_heat_decentral_demand(component_df, scalars):
+
+    amount = get_parameter_values(
         scalars,
-        'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
+        'Energy_FinalEnergy_Heat_HeatPump') * 1e3  # GWh to MWh
+
+    # The suffix _HeatPump means decentral heat.
+    # For experiment 1, there is no distinction between central/decentral heat.
+    if amount.empty:
+        amount = get_parameter_values(
+            scalars,
+            'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
+
+    # Fill column for ALL the elements
+    component_df['amount'] = amount
 
     return component_df
 
@@ -794,10 +822,12 @@ update_dict = {
     'electricity-shortage': update_electricity_shortage,
     'electricity-transmission': update_link,
     'electricity-h2_cavern': update_h2_cavern,
-    'heat-demand': update_heat_demand,
-    'heat-shortage': update_heat_shortage,
-    'heat-storage-large': update_heat_storage_large,
-    'heat-storage-small': update_heat_storage_small,
+    'heat_central-demand': update_heat_central_demand,
+    'heat_decentral-demand': update_heat_decentral_demand,
+    'heat_central-shortage': update_heat_shortage,
+    'heat_decentral-shortage': update_heat_shortage,
+    'heat_central-storage-large': update_heat_storage_large,
+    'heat_decentral-storage-small': update_heat_storage_small,
     'hydro-reservoir': update_hydro_reservoir,
     'electricity-liion_battery': update_liion_battery,
     'uranium-nuclear-st': update_nuclear_st,
