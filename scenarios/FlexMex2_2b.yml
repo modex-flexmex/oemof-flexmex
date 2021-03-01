@@ -23,10 +23,15 @@ components:
   ch4-boiler-large:
   electricity-pth:
   electricity-heatpump-large:
-  heat-storage-large:
-  heat-demand:
-  heat-shortage:
-  heat-excess:
+  heat_central-storage-large:
+  heat_central-demand:
+  heat_central-shortage:
+  heat_central-excess:
+  electricity-heatpump-small:
+  heat_decentral-storage-small:
+  heat_decentral-demand:
+  heat_decentral-shortage:
+  heat_decentral-excess:
 
 scenario_select:
   - FlexMex2-2b
