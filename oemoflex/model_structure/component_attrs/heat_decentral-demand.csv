@@ -6,4 +6,4 @@ carrier,str,n/a,heat_decentral,,Energy carrier
 tech,str,n/a,demand,,Technology
 bus,str,n/a,,-heat_decentral,The bus this component is connected to
 amount,float,GWh/a,n/a,,Total load over one year
-profile,str,n/a,n/a,-heat_central-demand-profile,Name of the profile
+profile,str,n/a,n/a,-heat_decentral-demand-profile,Name of the profile
