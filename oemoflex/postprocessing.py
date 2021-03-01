@@ -551,10 +551,6 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
                  select['tech'],
                  select['var_name']), 'var_value']
 
-            # Workaround for the case when there are alternative entries in oemoflex_scalars
-            if isinstance(value, pd.Series):
-                value = value.item()
-
         except KeyError:
             logging.info(
                 f"No key "
@@ -1048,6 +1044,36 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
     return df_re_generation
 
 
+def aggregate_heat(oemoflex_scalars):
+    print(oemoflex_scalars)
+
+    oemoflex_scalars.set_index(['region', 'name', 'type', 'carrier', 'tech'])
+
+    aggregated = (
+        oemoflex_scalars
+        .loc[
+            (
+                oemoflex_scalars['carrier'].isin(['heat_central', 'heat_decentral']) &
+                oemoflex_scalars['tech'].isin(['excess', 'shortage'])
+
+            )
+        ]
+        .loc[:, ['region', 'type', 'tech', 'var_name', 'var_value', 'var_unit']]
+        .groupby(['region', 'type', 'tech', 'var_name', 'var_unit'])
+        .sum()
+        .reset_index()
+    )
+
+    aggregated['carrier'] = 'heat'
+
+    aggregated['name'] = aggregated\
+        .apply(lambda x: '-'.join(x[['region', 'carrier', 'tech']]), 1)
+
+    oemoflex_scalars = pd.concat([oemoflex_scalars, aggregated])
+
+    return oemoflex_scalars
+
+
 def export_bus_sequences(es, destination):
 
     if not os.path.exists(destination):
@@ -1176,6 +1202,9 @@ def run_postprocessing(scenario_specs, exp_paths):
 
     # map direction of links
     oemoflex_scalars = map_link_direction(oemoflex_scalars)
+
+    # sum heat shortage and excess
+    oemoflex_scalars = aggregate_heat(oemoflex_scalars)
 
     # set experiment info
     oemoflex_scalars['usecase'] = scenario_specs['scenario']
