@@ -551,6 +551,10 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
                  select['tech'],
                  select['var_name']), 'var_value']
 
+            # Workaround for the case when there are alternative entries in oemoflex_scalars
+            if isinstance(value, pd.Series):
+                value = value.item()
+
         except KeyError:
             logging.info(
                 f"No key "
