@@ -13,10 +13,10 @@ components:
   ch4-boiler-large:
   electricity-pth:
   electricity-heatpump-large:
-  heat-storage-large:
-  heat-demand:
-  heat-shortage:
-  heat-excess:
+  heat_central-storage-large:
+  heat_central-demand:
+  heat_central-shortage:
+  heat_central-excess:
   
 scenario_select:
   - FlexMex1
