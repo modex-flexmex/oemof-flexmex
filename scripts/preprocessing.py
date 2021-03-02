@@ -6,8 +6,7 @@ from oemof.tools.logger import define_logging
 from oemoflex.model_structure import create_default_elements
 from oemoflex.parametrization_scalars import update_scalars
 from oemoflex.parametrization_sequences import create_profiles
-from oemoflex.helpers import (
-    setup_experiment_paths, check_if_csv_dirs_equal, load_yaml, load_scalar_input_data)
+from oemoflex.helpers import (check_if_csv_dirs_equal, load_yaml, load_scalar_input_data)
 
 if __name__ == '__main__':
     # load scenario specifications

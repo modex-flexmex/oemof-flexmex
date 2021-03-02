@@ -4,7 +4,6 @@ import sys
 from oemof.tools.logger import define_logging
 
 from oemoflex.helpers import load_yaml
-from oemoflex.helpers import setup_experiment_paths
 from oemoflex.optimization import optimize
 
 

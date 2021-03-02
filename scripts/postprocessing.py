@@ -7,7 +7,7 @@ from addict import Dict
 from oemof.tools.logger import define_logging
 
 from oemoflex.postprocessing import run_postprocessing
-from oemoflex.helpers import setup_experiment_paths, check_if_csv_dirs_equal, load_yaml
+from oemoflex.helpers import check_if_csv_dirs_equal, load_yaml
 
 
 if __name__ == '__main__':
