@@ -4,26 +4,21 @@ import sys
 
 import pandas as pd
 
-from oemoflex.helpers import get_experiment_paths
+results_postprocessed_path = sys.argv[1]
+results_comparison_path = sys.argv[2]
 
-
-# Get paths
-exp_paths = get_experiment_paths()
-
-exp_paths.results_comparison = os.path.join(exp_paths.results_comparison, 'oemof')
-
-if os.path.exists(exp_paths.results_comparison):
+if os.path.exists(results_comparison_path):
     print("Overwriting existing results. OK?")
 
     ok = input("If that is fine, type ok: ")
 
     if ok == 'ok':
-        shutil.rmtree(exp_paths.results_comparison)
+        shutil.rmtree(results_comparison_path)
     else:
         sys.exit(f"You typed '{ok}'. Aborting.")
 
 
-os.makedirs(exp_paths.results_comparison)
+os.makedirs(results_comparison_path)
 
 scenarios = [
     'FlexMex1_2a',
@@ -46,7 +41,7 @@ def join_scalars(experiments):
     scalars = []
     for subdir in experiments:
         scalar = pd.read_csv(
-            os.path.join('../005_results_postprocessed', subdir, 'Scalars.csv'), index_col=[0])
+            os.path.join(results_postprocessed_path, subdir, 'Scalars.csv'), index_col=[0])
         scalars.append(scalar)
 
     scalars = pd.concat(scalars)
@@ -66,6 +61,8 @@ def copy_timeseries(experiments, fro, to):
 
 
 all_scalars = join_scalars(scenarios)
-all_scalars.to_csv('../006_results_comparison/oemof/Scalars.csv')
+all_scalars.to_csv(
+    os.path.join(results_comparison_path, 'Scalars.csv')
+)
 
-copy_timeseries(scenarios, exp_paths.results_postprocessed, exp_paths.results_comparison)
+copy_timeseries(scenarios, results_postprocessed_path, results_comparison_path)
