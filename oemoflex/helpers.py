@@ -8,51 +8,11 @@ from pandas.testing import assert_frame_equal
 import yaml
 
 
-MODEL_CONFIG_YAML = 'model_config/experiment_paths.yml'
-
-
 def load_yaml(file_path):
     with open(file_path, 'r') as yaml_file:
         yaml_data = yaml.safe_load(yaml_file)
 
     return yaml_data
-
-
-def setup_experiment_paths(scenario):
-    r"""
-    Gets the experiment paths for a given experiment. If they do not exist, they are created.
-
-    Parameters
-    ----------
-    scenario : str
-        Name of the scenario.
-
-    Returns
-    -------
-    experiment_paths : addict.Dict
-        Dictionary containing the experiment's path structure
-
-    """
-    module_path = os.path.abspath(os.path.dirname(__file__))
-    config_path = os.path.join(module_path, MODEL_CONFIG_YAML)
-
-    with open(config_path, 'r') as config_file:
-        config = yaml.safe_load(config_file)
-
-    experiment_paths = Dict()
-
-    # Use module path to make all paths absolute
-    for k, v in config['paths'].items():
-        experiment_paths[k] = os.path.realpath(os.path.join(module_path, v))
-
-    # Use scenario name to get scenario subdirs
-    for k, v in config['scenario_subdirs'].items():
-        experiment_paths[k] = os.path.realpath(os.path.join(experiment_paths['base'], scenario, v))
-
-        if not os.path.exists(experiment_paths[k]):
-            os.makedirs(experiment_paths[k])
-
-    return experiment_paths
 
 
 def read_csv_file(filepath):
