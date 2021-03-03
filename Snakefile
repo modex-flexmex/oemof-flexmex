@@ -9,7 +9,7 @@ preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized = "results/{scenario}/02_optimized"
 postprocessed = "results/{scenario}/03_postprocessed"
 
-results_template = "flexmex_config/output_template/v0.06/Template"
+results_template = "flexmex_config/output_template/v0.06_alt/Template"
 
 # Set oemof.tabular sub-paths
 preprocessed_data = preprocessed_dir + "/data"
@@ -97,10 +97,22 @@ rule postprocess:
         " {output} {params.log}"
 
 
-def postprocessed_scenarios(wildcards):
-    scenarios = [dirname for dirname in os.listdir("results") if dirname.startswith(wildcards.experiment)]
-    # Use the pre-defined path "postprocessed" and expand the inner "scenario" key with the list
-    return expand(expand("{postprocessed}/Scalars.csv", postprocessed=postprocessed), scenario=scenarios)
+def processed_scenarios(wildcards):
+    # Returns a list of run scenarios. No check if postprocessing has been run or not.
+    scenarios = [
+        dirname for dirname in os.listdir("results")
+        if dirname.startswith(wildcards.experiment)  # only FlexMex1_ or FlexMex2_ directories
+        and dirname != wildcards.experiment  # exclude this rule's output directory
+    ]
+    return scenarios
+
+
+def postprocessed_paths(wildcards):
+    # Wrap scenario names into their respective postprocessed paths (pre-defined above)
+    return expand(
+        expand("{postprocessed}", postprocessed=postprocessed),
+        scenario=processed_scenarios(wildcards)  # 'scenario' is wildcard in 'postprocessed'
+    )
 
 
 rule join_results:
@@ -109,13 +121,16 @@ rule join_results:
     wildcard_constraints:
         experiment="(FlexMex1|FlexMex2)"
     input:
-        # Only use existing scenario runs as an input (function call)
-        scenario_list=postprocessed_scenarios,
         script="scripts/join_results.py"  # re-run if updated
     output:
         directory("results/{experiment}")
-    shell:
-        "python scripts/join_results.py {input.scenario_list} {output}"
+    params:
+        # Only use existing scenario runs as an input (function call)
+        # As 'params' to prevent preceding steps from being run
+        scenario_paths=postprocessed_paths,
+        scenarios=processed_scenarios,
+    script:
+        "scripts/join_results.py"
 
 
 rule check_against_default:
