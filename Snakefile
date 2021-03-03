@@ -1,5 +1,6 @@
-# load experiment config
+import os
 
+# load experiment config
 scenario_yml = "scenarios/{scenario}.yml"
 
 raw = "data/In/v0.06"
@@ -96,16 +97,25 @@ rule postprocess:
         " {output} {params.log}"
 
 
+def postprocessed_scenarios(wildcards):
+    scenarios = [dirname for dirname in os.listdir("results") if dirname.startswith(wildcards.experiment)]
+    # Use the pre-defined path "postprocessed" and expand the inner "scenario" key with the list
+    return expand(expand("{postprocessed}/Scalars.csv", postprocessed=postprocessed), scenario=scenarios)
+
+
 rule join_results:
     message:
         "Join results."
+    wildcard_constraints:
+        experiment="(FlexMex1|FlexMex2)"
     input:
-        "results/{scenario}/01_preprocessed/"
-        "scripts/joining.py"  # re-run if updated
+        # Only use existing scenario runs as an input (function call)
+        scenario_list=postprocessed_scenarios,
+        script="scripts/join_results.py"  # re-run if updated
     output:
-        "results/joined"
+        directory("results/{experiment}")
     shell:
-        "scripts/joining.py results/{scenario}/03_postprocessed/"
+        "python scripts/join_results.py {input.scenario_list} {output}"
 
 
 rule check_against_default:
