@@ -4,65 +4,55 @@ import sys
 
 import pandas as pd
 
-results_postprocessed_path = sys.argv[1]
-results_comparison_path = sys.argv[2]
+# Switch for Snakemake run vs. command line call (debugging)
+if 'snakemake' in globals():
+    postprocessed_results_paths = snakemake.params['scenario_paths']
+    scenarios = snakemake.params['scenarios']
+    output_path = snakemake.output[0]
 
-if os.path.exists(results_comparison_path):
-    print("Overwriting existing results. OK?")
+    # Removing and overwriting output from former runs is managed by Snakemake beforehand
 
-    ok = input("If that is fine, type ok: ")
+else:
+    _, *postprocessed_results_paths, output_path = sys.argv
 
-    if ok == 'ok':
-        shutil.rmtree(results_comparison_path)
-    else:
-        sys.exit(f"You typed '{ok}'. Aborting.")
+    # In CLI debugging mode, derive scenario names from paths.
+    # Not safe! Needs to be adapted along with changes in directory structure!
+    scenarios = [os.path.basename(os.path.dirname(path)) for path in postprocessed_results_paths]
 
+    if os.path.exists(output_path):
+        print("Overwriting existing results. OK?")
 
-os.makedirs(results_comparison_path)
+        userinput = input("If that is fine, type ok: ")
 
-scenarios = [
-    'FlexMex1_2a',
-    'FlexMex1_2b',
-    'FlexMex1_2c',
-    'FlexMex1_2d',
-    'FlexMex1_3',
-    'FlexMex1_4a',
-    'FlexMex1_4b',
-    'FlexMex1_4c',
-    'FlexMex1_4d',
-    'FlexMex1_4e',
-    'FlexMex1_5',
-    'FlexMex1_7b',
-    'FlexMex1_10',
-]
+        if userinput == 'ok':
+            shutil.rmtree(output_path)
+        else:
+            sys.exit(f"You typed '{userinput}'. Aborting.")
 
+    os.makedirs(output_path)
 
-def join_scalars(experiments):
-    scalars = []
-    for subdir in experiments:
-        scalar = pd.read_csv(
-            os.path.join(results_postprocessed_path, subdir, 'Scalars.csv'), index_col=[0])
-        scalars.append(scalar)
+print(f"Joining results of these scenarios:")
+for name, path in zip(scenarios, postprocessed_results_paths):
+    print(f"{name} ({path})")
 
-    scalars = pd.concat(scalars)
+all_scalars = pd.DataFrame()
 
-    return scalars
+for scenario_name, scenario_path in zip(scenarios, postprocessed_results_paths):
 
+    # Read scenario's Scalars.csv and concat it
+    df = pd.read_csv(
+        os.path.join(scenario_path, 'Scalars.csv'), index_col=[0])
+    all_scalars = pd.concat([all_scalars, df])
 
-def copy_timeseries(experiments, fro, to):
-    from_to = {os.path.join(fro, e): os.path.join(to, e) for e in experiments}
+    # Copy timeseries directories
+    dst = os.path.join(output_path, scenario_name)
+    shutil.copytree(scenario_path, dst, ignore=shutil.ignore_patterns(
+        'Scalars.csv',
+        'oemoflex.log*',
+        'oemoflex_scalars.csv',
+    ))
 
-    for src, dst in from_to.items():
-        shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
-            'Scalars.csv',
-            'oemoflex.log*',
-            'oemoflex_scalars.csv',
-        ))
-
-
-all_scalars = join_scalars(scenarios)
+# Write concat'ed results
 all_scalars.to_csv(
-    os.path.join(results_comparison_path, 'Scalars.csv')
+    os.path.join(output_path, 'Scalars.csv')
 )
-
-copy_timeseries(scenarios, results_postprocessed_path, results_comparison_path)
