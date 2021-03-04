@@ -16,10 +16,16 @@ inferred_datapackage = os.path.join(preprocessed_dir, "datapackage.json")
 
 
 rule all:
+    # Test: snakemake -npr
+    # Run: snakemake -j1
     message:
         "Run entire analysis."
     input:
-        "results/{scenario}/03_postprocessed"
+        # Read-in a complete list of scenarios (all the files found by 'scenario_yml')
+        expand(
+            postprocessed_dir,
+            scenario=[os.path.splitext(d)[0] for d in os.listdir(os.path.dirname(scenario_yml))]
+        )
 
 
 rule preprocess:
