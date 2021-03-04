@@ -4,68 +4,56 @@ import sys
 
 import pandas as pd
 
-from oemoflex.helpers import get_experiment_paths
+# Switch for Snakemake run vs. command line call (debugging)
+if 'snakemake' in globals():
+    # pylint: disable=undefined-variable
+    postprocessed_results_paths = snakemake.params['scenario_paths']  # noqa: F821
+    scenarios = snakemake.params['scenarios']  # noqa: F821
+    output_path = snakemake.output[0]  # noqa: F821
 
+    # Removing and overwriting output from former runs is managed by Snakemake beforehand
 
-# Get paths
-exp_paths = get_experiment_paths()
+else:
+    _, *postprocessed_results_paths, output_path = sys.argv
 
-exp_paths.results_comparison = os.path.join(exp_paths.results_comparison, 'oemof')
+    # In CLI debugging mode, derive scenario names from paths.
+    # Not safe! Needs to be adapted along with changes in directory structure!
+    scenarios = [os.path.basename(os.path.dirname(path)) for path in postprocessed_results_paths]
 
-if os.path.exists(exp_paths.results_comparison):
-    print("Overwriting existing results. OK?")
+    if os.path.exists(output_path):
+        print("Overwriting existing results. OK?")
 
-    ok = input("If that is fine, type ok: ")
+        userinput = input("If that is fine, type ok: ")
 
-    if ok == 'ok':
-        shutil.rmtree(exp_paths.results_comparison)
-    else:
-        sys.exit(f"You typed '{ok}'. Aborting.")
+        if userinput == 'ok':
+            shutil.rmtree(output_path)
+        else:
+            sys.exit(f"You typed '{userinput}'. Aborting.")
 
+    os.makedirs(output_path)
 
-os.makedirs(exp_paths.results_comparison)
+print("Joining results of these scenarios:")
+for name, path in zip(scenarios, postprocessed_results_paths):
+    print(f"{name} ({path})")
 
-scenarios = [
-    'FlexMex1_2a',
-    'FlexMex1_2b',
-    'FlexMex1_2c',
-    'FlexMex1_2d',
-    'FlexMex1_3',
-    'FlexMex1_4a',
-    'FlexMex1_4b',
-    'FlexMex1_4c',
-    'FlexMex1_4d',
-    'FlexMex1_4e',
-    'FlexMex1_5',
-    'FlexMex1_7b',
-    'FlexMex1_10',
-]
+all_scalars = pd.DataFrame()
 
+for scenario_name, scenario_path in zip(scenarios, postprocessed_results_paths):
 
-def join_scalars(experiments):
-    scalars = []
-    for subdir in experiments:
-        scalar = pd.read_csv(
-            os.path.join('../005_results_postprocessed', subdir, 'Scalars.csv'), index_col=[0])
-        scalars.append(scalar)
+    # Read scenario's Scalars.csv and concat it
+    df = pd.read_csv(
+        os.path.join(scenario_path, 'Scalars.csv'), index_col=[0])
+    all_scalars = pd.concat([all_scalars, df])
 
-    scalars = pd.concat(scalars)
+    # Copy timeseries directories
+    dst = os.path.join(output_path, scenario_name)
+    shutil.copytree(scenario_path, dst, ignore=shutil.ignore_patterns(
+        'Scalars.csv',
+        'oemoflex.log*',
+        'oemoflex_scalars.csv',
+    ))
 
-    return scalars
-
-
-def copy_timeseries(experiments, fro, to):
-    from_to = {os.path.join(fro, e): os.path.join(to, e) for e in experiments}
-
-    for src, dst in from_to.items():
-        shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
-            'Scalars.csv',
-            'oemoflex.log*',
-            'oemoflex_scalars.csv',
-        ))
-
-
-all_scalars = join_scalars(scenarios)
-all_scalars.to_csv('../006_results_comparison/oemof/Scalars.csv')
-
-copy_timeseries(scenarios, exp_paths.results_postprocessed, exp_paths.results_comparison)
+# Write concat'ed results
+all_scalars.to_csv(
+    os.path.join(output_path, 'Scalars.csv')
+)

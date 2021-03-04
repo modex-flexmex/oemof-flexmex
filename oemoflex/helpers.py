@@ -2,13 +2,14 @@ import os
 import shutil
 import subprocess
 
-from addict import Dict
 import pandas as pd
+from oemof.tools.logger import define_logging
 from pandas.testing import assert_frame_equal
 import yaml
 
 
-MODEL_CONFIG_YAML = 'model_config/experiment_paths.yml'
+def setup_logging(log_path):
+    define_logging(logpath=log_path, logfile='oemoflex.log')
 
 
 def load_yaml(file_path):
@@ -16,43 +17,6 @@ def load_yaml(file_path):
         yaml_data = yaml.safe_load(yaml_file)
 
     return yaml_data
-
-
-def setup_experiment_paths(scenario):
-    r"""
-    Gets the experiment paths for a given experiment. If they do not exist, they are created.
-
-    Parameters
-    ----------
-    scenario : str
-        Name of the scenario.
-
-    Returns
-    -------
-    experiment_paths : addict.Dict
-        Dictionary containing the experiment's path structure
-
-    """
-    module_path = os.path.abspath(os.path.dirname(__file__))
-    config_path = os.path.join(module_path, MODEL_CONFIG_YAML)
-
-    with open(config_path, 'r') as config_file:
-        config = yaml.safe_load(config_file)
-
-    experiment_paths = Dict()
-
-    # Use module path to make all paths absolute
-    for k, v in config['paths'].items():
-        experiment_paths[k] = os.path.realpath(os.path.join(module_path, v))
-
-    # Use scenario name to get scenario subdirs
-    for k, v in config['scenario_subdirs'].items():
-        experiment_paths[k] = os.path.realpath(os.path.join(experiment_paths['base'], scenario, v))
-
-        if not os.path.exists(experiment_paths[k]):
-            os.makedirs(experiment_paths[k])
-
-    return experiment_paths
 
 
 def read_csv_file(filepath):
@@ -203,7 +167,7 @@ def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
     return scalars
 
 
-def load_scalar_input_data(scenario_specs, exp_paths):
+def load_scalar_input_data(scenario_specs, path_to_input_data):
     r"""
     Reads, filters and checks FlexMex Scalars.csv input data
 
@@ -214,8 +178,8 @@ def load_scalar_input_data(scenario_specs, exp_paths):
     scenario_specs : dict
         Special dict with scenario settings
 
-    exp_paths : dict
-        Special dict of paths
+    path_to_input_data : str
+        Path to scalar input data
 
     Returns
     -------
@@ -226,7 +190,7 @@ def load_scalar_input_data(scenario_specs, exp_paths):
     experiment_name = scenario_specs['scenario'].split('_')[0]
 
     # Load common input parameters
-    scalars = read_scalar_input_data(exp_paths.data_raw, experiment_name)
+    scalars = read_scalar_input_data(path_to_input_data, experiment_name)
 
     # Filter out only scenario-related input parameters
     scalars = filter_scalar_input_data(

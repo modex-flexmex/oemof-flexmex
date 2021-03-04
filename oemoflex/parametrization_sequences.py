@@ -55,7 +55,7 @@ def combine_profiles(raw_profile_path, column_name):
     return profile_df
 
 
-def create_profiles(exp_path, select_components):
+def create_profiles(data_raw_path, preprocessed_path, select_components):
 
     def normalize_year(timeseries):
         r"""Normalizes the DataFrame 'timeseries' to values that add up to 1.0."""
@@ -81,7 +81,7 @@ def create_profiles(exp_path, select_components):
             for profile_name, profile in profiles.items():
                 logging.info(f"Creating '{profile_name}' timeseries for '{component}'.")
 
-                profile_paths = os.path.join(exp_path.data_raw, profile['input-path'])
+                profile_paths = os.path.join(data_raw_path, profile['input-path'])
 
                 profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
 
@@ -97,7 +97,7 @@ def create_profiles(exp_path, select_components):
 
                 profile_df.to_csv(
                     os.path.join(
-                        exp_path.data_preprocessed,
+                        preprocessed_path,
                         sequences_dir,
                         output_filename_base + profile_file_suffix + '.csv')
                 )
