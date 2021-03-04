@@ -4,10 +4,8 @@ import sys
 
 from addict import Dict
 
-from oemof.tools.logger import define_logging
-
 from oemoflex.postprocessing import run_postprocessing
-from oemoflex.helpers import check_if_csv_dirs_equal, load_yaml
+from oemoflex.helpers import check_if_csv_dirs_equal, load_yaml, setup_logging
 
 
 if __name__ == '__main__':
@@ -21,10 +19,7 @@ if __name__ == '__main__':
     paths.results_postprocessed = sys.argv[6]
     logging_path = sys.argv[7]
 
-    logpath = define_logging(
-        logpath=logging_path,
-        logfile='oemoflex.log'
-    )
+    setup_logging(logging_path)
 
     if not os.path.exists(paths.results_postprocessed):
         os.makedirs(paths.results_postprocessed)

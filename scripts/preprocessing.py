@@ -2,11 +2,12 @@ import os
 import logging
 import sys
 
-from oemof.tools.logger import define_logging
 from oemoflex.model_structure import create_default_elements
 from oemoflex.parametrization_scalars import update_scalars
 from oemoflex.parametrization_sequences import create_profiles
-from oemoflex.helpers import (check_if_csv_dirs_equal, load_yaml, load_scalar_input_data)
+from oemoflex.helpers import (
+    check_if_csv_dirs_equal, load_yaml, load_scalar_input_data, setup_logging
+)
 
 if __name__ == '__main__':
     # load scenario specifications
@@ -15,10 +16,7 @@ if __name__ == '__main__':
     preprocessed_output_path = sys.argv[3]
     logging_path = sys.argv[4]
 
-    logpath = define_logging(
-        logpath=logging_path,
-        logfile='oemoflex.log'
-    )
+    setup_logging(logging_path)
 
     if not os.path.exists(preprocessed_output_path):
         for subdir in ['elements', 'sequences']:

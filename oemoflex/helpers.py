@@ -3,8 +3,13 @@ import shutil
 import subprocess
 
 import pandas as pd
+from oemof.tools.logger import define_logging
 from pandas.testing import assert_frame_equal
 import yaml
+
+
+def setup_logging(log_path):
+    define_logging(logpath=log_path, logfile='oemoflex.log')
 
 
 def load_yaml(file_path):
