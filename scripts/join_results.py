@@ -6,9 +6,9 @@ import pandas as pd
 
 # Switch for Snakemake run vs. command line call (debugging)
 if 'snakemake' in globals():
-    postprocessed_results_paths = snakemake.params['scenario_paths']
-    scenarios = snakemake.params['scenarios']
-    output_path = snakemake.output[0]
+    postprocessed_results_paths = snakemake.params['scenario_paths']  # noqa: F821
+    scenarios = snakemake.params['scenarios']  # noqa: F821
+    output_path = snakemake.output[0]  # noqa: F821
 
     # Removing and overwriting output from former runs is managed by Snakemake beforehand
 
@@ -31,7 +31,7 @@ else:
 
     os.makedirs(output_path)
 
-print(f"Joining results of these scenarios:")
+print("Joining results of these scenarios:")
 for name, path in zip(scenarios, postprocessed_results_paths):
     print(f"{name} ({path})")
 
