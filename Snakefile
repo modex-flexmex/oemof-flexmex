@@ -1,15 +1,13 @@
 import os
 
-# load experiment config
+# Configuration
 scenario_yml = "scenarios/{scenario}.yml"
-
-raw = "data/In/v0.06"
-results_dir = "results/{scenario}"  # for logging
+raw_dir = "data/In/v0.06"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
-optimized = "results/{scenario}/02_optimized"
-postprocessed = "results/{scenario}/03_postprocessed"
-
+optimized_dir = "results/{scenario}/02_optimized"
+postprocessed_dir = "results/{scenario}/03_postprocessed"
 results_template = "flexmex_config/output_template/v0.06_alt/Template"
+log_dir = "results/{scenario}"
 
 # Set oemof.tabular sub-paths
 preprocessed_data = preprocessed_dir + "/data"
@@ -27,13 +25,13 @@ rule preprocess:
     message:
         "Preprocess input data for scenario '{wildcards.scenario}'."
     input:
-        raw=raw,
+        raw=raw_dir,
         scenario_yml=scenario_yml,
         script="scripts/preprocessing.py",  # re-run if updated
     output:
         directory(preprocessed_data)
     params:
-        log=results_dir
+        log=log_dir
     shell:
         "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output} {params.log}"
 
@@ -63,11 +61,11 @@ rule optimize:
         scenario_yml=scenario_yml,
         script="scripts/optimization.py"  # re-run if updated
     output:
-        directory(optimized)
+        directory(optimized_dir)
     params:
         # oemoflex's optimize() expects the datapackage base dir as input:
-        preprocessed_dir=preprocessed_dir,
-        log=results_dir,
+          preprocessed_dir=preprocessed_dir,
+          log=log_dir,
     shell:
         "python scripts/optimization.py {input.scenario_yml} {params.preprocessed_dir}"
         " {output} {params.log}"
@@ -78,18 +76,18 @@ rule postprocess:
         "Postprocess results for scenario '{wildcards.scenario}'."
     input:
         preprocessed_data,  # for monitoring only
-        scenario_yml=scenario_yml,
-        optimized=optimized,
-        results_template=results_template,
-        script="scripts/postprocessing.py"  # re-run if updated
+         scenario_yml=scenario_yml,
+         optimized=optimized_dir,
+         results_template=results_template,
+         script="scripts/postprocessing.py"  # re-run if updated
     output:
-        directory(postprocessed)
+        directory(postprocessed_dir)
     params:
         # Not necessarily as input, whole pipeline must be re-run anyway if this changes:
-        raw=raw,
-        # postprocessing load_elements() expects the datapackage base dir as input:
-        preprocessed_dir=preprocessed_dir,
-        log=results_dir,
+          raw=raw_dir,
+          # postprocessing load_elements() expects the datapackage base dir as input:
+          preprocessed_dir=preprocessed_dir,
+          log=log_dir,
     shell:
         "python scripts/postprocessing.py {input.scenario_yml}"
         " {params.raw} {params.preprocessed_dir}"
@@ -110,7 +108,7 @@ def processed_scenarios(wildcards):
 def postprocessed_paths(wildcards):
     # Wrap scenario names into their respective postprocessed paths (pre-defined above)
     return expand(
-        expand("{postprocessed}", postprocessed=postprocessed),
+        expand("{postprocessed}", postprocessed=postprocessed_dir),
         scenario=processed_scenarios(wildcards)  # 'scenario' is wildcard in 'postprocessed'
     )
 
