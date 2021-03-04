@@ -96,11 +96,16 @@ rule postprocess:
 
 
 def processed_scenarios(wildcards):
-    # Returns a list of run scenarios. No check if postprocessing has been run or not.
+    # Returns a list of scenarios with completed postprocessing.
+
+    def postprocessing_data_exist(path):
+        return os.path.isdir(postprocessed_dir.format(scenario=path))
+
     scenarios = [
         dirname for dirname in os.listdir("results")
         if dirname.startswith(wildcards.experiment)  # only FlexMex1_ or FlexMex2_ directories
         and dirname != wildcards.experiment  # exclude this rule's output directory
+        and postprocessing_data_exist(dirname)  # only postprocessed scenarios
     ]
     return scenarios
 
