@@ -6,6 +6,7 @@ import pandas as pd
 
 # Switch for Snakemake run vs. command line call (debugging)
 if 'snakemake' in globals():
+    # pylint: disable=undefined-variable
     postprocessed_results_paths = snakemake.params['scenario_paths']  # noqa: F821
     scenarios = snakemake.params['scenarios']  # noqa: F821
     output_path = snakemake.output[0]  # noqa: F821
