@@ -10,8 +10,8 @@ results_template = "flexmex_config/output_template/v0.06_alt/Template"
 log_dir = "results/{scenario}"
 
 # Set oemof.tabular sub-paths
-preprocessed_data = preprocessed_dir + "/data"
-inferred_datapackage = preprocessed_dir + "/datapackage.json"
+preprocessed_data = os.path.join(preprocessed_dir, "data")
+inferred_datapackage = os.path.join(preprocessed_dir, "datapackage.json")
 
 
 rule all:
