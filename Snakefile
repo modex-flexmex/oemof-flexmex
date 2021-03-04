@@ -8,6 +8,7 @@ optimized_dir = "results/{scenario}/02_optimized"
 postprocessed_dir = "results/{scenario}/03_postprocessed"
 results_template = "flexmex_config/output_template/v0.06_alt/Template"
 log_dir = "results/{scenario}"
+results_joined_dir = "results/{experiment}"
 
 # Set oemof.tabular sub-paths
 preprocessed_data = os.path.join(preprocessed_dir, "data")
@@ -124,7 +125,7 @@ rule join_results:
     input:
         script="scripts/join_results.py"  # re-run if updated
     output:
-        directory("results/{experiment}")
+        directory(results_joined_dir)
     params:
         # Only use existing scenario runs as an input (function call)
         # As 'params' to prevent preceding steps from being run
