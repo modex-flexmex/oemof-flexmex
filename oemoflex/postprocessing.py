@@ -1047,8 +1047,6 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
 def aggregate_heat(oemoflex_scalars):
     print(oemoflex_scalars)
 
-    oemoflex_scalars.set_index(['region', 'name', 'type', 'carrier', 'tech'])
-
     aggregated = (
         oemoflex_scalars
         .loc[
@@ -1064,12 +1062,14 @@ def aggregate_heat(oemoflex_scalars):
         .reset_index()
     )
 
-    aggregated['carrier'] = 'heat'
+    if not aggregated.empty:
 
-    aggregated['name'] = aggregated\
-        .apply(lambda x: '-'.join(x[['region', 'carrier', 'tech']]), 1)
+        aggregated['carrier'] = 'heat'
 
-    oemoflex_scalars = pd.concat([oemoflex_scalars, aggregated])
+        aggregated['name'] = aggregated\
+            .apply(lambda x: '-'.join(x[['region', 'carrier', 'tech']]), 1)
+
+        oemoflex_scalars = pd.concat([oemoflex_scalars, aggregated])
 
     return oemoflex_scalars
 
