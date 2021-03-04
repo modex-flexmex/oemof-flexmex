@@ -1094,7 +1094,7 @@ def run_postprocessing(scenario_specs, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
     # load raw data
-    scalars_raw = load_scalar_input_data(scenario_specs, exp_paths)
+    scalars_raw = load_scalar_input_data(scenario_specs, exp_paths.data_raw)
 
     # load scalars templates
     exp, case = scenario_specs['scenario'].split('_')

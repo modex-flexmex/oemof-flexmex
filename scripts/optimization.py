@@ -1,20 +1,18 @@
+import os
 import sys
 
-from oemof.tools.logger import define_logging
-
-from oemoflex.helpers import load_yaml
-from oemoflex.helpers import setup_experiment_paths
+from oemoflex.helpers import load_yaml, setup_logging
 from oemoflex.optimization import optimize
-
 
 if __name__ == '__main__':
     scenario_specs = load_yaml(sys.argv[1])
+    data_preprocessed = sys.argv[2]
+    results_optimization = sys.argv[3]
+    logging_path = sys.argv[4]
 
-    exp_paths = setup_experiment_paths(scenario_specs['scenario'])
+    setup_logging(logging_path)
 
-    logpath = define_logging(
-        logpath=exp_paths.results_postprocessed,
-        logfile='oemoflex.log'
-    )
+    if not os.path.exists(results_optimization):
+        os.makedirs(results_optimization)
 
-    optimize(exp_paths.data_preprocessed, exp_paths.results_optimization)
+    optimize(data_preprocessed, results_optimization)
