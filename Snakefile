@@ -64,8 +64,8 @@ rule optimize:
         directory(optimized_dir)
     params:
         # oemoflex's optimize() expects the datapackage base dir as input:
-          preprocessed_dir=preprocessed_dir,
-          log=log_dir,
+        preprocessed_dir=preprocessed_dir,
+        log=log_dir,
     shell:
         "python scripts/optimization.py {input.scenario_yml} {params.preprocessed_dir}"
         " {output} {params.log}"
@@ -76,18 +76,18 @@ rule postprocess:
         "Postprocess results for scenario '{wildcards.scenario}'."
     input:
         preprocessed_data,  # for monitoring only
-         scenario_yml=scenario_yml,
-         optimized=optimized_dir,
-         results_template=results_template,
-         script="scripts/postprocessing.py"  # re-run if updated
+        scenario_yml=scenario_yml,
+        optimized=optimized_dir,
+        results_template=results_template,
+        script="scripts/postprocessing.py"  # re-run if updated
     output:
         directory(postprocessed_dir)
     params:
         # Not necessarily as input, whole pipeline must be re-run anyway if this changes:
-          raw=raw_dir,
-          # postprocessing load_elements() expects the datapackage base dir as input:
-          preprocessed_dir=preprocessed_dir,
-          log=log_dir,
+        raw=raw_dir,
+        # postprocessing load_elements() expects the datapackage base dir as input:
+        preprocessed_dir=preprocessed_dir,
+        log=log_dir,
     shell:
         "python scripts/postprocessing.py {input.scenario_yml}"
         " {params.raw} {params.preprocessed_dir}"
