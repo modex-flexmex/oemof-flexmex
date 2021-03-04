@@ -112,10 +112,8 @@ def processed_scenarios(wildcards):
 
 def postprocessed_paths(wildcards):
     # Wrap scenario names into their respective postprocessed paths (pre-defined above)
-    return expand(
-        expand("{postprocessed}", postprocessed=postprocessed_dir),
-        scenario=processed_scenarios(wildcards)  # 'scenario' is wildcard in 'postprocessed'
-    )
+    # 'scenario' is wildcard in 'postprocessed'
+    return expand(postprocessed_dir, scenario=processed_scenarios(wildcards))
 
 
 rule join_results:
