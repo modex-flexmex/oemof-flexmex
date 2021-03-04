@@ -24,7 +24,7 @@ install:
 # commands to run tests 
 script:
   - flake8
-  - pylint oemoflex tests/*.py
+  - pylint oemoflex scripts tests/*.py
   - pytest --cov=oemoflex
 #jobs:
 #  include:
