@@ -1,6 +1,7 @@
 import logging
 import os
 
+from oemof.outputlib import processing
 from oemof.solph import EnergySystem, Model
 
 # DONT REMOVE THIS LINE!
@@ -36,10 +37,12 @@ def optimize(data_preprocessed, results_optimization, solver='cbc', save_lp=Fals
 
     # select solver 'gurobi', 'cplex', 'glpk' etc
     logging.info(f'Solving the problem using {solver}')
-    m.solve(solver=solver)
+    m.solve(solver=solver, solve_kwargs={"tee": True})
 
     # get the results from the the solved model(still oemof.solph)
-    es.results = m.results()
+    es.meta_results = processing.meta_results(m)
+    es.results = processing.results(m)
+    es.params = processing.parameter_as_dict(es)
 
     # now we use the write results method to write the results in oemof-tabular
     # format
