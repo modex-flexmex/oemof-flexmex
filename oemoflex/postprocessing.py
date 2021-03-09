@@ -1060,6 +1060,15 @@ def export_bus_sequences(es, destination):
         value.to_csv(file_path)
 
 
+def log_solver_time_to_file(meta_results, path):
+    r"""Log solver time from oemof.outputlib.processing.meta_results() to a log file in 'path'"""
+    # Use 'System time' because it relates to 'Total time (CPU seconds):' in CBC output
+    cpu_time = meta_results['solver']['System time']
+    output_path = os.path.join(path, 'solver_time.log')
+    time = pd.Series({'cpu_time': cpu_time})
+    time.to_csv(output_path, header=False)
+
+
 def run_postprocessing(scenario_specs, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
@@ -1081,6 +1090,8 @@ def run_postprocessing(scenario_specs, exp_paths):
     # restore EnergySystem with results
     es = EnergySystem()
     es.restore(exp_paths.results_optimization)
+
+    log_solver_time_to_file(es.meta_results, exp_paths.logging_path)
 
     # format results sequences
     sequences_by_tech = get_sequences_by_tech(es.results)
