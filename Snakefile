@@ -39,6 +39,8 @@ rule preprocess:
         directory(preprocessed_data)
     params:
         log=log_dir
+    benchmark:
+        os.path.join(log_dir, "benchmark-preprocess.log")
     shell:
         "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output} {params.log}"
 
@@ -55,6 +57,8 @@ rule infer:
     params:
         # tabular's infer_metadata() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
+    benchmark:
+        os.path.join(log_dir, "benchmark-infer.log")
     shell:
         "python scripts/infer.py {input.scenario_yml} {params.preprocessed_dir}"
 
@@ -73,6 +77,8 @@ rule optimize:
         # oemoflex's optimize() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
         log=log_dir,
+    benchmark:
+        os.path.join(log_dir, "benchmark-optimize.log")
     shell:
         "python scripts/optimization.py {input.scenario_yml} {params.preprocessed_dir}"
         " {output} {params.log}"
@@ -95,6 +101,8 @@ rule postprocess:
         # postprocessing load_elements() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
         log=log_dir,
+    benchmark:
+        os.path.join(log_dir, "benchmark-postprocess.log")
     shell:
         "python scripts/postprocessing.py {input.scenario_yml}"
         " {params.raw} {params.preprocessed_dir}"
