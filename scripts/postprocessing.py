@@ -17,9 +17,9 @@ if __name__ == '__main__':
     paths.results_optimization = sys.argv[4]
     paths.results_template = sys.argv[5]
     paths.results_postprocessed = sys.argv[6]
-    logging_path = sys.argv[7]
+    paths.logging_path = sys.argv[7]
 
-    setup_logging(logging_path)
+    setup_logging(paths.logging_path)
 
     if not os.path.exists(paths.results_postprocessed):
         os.makedirs(paths.results_postprocessed)
