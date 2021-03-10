@@ -23,14 +23,19 @@ preprocess_path = os.path.join(input_dir, 'benchmark-preprocess.log')
 solver_path = os.path.join(input_dir, 'solver_time.log')
 
 # Read time values
+# Snakemake Benchmark results per processing step
 infer_time = pd.read_csv(infer_path, sep='\t')['cpu_time'][0]
 optimize_time = pd.read_csv(optimize_path, sep='\t')['cpu_time'][0]
 postprocess_time = pd.read_csv(postprocess_path, sep='\t')['cpu_time'][0]
 preprocess_time = pd.read_csv(preprocess_path, sep='\t')['cpu_time'][0]
+
+# CBC meta results output from postprocessing
+# Use 'System time' for CPU time because it equals 'Total time (CPU seconds)' in CBC's stdout
 solver_time = pd.read_csv(solver_path, index_col=False)['system_time'][0]
 
 # Calculate time values
-optimize_extra_time = optimize_time - solver_time
+optimize_extra_time = optimize_time - solver_time  # Energy model building AND dumping results
+# Assign extra time from optimization step to preprocessing time in lack of precision
 preprocessing = preprocess_time + infer_time + optimize_extra_time
 solving = solver_time
 postprocessing = postprocess_time
