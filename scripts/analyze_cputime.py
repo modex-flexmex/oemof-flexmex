@@ -27,7 +27,7 @@ infer_time = pd.read_csv(infer_path, sep='\t')['cpu_time'][0]
 optimize_time = pd.read_csv(optimize_path, sep='\t')['cpu_time'][0]
 postprocess_time = pd.read_csv(postprocess_path, sep='\t')['cpu_time'][0]
 preprocess_time = pd.read_csv(preprocess_path, sep='\t')['cpu_time'][0]
-solver_time = pd.read_csv(solver_path, header=None, index_col=0).loc['cpu_time', 1]
+solver_time = pd.read_csv(solver_path, index_col=False)['system_time'][0]
 
 # Calculate time values
 optimize_extra_time = optimize_time - solver_time

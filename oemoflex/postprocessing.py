@@ -1062,11 +1062,20 @@ def export_bus_sequences(es, destination):
 
 def log_solver_time_to_file(meta_results, path):
     r"""Log solver time from oemof.outputlib.processing.meta_results() to a log file in 'path'"""
-    # Use 'System time' because it relates to 'Total time (CPU seconds):' in CBC output
-    cpu_time = meta_results['solver']['System time']
+
+    sys_time = meta_results['solver']['System time']  # equals 'Total time (CPU seconds)' in stdout
+    wc_time = meta_results['solver']['Wallclock time']
+    user_time = meta_results['solver']['User time']  # Always -1 so far
+    time = meta_results['solver']['Time']  # Not clear what this means
     output_path = os.path.join(path, 'solver_time.log')
-    time = pd.Series({'cpu_time': cpu_time})
-    time.to_csv(output_path, header=False)
+
+    df = pd.DataFrame(
+        {'system_time': [sys_time],
+         'wallclock_time': [wc_time],
+         'user_time': [user_time],
+         'time': [time],
+         })
+    df.to_csv(output_path, index=False)
 
 
 def run_postprocessing(scenario_specs, exp_paths):
