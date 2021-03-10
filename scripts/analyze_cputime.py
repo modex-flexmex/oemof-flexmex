@@ -14,7 +14,7 @@ def append_csv(df, path):
 
 scenario_name = sys.argv[1]
 input_dir = sys.argv[2]
-output_dir = sys.argv[3]
+output_path = sys.argv[3]
 
 infer_path = os.path.join(input_dir, 'benchmark-infer.log')
 optimize_path = os.path.join(input_dir, 'benchmark-optimize.log')
@@ -49,8 +49,6 @@ df = pd.DataFrame(
 )
 
 # Output
-output_path = os.path.join(output_dir, 'cpu_time_analysis.csv')
-
 if os.path.exists(output_path):
     append_csv(df, output_path)
 else:
