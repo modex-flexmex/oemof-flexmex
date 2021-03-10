@@ -4,12 +4,12 @@ import sys
 import pandas as pd
 
 
-def write_csv(df, path, mode='w', header=True):
-    df.to_csv(path, mode=mode, header=header, index=False, float_format='%.2f')
+def write_csv(dataframe, path, mode='w', header=True):
+    dataframe.to_csv(path, mode=mode, header=header, index=False, float_format='%.2f')
 
 
-def append_csv(df, path):
-    write_csv(df, path, mode='a', header=False)
+def append_csv(dataframe, path):
+    write_csv(dataframe, path, mode='a', header=False)
 
 
 scenario_name = sys.argv[1]
@@ -18,7 +18,7 @@ output_path = sys.argv[3]
 
 infer_path = os.path.join(input_dir, 'benchmark-infer.log')
 optimize_path = os.path.join(input_dir, 'benchmark-optimize.log')
-postprocess_path =os.path.join(input_dir, 'benchmark-postprocess.log')
+postprocess_path = os.path.join(input_dir, 'benchmark-postprocess.log')
 preprocess_path = os.path.join(input_dir, 'benchmark-preprocess.log')
 solver_path = os.path.join(input_dir, 'solver_time.log')
 
@@ -53,4 +53,3 @@ if os.path.exists(output_path):
     append_csv(df, output_path)
 else:
     write_csv(df, output_path)
-
