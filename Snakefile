@@ -147,3 +147,18 @@ rule join_results:
         scenarios=processed_scenarios,
     script:
         "scripts/join_results.py"
+
+rule analyze_cputime:
+    message:
+        "Time measurement output."
+    input:
+        script="scripts/analyze_cputime.py"  # re-run if updated
+    output:
+        touch(os.path.join(log_dir, "cpu_time_analysis.done"))
+    params:
+        input_dir=log_dir,
+        output_path=os.path.join(log_dir, "cpu_time_analysis.csv")
+    shell:
+         "python scripts/analyze_cputime.py {wildcards.scenario}"
+         " {params.input_dir}"
+         " {params.output_path}"
