@@ -1078,6 +1078,23 @@ def log_solver_time_to_file(meta_results, path):
     df.to_csv(output_path, index=False)
 
 
+def log_problem_metrics_to_file(meta_results, path):
+    r"""Log a number of solver metrics from oemof.outputlib.processing.meta_results()
+    to a log file in 'path'"""
+
+    no_of_constraints = meta_results['problem']['Number of constraints']
+    no_of_vars = meta_results['problem']['Number of variables']
+    no_of_nonzeros = meta_results['problem']['Number of nonzeros']
+    output_path = os.path.join(path, 'problem_metrics.log')
+
+    df = pd.DataFrame(
+        {'constraints': [no_of_constraints],
+         'vars': [no_of_vars],
+         'nonzeros': [no_of_nonzeros],
+         })
+    df.to_csv(output_path, index=False)
+
+
 def run_postprocessing(scenario_specs, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
@@ -1101,6 +1118,7 @@ def run_postprocessing(scenario_specs, exp_paths):
     es.restore(exp_paths.results_optimization)
 
     log_solver_time_to_file(es.meta_results, exp_paths.logging_path)
+    log_problem_metrics_to_file(es.meta_results, exp_paths.logging_path)
 
     # format results sequences
     sequences_by_tech = get_sequences_by_tech(es.results)
