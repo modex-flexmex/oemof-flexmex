@@ -154,11 +154,10 @@ rule analyze_cputime:
     input:
         script="scripts/analyze_cputime.py"  # re-run if updated
     output:
-        touch(os.path.join(log_dir, "cpu_time_analysis.done"))
+        os.path.join(log_dir, "cpu_time_analysis.csv")
     params:
         input_dir=log_dir,
-        output_path=os.path.join(log_dir, "cpu_time_analysis.csv")
     shell:
          "python scripts/analyze_cputime.py {wildcards.scenario}"
          " {params.input_dir}"
-         " {params.output_path}"
+         " {output}"
