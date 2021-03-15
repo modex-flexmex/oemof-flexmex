@@ -1067,7 +1067,7 @@ def log_solver_time_to_file(meta_results, path):
     wc_time = meta_results['solver']['Wallclock time']
     user_time = meta_results['solver']['User time']  # Always -1 so far
     time = meta_results['solver']['Time']  # Not clear what this means
-    output_path = os.path.join(path, 'solver_time.log')
+    output_path = os.path.join(path, 'solver_time.csv')
 
     df = pd.DataFrame(
         {'system_time': [sys_time],
@@ -1085,7 +1085,7 @@ def log_problem_metrics_to_file(meta_results, path):
     no_of_constraints = meta_results['problem']['Number of constraints']
     no_of_vars = meta_results['problem']['Number of variables']
     no_of_nonzeros = meta_results['problem']['Number of nonzeros']
-    output_path = os.path.join(path, 'problem_metrics.log')
+    output_path = os.path.join(path, 'problem_metrics.csv')
 
     df = pd.DataFrame(
         {'constraints': [no_of_constraints],
