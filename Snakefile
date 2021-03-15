@@ -152,6 +152,10 @@ rule analyze_cputime:
     message:
         "Time measurement output."
     input:
+        os.path.join(log_dir, "benchmark-preprocess.log"),
+        os.path.join(log_dir, "benchmark-infer.log"),
+        os.path.join(log_dir, "benchmark-optimize.log"),
+        os.path.join(log_dir, "benchmark-postprocess.log"),
         script="scripts/analyze_cputime.py"  # re-run if updated
     output:
         os.path.join(log_dir, "cpu_time_analysis.csv")
