@@ -20,7 +20,7 @@ infer_path = os.path.join(input_dir, 'benchmark-infer.log')
 optimize_path = os.path.join(input_dir, 'benchmark-optimize.log')
 postprocess_path = os.path.join(input_dir, 'benchmark-postprocess.log')
 preprocess_path = os.path.join(input_dir, 'benchmark-preprocess.log')
-solver_path = os.path.join(input_dir, 'solver_time.log')
+solver_path = os.path.join(input_dir, 'solver_time.csv')
 
 # Read time values
 # Snakemake Benchmark results per processing step
