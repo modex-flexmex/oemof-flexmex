@@ -49,7 +49,7 @@ rule infer:
     message:
         "Infer meta-data from preprcoessed data for scenario '{wildcards.scenario}'."
     input:
-        preprocessed_data,  # for monitoring only
+        preprocessed_data,  # for Snakemake monitoring only
         scenario_yml=scenario_yml,
         script="scripts/infer.py",  # re-run if updated
     output:
@@ -67,8 +67,8 @@ rule optimize:
     message:
         "Optimize scenario '{wildcards.scenario}'."
     input:
-        preprocessed_data,  # for monitoring only
-        inferred_datapackage,  # for monitoring only
+        preprocessed_data,  # for Snakemake monitoring only
+        inferred_datapackage,  # for Snakemake monitoring only
         scenario_yml=scenario_yml,
         script="scripts/optimization.py"  # re-run if updated
     output:
@@ -88,7 +88,7 @@ rule postprocess:
     message:
         "Postprocess results for scenario '{wildcards.scenario}'."
     input:
-        preprocessed_data,  # for monitoring only
+        preprocessed_data,  # for Snakemake monitoring only
         scenario_yml=scenario_yml,
         optimized=optimized_dir,
         results_template=results_template,
@@ -152,10 +152,10 @@ rule analyze_cputime:
     message:
         "Time measurement output."
     input:
-        os.path.join(log_dir, "benchmark-preprocess.log"),
-        os.path.join(log_dir, "benchmark-infer.log"),
-        os.path.join(log_dir, "benchmark-optimize.log"),
-        os.path.join(log_dir, "benchmark-postprocess.log"),
+        os.path.join(log_dir, "benchmark-preprocess.log"),  # for Snakemake monitoring only
+        os.path.join(log_dir, "benchmark-infer.log"),  # for Snakemake monitoring only
+        os.path.join(log_dir, "benchmark-optimize.log"),  # for Snakemake monitoring only
+        os.path.join(log_dir, "benchmark-postprocess.log"),  # for Snakemake monitoring only
         script="scripts/analyze_cputime.py"  # re-run if updated
     output:
         os.path.join(log_dir, "cpu_time_analysis.csv")
