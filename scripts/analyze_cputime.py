@@ -49,7 +49,4 @@ df = pd.DataFrame(
 )
 
 # Output
-if os.path.exists(output_path):
-    append_csv(df, output_path)
-else:
-    write_csv(df, output_path)
+write_csv(df, output_path)
