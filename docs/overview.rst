@@ -7,13 +7,18 @@ Overview
 oemoflex is sector-integrated multi-node energy system model featuring a lot of flexibility options.
 Its region, interconnections and components can be adapted flexibly.
 
+The model has been developed in the context of the model comparison project FlexMex and builds upon the open energy modeling framework _oemof_.
+Oemoflex defines a data format to run energy system optimization using oemof.solph and oemof.tabular. It provides pre- and postprocessing routines
+to feed the project's harmonized input data into the model and transform the output data into the output data template.
 
-Scenario
+
+Scenarios
 =========
 
-In oemoflex, each scenario (called *use case* in the first part of FlexMex project) defines its own energy system
-consisting of different types of energy supply, transport and demand.
-All scenarios are provided with the same set of timeseries, e.g. for energy demand and renewable energy supply.
+In oemoflex, each scenario defines its own energy system
+which can include different energy carriers (or sectors), primary energy sources, conversion, storage, transmission and demand.
+All scenarios are provided with the same set of input data, i.e. scalars (e.g. capacities) and timeseries 
+(e.g. energy demand or hourly capacity factors for renewable energies).
 Thus, oemoflex helps to model different flexibility options within a given (or future) energy system.
 
 
