@@ -4,11 +4,16 @@
 Model pipeline
 ~~~~~~~~~~~~~~
 
-Data processing in oemoflex is divided in 3 main steps:
+TODO: Start with a short section on snakemake, explain that this is the workflow management tool that is used.
+
+Data processing in oemoflex is divided in 4 main steps:
 
 * preprocessing
+* inferring
 * optimization
 * postprocessing
+
+TODO: Each of these steps is represented by a snakemake rule, which runs the script with the same name.
 
 The data each step is provided with is held in different forms:
 
@@ -120,10 +125,14 @@ The found filenames are interpreted according to the following pattern::
 Preprocessing
 =============
 
+
+
 Preprocessing brings the raw data into the `oemof.tabular format <https://oemof-tabular.readthedocs.io/en/latest/usage.html>`_.
 In this step, scalars belonging to a component are mapped to the components model parameters and saved within an input CSV file.
 Timeseries are attached in a similar way.
 The so formed input data is held in a ``datapackage`` format comprising a JSON schema file (meta data) and the CSV files containing the actual data.
+
+TODO: This repeates information that is already found in "model structure". Move the docs on extra parameters there.
 
 The found timeseries are combined into a new set of CSV files, with one file per technology and ``{region code}-{component}-profile`` as column names.
 They are stored in ::
@@ -153,7 +162,8 @@ B) Make the CSV file semicolon-separated and separate the output_parameters and/
 Optimization
 ============
 
-Optimization is performed by oemof-solph.
+Optimization is performed by oemof-solph. Specifically, with the help of oemof.tabular, an :class:`EnergySystem` can be created from the data package
+created in preprocessing.
 
 .. _postprocessing:
 
