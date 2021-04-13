@@ -9,6 +9,6 @@ The model has been developed in the context of the model comparison project Flex
 Oemoflex defines a data format to run energy system optimization using oemof.solph and oemof.tabular. It provides pre- and postprocessing routines
 to feed the project's harmonized input data into the model and transform the output data into the output data template.
 
-For more information, please visit the `docs <https://oemof.readthedocs.io/>`_.
+For more information, please visit the `docs <https://oemoflex.readthedocs.io/>`_.
 
 
