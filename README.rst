@@ -2,47 +2,13 @@
 oemo-flex
 ~~~~~~~~~
 
-Oemo-Flex (Open Energy Model for FlexMex) is an oemof model built for model comparison within
-the Modex project FlexMex.
+oemoflex is sector-integrated multi-node energy system model featuring a lot of flexibility options.
+Its region, interconnections and components can be adapted flexibly.
 
-.. contents::
+The model has been developed in the context of the model comparison project FlexMex and builds upon the open energy modeling framework _oemof_.
+Oemoflex defines a data format to run energy system optimization using oemof.solph and oemof.tabular. It provides pre- and postprocessing routines
+to feed the project's harmonized input data into the model and transform the output data into the output data template.
 
-
-Getting started
-===============
-
-Install oemo-flex and its dependencies by setting up a virtual environment and from within call
-
-.. code-block:: bash
-
-    pip install -e oemo-flex
+For more information, please visit the `docs <https://oemof.readthedocs.io/>`_.
 
 
-Experiment 1
-____________
-
-
-Experiment 1 consists of a list of UseCases. To run a UseCase, type:
-
-.. code-block:: bash
-
-    python experiment_1/scripts/<name-of-UseCase>/<name-of-UseCase>_runall.py
-
-
-This runs all scripts of the modeling pipeline.
-
-The directory structure reflects the consecutive steps taken from raw data, preprocessing,
-optimization, postprocessed data and comparison with the results of other models.
-
-.. code-block:: text
-
-    experiment_1
-    ├── 001_data_raw
-    ├── 002_data_preprocessed
-    ├── 003_results_optimization
-    ├── 004_results_data_template
-    ├── 005_results_postprocessed
-    ├── 006_results_comparison
-    └── scripts
-
-A log will be saved in `005_results_postprocessed`.
