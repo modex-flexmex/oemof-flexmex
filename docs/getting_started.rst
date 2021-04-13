@@ -63,7 +63,7 @@ Required data
 * Raw input data, see :ref:`input data format`.
 * Output template data, see :ref:`postprocessing`.
 
-This data will be provided on github in the future.
+This data is planned to be published at a later point in time by the project FlexMex.
 
 Contributing to oemoflex
 ========================
