@@ -6,7 +6,7 @@ raw_dir = "data/In/v0.06"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized_dir = "results/{scenario}/02_optimized"
 postprocessed_dir = "results/{scenario}/03_postprocessed"
-results_template = "flexmex_config/output_template/v0.06_alt/Template"
+results_template = "flexmex_config/output_template/v0.07/Template"
 log_dir = "results/{scenario}"
 results_joined_dir = "results/{experiment}"
 
