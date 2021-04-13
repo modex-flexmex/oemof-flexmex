@@ -1045,7 +1045,6 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
 
 
 def aggregate_heat(oemoflex_scalars):
-    print(oemoflex_scalars)
 
     aggregated = (
         oemoflex_scalars
