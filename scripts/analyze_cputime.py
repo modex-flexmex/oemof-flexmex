@@ -8,10 +8,6 @@ def write_csv(dataframe, path, mode='w', header=True):
     dataframe.to_csv(path, mode=mode, header=header, index=False, float_format='%.2f')
 
 
-def append_csv(dataframe, path):
-    write_csv(dataframe, path, mode='a', header=False)
-
-
 scenario_name = sys.argv[1]
 input_dir = sys.argv[2]
 output_path = sys.argv[3]
