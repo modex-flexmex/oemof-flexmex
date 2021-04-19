@@ -23,6 +23,7 @@ setup(
         'pyyaml',
         'addict',
         'Pyomo==5.6.7',
-        'PyUtilib==5.7.2'
+        'PyUtilib==5.7.2',
+        'Snakemake>=5.32.0'
     ],
 )
