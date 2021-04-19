@@ -6,7 +6,7 @@ raw_dir = "data/In/v0.06"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized_dir = "results/{scenario}/02_optimized"
 postprocessed_dir = "results/{scenario}/03_postprocessed"
-results_template = "flexmex_config/output_template/v0.06_alt/Template"
+results_template = "flexmex_config/output_template/v0.07/Template"
 log_dir = "results/{scenario}"
 results_joined_dir = "results/{experiment}"
 
@@ -94,7 +94,8 @@ rule postprocess:
         results_template=results_template,
         script="scripts/postprocessing.py"  # re-run if updated
     output:
-        directory(postprocessed_dir)
+        data=directory(postprocessed_dir),
+        solver_time=os.path.join(log_dir, "solver_time.csv")
     params:
         # Not necessarily as input, whole pipeline must be re-run anyway if this changes:
         raw=raw_dir,
@@ -107,7 +108,7 @@ rule postprocess:
         "python scripts/postprocessing.py {input.scenario_yml}"
         " {params.raw} {params.preprocessed_dir}"
         " {input.optimized} {input.results_template}"
-        " {output} {params.log}"
+        " {output.data} {params.log}"
 
 
 def processed_scenarios(wildcards):
@@ -156,6 +157,7 @@ rule analyze_cputime:
         os.path.join(log_dir, "benchmark-infer.log"),  # for Snakemake monitoring only
         os.path.join(log_dir, "benchmark-optimize.log"),  # for Snakemake monitoring only
         os.path.join(log_dir, "benchmark-postprocess.log"),  # for Snakemake monitoring only
+        os.path.join(log_dir, "solver_time.csv"),
         script="scripts/analyze_cputime.py"  # re-run if updated
     output:
         os.path.join(log_dir, "cpu_time_analysis.csv")
