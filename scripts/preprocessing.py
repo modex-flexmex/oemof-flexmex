@@ -33,11 +33,14 @@ if __name__ == '__main__':
     # update elements
     update_scalars(scenario_specs['components'], preprocessed_output_path, scalars)
 
+    experiment = scenario_specs['scenario'].split('_')[0]
+
     # create sequences
     create_profiles(
         data_raw_path,
         preprocessed_output_path,
-        select_components=scenario_specs['components']
+        select_components=scenario_specs['components'],
+        select_experiment=experiment,
     )
 
     # compare with previous data

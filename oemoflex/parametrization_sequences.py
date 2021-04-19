@@ -29,10 +29,15 @@ datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 mapping = load_yaml(path_mapping_input_timeseries)
 
 
-def combine_profiles(raw_profile_path, column_name):
+def combine_profiles(raw_profile_path, select_experiment, column_name):
     profile_file_list = sorted(os.listdir(raw_profile_path))
 
-    profile_file_list = [file for file in profile_file_list if file.endswith('csv')]
+    # filter for files starting with select_experiment and csv files
+    profile_file_list = [
+        file for file in profile_file_list
+        if file.endswith('csv')
+        if file.startswith(select_experiment)
+    ]
 
     profile_list = []
     for file in profile_file_list:
@@ -55,7 +60,7 @@ def combine_profiles(raw_profile_path, column_name):
     return profile_df
 
 
-def create_profiles(data_raw_path, preprocessed_path, select_components):
+def create_profiles(data_raw_path, preprocessed_path, select_components, select_experiment):
 
     def normalize_year(timeseries):
         r"""Normalizes the DataFrame 'timeseries' to values that add up to 1.0."""
@@ -83,7 +88,9 @@ def create_profiles(data_raw_path, preprocessed_path, select_components):
 
                 profile_paths = os.path.join(data_raw_path, profile['input-path'])
 
-                profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
+                profile_df = combine_profiles(
+                    profile_paths, select_experiment, profile_name + profile_name_suffix
+                )
 
                 if 'apply-function' in profile:
                     function_name = profile['apply-function']
