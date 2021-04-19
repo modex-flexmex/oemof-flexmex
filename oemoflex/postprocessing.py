@@ -1096,7 +1096,7 @@ def run_postprocessing(scenario_specs, exp_paths):
     scalars_raw = load_scalar_input_data(scenario_specs, exp_paths.data_raw)
 
     # load scalars templates
-    exp, case = scenario_specs['scenario'].split('_')
+    exp, _ = scenario_specs['scenario'].split('_')
 
     if exp == 'FlexMex1':
         flexmex_scalars_template = pd.read_csv(
