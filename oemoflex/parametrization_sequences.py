@@ -18,15 +18,22 @@ path_oemof_tabular_settings = os.path.join(
 
 path_mappings = os.path.abspath(os.path.join(module_path, PATH_MAPPINGS_REL))
 
-path_mapping_input_timeseries = os.path.join(path_mappings, 'mapping-input-timeseries.yml')
+path_mapping_input_timeseries_flexmex1 = os.path.join(
+    path_mappings, 'mapping-input-timeseries-FlexMex1.yml')
+
+path_mapping_input_timeseries_flexmex2 = os.path.join(
+    path_mappings, 'mapping-input-timeseries-FlexMex2.yml')
 
 # Load configs
 oemof_tabular_settings = load_yaml(path_oemof_tabular_settings)
 
+mapping_input_timeseries = {
+    "FlexMex1": load_yaml(path_mapping_input_timeseries_flexmex1),
+    "FlexMex2": load_yaml(path_mapping_input_timeseries_flexmex2),
+}
+
 # Define time index and regions
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
-
-mapping = load_yaml(path_mapping_input_timeseries)
 
 
 def combine_profiles(raw_profile_path, select_experiment, column_name):
@@ -75,6 +82,8 @@ def create_profiles(data_raw_path, preprocessed_path, select_components, select_
     sequences_dir = oemof_tabular_settings['sequences-dir']
     profile_file_suffix = oemof_tabular_settings['profile-file-suffix']
     profile_name_suffix = oemof_tabular_settings['profile-name-suffix']
+
+    mapping = mapping_input_timeseries[select_experiment]
 
     for component in select_components:
 
