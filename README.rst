@@ -11,7 +11,7 @@ the Modex project FlexMex.
 Getting started
 ===============
 
-Install oemo-flex and its dependencies by setting up a virtual environment and from within call
+Install oemof-flexmex and its dependencies by setting up a virtual environment and from within call
 
 .. code-block:: bash
 
