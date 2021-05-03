@@ -2,10 +2,10 @@ import os
 import logging
 import sys
 
-from oemoflex.model_structure import create_default_elements
-from oemoflex.parametrization_scalars import update_scalars
-from oemoflex.parametrization_sequences import create_profiles
-from oemoflex.helpers import (
+from oemof_flexmex.model_structure import create_default_elements
+from oemof_flexmex.parametrization_scalars import update_scalars
+from oemof_flexmex.parametrization_sequences import create_profiles
+from oemof_flexmex.helpers import (
     check_if_csv_dirs_equal, load_yaml, load_scalar_input_data, setup_logging
 )
 

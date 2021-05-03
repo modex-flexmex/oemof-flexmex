@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from oemoflex.helpers import check_if_csv_dirs_equal
+from oemof_flexmex.helpers import check_if_csv_dirs_equal
 
 basepath = os.path.abspath(os.path.dirname(__file__))
 

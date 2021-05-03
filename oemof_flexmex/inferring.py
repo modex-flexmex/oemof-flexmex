@@ -1,7 +1,7 @@
 import os
 
 from oemof.tabular.datapackage import building
-from oemoflex.helpers import load_yaml
+from oemof_flexmex.helpers import load_yaml
 
 
 # Path definitions

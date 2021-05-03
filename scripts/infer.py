@@ -1,7 +1,7 @@
 import sys
 
-from oemoflex.helpers import load_yaml
-from oemoflex.inferring import infer
+from oemof_flexmex.helpers import load_yaml
+from oemof_flexmex.inferring import infer
 
 
 if __name__ == '__main__':
