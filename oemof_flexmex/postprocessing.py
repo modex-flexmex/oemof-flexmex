@@ -8,10 +8,11 @@ import pandas as pd
 from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
-from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data, load_yaml
-from oemoflex.parametrization_scalars import get_parameter_values
+from oemof_flexmex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data,\
+    load_yaml
+from oemof_flexmex.parametrization_scalars import get_parameter_values
 
-from oemoflex.facades import TYPEMAP
+from oemof_flexmex.facades import TYPEMAP
 
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']

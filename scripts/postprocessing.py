@@ -4,8 +4,8 @@ import sys
 
 from addict import Dict
 
-from oemoflex.postprocessing import run_postprocessing
-from oemoflex.helpers import check_if_csv_dirs_equal, load_yaml, setup_logging
+from oemof_flexmex.postprocessing import run_postprocessing
+from oemof_flexmex.helpers import check_if_csv_dirs_equal, load_yaml, setup_logging
 
 
 if __name__ == '__main__':
