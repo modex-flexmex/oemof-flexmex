@@ -2,7 +2,7 @@ import os
 
 # Configuration
 scenario_yml = "scenarios/{scenario}.yml"
-raw_dir = "data/In/v0.08"
+raw_dir = "data/In/v0.09"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized_dir = "results/{scenario}/02_optimized"
 postprocessed_dir = "results/{scenario}/03_postprocessed"
