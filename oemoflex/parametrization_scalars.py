@@ -752,7 +752,7 @@ def update_hydro_reservoir(component_df, scalars):
 
     initial_storage_level = get_parameter_values(
         scalars,
-        'Energy_PrimaryEnergy_Hydro_Reservoir_FillingLevelStart')
+        'EnergyConversion_FillingLevelStart_Electricity_Hydro_Reservoir')
 
     component_df['storage_capacity'] = storage_capacity
 
