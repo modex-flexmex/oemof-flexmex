@@ -408,7 +408,7 @@ def update_h2_cavern(
         scalars, 'Storage_Capacity_H2_CavernStorage') * 1e3  # GWh to MWh
 
     self_discharge = get_parameter_values(
-        scalars, 'Storage_SelfDischarge_Electricity_H2_Cavern') * 1e-2  # percent -> 0...1
+        scalars, 'Storage_SelfDischarge_H2_Cavern') * 1e-2  # percent -> 0...1
 
     operation_cost = get_parameter_values(
         scalars, 'Storage_VarOM_H2_Cavern') * 1e-3  # Eur/GWh -> Eur/MWh
