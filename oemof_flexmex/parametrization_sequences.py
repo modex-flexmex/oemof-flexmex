@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 
-from oemoflex.helpers import load_yaml
+from oemof_flexmex.helpers import load_yaml
 
 
 # Path definitions

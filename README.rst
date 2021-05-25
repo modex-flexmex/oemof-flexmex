@@ -1,8 +1,8 @@
-~~~~~~~~~
-oemo-flex
-~~~~~~~~~
+~~~~~~~~~~~~~
+oemof-flexmex
+~~~~~~~~~~~~~
 
-Oemo-Flex (Open Energy Model for FlexMex) is an oemof model built for model comparison within
+oemof-flexmex (Open Energy Model for FlexMex) is an oemof model built for model comparison within
 the Modex project FlexMex.
 
 .. contents::
@@ -11,11 +11,11 @@ the Modex project FlexMex.
 Getting started
 ===============
 
-Install oemo-flex and its dependencies by setting up a virtual environment and from within call
+Install oemof-flexmex and its dependencies by setting up a virtual environment and from within call
 
 .. code-block:: bash
 
-    pip install -e oemo-flex
+    pip install -e oemof_flexmex
 
 
 Experiment 1

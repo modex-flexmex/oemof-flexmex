@@ -1,8 +1,8 @@
 import os
 import sys
 
-from oemoflex.helpers import load_yaml, setup_logging
-from oemoflex.optimization import optimize
+from oemof_flexmex.helpers import load_yaml, setup_logging
+from oemof_flexmex.optimization import optimize
 
 if __name__ == '__main__':
     scenario_specs = load_yaml(sys.argv[1])

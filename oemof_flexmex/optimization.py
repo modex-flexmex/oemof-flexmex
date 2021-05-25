@@ -7,7 +7,7 @@ from oemof.solph import EnergySystem, Model
 # DONT REMOVE THIS LINE!
 # pylint: disable=unused-import
 from oemof.tabular import datapackage  # noqa
-from oemoflex.facades import TYPEMAP
+from oemof_flexmex.facades import TYPEMAP
 
 
 def optimize(data_preprocessed, results_optimization, solver='cbc', save_lp=False):
