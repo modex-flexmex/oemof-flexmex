@@ -398,12 +398,66 @@ def update_electricity_heatpump_large(
     return component_df
 
 
-def update_heat_storage_small(component_df, scalars):
+def update_heat_storage_small(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_SmallDischarge')
 
-    component_df['storage_capacity'] = get_parameter_values(
-        scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_SmallDischarge')
+
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_SmallStorage') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_Heat_Small') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_Heat_Small')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge + capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost_charge \
+                                        + fix_cost * (capex_charge + capex_discharge)
+
+        component_df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    if expandable and greenfield:
+        component_df['capacity'] = 0
+        component_df['storage_capacity'] = 0
+
+    else:
+        component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
+
+        component_df['storage_capacity'] = get_parameter_values(
+            scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
 
     component_df['loss_rate'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
@@ -417,7 +471,66 @@ def update_heat_storage_small(component_df, scalars):
     return component_df
 
 
-def update_heat_storage_large(component_df, scalars):
+def update_heat_storage_large(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
+
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_LargeCharge')
+
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_LargeDischarge')
+
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_LargeStorage') * 1e-3  # Eur/GWh -> Eur/MWh
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_Heat_Large') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_Heat_Large')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge + capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost_charge \
+                                        + fix_cost * (capex_charge + capex_discharge)
+
+        component_df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    if expandable and greenfield:
+        component_df['capacity'] = 0
+        component_df['storage_capacity'] = 0
+
+    else:
+        component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
+
+        component_df['storage_capacity'] = get_parameter_values(
+            scalars, 'Storage_Capacity_Heat_LargeStorage') * 1e3  # GWh to MWh
 
     component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
 
