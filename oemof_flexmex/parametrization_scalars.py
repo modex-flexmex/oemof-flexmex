@@ -74,6 +74,16 @@ def update_electricity_demand(component_df, scalars):
     return component_df
 
 
+def update_electricity_h2_demand(component_df, scalars):
+
+    # Fill column for ALL the elements
+    component_df['amount'] = get_parameter_values(
+        scalars,
+        'Energy_FinalEnergy_Electricity_H2') * 1e3  # GWh to MWh
+
+    return component_df
+
+
 def update_heat_central_demand(component_df, scalars):
 
     amount = get_parameter_values(
@@ -816,6 +826,7 @@ update_dict = {
     'ch4-gt': update_ch4_gt,
     'electricity-bev': update_electricity_bev,
     'electricity-demand': update_electricity_demand,
+    'electricity-h2_demand': update_electricity_h2_demand,
     'electricity-heatpump-large': update_electricity_heatpump_large,
     'electricity-heatpump-small': update_electricity_heatpump_small,
     'electricity-pth': update_pth,

@@ -3,6 +3,11 @@ electricity-demand:
     electricity-demand:
       input-path: Energy/FinalEnergy/Electricity
 
+electricity-h2_demand:
+  profiles:
+    electricity-h2_demand:
+      input-path: Energy/FinalEnergy/H2
+
 heat_central-demand:
   profiles:
     heat_central-demand:
