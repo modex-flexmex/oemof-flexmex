@@ -196,11 +196,42 @@ def update_extchp(component_df, scalars):
     return component_df
 
 
-def update_boiler_large(component_df, scalars):
+def update_boiler_large(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['capacity'] = get_parameter_values(
+    capacity = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_CH4_Large'
     )
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Heat_CH4_Large')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Heat_CH4_Large') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Heat_CH4_Large')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_CH4_Large') * 0.01  # Percent to decimals
@@ -232,10 +263,41 @@ def update_boiler_small(component_df, scalars):
     return component_df
 
 
-def update_pth(component_df, scalars):
+def update_pth(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['capacity'] = get_parameter_values(
+    capacity = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_Electricity_Large')
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Heat_Electricity_Large')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Heat_Electricity_Large') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Heat_Electricity_Large')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_Electricity_Large') * 0.01  # Percent to decimals
@@ -246,11 +308,42 @@ def update_pth(component_df, scalars):
     return component_df
 
 
-def update_electricity_heatpump_small(component_df, scalars):
+def update_electricity_heatpump_small(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['capacity'] = get_parameter_values(
+    capacity = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Small'
     )
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Heat_ElectricityHeat_Small')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Heat_ElectricityHeat_Small') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Heat_ElectricityHeat_Small')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Small') * 1e-3  # Eur/GWh to Eur/MWh
@@ -258,11 +351,42 @@ def update_electricity_heatpump_small(component_df, scalars):
     return component_df
 
 
-def update_electricity_heatpump_large(component_df, scalars):
+def update_electricity_heatpump_large(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['capacity'] = get_parameter_values(
+    capacity = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Large'
     )
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Heat_ElectricityHeat_Large')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Heat_ElectricityHeat_Large') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Heat_ElectricityHeat_Large')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_COP_Heat_ElectricityHeat_Large'
