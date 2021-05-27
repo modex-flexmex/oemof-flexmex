@@ -37,9 +37,6 @@ components:
   heat_decentral-storage-small:
   hydro-reservoir:
   solar-pv:
-  uranium-nuclear-st:
-    expandable: True
-    greenfield: True
   wind-offshore:
   wind-onshore:
 
