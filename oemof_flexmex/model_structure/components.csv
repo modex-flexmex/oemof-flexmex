@@ -27,3 +27,4 @@ heat_decentral-storage-small,component_attrs/heat_decentral-storage-small.csv,Sm
 heat_decentral-excess,component_attrs/heat_decentral-excess.csv,Decentral heat excess
 hydro-reservoir,component_attrs/hydro-reservoir.csv,Hydro reservoir
 electricity-bev,component_attrs/electricity-bev.csv,Battery electric vehicle
+electricity-h2_demand,component_attrs/electricity-h2_demand.csv,Substitute electricity demand as electrolysis is not modeled
