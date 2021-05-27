@@ -17,6 +17,7 @@ components:
   hydro-reservoir:
   electricity-transmission:
   electricity-liion_battery:
+  electricity-h2_cavern:
   electricity-bev:
   ch4-gt:
   ch4-extchp:
