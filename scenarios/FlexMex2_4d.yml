@@ -16,6 +16,7 @@ components:
   electricity-bev:
   electricity-curtailment:
   electricity-demand:
+  electricity-h2_demand:
   electricity-h2_cavern:
     expandable: True
     greenfield: True

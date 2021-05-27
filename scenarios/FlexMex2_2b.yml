@@ -11,6 +11,7 @@ components:
   electricity-shortage:
   electricity-curtailment:
   electricity-demand:
+  electricity-h2_demand:
   wind-offshore:
   wind-onshore:
   solar-pv:
