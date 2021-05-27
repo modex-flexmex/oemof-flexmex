@@ -18,13 +18,7 @@ components:
   electricity-liion_battery:
     expandable: True
     greenfield: True
-  electricity-h2_cavern:
-    expandable: True
-    greenfield: True
   ch4-gt:
-    expandable: True
-    greenfield: True
-  uranium-nuclear-st:
     expandable: True
     greenfield: True
 
