@@ -26,7 +26,39 @@ tech:
     fixom: Storage_FixOM_Electricity_LiIonBattery
     storage_capex: Storage_Capex_Electricity_LiIonBatteryStorage
     storage_lifetime: Storage_LifeTime_Electricity_LiIonBatteryStorage
-  nuclear-st:
+  storage-large:
+    charge_capex: Storage_Capex_Heat_LargeCharge
+    charge_lifetime: Storage_LifeTime_Heat_Large
+    discharge_capex: Storage_Capex_Heat_LargeDischarge
+    discharge_lifetime: Storage_LifeTime_Heat_Large
+    fixom: Storage_FixOM_Heat_LargeStorage
+    storage_capex: Storage_Capex_Heat_LargeStorage
+    storage_lifetime: Storage_LifeTime_Heat_Large
+  storage-small:
+    charge_capex: Storage_Capex_Heat_SmallCharge
+    charge_lifetime: Storage_LifeTime_Heat_Small
+    discharge_capex: Storage_Capex_Heat_SmallDischarge
+    discharge_lifetime: Storage_LifeTime_Heat_Small
+    fixom: Storage_FixOM_Heat_SmallStorage
+    storage_capex: Storage_Capex_Heat_SmallStorage
+    storage_lifetime: Storage_LifeTime_Heat_Small
+  st:
     capex: EnergyConversion_Capex_Electricity_Nuclear_ST
     fixom: EnergyConversion_FixOM_Electricity_Nuclear_ST
     lifetime: EnergyConversion_LifeTime_Electricity_Nuclear_ST
+  heatpump-large:
+    capex: EnergyConversion_Capex_Heat_ElectricityHeat_Large
+    fixom: EnergyConversion_FixOM_Heat_ElectricityHeat_Large
+    lifetime: EnergyConversion_LifeTime_Heat_ElectricityHeat_Large
+  heatpump-small:
+    capex: EnergyConversion_Capex_Heat_ElectricityHeat_Small
+    fixom: EnergyConversion_FixOM_Heat_ElectricityHeat_Small
+    lifetime: EnergyConversion_LifeTime_Heat_ElectricityHeat_Small
+  boiler-large:
+    capex: EnergyConversion_Capex_Heat_CH4_Large
+    fixom: EnergyConversion_FixOM_Heat_CH4_Large
+    lifetime: EnergyConversion_LifeTime_Heat_CH4_Large
+  pth:
+    capex: EnergyConversion_Capex_Heat_Electricity_Large
+    fixom: EnergyConversion_FixOM_Heat_Electricity_Large
+    lifetime: EnergyConversion_LifeTime_Heat_Electricity_Large
