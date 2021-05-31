@@ -820,7 +820,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
 
             # Special treatment for storages
-            if tech_name in ['h2_cavern', 'liion_battery']:
+            if tech_name in ['h2_cavern', 'liion_battery', 'storage-large', 'storage-small']:
 
                 # Charge device
                 capex = get_parameter_values(scalars_raw, parameters['charge_capex'])
@@ -892,7 +892,7 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
             parameters = FlexMex_Parameter_Map['tech'][tech_name]
 
             # Special treatment for storages
-            if tech_name in ['h2_cavern', 'liion_battery']:
+            if tech_name in ['h2_cavern', 'liion_battery', 'storage-large', 'storage-small']:
 
                 # One fix cost factor for all sub-components
                 fix_cost_factor = get_parameter_values(
