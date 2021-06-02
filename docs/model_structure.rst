@@ -39,11 +39,11 @@ The filenames are of the form type_profile (e.g.
 Available components
 ====================
 
-These components are available in oemoflex.
+These components are available in oemof-flexmex.
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/model_structure/components.csv
+   :file: ../oemof_flexmex/model_structure/components.csv
 
 Component attributes
 ====================
@@ -55,28 +55,28 @@ Bus
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/model_structure/busses.csv
+   :file: ../oemof_flexmex/model_structure/busses.csv
 
 Shortage
 --------
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/model_structure/component_attrs/electricity-shortage.csv
+   :file: ../oemof_flexmex/model_structure/component_attrs/electricity-shortage.csv
 
 Curtailment
 -----------
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/model_structure/component_attrs/electricity-curtailment.csv
+   :file: ../oemof_flexmex/model_structure/component_attrs/electricity-curtailment.csv
 
 PV
 --
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/model_structure/component_attrs/solar-pv.csv
+   :file: ../oemof_flexmex/model_structure/component_attrs/solar-pv.csv
 
 Wind onshore
 ------------
@@ -85,11 +85,11 @@ Wind offshore is identical apart from onshore replaced by offshore.
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/model_structure/component_attrs/wind-onshore.csv
+   :file: ../oemof_flexmex/model_structure/component_attrs/wind-onshore.csv
 
 Link
 ----
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/model_structure/component_attrs/electricity-transmission.csv
+   :file: ../oemof_flexmex/model_structure/component_attrs/electricity-transmission.csv
