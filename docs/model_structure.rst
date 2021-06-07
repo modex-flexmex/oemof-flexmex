@@ -41,6 +41,14 @@ The filenames are of the form type_profile (e.g.
 
 TODO: explain the columns and their names within the sequences files
 
+The found timeseries are combined into a new set of CSV files, with one file per technology and
+``{region code}-{component}-profile`` as column names.
+They are stored in ::
+
+    results/{scenario name}/01_preprocessed/data/sequences/{technology}_profile.csv
+
+for the optimization step.
+
 Available components
 ====================
 
@@ -57,3 +65,22 @@ The component's attributes are defined in separate csv files contained in
 :file:`oemof-flexmex/model_structure/component_attrs/`
 
 TODO: Explain defaults, suffices
+
+
+Extra parameters
+----------------
+
+tabular supports handing over extra ``output_parameters`` and ``input_parameters`` to the components’ classes.
+These have to be given as ``dict``'s in the corresponding CSV field.
+If you want to pass more than two parameters:
+
+A) Enclose the ``dict`` with quotes and use double-quotes in it (*less readable*).
+
+*OR*
+
+B) Make the CSV file semicolon-separated and separate the output_parameters and/or
+   input_parameters with commas (*better readable*).
+
+   More over, all component ``read_csv()`` function calls in ``preprocessing.csv`` must be adapted to the new separator (``sep=';'``).
+
+   See https://github.com/modex-flexmex/oemo-flex/issues/57 for details.
