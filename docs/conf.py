@@ -63,7 +63,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'oemoflex'
+project = u'oemof-flexmex'
 copyright = u'2020, Reiner Lemoine Institut'
 author = u'Jann Launer'
 
@@ -224,7 +224,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'oemoflex.tex', u'oemoflex documentation',
+    ('index', 'oemof-flexmex.tex', u'oemof-flexmex documentation',
      u'Jann Launer', 'manual'),
 ]
 
@@ -254,7 +254,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'oemof', u'oemoflex documentation',
+    ('index', 'oemof', u'oemof-flexmex documentation',
      [u'Reiner Lemoine Institut'], 1)
 ]
 
@@ -268,7 +268,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'oemoflex', u'oemoflex documentation',
+    ('index', 'oemof-flexmex', u'oemof-flexmex documentation',
      u'Author', 'Jann Launer', 'An open energy system model for flexibility'
      'in the European energy system.',
      ''),
@@ -290,7 +290,7 @@ texinfo_documents = [
 # -- Options for Epub output ----------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'oemoflex'
+epub_title = u'oemof-flexmex'
 epub_author = u'Jann Launer'
 epub_copyright = u'2020, Reiner Lemoine Institut'
 

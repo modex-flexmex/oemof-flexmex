@@ -44,16 +44,16 @@ TODO: explain the columns and their names within the sequences files
 Available components
 ====================
 
-These components are available in oemoflex.
+These components are available in oemof-flexmex.
 
 .. csv-table::
    :header-rows: 1
-   :file: ../oemoflex/model_structure/components.csv
+   :file: ../oemof_flexmex/model_structure/components.csv
 
 Component attributes
 ====================
 
 The component's attributes are defined in separate csv files contained in
-:file:`oemoflex/model_structure/component_attrs/`
+:file:`oemof-flexmex/model_structure/component_attrs/`
 
 TODO: Explain defaults, suffices

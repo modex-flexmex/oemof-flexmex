@@ -6,7 +6,7 @@ raw_dir = "data/In/v0.06"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized_dir = "results/{scenario}/02_optimized"
 postprocessed_dir = "results/{scenario}/03_postprocessed"
-results_template = "flexmex_config/output_template/v0.06_alt/Template"
+results_template = "flexmex_config/output_template/v0.07/Template"
 log_dir = "results/{scenario}"
 results_joined_dir = "results/{experiment}"
 
@@ -39,6 +39,8 @@ rule preprocess:
         directory(preprocessed_data)
     params:
         log=log_dir
+    benchmark:
+        os.path.join(log_dir, "benchmark-preprocess.log")
     shell:
         "python scripts/preprocessing.py {input.scenario_yml} {input.raw} {output} {params.log}"
 
@@ -47,7 +49,7 @@ rule infer:
     message:
         "Infer meta-data from preprcoessed data for scenario '{wildcards.scenario}'."
     input:
-        preprocessed_data,  # for monitoring only
+        preprocessed_data,  # for Snakemake monitoring only
         scenario_yml=scenario_yml,
         script="scripts/infer.py",  # re-run if updated
     output:
@@ -55,6 +57,8 @@ rule infer:
     params:
         # tabular's infer_metadata() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
+    benchmark:
+        os.path.join(log_dir, "benchmark-infer.log")
     shell:
         "python scripts/infer.py {input.scenario_yml} {params.preprocessed_dir}"
 
@@ -63,8 +67,8 @@ rule optimize:
     message:
         "Optimize scenario '{wildcards.scenario}'."
     input:
-        preprocessed_data,  # for monitoring only
-        inferred_datapackage,  # for monitoring only
+        preprocessed_data,  # for Snakemake monitoring only
+        inferred_datapackage,  # for Snakemake monitoring only
         scenario_yml=scenario_yml,
         script="scripts/optimization.py"  # re-run if updated
     output:
@@ -73,6 +77,8 @@ rule optimize:
         # oemoflex's optimize() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
         log=log_dir,
+    benchmark:
+        os.path.join(log_dir, "benchmark-optimize.log")
     shell:
         "python scripts/optimization.py {input.scenario_yml} {params.preprocessed_dir}"
         " {output} {params.log}"
@@ -82,24 +88,27 @@ rule postprocess:
     message:
         "Postprocess results for scenario '{wildcards.scenario}'."
     input:
-        preprocessed_data,  # for monitoring only
+        preprocessed_data,  # for Snakemake monitoring only
         scenario_yml=scenario_yml,
         optimized=optimized_dir,
         results_template=results_template,
         script="scripts/postprocessing.py"  # re-run if updated
     output:
-        directory(postprocessed_dir)
+        data=directory(postprocessed_dir),
+        solver_time=os.path.join(log_dir, "solver_time.csv")
     params:
         # Not necessarily as input, whole pipeline must be re-run anyway if this changes:
         raw=raw_dir,
         # postprocessing load_elements() expects the datapackage base dir as input:
         preprocessed_dir=preprocessed_dir,
         log=log_dir,
+    benchmark:
+        os.path.join(log_dir, "benchmark-postprocess.log")
     shell:
         "python scripts/postprocessing.py {input.scenario_yml}"
         " {params.raw} {params.preprocessed_dir}"
         " {input.optimized} {input.results_template}"
-        " {output} {params.log}"
+        " {output.data} {params.log}"
 
 
 def processed_scenarios(wildcards):
@@ -139,3 +148,22 @@ rule join_results:
         scenarios=processed_scenarios,
     script:
         "scripts/join_results.py"
+
+rule analyze_cputime:
+    message:
+        "Time measurement output."
+    input:
+        os.path.join(log_dir, "benchmark-preprocess.log"),  # for Snakemake monitoring only
+        os.path.join(log_dir, "benchmark-infer.log"),  # for Snakemake monitoring only
+        os.path.join(log_dir, "benchmark-optimize.log"),  # for Snakemake monitoring only
+        os.path.join(log_dir, "benchmark-postprocess.log"),  # for Snakemake monitoring only
+        os.path.join(log_dir, "solver_time.csv"),
+        script="scripts/analyze_cputime.py"  # re-run if updated
+    output:
+        os.path.join(log_dir, "cpu_time_analysis.csv")
+    params:
+        input_dir=log_dir,
+    shell:
+         "python scripts/analyze_cputime.py {wildcards.scenario}"
+         " {params.input_dir}"
+         " {output}"

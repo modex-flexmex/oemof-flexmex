@@ -8,10 +8,11 @@ import pandas as pd
 from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
-from oemoflex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data, load_yaml
-from oemoflex.parametrization_scalars import get_parameter_values
+from oemof_flexmex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data,\
+    load_yaml
+from oemof_flexmex.parametrization_scalars import get_parameter_values
 
-from oemoflex.facades import TYPEMAP
+from oemof_flexmex.facades import TYPEMAP
 
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
@@ -1060,6 +1061,41 @@ def export_bus_sequences(es, destination):
         value.to_csv(file_path)
 
 
+def log_solver_time_to_file(meta_results, path):
+    r"""Log solver time from oemof.outputlib.processing.meta_results() to a log file in 'path'"""
+
+    sys_time = meta_results['solver']['System time']  # equals 'Total time (CPU seconds)' in stdout
+    wc_time = meta_results['solver']['Wallclock time']
+    user_time = meta_results['solver']['User time']  # Always -1 so far
+    time = meta_results['solver']['Time']  # Not clear what this means
+    output_path = os.path.join(path, 'solver_time.csv')
+
+    df = pd.DataFrame(
+        {'system_time': [sys_time],
+         'wallclock_time': [wc_time],
+         'user_time': [user_time],
+         'time': [time],
+         })
+    df.to_csv(output_path, index=False)
+
+
+def log_problem_metrics_to_file(meta_results, path):
+    r"""Log a number of solver metrics from oemof.outputlib.processing.meta_results()
+    to a log file in 'path'"""
+
+    no_of_constraints = meta_results['problem']['Number of constraints']
+    no_of_vars = meta_results['problem']['Number of variables']
+    no_of_nonzeros = meta_results['problem']['Number of nonzeros']
+    output_path = os.path.join(path, 'problem_metrics.csv')
+
+    df = pd.DataFrame(
+        {'constraints': [no_of_constraints],
+         'vars': [no_of_vars],
+         'nonzeros': [no_of_nonzeros],
+         })
+    df.to_csv(output_path, index=False)
+
+
 def run_postprocessing(scenario_specs, exp_paths):
     create_postprocessed_results_subdirs(exp_paths.results_postprocessed)
 
@@ -1081,6 +1117,9 @@ def run_postprocessing(scenario_specs, exp_paths):
     # restore EnergySystem with results
     es = EnergySystem()
     es.restore(exp_paths.results_optimization)
+
+    log_solver_time_to_file(es.meta_results, exp_paths.logging_path)
+    log_problem_metrics_to_file(es.meta_results, exp_paths.logging_path)
 
     # format results sequences
     sequences_by_tech = get_sequences_by_tech(es.results)

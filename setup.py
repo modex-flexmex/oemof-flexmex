@@ -9,13 +9,13 @@ def read(fname):
 
 
 setup(
-    name='oemoflex',
+    name='oemof-flexmex',
     version='0.0.0',
     description='Energy system model of the flexibilities in the European energy system',
     author='Jann Launer',
     author_email='jann.launer@rl-institut.de',
     long_description=read('README.rst'),
-    packages=['oemoflex'],
+    packages=['oemof_flexmex'],
     install_requires=[
         'pandas',
         'oemof',
@@ -23,6 +23,7 @@ setup(
         'pyyaml',
         'addict',
         'Pyomo==5.6.7',
-        'PyUtilib==5.7.2'
+        'PyUtilib==5.7.2',
+        'Snakemake>=5.32.0'
     ],
 )

@@ -9,37 +9,37 @@ Getting started
     :local:
     :backlinks: top
 
-Using oemoflex
-==============
+Using oemof-flexmex
+===================
 
 
 Installing the latest (dev) version
 -----------------------------------
 
-Clone oemoflex from github:
+Clone oemof-flexmex from github:
 
 ::
 
-    git clone git@github.com:modex-flexmex/oemoflex.git
+    git clone git@github.com:modex-flexmex/oemof-flexmex.git
 
 
-Now you can install it your local version of oemoflex using pip:
+Now you can install it your local version of oemof-flexmex using pip:
 
 ::
 
-    pip install -e <path/to/oemoflex/root/dir>
+    pip install -e <path/to/oemof-flexmex/root/dir>
 
 
 Requirements
 ------------
-1. To use `oemof-solph`, the core of oemoflex, a LP/MILP solver must be installed.
+1. To use `oemof-solph`, the core of oemof-flexmex, a LP/MILP solver must be installed.
    To use the CBC solver install the `coinor-cbc` package:
 
    ::
 
     apt-get install coinor-cbc
 
-2. oemoflex needs `oemof-tabular` for data preprocessing.
+2. oemof-flexmex needs `oemof-tabular` for data preprocessing.
    Please install the dev version from github rather than installing from PyPi/pip.
 
    ::
@@ -65,8 +65,8 @@ Required data
 
 This data is planned to be published at a later point in time by the project FlexMex.
 
-Contributing to oemoflex
-========================
+Contributing to oemof-flexmex
+=============================
 
 You can write issues to announce bugs or errors or to propose
 enhancements.

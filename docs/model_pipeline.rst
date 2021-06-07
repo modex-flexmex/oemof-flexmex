@@ -6,7 +6,7 @@ Model pipeline
 
 TODO: Start with a short section on snakemake, explain that this is the workflow management tool that is used.
 
-Data processing in oemoflex is divided in 4 main steps:
+Data processing in oemof-flexmex is divided in 4 main steps:
 
 * preprocessing
 * inferring
@@ -36,7 +36,7 @@ It consists of a parameter database (parameters are called `scalars`) and a bunc
 The data is expected to be CSV-formatted and is read from ``data/In``.
 The format of timeseries and scalars is described below.
 
-.. note:: Raw data for FlexMex is not part of the oemoflex github repository but can be provided by the FlexMex project partners.
+.. note:: Raw data for FlexMex is not part of the oemof-flexmex github repository but can be provided by the FlexMex project partners.
 
 Scalars
 -------
@@ -107,7 +107,7 @@ Value: `float`
 Timeseries
 ----------
 
-Timeseries in oemoflex assign a value to every hour of the year (1...8760).
+Timeseries in oemof-flexmex assign a value to every hour of the year (1...8760).
 They are hold in CSV files with time index-value pairs per line and one timeseries per file.
 
 .. warning:: The time index is ignored at the moment. It will be overwritten by a ``pandas`` ``datetimeindex``.
@@ -172,7 +172,7 @@ Postprocessing
 
 Postprocessing translates the results into an exchange-friendly format defined by the FlexMex project partners.
 For that, a result template defines the parameters to be output for each scenario.
-The oemoflex-internal parameters are recalculated and mapped to the FlexMex parameter names.
+The oemof-flexmex-internal parameters are recalculated and mapped to the FlexMex parameter names.
 
 The results template is provided by the FlexMex project partners.
 It consists of an output directory structure and a scaffold Scalars.csv output file (with no values).
