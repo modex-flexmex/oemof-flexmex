@@ -532,11 +532,6 @@ def update_heat_storage_large(
         component_df['storage_capacity'] = get_parameter_values(
             scalars, 'Storage_Capacity_Heat_LargeStorage') * 1e3  # GWh to MWh
 
-    component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
-
-    component_df['storage_capacity'] = get_parameter_values(
-        scalars, 'Storage_Capacity_Heat_LargeStorage') * 1e3  # GWh to MWh
-
     component_df['loss_rate'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Large') * 0.01  # Percent to decimals
 
