@@ -217,7 +217,9 @@ def format_capacities(oemoflex_scalars, capacities):
     df.loc[:, 'type'] = capacities.reset_index().loc[:, 'type']
     df.loc[:, 'region'] = capacities.reset_index().loc[:, 'region']
 
-    df['var_unit'] = 'MW'
+    df.loc[:, 'var_unit'] = 'MW'
+    df.loc[df['var_name'] == 'storage_capacity', 'var_unit'] = 'MWh'
+    df.loc[df['var_name'] == 'storage_capacity_invest', 'var_unit'] = 'MWh'
 
     return df
 
