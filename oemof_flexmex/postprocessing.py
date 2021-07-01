@@ -1271,7 +1271,7 @@ def run_postprocessing(scenario_specs, exp_paths):
             index=False
         )
 
-    save_oemoflex_timeseries = False
+    save_oemoflex_timeseries = True
     if save_oemoflex_timeseries:
         export_bus_sequences(
             es,
