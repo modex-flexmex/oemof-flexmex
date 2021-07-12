@@ -29,7 +29,8 @@ TODO: Explain the basic columns in the scalar files.
   :py:attr:`'AT-electricity-airsourcehp'`)
 * **type** Type of oemof.tabular.facade
 * **carrier** Energy sector according to carrier (e.g. solar, wind, biomass, coal, lignite, uranium, oil, gas, methane, hydro, waste, electricity, heat).
-* **tech** Specification of the technology (e.g. st, ocgt, ccgt, pv, onshore, offshore, ror, phs, extchp, bpchp, battery)
+* **tech** Specification of the technology (e.g. pv, onshore, offshore, battery, demand, curtailment,
+shortage, transmission, ror, st, ocgt, ccgt, extchp, bpchp)
 
 TODO: Explain that other columns that follow describe the attributes of the components.
 
