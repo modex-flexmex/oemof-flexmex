@@ -4,12 +4,20 @@
 Overview
 ~~~~~~~~
 
-oemof-flexmex is sector-integrated multi-node energy system model featuring a lot of flexibility options.
+oemof-flexmex is a sector-integrated multi-node energy system model featuring a lot of flexibility options.
 Its region, interconnections and components can be adapted flexibly.
 
-The model has been developed in the context of the model comparison project FlexMex and builds upon the open energy modeling framework _oemof_.
-oemof-flexmex defines a data format to run energy system optimization using oemof.solph and oemof.tabular. It provides pre- and postprocessing routines
-to feed the project's harmonized input data into the model and transform the output data into the output data template.
+The model has been developed in the context of the model comparison project
+`FlexMex <https://reiner-lemoine-institut.de/en/flexmex/>`_ and builds upon the open energy modeling
+framework _oemof_.
+
+`oemof <https://oemof.org>`_ is an open source, modular toolbox for building energy system models.
+It hosts different libraries for different purposes. This model, oemof-flexmex, uses
+`oemof.solph <https://oemof-solph.readthedocs.io>`_ for linear optimisation models and
+`oemof.tabular <https://oemof-tabular.readthedocs.io>`_ for the handling of input data.
+
+oemof-flexmex uses these libraries to providee pre- and postprocessing routines to feed the
+project's harmonized input data into the model and transform the output data into the output data template.
 
 
 Scenarios
