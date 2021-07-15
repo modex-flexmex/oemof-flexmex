@@ -4,6 +4,7 @@ import sys
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import oemoflex.tools.plots as plots
+from oemof_flexmex.model_config import plot_labels
 import pandas as pd
 from addict import Dict
 
@@ -42,7 +43,7 @@ if __name__ == "__main__":
         conv_number = 1000
         data = data * conv_number
         df, df_demand = plots.prepare_dispatch_data(
-            data, bus_name=bus_name, demand_name="demand"
+            data, bus_name=bus_name, demand_name="demand", general_labels_dict=plot_labels
         )
 
         # interactive plotly dispatch plot
