@@ -4,7 +4,7 @@ import sys
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import oemoflex.tools.plots as plots
-from oemof_flexmex.model_config import plot_labels
+from oemof_flexmex.model_config import plot_labels, colors_odict
 import pandas as pd
 from addict import Dict
 
@@ -52,6 +52,7 @@ if __name__ == "__main__":
             df=df,
             df_demand=df_demand,
             unit="W",
+            colors_odict=colors_odict
         )
         file_name = bus_name + "_dispatch_interactive" + ".html"
         fig_plotly.write_html(
@@ -72,7 +73,7 @@ if __name__ == "__main__":
             )
             # plot time filtered data
             plots.plot_dispatch(
-                ax=ax, df=df_time_filtered, df_demand=df_demand_time_filtered, unit="W"
+                ax=ax, df=df_time_filtered, df_demand=df_demand_time_filtered, unit="W", colors_odict=colors_odict
             )
 
             plt.grid()
