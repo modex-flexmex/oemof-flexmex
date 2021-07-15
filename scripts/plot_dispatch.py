@@ -15,7 +15,8 @@ if __name__ == "__main__":
     paths.plotted = sys.argv[2]
 
     # create the directory plotted where all plots are saved
-    os.makedirs(paths.plotted)
+    if not os.path.exists(paths.plotted):
+        os.makedirs(paths.plotted)
 
     timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries")
     timeseries_files = os.listdir(timeseries_directory)
