@@ -116,7 +116,7 @@ rule plot_dispatch:
     input:
         postprocessed_dir
     output:
-        plotted_dir
+        directory(plotted_dir)
     shell:
         "python scripts/plot_dispatch.py {input} {output}"
 
