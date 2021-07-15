@@ -6,6 +6,7 @@ raw_dir = "data/In/v0.06"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized_dir = "results/{scenario}/02_optimized"
 postprocessed_dir = "results/{scenario}/03_postprocessed"
+plotted_dir = "results/{scenario}/04_plotted"
 results_template = "flexmex_config/output_template/v0.07/Template"
 log_dir = "results/{scenario}"
 results_joined_dir = "results/{experiment}"
@@ -109,6 +110,15 @@ rule postprocess:
         " {params.raw} {params.preprocessed_dir}"
         " {input.optimized} {input.results_template}"
         " {output.data} {params.log}"
+
+
+rule plot_dispatch:
+    input:
+        postprocessed_dir
+    output:
+        plotted_dir
+    shell:
+        "python scripts/plot_dispatch.py {input} {output}"
 
 
 def processed_scenarios(wildcards):
