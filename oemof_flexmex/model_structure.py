@@ -159,7 +159,6 @@ def create_component_element(component_attrs_file):
         # TODO: Check the diverging conventions of '-' and '_' and think about unifying.
         comp_data['region'] = [link.replace('-', '_') for link in link_list]
         comp_data['name'] = ['-'.join([link, defaults['carrier'], defaults['tech']]) for link in link_list]
-        print(comp_data['name'])
         comp_data['from_bus'] = [link.split('-')[0] + suffices['from_bus'] for link in link_list]
         comp_data['to_bus'] = [link.split('-')[1] + suffices['to_bus'] for link in link_list]
 
