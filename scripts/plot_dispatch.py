@@ -37,37 +37,40 @@ if __name__ == "__main__":
 
         data = pd.read_csv(bus_path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
 
-        # interactive plotly dispatch plot
-        fig_plotly = plots.plot_dispatch_plotly(
-            df=data.copy(), bus_name=bus_name, unit="W", conv_number=1000
+        # prepare dispatch data
+        # convert data to SI-unit
+        conv_number = 1000
+        data = data * conv_number
+        df, df_demand = plots.prepare_dispatch_data(
+            data, bus_name=bus_name, demand_name="demand"
         )
 
-        fig_plotly.update_layout(title=bus_name + " dispatch")
-
+        # interactive plotly dispatch plot
+        fig_plotly = plots.plot_dispatch_plotly(
+            df=df,
+            df_demand=df_demand,
+            unit="W",
+        )
         file_name = bus_name + "_dispatch_interactive" + ".html"
         fig_plotly.write_html(
             file=os.path.join(paths.plotted, file_name),
-            # The following parameters are set according to
-            # https://plotly.github.io/plotly.py-docs/generated/plotly.io.write_html.html
-            # The files are much smaller now because a script tag containing the plotly.js source
-            # code (~3MB) is not included in the output anymore. It is refered to plotlyjs via a
-            # link in div of the plot.
-            include_plotlyjs="cdn",
-            full_html=False,
+            # include_plotlyjs=False,
+            # full_html=False
         )
 
         # normal dispatch plot
         # plot one winter and one summer month
         for start_date, end_date in timeframe:
             fig, ax = plt.subplots(figsize=(12, 5))
-            ax, data = plots.eng_format(ax, data, "W", 1000)
 
+            # filter timeseries
+            df_time_filtered = plots.filter_timeseries(df, start_date, end_date)
+            df_demand_time_filtered = plots.filter_timeseries(
+                df_demand, start_date, end_date
+            )
+            # plot time filtered data
             plots.plot_dispatch(
-                ax=ax,
-                df=data,
-                start_date=start_date,
-                end_date=end_date,
-                bus_name=bus_name,
+                ax=ax, df=df_time_filtered, df_demand=df_demand_time_filtered, unit="W"
             )
 
             plt.grid()
