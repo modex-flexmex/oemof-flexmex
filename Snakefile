@@ -9,6 +9,7 @@ postprocessed_dir = "results/{scenario}/03_postprocessed"
 results_template = "flexmex_config/output_template/v0.07/Template"
 log_dir = "results/{scenario}"
 results_joined_dir = "results/{experiment}"
+results_joined_plotted_dir = "results/{experiment}_plotted"
 
 # Set oemof.tabular sub-paths
 preprocessed_data = os.path.join(preprocessed_dir, "data")
@@ -167,3 +168,17 @@ rule analyze_cputime:
          "python scripts/analyze_cputime.py {wildcards.scenario}"
          " {params.input_dir}"
          " {output}"
+
+
+rule plot_joined_scalars:
+    message:
+        "Plot joined scalars."
+    wildcard_constraints:
+        experiment="(FlexMex1|FlexMex2)"
+    input:
+        script="scripts/plot_joined_scalars.py",  # re-run if updated
+        scalars=os.path.join(results_joined_dir, "Scalars.csv")
+    output:
+        directory(results_joined_plotted_dir)
+    shell:
+        "python {input.script} {input.scalars} {output}"
