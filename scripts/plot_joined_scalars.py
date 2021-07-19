@@ -1,17 +1,20 @@
-import os
 import sys
+import os
 
 import pandas as pd
 from addict import Dict
 
-import oemof_flexmex.plotting as plotting
-from oemof_flexmex.helpers import read_scalar_input_data
+import oemof_flexmex.plotting.draw as draw
+import oemof_flexmex.plotting.prepare as prepare
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # get paths of input data and where to save plots.
     paths = Dict()
     paths.results_joined = sys.argv[1]
     paths.results_joined_plotted = sys.argv[2]
+
+    scenario = "FlexMex2_2"
+    onxaxes = 'Scenario'  # either Region or Scenario
 
     # create directory if it does not exist yet.
     if not os.path.exists(paths.results_joined_plotted):
@@ -19,4 +22,57 @@ if __name__ == '__main__':
 
     scalars = pd.read_csv(paths.results_joined)
 
-    # plot
+    # Retrieve the demand; demand is the same in all scenarios.
+    # TODO: This is true for demand, but is it also for the other values imported from this scalars file?
+    demand_file = os.path.join(
+        os.path.dirname(__file__),
+        "../data/In/v0.09/FlexMex2_Scalars_2a.csv",
+    )
+
+    df_demand = pd.read_csv(demand_file)
+
+    scalars.rename(columns={"UseCase": "Scenario"}, inplace=True)
+
+    df_in = scalars[scalars.loc[:, "Scenario"].str.contains(scenario)]
+
+    if scenario == "FlexMex2_1":
+        (
+            df_plot_conversion_electricity,
+            electricity_demand,
+        ) = prepare.conversion_electricity_FlexMex2_1(df_in, df_demand, onxaxes)
+
+    elif scenario == "FlexMex2_2":
+        (
+            df_plot_conversion_electricity,
+            electricity_demand,
+        ) = prepare.conversion_electricity_FlexMex2_2(df_in, df_demand, onxaxes)
+
+        df_plot_conversion_heat, heat_demand = prepare.conversion_heat_FlexMex2_2(
+            df_in, df_demand, onxaxes
+        )
+
+        df_plot_storage, filler_demand = prepare.storage_FlexMex2_2(df_in, onxaxes)
+
+    draw.stacked_scalars(
+        df_plot_conversion_electricity,
+        electricity_demand,
+        "2021-07-17-electricity_flows " + scenario + onxaxes,
+        "electricity in GWh",
+        "Scenario",
+    )
+
+    if scenario == "FlexMex2_2":
+        draw.stacked_scalars(
+            df_plot_conversion_heat,
+            heat_demand,
+            "2021-07-17-heat_flows " + scenario + onxaxes,
+            "heat in GWh",
+            "Scenario",
+        )
+        draw.stacked_scalars(
+            df_plot_storage,
+            filler_demand,
+            "2021-07-17-storage" + scenario + onxaxes,
+            "storage in GWh",
+            "Scenario",
+        )

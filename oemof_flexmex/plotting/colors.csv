@@ -1,0 +1,115 @@
+Color
+Solar_PV,#bcbd22
+SolarPV,#bcbd22
+Solar PV,#bcbd22
+PV,#bcbd22
+Wind,#407294
+Wind_Offshore,#1f77b4
+WindOffshore,#1f77b4
+Wind offshore,#1f77b4
+Wind onshore,#00ced1
+Wind_Onshore,#00ced1
+WindOnshore,#00ced1
+SecondaryEnergy_Electricity_RE,#069943
+EnergyConversion_SecondaryEnergy_Electricity_RE,#069943
+SecondaryEnergy_Electricity_Slack,#bf3636
+EnergyConversion_SecondaryEnergy_Electricity_Slack,#bf3636
+SecondaryEnergy_Heat_Slack,#bf3636
+EnergyConversion_SecondaryEnergy_Heat_Slack,#bf3636
+SecondaryEnergy_Heat_ElectricityHeat_Large,#3078a3
+EnergyConversion_SecondaryEnergy_Heat_ElectricityHeat_Large,#3078a3
+Capacity_Heat_ElectricityHeat_Large,#3078a3
+Capacity_Heat_ElectricityHeat_Small,#6fbeee
+SecondaryEnergy_Heat_ElectricityHeat_Small,#6fbeee
+Heatpump small,#6fbeee
+EnergyConversion_SecondaryEnergy_Heat_ElectricityHeat_Small,#6fbeee
+Heatpump large,#36b07b
+SecondaryEnergy_Heat_Electricity_Large,#36b07b
+EnergyConversion_SecondaryEnergy_Heat_Electricity_Large,#36b07b
+Resistance heating,#36b07b
+Hydro reservoir,#033996
+Capacity_Heat_Electricity_Large,#36b07b
+Losses_Electricity_Hydro_Reservoir,#0d1692
+EnergyConversion_SecondaryEnergy_Electricity_Hydro_ReservoirPump,#1786bd
+Hydro reservoir pump,#1786bd
+SecondaryEnergy_Electricity_Hydro_ReservoirPump,#1786bd
+EnergyConversion_SecondaryEnergy_Electricity_Hydro_ReservoirTurbine,#033996
+SecondaryEnergy_Electricity_Hydro_ReservoirTurbine,#033996
+EnergyConversion_VarOM_Electricity_Hydro_Reservoir,#4f6d9f
+Hydro,#4f6d9f
+H2CavernStorage,#54f2ff
+Storage_Losses_H2_H2CavernStorage,#3a979f
+Storage_Output_H2_H2CavernStorage,#4350ff
+Storage_Input_H2_H2CavernStorage,#8e93dd
+Biomass,#2ca02c
+CH4,#d62728
+CH4GT,#d62728
+CH4 GT,#d62728
+Combustible Fuels,#d62728
+Capacity_Heat_CH4_Large,#d46566
+SecondaryEnergy_Electricity_CH4_GT,#d62728
+CH4_GT,#d62728
+EnergyConversion_SecondaryEnergy_Electricity_CH4_GT,#d62728
+SecondaryEnergy_Heat_Gas_Large,#b07911
+EnergyConversion_SecondaryEnergy_Heat_Gas_Large,#b07911
+SecondaryEnergy_Electricity_ElectricityHeat_CH4_ExCCGT,#a81bc3
+EnergyConversion_SecondaryEnergy_Electricity_ElectricityHeat_CH4_ExCCGT,#a81bc3
+EnergyConversion_SecondaryEnergy_Heat_ElectricityHeat_CH4_ExCCGT,#a81bc3
+SecondaryEnergy_Heat_ElectricityHeat_CH4_ExCCGT,#ca71db
+Capacity_ElectricityHeat_CH4_ExCCGT,#e0a2ec
+CapacityElectricityHeatCH4ExCCGT,#e0a2ec
+Nuclear,#e4f200
+CombustibleFuels,#d62728
+BATdischarge,#9467bd
+BAT discharge,#9467bd
+BATcharge,#e377c2
+BAT charge,#e377c2
+Import,#17becf
+Shortage,#ff7f0e
+Export,#8c564b
+Curtailment,#7f7f7f
+Curtailment_Electricity_RE,#7f7f7f
+EnergyConversion_Curtailment_Electricity_RE,#7f7f7f
+Demand,#000000
+El. demand,#000000
+Total demand,#ffa700
+SolarThermal,#ecd70e
+Solar Thermal,#ecd70e
+Geothermal,#cdb79e
+"Tide, Wave and Ocean",#133337
+Other Sources,#e0d6ce
+LiIonBatteryCharge,#ff80ed
+LiIonBatteryDischarge,#ffc0cb
+Storage_Capacity_Electricity_LiIonBatteryStorage,#cdb79e
+LiIonBatteryStorage,#cdb79e
+Storage_Input_Electricity_LiIonBatteryStorage,#a4a1e3
+Storage_Losses_Electricity_LiIonBatteryStorage,#694872
+Storage_Output_Electricity_LiIonBatteryStorage,#c321ee
+Storage_Capacity_Heat_LargeStorage,#ce2863
+Storage_Capacity_Heat_SmallStorage,#dd8ca8
+Storage_Input_Heat_SmallStorage,#e5ca8a
+Storage_Input_Heat_LargeStorage,#c321ee
+Storage_Losses_Heat_SmallStorage,#a39269
+Storage_Losses_Heat_LargeStorage,#858052
+Storage_Output_Heat_SmallStorage,#e5a305
+Storage_Output_Heat_LargeStorage,#f4df0b
+Storage_Capacity_Electricity_H2CavernStorage,#1bbf9a
+Storage_Capacity_H2_H2CavernStorage,#1bbf9a
+H2 demand,#1bbf9a
+Energy_FinalEnergy_Electricity,#000000
+Energy_FinalEnergy_Electricity_H2,#5f7c83
+Energy_FinalEnergy_Heat_CHP,#292585
+Extraction CHP,#292585
+Energy_FinalEnergy_Heat_HeatPump,#807be7
+Transmission_Flows_Electricity_Grid,#a9a9a9
+Transmission_Incoming,#c3a6a6
+Transmission In,#c3a6a6
+Transmission Out,#ab7777
+Transmission_Outgoing,#ab7777
+Transmission_Losses,#631717
+Transmission_Losses_Electricity_Grid,#69679f
+Transport_AnnualDemand_Electricity_Cars,#4740ec
+Transport_FeedIn_DrivePower_Electricity,#a4a1e3
+BEV charge,#a4a1e3
+BEV to grid,#a4a1e3
+

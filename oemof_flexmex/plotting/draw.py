@@ -1,0 +1,173 @@
+
+
+import os
+import pdb
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import OrderedDict
+
+dir_name = os.path.abspath(os.path.dirname(__file__))
+colors_csv = pd.read_csv(
+    os.path.join(dir_name, "colors.csv"), header=[0], index_col=[0])
+
+colors_csv = colors_csv.T
+colors_odict = OrderedDict()
+for i in colors_csv.columns:
+    colors_odict[i] = colors_csv.loc["Color", i]
+
+
+# from analysis import colors
+
+"""
+Import a specific range of data from energy_statistical_countrydatasheets.xlsx
+"""
+def import_countrydatasheet_data(sheet_name, last_row_to_skip, number_of_rows):
+    data = os.path.join(os.path.dirname(__file__), '../data/energy_statistical_countrydatasheets.xlsx')
+    df = pd.read_excel(data, sheet_name=sheet_name, index_col=2, usecols="A:AG",
+                       skiprows=lambda x: x in range(0, last_row_to_skip) and x != 7, nrows=number_of_rows, engine='openpyxl')
+    df1 = df.drop([8, 'Unnamed: 1'], axis=1)
+    return df1, sheet_name
+
+"""
+Functions for creating stacked bar plots from a table in the scalars-table-format. The input data
+must contain only one single country.
+"""
+# TODO: use country as an input variable
+def preprocessing_stacked_scalars(plot_data, factor, onxaxes): # put a factor here that the values should be devided be, e.g. 1 or 1000
+    df_plot_conversion_heat = pd.DataFrame()
+    df_plot_conversion_electricity = pd.DataFrame()
+    df_plot_storage_heat = pd.DataFrame()
+    df_plot_storage_electricity = pd.DataFrame()
+    df_plot_capacity_heat = pd.DataFrame()
+    df_plot_capacity_electricity = pd.DataFrame()
+
+    if plot_data['Parameter'].str.contains('EnergyConversion_Capacity_Electricity').any():
+        plot_data['Parameter'] = plot_data['Parameter'].str.replace('EnergyConversion_Capacity_Electricity_', '')
+    if plot_data['Parameter'].str.contains('EnergyConversion_').any():
+        plot_data['Parameter'] = plot_data['Parameter'].str.replace('EnergyConversion_', '')
+    if plot_data['Parameter'].str.contains('Storage').any():
+        # store storage in a separate dataframe ...
+        df_storage = plot_data.loc[plot_data['Parameter'].str.contains('Storage'), :]
+        # df_storage['Parameter'] = df_storage['Parameter'].str.replace('Storage_Capacity_Electricity_', '')
+        # Show only output and losses and not inputs; capacities should be plotted separately
+        df_storage = df_storage.loc[~df_storage['Parameter'].str.contains('Input|Capacity'), :]
+        # ... and remove it from the original one
+        plot_data = plot_data[~plot_data['Parameter'].str.contains('Storage')]
+        if df_storage['Parameter'].str.contains('Heat').any():
+            df_storage_heat = df_storage.loc[df_storage['Parameter'].str.contains('Heat'), :]
+            df_plot_storage_heat = pd.crosstab(index=df_storage_heat[onxaxes], columns=df_storage_heat.Parameter,
+                                               values=df_storage_heat.Value / factor, aggfunc='mean')
+
+        df_storage_electricity = df_storage[~df_storage['Parameter'].str.contains('Heat')]
+        df_plot_storage_electricity = pd.crosstab(index=df_storage_electricity[onxaxes],
+                                                      columns=df_storage_electricity.Parameter,
+                                                      values=df_storage_electricity.Value / factor, aggfunc='mean')
+    # do the same for separating heat and electricity, both for storage and for energy conversion
+    # It would be better to use a for loop for this (for dataframe in (plot_data, df_storage): ...
+    if plot_data['Parameter'].str.contains('SecondaryEnergy_Heat').any():
+        df_conversion_heat = plot_data.loc[plot_data['Parameter'].str.contains('SecondaryEnergy_Heat|Energy_FinalEnergy_Heat'), :]
+        df_plot_conversion_heat = pd.crosstab(index=df_conversion_heat[onxaxes], columns=df_conversion_heat.Parameter,
+                                              values=df_conversion_heat.Value / factor, aggfunc='mean')
+    df_conversion_electricity = plot_data[~plot_data['Parameter'].str.contains('SecondaryEnergy_Heat|Energy_FinalEnergy_Heat')]
+    if plot_data['Parameter'].str.contains('Capacity_Heat').any():
+        df_capacity_heat = plot_data.loc[plot_data['Parameter'].str.contains('Capacity_Heat')]
+        df_plot_capacity_heat = pd.crosstab(index=df_capacity_heat[onxaxes], columns=df_capacity_heat.Parameter,
+                                            values=df_capacity_heat.Value / factor, aggfunc='mean')
+        df_capacity_electricity = plot_data.loc[~plot_data['Parameter'].str.contains('Capacity_Heat')]
+        df_plot_capacity_electricity = pd.crosstab(index=df_capacity_electricity[onxaxes], columns=df_capacity_electricity.Parameter,
+                                            values=df_capacity_electricity.Value / factor, aggfunc='mean')
+
+#        df_plot_conversion_heat = pd.crosstab(index=df_conversion_heat.UseCase, columns=df_conversion_heat.Parameter,
+#                                       values=df_conversion_heat.Value / factor, aggfunc='mean')
+#        df_plot_conversion_electricity = pd.crosstab(index=df_conversion_electricity.UseCase, columns=df_conversion_electricity.Parameter,
+#                                       values=df_conversion_electricity.Value / factor, aggfunc='mean')
+
+    df_plot_conversion_electricity = pd.crosstab(index=df_conversion_electricity[onxaxes], columns=df_conversion_electricity.Parameter,
+                                           values=df_conversion_electricity.Value / factor, aggfunc='mean')
+
+    #df_plot_conversion_electricity = \
+    #    df_plot_conversion_electricity.reindex(columns=['Energy_FinalEnergy_Electricity', 'Energy_FinalEnergy_Electricity_H2',
+    #                                                    'Energy_FinalEnergy_H2', 'SecondaryEnergy_Electricity_CH4_GT',
+    #                                                    'SecondaryEnergy_Electricity_RE', 'SecondaryEnergy_Electricity_Slack',
+    #                                                    'Curtailment_Electricity_RE'])
+    # TODO: check is_unique, if not issue warning message
+
+    #if df_plot.columns.str.contains('Curtailment').any():
+    #    df_plot['Curtailment_Electricity_RE'] = df_plot['Curtailment_Electricity_RE'] * (-1)
+    # Storage should be plotted in a separate diagram. It is therefore herewith allocated to a separate DataFrame
+    # and removed from df_plot.
+
+    return df_plot_conversion_heat, df_plot_conversion_electricity, df_plot_storage_heat, df_plot_storage_electricity, \
+           df_plot_capacity_electricity, df_plot_capacity_heat
+
+# The above preprocessing function has become too complicated and doesn't work for electricity flows in FlexMex2_2 now.
+# This is why I now write explicit functions for all the plot_dataframes I need.
+
+
+def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
+
+    df_plot.dropna(axis=1, how='all', inplace = True)
+    if df_plot.columns.str.contains('Transmission_Outgoing').any():
+        new_df = df_plot.drop('Transmission_Outgoing', axis = 1)
+        #new_df = df_plot[df_plot.columns.difference(['Transmission_Outgoing'])]
+        new_df.plot(kind='bar', stacked=True, bottom = df_plot.loc[:, 'Transmission_Outgoing'], color=colors_odict)
+    else:
+        df_plot.plot(kind='bar', stacked=True, color=colors_odict)
+
+    #df_plot = df_plot.drop('Transmission_Outgoing', axis = 1)
+
+    if demand > 0:
+        plt.hlines(demand, plt.xlim()[0], plt.xlim()[1], label='Demand')
+        print(demand)
+    plt.axhline(0, color='black')
+    plt.title(title)
+    plt.xlabel(xlabel, fontsize = 12)
+    plt.ylabel(ylabel, fontsize = 12)
+    plt.legend(bbox_to_anchor=(1,1), loc="upper left")
+    plt.savefig(os.path.join(os.path.dirname(__file__), '../results/' + title), bbox_inches='tight')
+
+def preprocessing_timeseries (inputdatapath, type):
+    input_file = os.path.join(os.path.dirname(__file__),
+                              inputdatapath)
+    df_in = pd.read_csv(input_file, index_col='timeindex')
+    df_in = df_in[type]
+    return(df_in)
+
+def plot_timeseries (df_in, timeframe, label, title, xlabel, ylabel):
+    fig = plt.figure()
+    fig, ax = plt.subplots()
+    if timeframe == 'weeks':
+        ax.plot(df_in.iloc[0:168 * 4], label=label)
+    elif timeframe == 'year':
+        # one point for every day
+        # ax.plot(df_in.iloc[range(0, 8760, 24)], label=label)
+        # daily averages
+        ar = np.zeros(shape=365)
+
+        for i in range (0, 365):
+            start = i*24
+            end = (i+1)*24
+            day_mean = df_in.iloc[range(start, end)].mean()
+            ar[i] = day_mean
+        ax.plot(ar, label = label)
+    # in order to show larger tendencies in wind power, here is another kind of plot with weekly averages
+    elif timeframe == 'year-rough':
+        ar = np.zeros(shape=52)
+        for i in range (0, 52):
+            start = i*168
+            end = (i+1)*168
+            week_mean = df_in.iloc[range(start, end)].mean()
+            ar[i] = week_mean
+        ax.plot(ar, label = label)
+    elif timeframe == 'day':
+        ax.plot(df_in.iloc[range(6*168, 6*168 + 24)], label=label) # the first day of the sixth week - the choice of the day is arbitrary
+    else:
+        print('Only day, weeks, year and year-rough are possible timeframes')
+    ax.set_title(title)
+    ax.set_ylabel(ylabel, fontsize = 12)
+    ax.set_xlabel(xlabel, fontsize = 12)
+    ax.legend()  # loc='upper center', bbox_to_anchor=(1.45, 0.8), shadow=True, ncol=1)
+    plt.savefig(os.path.join(os.path.dirname(__file__), '../results/timeseries/' + title), bbox_inches='tight')
+    # TODO: adjust x-axis depending on timeframe (days or months would be good, not hours)
