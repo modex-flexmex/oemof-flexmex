@@ -20,22 +20,50 @@ for i in colors_csv.columns:
 
 # from analysis import colors
 
-"""
-Import a specific range of data from energy_statistical_countrydatasheets.xlsx
-"""
+
 def import_countrydatasheet_data(sheet_name, last_row_to_skip, number_of_rows):
+    r"""
+    Import a specific range of data from energy_statistical_countrydatasheets.xlsx. The countrydatasheet is a publication
+    from the European Commission collecting various energy-related data from all European countries.
+    """
     data = os.path.join(os.path.dirname(__file__), '../data/energy_statistical_countrydatasheets.xlsx')
     df = pd.read_excel(data, sheet_name=sheet_name, index_col=2, usecols="A:AG",
                        skiprows=lambda x: x in range(0, last_row_to_skip) and x != 7, nrows=number_of_rows, engine='openpyxl')
     df1 = df.drop([8, 'Unnamed: 1'], axis=1)
     return df1, sheet_name
 
-"""
-Functions for creating stacked bar plots from a table in the scalars-table-format. The input data
-must contain only one single country.
-"""
-# TODO: use country as an input variable
+
+
 def preprocessing_stacked_scalars(plot_data, factor, onxaxes): # put a factor here that the values should be devided be, e.g. 1 or 1000
+    r"""
+    Functions for creating stacked bar plots from a table in the scalars-table-format
+
+    Parameters
+    --------------
+    plot_data: pandas.DataFrame
+        Input data to be plotted. They must contain only data for one single country.
+    factor: int or float
+        The factor by which all data should be divided, e.g. for conversion from MW to GW.
+    onxaxes: str; either 'Scenario' or 'Region'
+        If Scenario is chosen, all Scenarios (a-d) for Germany are plotted; if 'Region' is chosen, only the scenario
+        'c' is plotted but for all countries.
+
+    Returns
+    -------------
+    df_plot_conversion_heat: pandas.DataFrame
+        Heat conversion data ready to be plotted in the 'stacked_scalars' function. This method is outdated because
+        it has been replaced by a function in 'prepare.py'.
+    df_plot_conversion_electricity: pandas.DataFrame
+        Same as above but for electricity
+    df_plot_storage_heat: pandas.DataFrame
+        Same as above, for heat storage
+    df_plot_storage_electricity: pandas.DataFrame
+        Same as above, for electricity storage
+    df_plot_capacity_electricity: pandas.DataFrame
+        Electricity conversion data ready to be plotted in the 'stacked_scalars' function.
+    df_plot_capacity_heat: pandas.DataFrame
+        Heat conversion data ready to be plotted in the 'stacked_scalars' function.
+    """
     df_plot_conversion_heat = pd.DataFrame()
     df_plot_conversion_electricity = pd.DataFrame()
     df_plot_storage_heat = pd.DataFrame()
@@ -87,18 +115,6 @@ def preprocessing_stacked_scalars(plot_data, factor, onxaxes): # put a factor he
     df_plot_conversion_electricity = pd.crosstab(index=df_conversion_electricity[onxaxes], columns=df_conversion_electricity.Parameter,
                                            values=df_conversion_electricity.Value / factor, aggfunc='mean')
 
-    #df_plot_conversion_electricity = \
-    #    df_plot_conversion_electricity.reindex(columns=['Energy_FinalEnergy_Electricity', 'Energy_FinalEnergy_Electricity_H2',
-    #                                                    'Energy_FinalEnergy_H2', 'SecondaryEnergy_Electricity_CH4_GT',
-    #                                                    'SecondaryEnergy_Electricity_RE', 'SecondaryEnergy_Electricity_Slack',
-    #                                                    'Curtailment_Electricity_RE'])
-    # TODO: check is_unique, if not issue warning message
-
-    #if df_plot.columns.str.contains('Curtailment').any():
-    #    df_plot['Curtailment_Electricity_RE'] = df_plot['Curtailment_Electricity_RE'] * (-1)
-    # Storage should be plotted in a separate diagram. It is therefore herewith allocated to a separate DataFrame
-    # and removed from df_plot.
-
     return df_plot_conversion_heat, df_plot_conversion_electricity, df_plot_storage_heat, df_plot_storage_electricity, \
            df_plot_capacity_electricity, df_plot_capacity_heat
 
@@ -107,7 +123,20 @@ def preprocessing_stacked_scalars(plot_data, factor, onxaxes): # put a factor he
 
 
 def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
+    r"""
+    Plots stacked scalars.
 
+    Parameters
+    --------------
+    df_plot: pandas.DataFrame
+        Must have scenarios on the rows and technologies in the columns.
+    demand: int or float
+        Demand which will be plotted as a horizontal line in the bar plot.
+    title: str
+        Title for the bar plot.
+    ylabel: str
+    xlabel: str
+    """
     df_plot.dropna(axis=1, how='all', inplace = True)
     if df_plot.columns.str.contains('Transmission_Outgoing').any():
         new_df = df_plot.drop('Transmission_Outgoing', axis = 1)
