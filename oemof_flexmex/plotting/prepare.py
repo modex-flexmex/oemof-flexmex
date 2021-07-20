@@ -17,14 +17,14 @@ def onxaxes_preparation(plot_data, onxaxes, scenario_regions):
 def sum_transmissions(plot_data, scenario,  region):
     df_total_outgoing = plot_data[(plot_data.loc[:, 'Parameter'] == 'Transmission_Flows_Electricity_Grid') &
                                   (plot_data.loc[:, 'Scenario'] == scenario) &
-                                  (plot_data.loc[:, 'Region'].str.contains('_'+region))]
+                                  (plot_data.loc[:, 'Region'].str.contains(region + '_'))]
 
     total_outgoing = -df_total_outgoing['Value'].sum()
     row_total_outgoing = {'Scenario': scenario, 'Region': region, 'Parameter': 'Transmission_Outgoing', 'Unit': 'GWh',
                           'Value': total_outgoing}
     df_total_incoming = plot_data[(plot_data.loc[:, 'Parameter'] == 'Transmission_Flows_Electricity_Grid') &
                                   (plot_data.loc[:, 'Scenario'] == scenario) &
-                                  (plot_data.loc[:, 'Region'].str.contains(region+'_'))]
+                                  (plot_data.loc[:, 'Region'].str.contains('_' + region))]
     total_incoming = df_total_incoming['Value'].sum()
     row_total_ingoing = {'Scenario': scenario, 'Region': region, 'Parameter': 'Transmission_Incoming', 'Unit': 'GWh',
                          'Value': total_incoming}
