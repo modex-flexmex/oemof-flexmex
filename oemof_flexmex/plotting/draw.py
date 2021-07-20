@@ -126,7 +126,7 @@ def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
     plt.xlabel(xlabel, fontsize = 12)
     plt.ylabel(ylabel, fontsize = 12)
     plt.legend(bbox_to_anchor=(1,1), loc="upper left")
-    plt.savefig(os.path.join(os.path.dirname(__file__), '../results/' + title), bbox_inches='tight')
+    plt.savefig(os.path.join(os.path.dirname(__file__), '../../results/FlexMex2_plotted/' + title), bbox_inches='tight')
 
 def preprocessing_timeseries (inputdatapath, type):
     input_file = os.path.join(os.path.dirname(__file__),
