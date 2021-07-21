@@ -42,6 +42,11 @@ if __name__ == "__main__":
                 electricity_demand_FlexMex2_1,
             ) = prepare.conversion_electricity_FlexMex2_1(df_in, df_demand, onxaxes)
 
+            df_plot_storage_electricity_FlexMex2_1 = prepare.electricity_storage_FlexMex2_1(
+                df_in, onxaxes
+            )
+
+
         elif scenario == "FlexMex2_2":
             (
                 df_plot_conversion_electricity_FlexMex2_2,
@@ -81,6 +86,13 @@ if __name__ == "__main__":
         "Heat flows in FlexMex2_2",
         "heat in GWh",
         "Scenario",
+    )
+    draw.stacked_scalars(
+        df_plot=df_plot_storage_electricity_FlexMex2_1,
+        demand=0,
+        title="Electricity storage in FlexMex2_1",
+        ylabel="Storage in GWh",
+        xlabel="Scenario",
     )
     draw.stacked_scalars(
         df_plot=df_plot_storage_electricity_FlexMex2_2,

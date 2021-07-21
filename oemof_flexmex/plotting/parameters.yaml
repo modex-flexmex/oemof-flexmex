@@ -25,6 +25,10 @@ conversion_heat_FlexMex2_2:
   EnergyConversion_SecondaryEnergy_Heat_Gas_Large:
   EnergyConversion_SecondaryEnergy_Heat_Slack:
 
+electricity_storage_FlexMex2_1:
+ Storage_Losses_Electricity_LiIonBatteryStorage:
+ Storage_Output_Electricity_LiIonBatteryStorage:
+
 electricity_storage_FlexMex2_2:
   Storage_Losses_Electricity_LiIonBatteryStorage:
   Storage_Losses_H2_H2CavernStorage:
