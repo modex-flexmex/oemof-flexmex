@@ -1,0 +1,15 @@
+electricity_storage_FlexMex2_2:
+  Storage_Losses_Electricity_LiIonBatteryStorage:
+  Storage_Losses_H2_H2CavernStorage:
+  Storage_Losses_H2_H2TankStorage:
+  Storage_Output_Electricity_LiIonBatteryStorage:
+  Storage_Output_H2_H2CavernStorage:
+  Storage_Output_H2_H2TankStorage:
+  Transport_FeedIn_DrivePower_Electricity: #? TODO
+  Transport_Shifting_DrivePower_Electricity:
+
+heat_storage_FlexMex2_2:
+  Storage_Losses_Heat_LargeStorage:
+  Storage_Losses_Heat_SmallStorage:
+  Storage_Output_Heat_LargeStorage:
+  Storage_Output_Heat_SmallStorage:

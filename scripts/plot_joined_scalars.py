@@ -51,12 +51,18 @@ if __name__ == "__main__":
             df_in, df_demand, onxaxes
         )
 
-        df_plot_storage, filler_demand = prepare.storage_FlexMex2_2(df_in, onxaxes)
+        df_plot_storage_electricity = prepare.electricity_storage_FlexMex2_2(
+            df_in, onxaxes
+        )
+
+        df_plot_storage_heat = prepare.heat_storage_FlexMex2_2(
+            df_in, onxaxes
+        )
 
     draw.stacked_scalars(
         df_plot_conversion_electricity,
         electricity_demand,
-        "2021-07-17-electricity_flows " + scenario + onxaxes,
+        "Electricity flows " + scenario + onxaxes,
         "electricity in GWh",
         "Scenario",
     )
@@ -65,14 +71,21 @@ if __name__ == "__main__":
         draw.stacked_scalars(
             df_plot_conversion_heat,
             heat_demand,
-            "2021-07-17-heat_flows " + scenario + onxaxes,
+            "Heat flows " + scenario + onxaxes,
             "heat in GWh",
             "Scenario",
         )
         draw.stacked_scalars(
-            df_plot_storage,
-            filler_demand,
-            "2021-07-17-storage" + scenario + onxaxes,
-            "storage in GWh",
-            "Scenario",
+            df_plot=df_plot_storage_electricity,
+            demand=0,
+            title="Electricity storage" + scenario + onxaxes,
+            ylabel="Storage in GWh",
+            xlabel="Scenario",
+        )
+        draw.stacked_scalars(
+            df_plot=df_plot_storage_heat,
+            demand=0,
+            title="Heat storage" + scenario + onxaxes,
+            ylabel="Storage in GWh",
+            xlabel="Scenario",
         )

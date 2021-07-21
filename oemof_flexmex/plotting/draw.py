@@ -149,8 +149,6 @@ def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
         new_df.plot(kind='bar', stacked=True, bottom = df_plot.loc[:, 'Transmission_Outgoing'], color=colors_odict)
     else:
         labels = generate_labels(df_plot, labels_dict)
-        import pdb
-        pdb.set_trace()
         df_plot.plot(kind='bar', stacked=True, color=colors_odict)
 
     #df_plot = df_plot.drop('Transmission_Outgoing', axis = 1)
