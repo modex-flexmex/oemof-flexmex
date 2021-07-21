@@ -51,13 +51,8 @@ def sum_transmissions(plot_data, scenario,  region):
 def conversion_electricity_FlexMex2_1(plot_data, df_demand, onxaxes):
     plot_data = onxaxes_preparation(plot_data, onxaxes, 'FlexMex2_1c')
     plot_data.to_csv('2021-07-03_plot_data.csv')
-
-    parameters = ['EnergyConversion_SecondaryEnergy_Electricity_CH4_GT',
-                  'EnergyConversion_SecondaryEnergy_Electricity_RE',
-                  'EnergyConversion_SecondaryEnergy_Electricity_Slack',
-                  'Transmission_Flows_Electricity_Grid',
-                  'Transmission_Losses_Electricity_Grid',
-                  'EnergyConversion_Curtailment_Electricity_RE']
+    parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
+    parameters = [*parameters['conversion_electricity_FlexMex2_1']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     # sum all outgoing and all ingoing transmissions for each scenario
     if onxaxes == 'Scenario':
@@ -87,16 +82,8 @@ def conversion_electricity_FlexMex2_1(plot_data, df_demand, onxaxes):
 def conversion_electricity_FlexMex2_2(plot_data, df_demand, onxaxes):
     plot_data = onxaxes_preparation(plot_data, onxaxes, 'FlexMex2_2c')
     plot_data.to_csv('2021-07-03_plot_data.csv')
-
-    parameters = ['EnergyConversion_SecondaryEnergy_Electricity_CH4_GT',
-                  'EnergyConversion_SecondaryEnergy_Electricity_ElectricityHeat_CH4_ExCCGT',
-                  'EnergyConversion_SecondaryEnergy_Electricity_RE',
-                  'EnergyConversion_SecondaryEnergy_Electricity_Hydro_ReservoirTurbine',
-                  'Transport_FeedIn_DrivePower_Electricity',
-                  'EnergyConversion_SecondaryEnergy_Electricity_Slack',
-                  'EnergyConversion_Curtailment_Electricity_RE',
-                  'Transmission_Flows_Electricity_Grid',
-                  'Transmission_Losses_Electricity_Grid']
+    parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
+    parameters = [*parameters['conversion_electricity_FlexMex2_2']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     # sum all outgoing and all ingoing transmissions for each scenario
     if onxaxes == 'Scenario':
@@ -124,15 +111,8 @@ def conversion_electricity_FlexMex2_2(plot_data, df_demand, onxaxes):
 
 def conversion_heat_FlexMex2_2(plot_data, df_demand, onxaxes):
     plot_data = onxaxes_preparation(plot_data, onxaxes, 'FlexMex2_2c')
-    plot_data.to_csv('2021-07-03_plot_data.csv')
-
-    parameters = ['EnergyConversion_SecondaryEnergy_Heat_Electricity_Large',
-                  'EnergyConversion_SecondaryEnergy_Heat_ElectricityHeat_CH4_ExCCGT',
-                  'EnergyConversion_SecondaryEnergy_Heat_ElectricityHeat_Large',
-                  'EnergyConversion_SecondaryEnergy_Heat_ElectricityHeat_Small',
-                  'EnergyConversion_SecondaryEnergy_Heat_Gas_Large',
-                  'EnergyConversion_SecondaryEnergy_Heat_Slack',
-                  ]
+    parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
+    parameters = [*parameters['conversion_heat_FlexMex2_2']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     # sum all outgoing and all ingoing transmissions for each scenario
 
