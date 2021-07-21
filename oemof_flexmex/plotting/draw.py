@@ -140,22 +140,27 @@ def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
     xlabel: str
     """
     df_plot.dropna(axis=1, how='all', inplace = True)
-    # prepare labels for the plot
+    # load labels dict
     labels_dict = load_yaml(os.path.join(dir_name, "stacked_plot_labels.yaml"))
-    labels = generate_labels(df_plot, labels_dict)
+
     if df_plot.columns.str.contains('Transmission_Outgoing').any():
         new_df = df_plot.drop('Transmission_Outgoing', axis = 1)
-        #new_df = df_plot[df_plot.columns.difference(['Transmission_Outgoing'])]
+        labels = generate_labels(new_df, labels_dict)
         new_df.plot(kind='bar', stacked=True, bottom = df_plot.loc[:, 'Transmission_Outgoing'], color=colors_odict)
     else:
+        labels = generate_labels(df_plot, labels_dict)
+        import pdb
+        pdb.set_trace()
         df_plot.plot(kind='bar', stacked=True, color=colors_odict)
 
     #df_plot = df_plot.drop('Transmission_Outgoing', axis = 1)
 
     if demand > 0:
-        plt.hlines(demand, plt.xlim()[0], plt.xlim()[1], label='Demand')
+        plt.hlines(demand, plt.xlim()[0], plt.xlim()[1])#, label='Demand')
+        labels.insert(0, 'Demand')
         print(demand)
-    plt.axhline(0, color='black')
+    plt.axhline(0, color='black', label='_nolegend_')
+    #labels.insert(1, None)
     plt.title(title)
     plt.xlabel(xlabel, fontsize = 12)
     plt.ylabel(ylabel, fontsize = 12)
