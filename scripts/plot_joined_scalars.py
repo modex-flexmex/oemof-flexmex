@@ -13,7 +13,7 @@ if __name__ == "__main__":
     paths.results_joined = sys.argv[1]
     paths.results_joined_plotted = sys.argv[2]
 
-    scenario = "FlexMex2_2"
+    scenarios = ["FlexMex2_1", "FlexMex2_2"]
     onxaxes = 'Scenario'  # either Region or Scenario
 
     # create directory if it does not exist yet.
@@ -33,59 +33,66 @@ if __name__ == "__main__":
 
     scalars.rename(columns={"UseCase": "Scenario"}, inplace=True)
 
-    df_in = scalars[scalars.loc[:, "Scenario"].str.contains(scenario)]
+    for scenario in scenarios:
+        df_in = scalars[scalars.loc[:, "Scenario"].str.contains(scenario)]
 
-    if scenario == "FlexMex2_1":
-        (
-            df_plot_conversion_electricity,
-            electricity_demand,
-        ) = prepare.conversion_electricity_FlexMex2_1(df_in, df_demand, onxaxes)
+        if scenario == "FlexMex2_1":
+            (
+                df_plot_conversion_electricity_FlexMex2_1,
+                electricity_demand_FlexMex2_1,
+            ) = prepare.conversion_electricity_FlexMex2_1(df_in, df_demand, onxaxes)
 
-    elif scenario == "FlexMex2_2":
-        (
-            df_plot_conversion_electricity,
-            electricity_demand,
-        ) = prepare.conversion_electricity_FlexMex2_2(df_in, df_demand, onxaxes)
+        elif scenario == "FlexMex2_2":
+            (
+                df_plot_conversion_electricity_FlexMex2_2,
+                electricity_demand_FlexMex2_2,
+            ) = prepare.conversion_electricity_FlexMex2_2(df_in, df_demand, onxaxes)
 
-        df_plot_conversion_heat, heat_demand = prepare.conversion_heat_FlexMex2_2(
-            df_in, df_demand, onxaxes
-        )
+            df_plot_conversion_heat, heat_demand = prepare.conversion_heat_FlexMex2_2(
+                df_in, df_demand, onxaxes
+            )
 
-        df_plot_storage_electricity = prepare.electricity_storage_FlexMex2_2(
-            df_in, onxaxes
-        )
+            df_plot_storage_electricity_FlexMex2_2 = prepare.electricity_storage_FlexMex2_2(
+                df_in, onxaxes
+            )
 
-        df_plot_storage_heat = prepare.heat_storage_FlexMex2_2(
-            df_in, onxaxes
-        )
+            df_plot_storage_heat = prepare.heat_storage_FlexMex2_2(
+             df_in, onxaxes
+            )
 
     draw.stacked_scalars(
-        df_plot_conversion_electricity,
-        electricity_demand,
-        "Electricity flows " + scenario + onxaxes,
+        df_plot_conversion_electricity_FlexMex2_1,
+        electricity_demand_FlexMex2_1,
+        "Electricity flows in FlexMex2_1",
+        "electricity in GWh",
+        "Scenario",
+    )
+    draw.stacked_scalars(
+        df_plot_conversion_electricity_FlexMex2_2,
+        electricity_demand_FlexMex2_2,
+        "Electricity flows in FlexMex2_2",
         "electricity in GWh",
         "Scenario",
     )
 
-    if scenario == "FlexMex2_2":
-        draw.stacked_scalars(
-            df_plot_conversion_heat,
-            heat_demand,
-            "Heat flows " + scenario + onxaxes,
-            "heat in GWh",
-            "Scenario",
-        )
-        draw.stacked_scalars(
-            df_plot=df_plot_storage_electricity,
-            demand=0,
-            title="Electricity storage" + scenario + onxaxes,
-            ylabel="Storage in GWh",
-            xlabel="Scenario",
-        )
-        draw.stacked_scalars(
-            df_plot=df_plot_storage_heat,
-            demand=0,
-            title="Heat storage" + scenario + onxaxes,
-            ylabel="Storage in GWh",
-            xlabel="Scenario",
-        )
+    draw.stacked_scalars(
+        df_plot_conversion_heat,
+        heat_demand,
+        "Heat flows in FlexMex2_2",
+        "heat in GWh",
+        "Scenario",
+    )
+    draw.stacked_scalars(
+        df_plot=df_plot_storage_electricity_FlexMex2_2,
+        demand=0,
+        title="Electricity storage in FlexMex2_2",
+        ylabel="Storage in GWh",
+        xlabel="Scenario",
+    )
+    draw.stacked_scalars(
+        df_plot=df_plot_storage_heat,
+        demand=0,
+        title="Heat storage in FlexMex2_2",
+        ylabel="Storage in GWh",
+        xlabel="Scenario",
+    )
