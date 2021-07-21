@@ -7,6 +7,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import OrderedDict
+from oemoflex.tools.helpers import load_yaml
+from oemof_flexmex.plotting.prepare import generate_labels
 
 dir_name = os.path.abspath(os.path.dirname(__file__))
 colors_csv = pd.read_csv(
@@ -138,6 +140,9 @@ def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
     xlabel: str
     """
     df_plot.dropna(axis=1, how='all', inplace = True)
+    # prepare labels for the plot
+    labels_dict = load_yaml(os.path.join(dir_name, "stacked_plot_labels.yaml"))
+    labels = generate_labels(df_plot, labels_dict)
     if df_plot.columns.str.contains('Transmission_Outgoing').any():
         new_df = df_plot.drop('Transmission_Outgoing', axis = 1)
         #new_df = df_plot[df_plot.columns.difference(['Transmission_Outgoing'])]
@@ -154,7 +159,7 @@ def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
     plt.title(title)
     plt.xlabel(xlabel, fontsize = 12)
     plt.ylabel(ylabel, fontsize = 12)
-    plt.legend(bbox_to_anchor=(1,1), loc="upper left")
+    plt.legend(labels, bbox_to_anchor=(1,1), loc="upper left")
     plt.savefig(os.path.join(os.path.dirname(__file__), '../../results/FlexMex2_plotted/' + title), bbox_inches='tight')
 
 def preprocessing_timeseries (inputdatapath, type):

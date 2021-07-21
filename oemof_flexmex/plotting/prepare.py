@@ -1,6 +1,7 @@
 import pandas as pd
 
 
+
 def onxaxes_preparation(plot_data, onxaxes, scenario_regions):
 
     if onxaxes == 'Region':
@@ -166,3 +167,22 @@ def storage_FlexMex2_2(plot_data, onxaxes):
                                           values=plot_data.Value, aggfunc='mean')
     filler_demand = 0 # only exists because the plotting function requires demand as an argument. It will be skipped if it is 0.
     return df_plot_storage, filler_demand
+
+def generate_labels(df_plot, labels_dict):
+    r"""
+    Parameters
+    -------------
+    df_plot: pandas.DataFrame
+        dataframe to be plotted; column names are the technologies and row names either scenarios or regions.
+    labels_dict: pandas.Dictionary (not completely sure about that yet)
+        dictionary from stacked_plot_labels.yaml
+    Returns
+    -------------
+    labels: list
+        list with labels for one specific plot
+    """
+    labels = []
+    for i in df_plot.columns:
+        label = labels_dict[i]
+        labels.append(label)
+    return labels
