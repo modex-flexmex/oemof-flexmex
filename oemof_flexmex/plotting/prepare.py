@@ -67,7 +67,7 @@ def conversion_electricity_FlexMex2_1(plot_data, df_demand, onxaxes):
 
 
     df_plot_conversion_electricity = pd.crosstab(index=plot_data[onxaxes], columns=plot_data.Parameter,
-                                           values=plot_data.Value, aggfunc='mean')
+                                           values=plot_data.Value / 1000, aggfunc='mean')
     df_plot_conversion_electricity = \
             df_plot_conversion_electricity.reindex(columns=['EnergyConversion_SecondaryEnergy_Electricity_CH4_GT',
                                                             'EnergyConversion_SecondaryEnergy_Electricity_RE',
@@ -98,7 +98,7 @@ def conversion_electricity_FlexMex2_2(plot_data, df_demand, onxaxes):
             plot_data = sum_transmissions(plot_data, 'FlexMex2_2c', region)
         demand = 0
     df_plot_conversion_electricity = pd.crosstab(index=plot_data[onxaxes], columns=plot_data.Parameter,
-                                           values=plot_data.Value, aggfunc='mean')
+                                           values=plot_data.Value / 1000, aggfunc='mean')
 #    df_plot_conversion_electricity = \
 #            df_plot_conversion_electricity.reindex(columns=['EnergyConversion_SecondaryEnergy_Electricity_CH4_GT',
 #                                                            'EnergyConversion_SecondaryEnergy_Electricity_RE',
@@ -123,7 +123,7 @@ def conversion_heat_FlexMex2_2(plot_data, df_demand, onxaxes):
                           'Value'].iloc[0]
 
     df_plot_conversion_heat = pd.crosstab(index=plot_data[onxaxes], columns=plot_data.Parameter,
-                                           values=plot_data.Value, aggfunc='mean')
+                                           values=plot_data.Value / 1000, aggfunc='mean')
 #    df_plot_conversion_electricity = \
 #            df_plot_conversion_electricity.reindex(columns=[])
     return df_plot_conversion_heat, demand
@@ -134,7 +134,7 @@ def electricity_storage_FlexMex2_1(plot_data, onxaxes):
     parameters = [*parameters['electricity_storage_FlexMex2_1']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     df_plot_storage_electricity_FlexMex2_1 = pd.crosstab(index=plot_data[onxaxes], columns=plot_data.Parameter,
-                                          values=plot_data.Value, aggfunc='mean')
+                                          values=plot_data.Value / 1000, aggfunc='mean')
     return df_plot_storage_electricity_FlexMex2_1
 
 def electricity_storage_FlexMex2_2(plot_data, onxaxes):
@@ -143,7 +143,7 @@ def electricity_storage_FlexMex2_2(plot_data, onxaxes):
     parameters = [*parameters['electricity_storage_FlexMex2_2']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     df_plot_storage_electricity_FlexMex2_2 = pd.crosstab(index=plot_data[onxaxes], columns=plot_data.Parameter,
-                                          values=plot_data.Value, aggfunc='mean')
+                                          values=plot_data.Value / 1000, aggfunc='mean')
     return df_plot_storage_electricity_FlexMex2_2
 
 def heat_storage_FlexMex2_2(plot_data, onxaxes):
@@ -152,7 +152,7 @@ def heat_storage_FlexMex2_2(plot_data, onxaxes):
     parameters = [*parameters['heat_storage_FlexMex2_2']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     df_plot_storage_heat = pd.crosstab(index=plot_data[onxaxes], columns=plot_data.Parameter,
-                                  values=plot_data.Value, aggfunc='mean')
+                                  values=plot_data.Value / 1000, aggfunc='mean')
     return df_plot_storage_heat
 
 def generate_labels(df_plot, labels_dict):

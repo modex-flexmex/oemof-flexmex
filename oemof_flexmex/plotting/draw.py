@@ -5,7 +5,9 @@ import pdb
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
+from matplotlib.ticker import EngFormatter
 from collections import OrderedDict
 from oemoflex.tools.helpers import load_yaml
 from oemof_flexmex.plotting.prepare import generate_labels
@@ -154,12 +156,15 @@ def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
     #df_plot = df_plot.drop('Transmission_Outgoing', axis = 1)
 
     if demand > 0:
+        # convert from GWh to TWh
+        demand = demand/1000
         plt.hlines(demand, plt.xlim()[0], plt.xlim()[1])#, label='Demand')
         labels.insert(0, 'Demand')
         print(demand)
     plt.axhline(0, color='black', label='_nolegend_')
     #labels.insert(1, None)
     plt.title(title)
+
     plt.xlabel(xlabel, fontsize = 12)
     plt.ylabel(ylabel, fontsize = 12)
     plt.legend(labels, bbox_to_anchor=(1,1), loc="upper left")

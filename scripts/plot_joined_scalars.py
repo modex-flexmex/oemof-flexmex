@@ -69,14 +69,14 @@ if __name__ == "__main__":
         df_plot_conversion_electricity_FlexMex2_1,
         electricity_demand_FlexMex2_1,
         "Electricity flows in FlexMex2_1",
-        "electricity in GWh",
+        "Electricity in TWh",
         "Scenario",
     )
     draw.stacked_scalars(
         df_plot_conversion_electricity_FlexMex2_2,
         electricity_demand_FlexMex2_2,
         "Electricity flows in FlexMex2_2",
-        "electricity in GWh",
+        "Electricity in TWh",
         "Scenario",
     )
 
@@ -84,27 +84,27 @@ if __name__ == "__main__":
         df_plot_conversion_heat,
         heat_demand,
         "Heat flows in FlexMex2_2",
-        "heat in GWh",
+        "Heat in TWh",
         "Scenario",
     )
     draw.stacked_scalars(
         df_plot=df_plot_storage_electricity_FlexMex2_1,
         demand=0,
         title="Electricity storage in FlexMex2_1",
-        ylabel="Storage in GWh",
+        ylabel="Storage in TWh",
         xlabel="Scenario",
     )
     draw.stacked_scalars(
         df_plot=df_plot_storage_electricity_FlexMex2_2,
         demand=0,
         title="Electricity storage in FlexMex2_2",
-        ylabel="Storage in GWh",
+        ylabel="Storage in TWh",
         xlabel="Scenario",
     )
     draw.stacked_scalars(
         df_plot=df_plot_storage_heat,
         demand=0,
         title="Heat storage in FlexMex2_2",
-        ylabel="Storage in GWh",
+        ylabel="Storage in TWh",
         xlabel="Scenario",
     )
