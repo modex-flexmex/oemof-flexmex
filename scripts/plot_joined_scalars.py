@@ -64,7 +64,8 @@ if __name__ == "__main__":
             df_plot_storage_heat = prepare.heat_storage_FlexMex2_2(
              df_in, onxaxes
             )
-
+    df_plot_conversion_electricity_FlexMex2_1.to_csv(os.path.join(os.path.dirname(__file__),
+                                                               '../results/FlexMex2_plotted/conv_elec_2_1.csv'))
     draw.stacked_scalars(
         df_plot_conversion_electricity_FlexMex2_1,
         electricity_demand_FlexMex2_1,
@@ -72,6 +73,8 @@ if __name__ == "__main__":
         "Electricity in TWh",
         "Scenario",
     )
+    df_plot_conversion_electricity_FlexMex2_2.to_csv(os.path.join(os.path.dirname(__file__),
+                                                               '../results/FlexMex2_plotted/conv_elec_2_2.csv'))
     draw.stacked_scalars(
         df_plot_conversion_electricity_FlexMex2_2,
         electricity_demand_FlexMex2_2,
@@ -79,7 +82,8 @@ if __name__ == "__main__":
         "Electricity in TWh",
         "Scenario",
     )
-
+    df_plot_conversion_heat.to_csv(os.path.join(os.path.dirname(__file__),
+                                                '../results/FlexMex2_plotted/conv_heat_2_2.csv'))
     draw.stacked_scalars(
         df_plot_conversion_heat,
         heat_demand,
@@ -87,6 +91,8 @@ if __name__ == "__main__":
         "Heat in TWh",
         "Scenario",
     )
+    df_plot_storage_electricity_FlexMex2_1.to_csv(os.path.join(os.path.dirname(__file__),
+                                                '../results/FlexMex2_plotted/stor_elec_2_1.csv'))
     draw.stacked_scalars(
         df_plot=df_plot_storage_electricity_FlexMex2_1,
         demand=0,
@@ -94,6 +100,8 @@ if __name__ == "__main__":
         ylabel="Storage in TWh",
         xlabel="Scenario",
     )
+    df_plot_storage_electricity_FlexMex2_2.to_csv(os.path.join(os.path.dirname(__file__),
+                                                               '../results/FlexMex2_plotted/stor_elec_2_2.csv'))
     draw.stacked_scalars(
         df_plot=df_plot_storage_electricity_FlexMex2_2,
         demand=0,
@@ -101,6 +109,8 @@ if __name__ == "__main__":
         ylabel="Storage in TWh",
         xlabel="Scenario",
     )
+    df_plot_storage_heat.to_csv(os.path.join(os.path.dirname(__file__),
+                                                               '../results/FlexMex2_plotted/stor_heat_2_2.csv'))
     draw.stacked_scalars(
         df_plot=df_plot_storage_heat,
         demand=0,
