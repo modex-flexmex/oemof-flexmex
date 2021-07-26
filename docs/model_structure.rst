@@ -37,7 +37,7 @@ TODO: Explain that other columns that follow describe the attributes of the comp
 Sequences
 ---------
 
-The filenames are of the form type_profile (e.g.
+The filenames are of the form <carrier>-<tech>_<profile>.csv (e.g.
 :file:`wind-offshore_profile.csv`, :file:`electricity-demand_profile.csv`).
 
 TODO: explain the columns and their names within the sequences files
