@@ -9,5 +9,5 @@ capacity,float,MW,n/a,,Installed capacity
 storage_capacity,float,MWh,n/a,,Installed storage capacity
 efficiency,float,unitless,n/a,,Efficiency of charging/discharging
 marginal_cost,float,Eur/MWh,n/a,,Marginal cost of charging/discharging
-input_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's input flow
+input_parameters,dict,n/a,"{""variable_costs"": 0.00001}",,Optional parameters passed to oemof-solph's input flow
 output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow
