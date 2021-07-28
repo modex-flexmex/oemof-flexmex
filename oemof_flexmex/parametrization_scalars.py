@@ -5,6 +5,7 @@ import pandas as pd
 
 from oemof.tools.economics import annuity
 
+aux_costs = 1e-6
 
 def get_parameter_values(scalars_df, parameter_name):
     r"""
@@ -468,6 +469,9 @@ def update_heat_storage_small(
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'Storage_VarOM_Heat_Small') * 1e-3  # Eur/GWh to Eur/MWh
 
+    # Small variable costs to prevent "hidden curtailment"
+    component_df['input_parameters'] = {"variable_costs": aux_cost}
+
     return component_df
 
 
@@ -541,6 +545,9 @@ def update_heat_storage_large(
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'Storage_VarOM_Heat_Large') * 1e-3  # Eur/GWh to Eur/MWh
 
+    # Small variable costs to prevent "hidden curtailment"
+    component_df['input_parameters'] = {"variable_costs": aux_costs}
+
     return component_df
 
 
@@ -577,6 +584,9 @@ def update_link(component_df, scalars):
         varom *
         transmission_length
     )
+
+    # Small variable costs to prevent "hidden curtailment"
+    component_df['input_parameters'] = {"variable_costs": aux_costs}
 
     return component_df
 
@@ -731,6 +741,9 @@ def update_h2_cavern(
 
     component_df['marginal_cost'] = operation_cost
 
+    # Small variable costs to prevent "hidden curtailment"
+    component_df['input_parameters'] = {"variable_costs": aux_costs}
+
     return component_df
 
 
@@ -854,6 +867,9 @@ def update_liion_battery(
         component_df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
 
     component_df['marginal_cost'] = operation_cost
+
+    # Small variable costs to prevent "hidden curtailment"
+    component_df['input_parameters'] = {"variable_costs": aux_costs}
 
     return component_df
 
@@ -1016,6 +1032,9 @@ def update_hydro_reservoir(component_df, scalars):
         scalars,
         'EnergyConversion_VarOM_Electricity_Hydro_Reservoir') * 1e-3  # Eur/GWh -> Eur/MWh
 
+    # Small variable costs to prevent "hidden curtailment"
+    component_df['input_parameters'] = {"variable_costs": aux_costs}
+
     return component_df
 
 
@@ -1046,6 +1065,9 @@ def update_electricity_bev(component_df, scalars):
     component_df['marginal_cost'] = get_parameter_values(
         scalars,
         'Transport_VarOMGridFeedIn_Electricity_Cars') * 1e-3  # Eur/GWh to Eur/MWh
+
+    # Small variable costs to prevent "hidden curtailment"
+    component_df['input_parameters'] = {"variable_costs": aux_costs}
 
     return component_df
 
