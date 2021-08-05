@@ -3,7 +3,6 @@ conversion_electricity_FlexMex2_1:
   EnergyConversion_SecondaryEnergy_Electricity_RE:
   EnergyConversion_SecondaryEnergy_Electricity_Slack:
   Transmission_Flows_Electricity_Grid:
-  Transmission_Losses_Electricity_Grid:
   EnergyConversion_Curtailment_Electricity_RE:
 
 conversion_electricity_FlexMex2_2:
@@ -15,7 +14,6 @@ conversion_electricity_FlexMex2_2:
  EnergyConversion_SecondaryEnergy_Electricity_Slack:
  EnergyConversion_Curtailment_Electricity_RE:
  Transmission_Flows_Electricity_Grid:
- Transmission_Losses_Electricity_Grid:
 
 conversion_heat_FlexMex2_2:
   EnergyConversion_SecondaryEnergy_Heat_Electricity_Large:
@@ -44,3 +42,4 @@ heat_storage_FlexMex2_2:
   Storage_Losses_Heat_SmallStorage:
   Storage_Output_Heat_LargeStorage:
   Storage_Output_Heat_SmallStorage:
+

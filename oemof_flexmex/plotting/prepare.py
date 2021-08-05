@@ -32,19 +32,19 @@ def sum_transmissions(plot_data, scenario,  region):
     total_incoming = df_total_incoming['Value'].sum()
     row_total_ingoing = {'Scenario': scenario, 'Region': region, 'Parameter': 'Transmission_Incoming', 'Unit': 'GWh',
                          'Value': total_incoming}
-    df_total_losses = plot_data[(plot_data.loc[:, 'Parameter'] == 'Transmission_Losses_Electricity_Grid') &
-                                (plot_data.loc[:, 'Scenario'] == scenario) &
-                                (plot_data.loc[:, 'Region'].str.contains(region))]
-    total_losses = -df_total_losses['Value'].sum()
-    row_total_losses = {'Scenario': scenario, 'Region': region, 'Parameter': 'Transmission_Losses', 'Unit': 'GWh',
-                        'Value': total_losses}
+#    df_total_losses = plot_data[(plot_data.loc[:, 'Parameter'] == 'Transmission_Losses_Electricity_Grid') &
+#                                (plot_data.loc[:, 'Scenario'] == scenario) &
+#                                (plot_data.loc[:, 'Region'].str.contains(region))]
+#    total_losses = -df_total_losses['Value'].sum()
+#    row_total_losses = {'Scenario': scenario, 'Region': region, 'Parameter': 'Transmission_Losses', 'Unit': 'GWh',
+#                        'Value': total_losses}
 
     plot_data.drop(df_total_outgoing.index.to_list(), inplace=True)
     plot_data.drop(df_total_incoming.index.to_list(), inplace=True)
-    plot_data.drop(df_total_losses.index.to_list(), inplace=True)
+#    plot_data.drop(df_total_losses.index.to_list(), inplace=True)
     plot_data = plot_data.append(row_total_outgoing, ignore_index=True) #is substituted by shifted bottom line
     plot_data = plot_data.append(row_total_ingoing, ignore_index=True)
-    plot_data = plot_data.append(row_total_losses, ignore_index=True)
+#    plot_data = plot_data.append(row_total_losses, ignore_index=True)
 
     return plot_data
 
@@ -57,6 +57,8 @@ def conversion_electricity_FlexMex2_1(plot_data, df_demand, onxaxes):
     # sum all outgoing and all ingoing transmissions for each scenario
     if onxaxes == 'Scenario':
         for scenario in ('FlexMex2_1a', 'FlexMex2_1b', 'FlexMex2_1c', 'FlexMex2_1d'):
+            import pdb
+            pdb.set_trace
             plot_data = sum_transmissions(plot_data, scenario, 'DE') #choose region here
         demand = df_demand[(df_demand.loc[:, 'Parameter'] == 'Energy_FinalEnergy_Electricity') &
                                (df_demand.loc[:, 'Region'] == 'DE')].loc[:, 'Value'].iloc[0]
