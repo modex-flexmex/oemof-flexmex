@@ -157,6 +157,24 @@ def heat_storage_FlexMex2_2(plot_data, onxaxes):
                                   values=plot_data.Value / 1000, aggfunc='mean')
     return df_plot_storage_heat
 
+def costs_FlexMex2_1(plot_data, onxaxes):
+    plot_data = onxaxes_preparation(plot_data, onxaxes, 'FlexMex2_1c')
+    parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
+    parameters = [*parameters['costs_FlexMex2_1']]
+    plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
+    df_plot_costs_FlexMex2_1 = pd.crosstab(index=plot_data[onxaxes], columns=plot_data.Parameter,
+                                       values=plot_data.Value / 1000000, aggfunc='mean')
+    return df_plot_costs_FlexMex2_1
+
+def costs_FlexMex2_2(plot_data, onxaxes):
+    plot_data = onxaxes_preparation(plot_data, onxaxes, 'FlexMex2_2c')
+    parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
+    parameters = [*parameters['costs_FlexMex2_2']]
+    plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
+    df_plot_costs_FlexMex2_2 = pd.crosstab(index=plot_data[onxaxes], columns=plot_data.Parameter,
+                                       values=plot_data.Value / 1000000, aggfunc='mean')
+    return df_plot_costs_FlexMex2_2
+
 def generate_labels(df_plot, labels_dict):
     r"""
     Reads in labels for the stacked bar plots for every individual plot

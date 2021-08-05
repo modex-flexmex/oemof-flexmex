@@ -47,6 +47,9 @@ if __name__ == "__main__":
             )
 
 
+            df_plot_costs_FlexMex2_1 = prepare.costs_FlexMex2_1(df_in, onxaxes)
+
+
         elif scenario == "FlexMex2_2":
             (
                 df_plot_conversion_electricity_FlexMex2_2,
@@ -64,6 +67,9 @@ if __name__ == "__main__":
             df_plot_storage_heat = prepare.heat_storage_FlexMex2_2(
              df_in, onxaxes
             )
+
+            df_plot_costs_FlexMex2_2 = prepare.costs_FlexMex2_2(df_in, onxaxes)
+
     df_plot_conversion_electricity_FlexMex2_1.to_csv(os.path.join(os.path.dirname(__file__),
                                                                '../results/FlexMex2_plotted/conv_elec_2_1.csv'))
     draw.stacked_scalars(
@@ -117,4 +123,20 @@ if __name__ == "__main__":
         title="Heat storage in FlexMex2_2",
         ylabel="Storage in TWh",
         xlabel="Scenario",
+    )
+
+    draw.stacked_scalars(
+        df_plot=df_plot_costs_FlexMex2_1,
+        demand=0,
+        title="Total costs in FlexMex2_1",
+        ylabel="Costs in mio Euro",
+        xlabel="Scenario"
+    )
+
+    draw.stacked_scalars(
+        df_plot=df_plot_costs_FlexMex2_2,
+        demand=0,
+        title="Total costs in FlexMex2_2",
+        ylabel="Costs in mio Euro",
+        xlabel="Scenario"
     )

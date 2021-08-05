@@ -5,7 +5,7 @@ EnergyConversion_Curtailment_Electricity_RE: Curtailment
 Transmission_Incoming: Import
 Transmission_Losses: Transmission losses
 Transmission_Outgoing: Export
-EnergyConversion_SecondaryEnergy_Electricity_ElectricityHeat_CH4_ExCCGT: Cogeneration turbine
+EnergyConversion_SecondaryEnergy_Electricity_ElectricityHeat_CH4_ExCCGT: Co-generation turbine
 EnergyConversion_SecondaryEnergy_Electricity_Hydro_ReservoirTurbine: Hydro reservoir turbine
 Transport_FeedIn_DrivePower_Electricity: Transport_FeedIn_DrivePower_Electricity #TODO: change
 EnergyConversion_SecondaryEnergy_Heat_Electricity_Large: Restistance heating
@@ -26,3 +26,19 @@ Storage_Output_Heat_LargeStorage: Output large heat storage
 Storage_Output_Heat_SmallStorage: Output small heat storage
 Transport_FeedIn_DrivePower_Electricity: FeedIn_DrivePower #? TODO
 Transport_Shifting_DrivePower_Electricity: Shifting_DrivePower
+
+Energy_EmissionCost_CO2: CO2 emission costs
+EnergyConversion_FuelCosts_Electricity_CH4_GT: Fuel costs gas turbine
+EnergyConversion_FuelCosts_ElectricityHeat_CH4_ExCCGT: Fuel costs co-generation turbine
+EnergyConversion_VarOM_Electricity_CH4_GT: VarOM gas turbine
+EnergyConversion_VarOM_Electricity_Hydro_Reservoir: VarOM hydro reservoir
+EnergyConversion_VarOM_ElectricityHeat_CH4_ExCCGT: VarOM co-generation turbine
+EnergyConversion_VarOM_Heat_Electricity_Large: VarOM gas boiler
+EnergyConversion_VarOM_Heat_ElectricityHeat_Large: VarOM large heatpump
+EnergyConversion_VarOM_Heat_ElectricityHeat_Small: VarOM small heatpump
+EnergyConversion_VarOM_Heat_Gas_Large: VarOM gas large
+Storage_VarOM_Electricity_LiIonBatteryStorage: VarOM lithium-ion battery
+Storage_VarOM_H2_H2CavernStorage: VarOM H2 cavern
+Storage_VarOM_Heat_LargeStorage: VarOM large heat storage
+Storage_VarOM_Heat_SmallStorage: VarOM small heat storage
+Transport_VarOM_DrivePower_Electricity: VarOM transport
