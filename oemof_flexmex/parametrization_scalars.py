@@ -74,12 +74,50 @@ def update_electricity_demand(component_df, scalars):
     return component_df
 
 
-def update_heat_demand(component_df, scalars):
+def update_electricity_h2_demand(component_df, scalars):
 
     # Fill column for ALL the elements
     component_df['amount'] = get_parameter_values(
         scalars,
-        'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
+        'Energy_FinalEnergy_Electricity_H2') * 1e3  # GWh to MWh
+
+    return component_df
+
+
+def update_heat_central_demand(component_df, scalars):
+
+    amount = get_parameter_values(
+        scalars,
+        'Energy_FinalEnergy_Heat_CHP') * 1e3  # GWh to MWh
+
+    # The suffix _CHP means central heat.
+    # For experiment 1, there is no distinction between central/decentral heat.
+    if amount.empty:
+        amount = get_parameter_values(
+            scalars,
+            'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
+
+    # Fill column for ALL the elements
+    component_df['amount'] = amount
+
+    return component_df
+
+
+def update_heat_decentral_demand(component_df, scalars):
+
+    amount = get_parameter_values(
+        scalars,
+        'Energy_FinalEnergy_Heat_HeatPump') * 1e3  # GWh to MWh
+
+    # The suffix _HeatPump means decentral heat.
+    # For experiment 1, there is no distinction between central/decentral heat.
+    if amount.empty:
+        amount = get_parameter_values(
+            scalars,
+            'Energy_FinalEnergy_Heat') * 1e3  # GWh to MWh
+
+    # Fill column for ALL the elements
+    component_df['amount'] = amount
 
     return component_df
 
@@ -158,23 +196,50 @@ def update_extchp(component_df, scalars):
     return component_df
 
 
-def update_boiler_large(component_df, scalars):
+def update_boiler_large(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['name'] = component_df['name'].str.replace(
-        'ch4-boiler', 'ch4-boiler-large', regex=False
-    )
-
-    component_df['tech'] = 'boiler-large'
-
-    component_df['capacity'] = get_parameter_values(
+    capacity = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_CH4_Large'
     )
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Heat_CH4_Large')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Heat_CH4_Large') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Heat_CH4_Large')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_CH4_Large') * 0.01  # Percent to decimals
 
-    component_df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
+    component_df['carrier_cost'] = (
+        get_parameter_values(scalars, 'Energy_Price_CH4')
+        + get_parameter_values(scalars, 'Energy_Price_CO2')
+        * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_CH4_Large') * 1e-3  # Eur/GWh to Eur/MWh
@@ -184,13 +249,6 @@ def update_boiler_large(component_df, scalars):
 
 def update_boiler_small(component_df, scalars):
 
-    # Replace AT-ch4-boiler by AT-ch4-boiler-small
-    component_df['name'] = component_df['name'].str.replace(
-        'ch4-boiler', 'ch4-boiler-small', regex=False
-    )
-
-    component_df['tech'] = 'boiler-small'
-
     component_df['capacity'] = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_CH4_Small'
     )
@@ -198,8 +256,10 @@ def update_boiler_small(component_df, scalars):
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_CH4_Small') * 0.01  # Percent to decimals
 
-    component_df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
+    component_df['carrier_cost'] = (
+        get_parameter_values(scalars, 'Energy_Price_CH4')
+        + get_parameter_values(scalars, 'Energy_Price_CO2')
+        * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_CH4_Small') * 1e-3  # Eur/GWh to Eur/MWh
@@ -207,10 +267,41 @@ def update_boiler_small(component_df, scalars):
     return component_df
 
 
-def update_pth(component_df, scalars):
+def update_pth(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['capacity'] = get_parameter_values(
+    capacity = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_Electricity_Large')
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Heat_Electricity_Large')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Heat_Electricity_Large') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Heat_Electricity_Large')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_Electricity_Large') * 0.01  # Percent to decimals
@@ -221,17 +312,42 @@ def update_pth(component_df, scalars):
     return component_df
 
 
-def update_electricity_heatpump_small(component_df, scalars):
+def update_electricity_heatpump_small(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['name'] = component_df['name'].str.replace(
-        'electricity-heatpump', 'electricity-heatpump-small', regex=False
-    )
-
-    component_df['tech'] = 'heatpump-small'
-
-    component_df['capacity'] = get_parameter_values(
+    capacity = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Small'
     )
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Heat_ElectricityHeat_Small')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Heat_ElectricityHeat_Small') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Heat_ElectricityHeat_Small')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_ElectricityHeat_Small') * 1e-3  # Eur/GWh to Eur/MWh
@@ -239,17 +355,42 @@ def update_electricity_heatpump_small(component_df, scalars):
     return component_df
 
 
-def update_electricity_heatpump_large(component_df, scalars):
+def update_electricity_heatpump_large(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['name'] = component_df['name'].str.replace(
-        'electricity-heatpump', 'electricity-heatpump-large', regex=False
-    )
-
-    component_df['tech'] = 'heatpump-large'
-
-    component_df['capacity'] = get_parameter_values(
+    capacity = get_parameter_values(
         scalars, 'EnergyConversion_Capacity_Heat_ElectricityHeat_Large'
     )
+
+    # Investment parameters
+    capex = get_parameter_values(
+        scalars,
+        'EnergyConversion_Capex_Heat_ElectricityHeat_Large')
+
+    fix_cost = get_parameter_values(
+        scalars,
+        'EnergyConversion_FixOM_Heat_ElectricityHeat_Large') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'EnergyConversion_LifeTime_Heat_ElectricityHeat_Large')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+    component_df['capacity'] = 0 if expandable and greenfield else capacity
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost + fix_cost * capex
 
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_COP_Heat_ElectricityHeat_Large'
@@ -261,18 +402,66 @@ def update_electricity_heatpump_large(component_df, scalars):
     return component_df
 
 
-def update_heat_storage_small(component_df, scalars):
+def update_heat_storage_small(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['name'] = component_df['name'].str.replace(
-        'heat-storage', 'heat-storage-small', regex=False
-    )
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_SmallDischarge')
 
-    component_df['tech'] = 'storage-small'
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_SmallDischarge')
 
-    component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_SmallStorage') * 1e-3  # Eur/GWh -> Eur/MWh
 
-    component_df['storage_capacity'] = get_parameter_values(
-        scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_Heat_Small') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_Heat_Small')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge + capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost_charge \
+                                        + fix_cost * (capex_charge + capex_discharge)
+
+        component_df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    if expandable and greenfield:
+        component_df['capacity'] = 0
+        component_df['storage_capacity'] = 0
+
+    else:
+        component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_SmallCharge')
+
+        component_df['storage_capacity'] = get_parameter_values(
+            scalars, 'Storage_Capacity_Heat_SmallStorage') * 1e3  # GWh to MWh
 
     component_df['loss_rate'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Small') * 0.01  # Percent to decimals
@@ -286,18 +475,66 @@ def update_heat_storage_small(component_df, scalars):
     return component_df
 
 
-def update_heat_storage_large(component_df, scalars):
+def update_heat_storage_large(
+        component_df,
+        scalars,
+        expandable=False,
+        greenfield=False
+    ):
 
-    component_df['name'] = component_df['name'].str.replace(
-        'heat-storage', 'heat-storage-large', regex=False
-    )
+    # Investment parameters
+    capex_charge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_LargeCharge')
 
-    component_df['tech'] = 'storage-large'
+    capex_discharge = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_LargeDischarge')
 
-    component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
+    capex_storage = get_parameter_values(
+        scalars,
+        'Storage_Capex_Heat_LargeStorage') * 1e-3  # Eur/GWh -> Eur/MWh
 
-    component_df['storage_capacity'] = get_parameter_values(
-        scalars, 'Storage_Capacity_Heat_LargeStorage') * 1e3  # GWh to MWh
+    fix_cost = get_parameter_values(
+        scalars,
+        'Storage_FixOM_Heat_Large') * 1e-2  # percent -> 0...1
+
+    lifetime = get_parameter_values(
+        scalars,
+        'Storage_LifeTime_Heat_Large')
+
+    interest = get_parameter_values(
+        scalars,
+        'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+
+    annualized_cost_charge = annuity(
+        capex=capex_charge + capex_discharge,
+        n=lifetime,
+        wacc=interest)
+
+    annualized_cost_storage = annuity(
+        capex=capex_storage,
+        n=lifetime,
+        wacc=interest)
+
+    # Actual assignments
+    component_df['expandable'] = expandable
+
+    if expandable:
+        component_df['capacity_cost'] = annualized_cost_charge \
+                                        + fix_cost * (capex_charge + capex_discharge)
+
+        component_df['storage_capacity_cost'] = annualized_cost_storage + fix_cost * capex_storage
+
+    if expandable and greenfield:
+        component_df['capacity'] = 0
+        component_df['storage_capacity'] = 0
+
+    else:
+        component_df['capacity'] = get_parameter_values(scalars, 'Storage_Capacity_Heat_LargeCharge')
+
+        component_df['storage_capacity'] = get_parameter_values(
+            scalars, 'Storage_Capacity_Heat_LargeStorage') * 1e3  # GWh to MWh
 
     component_df['loss_rate'] = get_parameter_values(
         scalars, 'Storage_SelfDischarge_Heat_Large') * 0.01  # Percent to decimals
@@ -417,7 +654,7 @@ def update_h2_cavern(
         scalars, 'Storage_Capacity_H2_CavernStorage') * 1e3  # GWh to MWh
 
     self_discharge = get_parameter_values(
-        scalars, 'Storage_SelfDischarge_Electricity_H2_Cavern') * 1e-2  # percent -> 0...1
+        scalars, 'Storage_SelfDischarge_H2_Cavern') * 1e-2  # percent -> 0...1
 
     operation_cost = get_parameter_values(
         scalars, 'Storage_VarOM_H2_Cavern') * 1e-3  # Eur/GWh -> Eur/MWh
@@ -761,12 +998,15 @@ def update_hydro_reservoir(component_df, scalars):
 
     initial_storage_level = get_parameter_values(
         scalars,
-        'Energy_PrimaryEnergy_Hydro_Reservoir_FillingLevelStart')
+        'EnergyConversion_FillingLevelStart_Electricity_Hydro_Reservoir')
 
     component_df['storage_capacity'] = storage_capacity
 
     # Recalculate filling level as a ratio of storage capacity (refer oemof.solph.components)
     component_df['initial_storage_level'] = initial_storage_level / storage_capacity
+
+    # make sure that this is not nan for zero capacity
+    component_df['initial_storage_level'].loc[storage_capacity == 0] = 0
 
     component_df['efficiency_turbine'] = get_parameter_values(
         scalars,
@@ -822,16 +1062,19 @@ update_dict = {
     'ch4-gt': update_ch4_gt,
     'electricity-bev': update_electricity_bev,
     'electricity-demand': update_electricity_demand,
+    'electricity-h2_demand': update_electricity_h2_demand,
     'electricity-heatpump-large': update_electricity_heatpump_large,
     'electricity-heatpump-small': update_electricity_heatpump_small,
     'electricity-pth': update_pth,
     'electricity-shortage': update_electricity_shortage,
     'electricity-transmission': update_link,
     'electricity-h2_cavern': update_h2_cavern,
-    'heat-demand': update_heat_demand,
-    'heat-shortage': update_heat_shortage,
-    'heat-storage-large': update_heat_storage_large,
-    'heat-storage-small': update_heat_storage_small,
+    'heat_central-demand': update_heat_central_demand,
+    'heat_decentral-demand': update_heat_decentral_demand,
+    'heat_central-shortage': update_heat_shortage,
+    'heat_decentral-shortage': update_heat_shortage,
+    'heat_central-storage-large': update_heat_storage_large,
+    'heat_decentral-storage-small': update_heat_storage_small,
     'hydro-reservoir': update_hydro_reservoir,
     'electricity-liion_battery': update_liion_battery,
     'uranium-nuclear-st': update_nuclear_st,

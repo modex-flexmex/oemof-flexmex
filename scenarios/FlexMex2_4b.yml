@@ -1,0 +1,60 @@
+scenario: FlexMex2_4b
+
+# Properties:
+#   Dispatch scenario
+#   Full set of technologies
+#   Renewable capacites 2x
+
+year: 2050
+
+components:
+  ch4-boiler-large:
+    expandable: True
+    greenfield: True
+  ch4-extchp:
+  ch4-gt:
+    expandable: True
+    greenfield: True
+  electricity-bev:
+  electricity-curtailment:
+  electricity-demand:
+  electricity-h2_demand:
+  electricity-h2_cavern:
+    expandable: True
+    greenfield: True
+  electricity-heatpump-large:
+    expandable: True
+    greenfield: True
+  electricity-heatpump-small:
+    expandable: True
+    greenfield: True
+  electricity-liion_battery:
+    expandable: True
+    greenfield: True
+  electricity-pth:
+    expandable: True
+    greenfield: True
+  electricity-shortage:
+  electricity-transmission:
+  heat_central-demand:
+  heat_central-excess:
+  heat_central-shortage:
+  heat_central-storage-large:
+    expandable: True
+    greenfield: True
+  heat_decentral-demand:
+  heat_decentral-excess:
+  heat_decentral-shortage:
+  heat_decentral-storage-small:
+    expandable: True
+    greenfield: True
+  hydro-reservoir:
+  solar-pv:
+  wind-offshore:
+  wind-onshore:
+
+scenario_select:
+  - FlexMex2-4b
+  - ALL
+
+scenario_overwrite:

@@ -13,5 +13,5 @@ loss_rate,float,unitless,n/a,,Losses due to self discharging
 expandable,boolean,n/a,,,Capacity can be expanded
 capacity_cost,float,Eur/MW,n/a,,Annualized investment cost per charging/discharging capacity
 storage_capacity_cost,float,Eur/MWh,n/a,,Annualized investment cost per storage capacity
-input_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's input flow
+input_parameters,dict,n/a,"{""variable_costs"": 0.00001}",,Optional parameters passed to oemof-solph's input flow
 output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow 

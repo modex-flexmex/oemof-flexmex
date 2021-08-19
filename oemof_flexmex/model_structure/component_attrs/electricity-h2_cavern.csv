@@ -16,5 +16,5 @@ expandable,boolean,n/a,,,Capacity can be expanded
 capacity_cost_charge,float,Eur/MW,n/a,,Annualized investment cost per charging capacity
 capacity_cost_discharge,float,Eur/MW,n/a,,Annualized investment cost per discharging capacity
 storage_capacity_cost,float,Eur/MWh,n/a,,Annualized investment cost per storage capacity
-input_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's input flow
+input_parameters,dict,n/a,"{""variable_costs"": 0.00001}",,Optional parameters passed to oemof-solph's input flow
 output_parameters,dict,n/a,{},,Optional parameters passed to oemof-solph's output flow 

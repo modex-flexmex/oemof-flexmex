@@ -59,17 +59,20 @@ electricity-pth:
 electricity-shortage:
   flow_out: Slack/Electricity
 
-heat-storage-small:
+heat_decentral-storage-small:
   flow_in: Storage/Heat/Small/In
   flow_out: Storage/Heat/Small/Out
   storage_content: Storage/Heat/Small/Level
 
-heat-storage-large:
+heat_central-storage-large:
   flow_in: Storage/Heat/Large/In
   flow_out: Storage/Heat/Large/Out
   storage_content: Storage/Heat/Large/Level
 
-heat-shortage:
+heat_central-shortage:
+  flow_out: Slack/Heat
+
+heat_decentral-shortage:
   flow_out: Slack/Heat
 
 hydro-reservoir:

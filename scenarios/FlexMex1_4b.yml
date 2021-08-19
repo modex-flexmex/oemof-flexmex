@@ -10,9 +10,9 @@ components:
   wind-onshore:
   solar-pv:
   ch4-extchp:
-  heat-demand:
-  heat-shortage:
-  heat-excess:
+  heat_central-demand:
+  heat_central-shortage:
+  heat_central-excess:
   
 scenario_select:
   - FlexMex1

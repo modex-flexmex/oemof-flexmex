@@ -10,9 +10,9 @@ components:
   wind-onshore:
   solar-pv:
   electricity-heatpump-small:
-  heat-storage-small:
-  heat-demand:
-  heat-shortage:
+  heat_decentral-storage-small:
+  heat_decentral-demand:
+  heat_decentral-shortage:
   ch4-gt:
 
 scenario_select:

@@ -3,9 +3,14 @@ electricity-demand:
     electricity-demand:
       input-path: Energy/FinalEnergy/Electricity
 
-heat-demand:
+heat_central-demand:
   profiles:
-    heat-demand:
+    heat_central-demand:
+      input-path: Energy/FinalEnergy/Heat
+
+heat_decentral-demand:
+  profiles:
+    heat_decentral-demand:
       input-path: Energy/FinalEnergy/Heat
 
 wind-onshore:

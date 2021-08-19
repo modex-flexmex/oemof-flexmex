@@ -18,21 +18,33 @@ path_oemof_tabular_settings = os.path.join(
 
 path_mappings = os.path.abspath(os.path.join(module_path, PATH_MAPPINGS_REL))
 
-path_mapping_input_timeseries = os.path.join(path_mappings, 'mapping-input-timeseries.yml')
+path_mapping_input_timeseries_flexmex1 = os.path.join(
+    path_mappings, 'mapping-input-timeseries-FlexMex1.yml')
+
+path_mapping_input_timeseries_flexmex2 = os.path.join(
+    path_mappings, 'mapping-input-timeseries-FlexMex2.yml')
 
 # Load configs
 oemof_tabular_settings = load_yaml(path_oemof_tabular_settings)
 
+mapping_input_timeseries = {
+    "FlexMex1": load_yaml(path_mapping_input_timeseries_flexmex1),
+    "FlexMex2": load_yaml(path_mapping_input_timeseries_flexmex2),
+}
+
 # Define time index and regions
 datetimeindex = pd.date_range(start='2019-01-01', freq='H', periods=8760)
 
-mapping = load_yaml(path_mapping_input_timeseries)
 
-
-def combine_profiles(raw_profile_path, column_name):
+def combine_profiles(raw_profile_path, select_experiment, column_name):
     profile_file_list = sorted(os.listdir(raw_profile_path))
 
-    profile_file_list = [file for file in profile_file_list if file.endswith('csv')]
+    # filter for files starting with select_experiment and csv files
+    profile_file_list = [
+        file for file in profile_file_list
+        if file.endswith('csv')
+        if file.startswith(select_experiment)
+    ]
 
     profile_list = []
     for file in profile_file_list:
@@ -55,7 +67,7 @@ def combine_profiles(raw_profile_path, column_name):
     return profile_df
 
 
-def create_profiles(data_raw_path, preprocessed_path, select_components):
+def create_profiles(data_raw_path, preprocessed_path, select_components, select_experiment):
 
     def normalize_year(timeseries):
         r"""Normalizes the DataFrame 'timeseries' to values that add up to 1.0."""
@@ -71,6 +83,8 @@ def create_profiles(data_raw_path, preprocessed_path, select_components):
     profile_file_suffix = oemof_tabular_settings['profile-file-suffix']
     profile_name_suffix = oemof_tabular_settings['profile-name-suffix']
 
+    mapping = mapping_input_timeseries[select_experiment]
+
     for component in select_components:
 
         try:
@@ -83,7 +97,9 @@ def create_profiles(data_raw_path, preprocessed_path, select_components):
 
                 profile_paths = os.path.join(data_raw_path, profile['input-path'])
 
-                profile_df = combine_profiles(profile_paths, profile_name + profile_name_suffix)
+                profile_df = combine_profiles(
+                    profile_paths, select_experiment, profile_name + profile_name_suffix
+                )
 
                 if 'apply-function' in profile:
                     function_name = profile['apply-function']

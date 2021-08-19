@@ -18,12 +18,11 @@ setup(
     packages=['oemof_flexmex'],
     install_requires=[
         'pandas',
-        'oemof',
-        'oemof.tabular',
+        'oemof.tabular @ git+https://git@github.com/oemof/oemof-tabular@dev#egg=oemof.tabular',
+        'pyomo<5.6.9',
+        'pyutilib<6.0.0',
+        'snakemake',
         'pyyaml',
         'addict',
-        'Pyomo==5.6.7',
-        'PyUtilib==5.7.2',
-        'Snakemake>=5.32.0'
     ],
 )

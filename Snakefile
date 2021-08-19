@@ -2,11 +2,11 @@ import os
 
 # Configuration
 scenario_yml = "scenarios/{scenario}.yml"
-raw_dir = "data/In/v0.06"
+raw_dir = "data/In/v0.09"
 preprocessed_dir = "results/{scenario}/01_preprocessed"
 optimized_dir = "results/{scenario}/02_optimized"
 postprocessed_dir = "results/{scenario}/03_postprocessed"
-results_template = "flexmex_config/output_template/v0.07/Template"
+results_template = "flexmex_config/output_template/v0.09/Template"
 log_dir = "results/{scenario}"
 results_joined_dir = "results/{experiment}"
 

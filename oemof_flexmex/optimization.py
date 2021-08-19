@@ -42,7 +42,6 @@ def optimize(data_preprocessed, results_optimization, solver='cbc', save_lp=Fals
     # get the results from the the solved model(still oemof.solph)
     es.meta_results = processing.meta_results(m)
     es.results = processing.results(m)
-    es.params = processing.parameter_as_dict(es)
 
     # now we use the write results method to write the results in oemof-tabular
     # format

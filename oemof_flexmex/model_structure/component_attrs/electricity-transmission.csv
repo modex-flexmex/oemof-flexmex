@@ -10,3 +10,4 @@ from_to_capacity,float,MW,n/a,,Net transfer capacity in forward direction
 to_from_capacity,float,MW,n/a,,Net transfer capacity in backward direction
 capacity_cost,float,Eur/MW,n/a,,Annualized costs of capacity expansion
 loss,float,unitless,n/a,,Transmission losses
+input_parameters,dict,n/a,"{""variable_costs"": 0.00001}",,Optional parameters passed to oemof-solph's input flow

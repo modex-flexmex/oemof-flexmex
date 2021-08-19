@@ -217,7 +217,9 @@ def format_capacities(oemoflex_scalars, capacities):
     df.loc[:, 'type'] = capacities.reset_index().loc[:, 'type']
     df.loc[:, 'region'] = capacities.reset_index().loc[:, 'region']
 
-    df['var_unit'] = 'MW'
+    df.loc[:, 'var_unit'] = 'MW'
+    df.loc[df['var_name'] == 'storage_capacity', 'var_unit'] = 'MWh'
+    df.loc[df['var_name'] == 'storage_capacity_invest', 'var_unit'] = 'MWh'
 
     return df
 
@@ -300,7 +302,7 @@ def get_sequences_by_tech(results):
 
         if isinstance(component, TYPEMAP["link"]):
             # Replace AT-DE by AT_DE to be ready to be merged with DataFrames from preprocessing
-            region = component.label.replace('-', '_')
+            region = '_'.join(component.label.split('-')[:2])
         else:
             # Take AT from AT-ch4-gt, string op since sub-nodes lack of a 'region' attribute
             region = component.label.split('-')[0]
@@ -820,7 +822,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
 
             # Special treatment for storages
-            if tech_name in ['h2_cavern', 'liion_battery']:
+            if tech_name in ['h2_cavern', 'liion_battery', 'storage-large', 'storage-small']:
 
                 # Charge device
                 capex = get_parameter_values(scalars_raw, parameters['charge_capex'])
@@ -892,7 +894,7 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
             parameters = FlexMex_Parameter_Map['tech'][tech_name]
 
             # Special treatment for storages
-            if tech_name in ['h2_cavern', 'liion_battery']:
+            if tech_name in ['h2_cavern', 'liion_battery', 'storage-large', 'storage-small']:
 
                 # One fix cost factor for all sub-components
                 fix_cost_factor = get_parameter_values(
@@ -1045,6 +1047,35 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
     return df_re_generation
 
 
+def aggregate_heat(oemoflex_scalars):
+
+    aggregated = (
+        oemoflex_scalars
+        .loc[
+            (
+                oemoflex_scalars['carrier'].isin(['heat_central', 'heat_decentral']) &
+                oemoflex_scalars['tech'].isin(['excess', 'shortage'])
+
+            )
+        ]
+        .loc[:, ['region', 'type', 'tech', 'var_name', 'var_value', 'var_unit']]
+        .groupby(['region', 'type', 'tech', 'var_name', 'var_unit'])
+        .sum()
+        .reset_index()
+    )
+
+    if not aggregated.empty:
+
+        aggregated['carrier'] = 'heat'
+
+        aggregated['name'] = aggregated\
+            .apply(lambda x: '-'.join(x[['region', 'carrier', 'tech']]), 1)
+
+        oemoflex_scalars = pd.concat([oemoflex_scalars, aggregated])
+
+    return oemoflex_scalars
+
+
 def export_bus_sequences(es, destination):
 
     if not os.path.exists(destination):
@@ -1103,7 +1134,18 @@ def run_postprocessing(scenario_specs, exp_paths):
     scalars_raw = load_scalar_input_data(scenario_specs, exp_paths.data_raw)
 
     # load scalars templates
-    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
+    exp, _ = scenario_specs['scenario'].split('_')
+
+    if exp == 'FlexMex1':
+        flexmex_scalars_template = pd.read_csv(
+            os.path.join(exp_paths.results_template, 'Scalars_FlexMex1.csv')
+        )
+
+    elif exp == 'FlexMex2':
+        flexmex_scalars_template = pd.read_csv(
+            os.path.join(exp_paths.results_template, 'Scalars_FlexMex2.csv')
+        )
+
     flexmex_scalars_template = flexmex_scalars_template.loc[
         flexmex_scalars_template['UseCase'] == scenario_specs['scenario']
     ]
@@ -1201,6 +1243,9 @@ def run_postprocessing(scenario_specs, exp_paths):
     # map direction of links
     oemoflex_scalars = map_link_direction(oemoflex_scalars)
 
+    # sum heat shortage and excess
+    oemoflex_scalars = aggregate_heat(oemoflex_scalars)
+
     # set experiment info
     oemoflex_scalars['usecase'] = scenario_specs['scenario']
     oemoflex_scalars['year'] = scenario_specs['year']
@@ -1226,7 +1271,7 @@ def run_postprocessing(scenario_specs, exp_paths):
             index=False
         )
 
-    save_oemoflex_timeseries = False
+    save_oemoflex_timeseries = True
     if save_oemoflex_timeseries:
         export_bus_sequences(
             es,
