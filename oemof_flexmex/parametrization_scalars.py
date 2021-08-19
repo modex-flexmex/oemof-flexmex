@@ -236,8 +236,10 @@ def update_boiler_large(
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_CH4_Large') * 0.01  # Percent to decimals
 
-    component_df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
+    component_df['carrier_cost'] = (
+        get_parameter_values(scalars, 'Energy_Price_CH4')
+        + get_parameter_values(scalars, 'Energy_Price_CO2')
+        * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_CH4_Large') * 1e-3  # Eur/GWh to Eur/MWh
@@ -254,8 +256,10 @@ def update_boiler_small(component_df, scalars):
     component_df['efficiency'] = get_parameter_values(
         scalars, 'EnergyConversion_Eta_Heat_CH4_Small') * 0.01  # Percent to decimals
 
-    component_df['carrier_cost'] = get_parameter_values(
-        scalars, 'Energy_Price_CH4') * 1e-3  # Eur/GWh to Eur/MWh
+    component_df['carrier_cost'] = (
+        get_parameter_values(scalars, 'Energy_Price_CH4')
+        + get_parameter_values(scalars, 'Energy_Price_CO2')
+        * get_parameter_values(scalars, 'Energy_EmissionFactor_CH4')) * 1e-3  # Eur/GWh to Eur/MWh
 
     component_df['marginal_cost'] = get_parameter_values(
         scalars, 'EnergyConversion_VarOM_Heat_CH4_Small') * 1e-3  # Eur/GWh to Eur/MWh
