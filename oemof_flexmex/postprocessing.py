@@ -302,7 +302,7 @@ def get_sequences_by_tech(results):
 
         if isinstance(component, TYPEMAP["link"]):
             # Replace AT-DE by AT_DE to be ready to be merged with DataFrames from preprocessing
-            region = component.label.replace('-', '_')
+            region = '_'.join(component.label.split('-')[:2])
         else:
             # Take AT from AT-ch4-gt, string op since sub-nodes lack of a 'region' attribute
             region = component.label.split('-')[0]
