@@ -1,15 +1,13 @@
-!!python/tuple ['-biomass-gt', '-electricity', 'flow']: Biomass GT
-!!python/tuple ['-biomass-st', '-electricity', 'flow']: Biomass ST
-!!python/tuple ['-ch4-gt', '-electricity', 'flow']: CH4
-!!python/tuple ['-electricity', '-electricity-curtailment', 'flow']: Curtailment
-!!python/tuple ['-electricity', '-electricity-demand', 'flow']: El. demand
-!!python/tuple ['-electricity', '-electricity-liion-battery', 'flow']: BAT charge
-!!python/tuple ['-electricity-liion-battery', '-electricity', 'flow']: BAT discharge
-!!python/tuple ['-electricity-shortage', '-electricity', 'flow']: Shortage
-!!python/tuple ['-solar-pv', '-electricity', 'flow']: PV
-!!python/tuple ['-wind-onshore', '-electricity', 'flow']: Wind on
-!!python/tuple ['-wind-offshore', '-electricity', 'flow']: Wind off
-!!python/tuple ['-electricity-transmission', '-electricity', 'flow']: Import
-!!python/tuple ['-electricity', '-electricity-transmission', 'flow']: Export
-!!python/tuple ['-heat', '-heat-demand', 'flow']: Heat demand
-!!python/tuple ['-ch4-boiler', '-heat', 'flow']: CH4 Boiler
+-biomass-gt: Biomass GT
+-biomass-st': Biomass ST
+-ch4-gt: CH4
+-electricity-curtailment: Curtailment
+-electricity-demand: El. demand
+-electricity-liion-battery: BAT
+-electricity-shortage: Shortage
+-solar-pv: PV
+-wind-onshore: Wind on
+-wind-offshore: Wind off
+-electricity-transmission: Transmission
+-heat-demand: Heat demand
+-ch4-boiler: CH4 Boiler
