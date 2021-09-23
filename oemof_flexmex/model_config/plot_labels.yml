@@ -18,4 +18,14 @@ electricity-heatpump-large: Large heat pump
 electricity-heatpump-small: Small heat pump
 electricity-pth: Resistance heating
 hydro-reservoir: Hydro reservoir
-electricity-h2_demand: Elec. demand for H2
+electricity-h2_demand: El. demand for H2
+
+# for heat plots
+heat_central-excess: Excess heat
+heat_central-demand: Heat demand
+heat_central-shortage: Heat shortage
+heat_central-storage-large: Large heat storage
+heat_decentral-excess: Excess heat
+heat_decentral-demand: Heat demand
+heat_decentral-storage-small: Small heat storage
+heat_decentral-shortage: Heat shortage

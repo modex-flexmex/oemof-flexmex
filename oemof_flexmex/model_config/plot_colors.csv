@@ -23,4 +23,13 @@ H2 cavern out,#4350ff
 Resistance heating,#d82b2b
 Small heat pump,#6fbeee
 Large heat pump,#36b07b
-Elec. demand for H2,#000000
+El. demand for H2,#000000
+
+Large heat storage in,#f4df0b
+Small heat storage in,#e5ca8a
+Large heat storage out,#c1a814
+Small heat storage out,#e5a305
+Heat shortage,#ff7f0e
+CH4 Boiler,#d46566
+Excess heat,#7f7f7f
+Heat demand,#000000
