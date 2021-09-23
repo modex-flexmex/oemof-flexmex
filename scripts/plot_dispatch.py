@@ -28,7 +28,7 @@ if __name__ == "__main__":
     ]
 
     # select carrier
-    carrier = "electricity"
+    carrier = "heat_decentral" # "electricity.csv" or "heat_decentral" or "heat_central"
 
     selected_timeseries_files = [file for file in timeseries_files if carrier in file]
 
