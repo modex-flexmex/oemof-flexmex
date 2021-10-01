@@ -54,7 +54,6 @@ if __name__ == "__main__":
         # convert data to SI-unit
         conv_number = 1000
         data = data * conv_number
-        print(data)
         data = sum_demands(data, bus_name=bus_name, demand_name="demand")
         df, df_demand = plots.prepare_dispatch_data(
             data, bus_name=bus_name, demand_name="demand", general_labels_dict=plot_labels
