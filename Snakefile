@@ -111,6 +111,15 @@ rule postprocess:
         " {output.data} {params.log}"
 
 
+rule plot_storage_levels:
+    input:
+        postprocessed_dir
+    output:
+        directory(plotted_dir)
+    shell:
+        "python scripts/plot_storage_levels.py {input} {output}"
+
+
 def processed_scenarios(wildcards):
     # Returns a list of scenarios with completed postprocessing.
 
