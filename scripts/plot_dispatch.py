@@ -8,6 +8,17 @@ from oemof_flexmex.model_config import plot_labels, colors_odict
 import pandas as pd
 from addict import Dict
 
+def sum_demands(data, bus_name, demand_name):
+    df_demand = pd.DataFrame()
+    for i in data.columns:
+        if demand_name in i[1]:
+            df_demand[i] = data[i]
+            data.drop(columns=[i], inplace=True)
+            if len(df_demand.columns) > 1:
+                total_demand = df_demand.sum(axis=1)
+                data[(bus_name, bus_name + '-demand', 'flow')] = total_demand
+    return data
+
 if __name__ == "__main__":
 
     paths = Dict()
@@ -43,6 +54,7 @@ if __name__ == "__main__":
         # convert data to SI-unit
         conv_number = 1000
         data = data * conv_number
+        sum_demands(data, bus_name=bus_name, demand_name="demand")
         df, df_demand = plots.prepare_dispatch_data(
             data, bus_name=bus_name, demand_name="demand", general_labels_dict=plot_labels
         )
