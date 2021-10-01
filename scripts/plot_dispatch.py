@@ -9,14 +9,13 @@ import pandas as pd
 from addict import Dict
 
 def sum_demands(data, bus_name, demand_name):
-    df_demand = pd.DataFrame()
+    d_demand = pd.DataFrame()
     for i in data.columns:
         if demand_name in i[1]:
-            df_demand[i] = data[i]
+            d_demand[i] = data[i]
             data.drop(columns=[i], inplace=True)
-            if len(df_demand.columns) > 1:
-                total_demand = df_demand.sum(axis=1)
-                data[(bus_name, bus_name + '-demand', 'flow')] = total_demand
+    total_demand = d_demand.sum(axis=1)
+    data[(bus_name, bus_name + '-demand', 'flow')] = total_demand
     return data
 
 if __name__ == "__main__":
@@ -38,12 +37,13 @@ if __name__ == "__main__":
         ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
     ]
 
-    # select carrier
-    carrier = "electricity.csv" # "electricity.csv" or "heat_decentral" or "heat_central"
+    carriers = ["electricity.csv", "heat_decentral", "heat_central"]
 
-    selected_timeseries_files = [file for file in timeseries_files if carrier in file]
+    for carrier in carriers:
 
-    for bus_file in selected_timeseries_files:
+      selected_timeseries_files = [file for file in timeseries_files if carrier in file]
+
+      for bus_file in selected_timeseries_files:
 
         bus_name = os.path.splitext(bus_file)[0]
         bus_path = os.path.join(timeseries_directory, bus_file)
@@ -54,7 +54,8 @@ if __name__ == "__main__":
         # convert data to SI-unit
         conv_number = 1000
         data = data * conv_number
-        sum_demands(data, bus_name=bus_name, demand_name="demand")
+        print(data)
+        data = sum_demands(data, bus_name=bus_name, demand_name="demand")
         df, df_demand = plots.prepare_dispatch_data(
             data, bus_name=bus_name, demand_name="demand", general_labels_dict=plot_labels
         )
