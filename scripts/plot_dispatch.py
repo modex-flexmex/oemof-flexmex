@@ -39,11 +39,10 @@ if __name__ == "__main__":
 
     carriers = ["electricity.csv", "heat_decentral", "heat_central"]
 
-    for carrier in carriers:
 
-      selected_timeseries_files = [file for file in timeseries_files if carrier in file]
-
-      for bus_file in selected_timeseries_files:
+    selected_timeseries_files = [file for file in timeseries_files for carrier in carriers if carrier in file]
+    print(selected_timeseries_files)
+    for bus_file in selected_timeseries_files:
 
         bus_name = os.path.splitext(bus_file)[0]
         bus_path = os.path.join(timeseries_directory, bus_file)
