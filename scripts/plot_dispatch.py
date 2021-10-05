@@ -56,7 +56,7 @@ if __name__ == "__main__":
         data = data * conv_number
         data = sum_demands(data, bus_name=bus_name, demand_name="demand")
         df, df_demand = plots.prepare_dispatch_data(
-            data, bus_name=bus_name, demand_name="demand", general_labels_dict=plot_labels
+            data, bus_name=bus_name, demand_name="demand", labels_dict=plot_labels
         )
 
         # interactive plotly dispatch plot
