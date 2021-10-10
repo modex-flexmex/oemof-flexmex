@@ -81,10 +81,14 @@ if __name__ == "__main__":
         ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
     ]
 
+    # possible carriers: "electricity.csv", "heat_decentral", "heat_central"
     carriers = ["electricity.csv", "heat_decentral", "heat_central"]
+    # possible regions: "AT", "BE", "CH", "CZ", "DK", "DE", "FR", "IT", "LU", "NL", "PL"
+    regions = ["DE", "FR", "PL"]
 
 
-    selected_timeseries_files = [file for file in timeseries_files for carrier in carriers if carrier in file]
+    selected_timeseries_files = [file for file in timeseries_files for carrier in carriers for region in regions
+                                 if carrier in file and region in file]
 
     for bus_file in selected_timeseries_files:
 
