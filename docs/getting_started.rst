@@ -23,7 +23,7 @@ Clone oemof-flexmex from github:
     git clone git@github.com:modex-flexmex/oemof-flexmex.git
 
 
-Now you can install it your local version of oemof-flexmex using pip:
+Now you can install your local version of oemof-flexmex using pip:
 
 ::
 
