@@ -1,19 +1,18 @@
-import os
-import logging
 import copy
+import logging
+import os
 
 import numpy as np
-import pandas as pd
-
-from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
+import pandas as pd
+from oemof.outputlib.views import convert_to_multiindex
+from oemof.solph import Bus, EnergySystem, Sink, Source
 from oemof.tools.economics import annuity
-from oemof_flexmex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data,\
-    load_yaml
-from oemof_flexmex.parametrization_scalars import get_parameter_values
 
 from oemof_flexmex.facades import TYPEMAP
-
+from oemof_flexmex.helpers import (delete_empty_subdirs, load_elements,
+                                   load_scalar_input_data, load_yaml)
+from oemof_flexmex.parametrization_scalars import get_parameter_values
 
 basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
 
@@ -1044,9 +1043,35 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
 
     return df_re_generation
 
+def get_seq_by_var(es, results):
 
-def get_sequences(es, kind=("bus", "component")):
+    # copy to avoid manipulating the data in es.results
+    sequences = copy.deepcopy(
+        {
+            key: value["sequences"]
+            for key, value in results.items()
+            if value["sequences"] is not None
+        }
+    )
 
+    sequences = convert_to_multiindex(sequences)
+
+    idx = pd.IndexSlice
+
+    variables = list(set(sequences.columns.get_level_values(2)))
+
+    sequences_by_variable = {}
+
+    for variable in variables:
+
+        var_results = sequences.loc[:, idx[:, :, variable]]
+
+        sequences_by_variable[variable] = var_results
+
+    return sequences_by_variable
+
+
+def get_sequences(es, kind=("bus", "component", "variable")):
     def get_rel_paths(keys, *subdirs, file_ext=".csv"):
         return {key: os.path.join(*subdirs, key + file_ext) for key in keys}
 
@@ -1056,6 +1081,7 @@ def get_sequences(es, kind=("bus", "component")):
     methods = {
         "bus": pp.bus_results,
         "component": pp.component_results,
+        "variable": get_seq_by_var,
     }
 
     methods = {k: v for k, v in methods.items() if k in kind}
@@ -1077,7 +1103,7 @@ def get_sequences(es, kind=("bus", "component")):
     return data_seq, rel_paths_seq
 
 
-def export_sequences(es, destination, kind=("bus", "component")):
+def export_sequences(es, destination, kind=("bus", "component", "variable")):
 
     data, rel_paths = get_sequences(es, kind)
 
