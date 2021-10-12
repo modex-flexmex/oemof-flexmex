@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
         for start_date, end_date in timeframe:
             fig = draw_plots(df=df, start_date=start_date, end_date=end_date, bus_name=bus_name, colors_odict=colors_odict)
-            file_name = bus_name + "_" + start_date[5:7] + ".pdf"
-            plt.savefig(os.path.join(paths.plotted, file_name), bbox_inches="tight")
             file_name = bus_name + "_" + start_date[5:7] + ".png"
+            plt.savefig(os.path.join(paths.plotted, file_name), bbox_inches="tight")
+            file_name = bus_name + "_" + start_date[5:7] + ".pdf"
             plt.savefig(os.path.join(paths.plotted, file_name), bbox_inches="tight")
