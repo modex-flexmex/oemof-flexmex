@@ -46,7 +46,11 @@ for region in regions:
 
 # fourth step: slice selected timeframes
 
+    for i in range(len(timeframe)):
+        df_filtered = plots.filter_timeseries(df=df, start_date=timeframe[0][0], end_date=timeframe[0][1])
+
 # fifth step: plot
+def plot(df):
     ax1 = plt.subplot(2, 1, 1)
     ax3 = plt.subplot(2, 1, 2, sharex=ax1)
     for i in df.columns:
