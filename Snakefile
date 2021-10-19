@@ -9,6 +9,7 @@ postprocessed_dir = "results/{scenario}/03_postprocessed"
 results_template = "flexmex_config/output_template/v0.07/Template"
 log_dir = "results/{scenario}"
 results_joined_dir = "results/{experiment}"
+plotted_dir_storage = "results/{scenario}/04_plotted/storage"
 
 # Set oemof.tabular sub-paths
 preprocessed_data = os.path.join(preprocessed_dir, "data")
@@ -115,7 +116,7 @@ rule plot_storage_levels:
     input:
         postprocessed_dir
     output:
-        directory(plotted_dir)
+        directory(plotted_dir_storage)
     shell:
         "python scripts/plot_storage_levels.py {input} {output}"
 
