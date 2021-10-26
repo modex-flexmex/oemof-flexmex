@@ -52,7 +52,8 @@ if __name__ == "__main__":
     if not os.path.exists(paths.plotted):
             os.makedirs(paths.plotted)
     timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries/variable")
-    capacity_data = os.path.join(timeseries_directory, "capacity.csv")
+    # oemof.solph 0.3.2 used 'capacity' to name this variable, oemof.solph > 0.4.0 renamed it to 'storage level'.
+    storage_level_data = os.path.join(timeseries_directory, "capacity.csv")
     capacities = pd.read_csv(capacity_data, header=[0, 1, 2], parse_dates=[0], index_col=[0])
 
 # second step: data selection: timeframe, country
