@@ -52,7 +52,7 @@ def plot_storage_levels(df):
        ax3.set_ylabel('Heat [GWh]')
     except UnboundLocalError:
         pass
-    plt.show()
+    return fig
 
 dir_name = os.path.abspath(os.path.dirname(__file__))
 labels_dict = helpers.load_yaml(os.path.join(dir_name, "../oemof_flexmex/model_config/plot_labels.yml"))
@@ -94,4 +94,5 @@ if __name__ == "__main__":
 
         # fifth step: plot
 
-        plot_storage_levels(df_time_filtered)
+        figure = plot_storage_levels(df_time_filtered)
+        plt.savefig(os.path.join(paths.plotted, region+"_"+timeframe[0][5:7]))
