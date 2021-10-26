@@ -35,39 +35,40 @@ def plot(df):
 dir_name = os.path.abspath(os.path.dirname(__file__))
 labels_dict = helpers.load_yaml(os.path.join(dir_name, "../oemof_flexmex/model_config/plot_labels.yml"))
 
+if __name__ == "__main__":
 # first step: data import
-paths = Dict()
-paths.postprocessed = sys.argv[1]
-paths.plotted = sys.argv[2]
-if not os.path.exists(paths.plotted):
-        os.makedirs(paths.plotted)
-timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries/variable")
-capacity_data = os.path.join(timeseries_directory, "capacity.csv")
-capacities = pd.read_csv(capacity_data, header=[0, 1, 2], parse_dates=[0], index_col=[0])
+    paths = Dict()
+    paths.postprocessed = sys.argv[1]
+    paths.plotted = sys.argv[2]
+    if not os.path.exists(paths.plotted):
+            os.makedirs(paths.plotted)
+    timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries/variable")
+    capacity_data = os.path.join(timeseries_directory, "capacity.csv")
+    capacities = pd.read_csv(capacity_data, header=[0, 1, 2], parse_dates=[0], index_col=[0])
 
 # second step: data selection: timeframe, country
 #TODO: integrate time frame and region definition for dispatch plots and for storage level plots
-timeframe = [
-        ("2019-01-01 00:00:00", "2019-01-31 23:00:00"),
-        ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
-    ]
-regions = ["DE", "PL"]
+    timeframe = [
+            ("2019-01-01 00:00:00", "2019-01-31 23:00:00"),
+            ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
+        ]
+    regions = ["DE", "PL"]
 
-for region in regions:
-    df = pd.DataFrame()
-    for column in capacities.columns:
-        if region in column[0]:
-            df[column] = capacities.loc[:, column]
-    df = df / 1000 # from MWh to GWh
+    for region in regions:
+        df = pd.DataFrame()
+        for column in capacities.columns:
+            if region in column[0]:
+                df[column] = capacities.loc[:, column]
+        df = df / 1000 # from MWh to GWh
 # third step: rename columns into short, understandable labels
 
-    df.columns = plots._rename_by_string_matching(columns=df.columns, labels_dict=labels_dict)
+        df.columns = plots._rename_by_string_matching(columns=df.columns, labels_dict=labels_dict)
 
 # fourth step: slice selected timeframes
 
-    for i in range(len(timeframe)):
-        df_filtered = plots.filter_timeseries(df=df, start_date=timeframe[i][0], end_date=timeframe[i][1])
+        for i in range(len(timeframe)):
+            df_filtered = plots.filter_timeseries(df=df, start_date=timeframe[i][0], end_date=timeframe[i][1])
 
 # fifth step: plot
 
-        plot(df_filtered)
+            plot(df_filtered)
