@@ -21,9 +21,18 @@ def plot(df):
     for i in df.columns:
         if 'heat' in i:
             ax3.plot(df.index, df[i], label=i, linewidth=2)  # , color=colors_odict[i])
+        elif 'BEV' in i:
+            pass
+        elif 'H2 cavern' in i:
+            ax2 = ax1.twinx()
+            ax2.set(ylim=(0, 45))
+            ax2.plot(df.index, df[i]/1000, label=i)#, color=colors_odict[i])
+            ax2.set_ylabel("Electricity [TWh]")
+            ax2.legend(loc='upper right')
+        # TODO: set colors as in https://matplotlib.org/stable/gallery/subplots_axes_and_figures/two_scales.html#sphx-glr-gallery-subplots-axes-and-figures-two-scales-py
         else:
             ax1.plot(df.index, df[i], label=i, linewidth=2)#, color=colors_odict[i])
-    ax1.legend()
+    ax1.legend(loc='upper left')
     ax1.set_ylabel('Electricity [GWh]')
     try:
        ax3.legend()
