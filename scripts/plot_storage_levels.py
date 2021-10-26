@@ -24,8 +24,10 @@ def plot(df):
         else:
             ax1.plot(df.index, df[i], label=i, linewidth=2)#, color=colors_odict[i])
     ax1.legend()
+    ax1.set_ylabel('Electricity [GWh]')
     try:
        ax3.legend()
+       ax3.set_ylabel('Heat [GWh]')
     except UnboundLocalError:
         pass
     plt.show()
@@ -49,14 +51,14 @@ timeframe = [
         ("2019-01-01 00:00:00", "2019-01-31 23:00:00"),
         ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
     ]
-regions = ["DE", "FR", "PL"]
+regions = ["DE", "PL"]
 
 for region in regions:
     df = pd.DataFrame()
     for column in capacities.columns:
         if region in column[0]:
             df[column] = capacities.loc[:, column]
-
+    df = df / 1000 # from MWh to GWh
 # third step: rename columns into short, understandable labels
 
     df.columns = plots._rename_by_string_matching(columns=df.columns, labels_dict=labels_dict)
