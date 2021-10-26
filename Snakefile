@@ -114,11 +114,12 @@ rule postprocess:
 
 rule plot_storage_levels:
     input:
-        postprocessed_dir
+        postprocessed=postprocessed_dir,
+        script="scripts/plot_storage_levels.py",
     output:
         directory(plotted_dir_storage)
     shell:
-        "python scripts/plot_storage_levels.py {input} {output}"
+        "python {input.script} {input.postprocessed} {output}"
 
 
 def processed_scenarios(wildcards):
