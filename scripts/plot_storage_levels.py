@@ -13,15 +13,21 @@ import oemoflex.tools.helpers as helpers
 
 def plot(df):
     fig, ax = plt.subplots(figsize=(14, 5), linewidth=20)
-    ax1 = plt.subplot(2, 1, 1)
-    ax3 = plt.subplot(2, 1, 2, sharex=ax1)
+    if df.columns.str.contains('heat').any():
+        ax1 = plt.subplot(2, 1, 1)
+        ax3 = plt.subplot(2, 1, 2, sharex=ax1)
+    else:
+        ax1 = plt.subplot()
     for i in df.columns:
         if 'heat' in i:
             ax3.plot(df.index, df[i], label=i, linewidth=2)  # , color=colors_odict[i])
         else:
             ax1.plot(df.index, df[i], label=i, linewidth=2)#, color=colors_odict[i])
     ax1.legend()
-    ax3.legend()
+    try:
+       ax3.legend()
+    except UnboundLocalError:
+        pass
     plt.show()
 
 dir_name = os.path.abspath(os.path.dirname(__file__))
