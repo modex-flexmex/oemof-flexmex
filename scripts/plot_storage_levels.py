@@ -11,6 +11,14 @@ import oemoflex.tools.helpers as helpers
 # plots), which display the storage level change in the two timeframes selected for the dispatch plots. The file should
 # also use the colors and the labels files that are used in the dispatch plots.
 
+def plot(df):
+    fig, ax = plt.subplots(figsize=(14, 5), linewidth=20)
+    ax1 = plt.subplot(2, 1, 1)
+    ax3 = plt.subplot(2, 1, 2, sharex=ax1)
+    for i in df.columns:
+        ax1.plot(df.index, df[i], label=i, linewidth=2)#, color=colors_odict[i])
+    ax1.legend()
+    plt.show()
 
 dir_name = os.path.abspath(os.path.dirname(__file__))
 labels_dict = helpers.load_yaml(os.path.join(dir_name, "../oemof_flexmex/model_config/plot_labels.yml"))
@@ -42,18 +50,12 @@ for region in regions:
 # third step: rename columns into short, understandable labels
 
     df.columns = plots._rename_by_string_matching(columns=df.columns, labels_dict=labels_dict)
-    fig, ax = plt.subplots(figsize=(14, 5), linewidth=20)
 
 # fourth step: slice selected timeframes
 
     for i in range(len(timeframe)):
-        df_filtered = plots.filter_timeseries(df=df, start_date=timeframe[0][0], end_date=timeframe[0][1])
+        df_filtered = plots.filter_timeseries(df=df, start_date=timeframe[i][0], end_date=timeframe[i][1])
 
 # fifth step: plot
-def plot(df):
-    ax1 = plt.subplot(2, 1, 1)
-    ax3 = plt.subplot(2, 1, 2, sharex=ax1)
-    for i in df.columns:
-        ax1.plot(df.index, df[i], label=i, linewidth=2)#, color=colors_odict[i])
-    ax1.legend()
-    plt.show()
+
+        plot(df_filtered)
