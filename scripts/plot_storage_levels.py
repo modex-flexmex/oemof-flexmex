@@ -16,8 +16,12 @@ def plot(df):
     ax1 = plt.subplot(2, 1, 1)
     ax3 = plt.subplot(2, 1, 2, sharex=ax1)
     for i in df.columns:
-        ax1.plot(df.index, df[i], label=i, linewidth=2)#, color=colors_odict[i])
+        if 'heat' in i:
+            ax3.plot(df.index, df[i], label=i, linewidth=2)  # , color=colors_odict[i])
+        else:
+            ax1.plot(df.index, df[i], label=i, linewidth=2)#, color=colors_odict[i])
     ax1.legend()
+    ax3.legend()
     plt.show()
 
 dir_name = os.path.abspath(os.path.dirname(__file__))
