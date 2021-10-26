@@ -96,3 +96,5 @@ if __name__ == "__main__":
 
         figure = plot_storage_levels(df_time_filtered)
         plt.savefig(os.path.join(paths.plotted, region+"_"+timeframe[0][5:7]))
+
+        # Test CI
