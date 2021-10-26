@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
+import itertools
 from addict import Dict
 import oemoflex.tools.plots as plots
 import oemoflex.tools.helpers as helpers
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries/variable")
     # oemof.solph 0.3.2 used 'capacity' to name this variable, oemof.solph > 0.4.0 renamed it to 'storage level'.
     storage_level_data = os.path.join(timeseries_directory, "capacity.csv")
-    capacities = pd.read_csv(capacity_data, header=[0, 1, 2], parse_dates=[0], index_col=[0])
+    capacities = pd.read_csv(storage_level_data, header=[0, 1, 2], parse_dates=[0], index_col=[0])
 
 # second step: data selection: timeframe, country
 #TODO: integrate time frame and region definition for dispatch plots and for storage level plots
@@ -64,21 +65,25 @@ if __name__ == "__main__":
         ]
     regions = ["DE", "PL"]
 
-    for region in regions:
+    for timeframe, region in itertools.product(timeframe, regions):
         df = pd.DataFrame()
         for column in capacities.columns:
             if region in column[0]:
                 df[column] = capacities.loc[:, column]
         df = df / 1000 # from MWh to GWh
-# third step: rename columns into short, understandable labels
+
+        # third step: rename columns into short, understandable labels
 
         df.columns = plots._rename_by_string_matching(columns=df.columns, labels_dict=labels_dict)
 
-# fourth step: slice selected timeframes
+        # fourth step: slice selected timeframes
 
-        for i in range(len(timeframe)):
-            df_filtered = plots.filter_timeseries(df=df, start_date=timeframe[i][0], end_date=timeframe[i][1])
+        df_time_filtered = plots.filter_timeseries(df=df, start_date=timeframe[0], end_date=timeframe[1])
 
-# fifth step: plot
+        # fifth step: plot
 
-            plot(df_filtered)
+        plot(df_time_filtered)
+
+
+
+    print(timeframe, region)
