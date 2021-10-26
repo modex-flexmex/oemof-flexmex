@@ -12,7 +12,19 @@ import oemoflex.tools.helpers as helpers
 # plots), which display the storage level change in the two timeframes selected for the dispatch plots. The file should
 # also use the colors and the labels files that are used in the dispatch plots.
 
-def plot(df):
+def plot_storage_levels(df):
+    r"""
+        Reads in the storage level time series from a dataframe and plots them according to their busses.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame()
+            Dataframe with storage level time series for a single country.
+
+        Returns
+        -------
+        figure
+        """
     fig, ax = plt.subplots(figsize=(14, 5), linewidth=20)
     if df.columns.str.contains('heat').any():
         ax1 = plt.subplot(2, 1, 1)
@@ -82,8 +94,4 @@ if __name__ == "__main__":
 
         # fifth step: plot
 
-        plot(df_time_filtered)
-
-
-
-    print(timeframe, region)
+        plot_storage_levels(df_time_filtered)
