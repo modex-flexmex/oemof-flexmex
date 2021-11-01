@@ -32,6 +32,7 @@ setup(
             "pytest",
             "black==20.8b1",
             "coverage",
+            "flake8"
         ]
     },
 )
