@@ -3,3 +3,4 @@ exclude = meta/migrations/
 per-file-ignores =
     docs/conf.py: E265
 max-line-length=100
+ignore = E203, W503
