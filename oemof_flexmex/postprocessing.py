@@ -18,6 +18,7 @@ from oemof_flexmex.parametrization_scalars import get_parameter_values
 
 from oemof_flexmex.facades import TYPEMAP
 
+
 basic_columns = ["region", "name", "type", "carrier", "tech"]
 
 # Path definitions
@@ -181,27 +182,26 @@ def get_capacities(es):
 
         storage.drop("level_0", 1, inplace=True)
 
-        storage.columns = ["name", "to", "var_name", "var_value"]
-        storage["region"] = [
-            getattr(t, "region", np.nan)
-            for t in components.index.get_level_values("from")
+==== BASE ====
+        storage.columns = ['name', 'to', 'var_name', 'var_value']
+        storage['region'] = [
+            getattr(t, "region", np.nan) for t in components.index.get_level_values('from')
+==== BASE ====
         ]
-        storage["type"] = [
-            getattr(t, "type", np.nan)
-            for t in components.index.get_level_values("from")
+==== BASE ====
+        storage['type'] = [
+            getattr(t, "type", np.nan) for t in components.index.get_level_values('from')
+==== BASE ====
         ]
-        storage["carrier"] = [
-            getattr(t, "carrier", np.nan)
-            for t in components.index.get_level_values("from")
+==== BASE ====
+        storage['carrier'] = [
+            getattr(t, "carrier", np.nan) for t in components.index.get_level_values('from')
+==== BASE ====
         ]
-        storage["tech"] = [
-            getattr(t, "tech", np.nan)
-            for t in components.index.get_level_values("from")
-        ]
-        storage = storage.loc[storage["to"].isna()]
-        storage.drop("to", 1, inplace=True)
-        storage = storage[
-            ["region", "name", "type", "carrier", "tech", "var_name", "var_value"]
+==== BASE ====
+        storage['tech'] = [
+            getattr(t, "tech", np.nan) for t in components.index.get_level_values('from')
+==== BASE ====
         ]
 
         # Delete unused 'init_cap' rows - parameter name misleading! (oemof issue)
