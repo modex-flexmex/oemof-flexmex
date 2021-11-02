@@ -20,7 +20,7 @@ def sum_demands(data, bus_name, demand_name):
     return data
 
 
-def draw_plots(df, start_date, end_date, bus_name, colors_odict):
+def draw_plots(df, df_demand, start_date, end_date, bus_name, colors_odict):
     r"""
     Creates a dispatch plot for the specified bus and time frame.
 
@@ -148,7 +148,14 @@ if __name__ == "__main__":
             if type == ".html":
                 pass
             else:
-                fig = draw_plots(df=df, start_date=start_date, end_date=end_date, bus_name=bus_name, colors_odict=colors_odict)
+                fig = draw_plots(
+                    df=df,
+                    df_demand=df_demand,
+                    start_date=start_date,
+                    end_date=end_date,
+                    bus_name=bus_name,
+                    colors_odict=colors_odict
+                )
 
                 file_name = bus_name + "_" + start_date[5:7] + type
                 plt.savefig(os.path.join(paths.plotted, file_name), bbox_inches="tight")
