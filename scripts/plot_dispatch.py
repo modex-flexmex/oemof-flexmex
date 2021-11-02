@@ -19,9 +19,28 @@ def sum_demands(data, bus_name, demand_name):
     return data
 
 
-# normal dispatch plot
-# plot one winter and one summer month
 def draw_plots(df, start_date, end_date, bus_name, colors_odict):
+    """
+    Creates a dispatch plot for the specified bus and time frame.
+
+    Parameters
+    -------------
+    df : dataframe
+         oemoflex time series data for a single bus in a single region
+    start_date : datetime64
+        the first hour of the dispatch plot
+    end_date : datetime64
+        the last hour of the dispatch plot
+    bus_name : str
+        format: RE-carrier (e.g. "PL-electricity")
+    colors_odict : dict
+        defines colors for each plotted component with the keys taken from the plot legend
+
+    Returns
+    ---------
+    fig: fig
+        figure containing the dispatch plot
+    """
     fig, ax = plt.subplots(figsize=(12, 5))
 
     # filter timeseries
