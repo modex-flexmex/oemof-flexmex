@@ -8,7 +8,7 @@ from oemof_flexmex.postprocessing import run_postprocessing
 from oemof_flexmex.helpers import check_if_csv_dirs_equal, load_yaml, setup_logging
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     scenario_specs = load_yaml(sys.argv[1])
 
     paths = Dict()
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     run_postprocessing(scenario_specs, paths)
 
     # compare with previous data
-    previous_path = paths.results_postprocessed.replace('results', 'defaults')
+    previous_path = paths.results_postprocessed.replace("results", "defaults")
     new_path = paths.results_postprocessed
     try:
         check_if_csv_dirs_equal(new_path, previous_path)

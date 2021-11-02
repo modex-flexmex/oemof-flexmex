@@ -8,27 +8,33 @@ import pandas as pd
 from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
 from oemof.tools.economics import annuity
-from oemof_flexmex.helpers import delete_empty_subdirs, load_elements, load_scalar_input_data,\
-    load_yaml
+from oemof_flexmex.helpers import (
+    delete_empty_subdirs,
+    load_elements,
+    load_scalar_input_data,
+    load_yaml,
+)
 from oemof_flexmex.parametrization_scalars import get_parameter_values
 
 from oemof_flexmex.facades import TYPEMAP
 
 
-basic_columns = ['region', 'name', 'type', 'carrier', 'tech']
+basic_columns = ["region", "name", "type", "carrier", "tech"]
 
 # Path definitions
 module_path = os.path.abspath(os.path.dirname(__file__))
 
-MODEL_CONFIG = 'model_config'
+MODEL_CONFIG = "model_config"
 
-PATH_MAPPINGS_REL = '../flexmex_config'
+PATH_MAPPINGS_REL = "../flexmex_config"
 
 path_mappings = os.path.abspath(os.path.join(module_path, PATH_MAPPINGS_REL))
 
-path_map_output_timeseries = os.path.join(path_mappings, 'mapping-output-timeseries.yml')
+path_map_output_timeseries = os.path.join(
+    path_mappings, "mapping-output-timeseries.yml"
+)
 
-path_map_input_scalars = os.path.join(path_mappings, 'mapping-input-scalars.yml')
+path_map_input_scalars = os.path.join(path_mappings, "mapping-input-scalars.yml")
 
 # Load mappings
 map_output_timeseries = load_yaml(path_map_output_timeseries)
@@ -66,27 +72,29 @@ def get_capacities(es):
         # the Facade object in bus_results() DataFrame columns "from" or "to"
         def fnc(flow):
             # Get property from the Storage object in "from" for the discharge device
-            if isinstance(flow['from'], (TYPEMAP["storage"],
-                                         TYPEMAP["asymmetric storage"])):
-                return getattr(flow['from'], attr, np.nan)
+            if isinstance(
+                flow["from"], (TYPEMAP["storage"], TYPEMAP["asymmetric storage"])
+            ):
+                return getattr(flow["from"], attr, np.nan)
 
             # Get property from the Storage object in "to" for the charge device
-            if isinstance(flow['to'], (TYPEMAP["storage"],
-                                       TYPEMAP["asymmetric storage"])):
-                return getattr(flow['to'], attr, np.nan)
+            if isinstance(
+                flow["to"], (TYPEMAP["storage"], TYPEMAP["asymmetric storage"])
+            ):
+                return getattr(flow["to"], attr, np.nan)
 
             # Get property from other object in "from"
-            return getattr(flow['from'], attr, np.nan)
+            return getattr(flow["from"], attr, np.nan)
 
         return fnc
 
     def get_parameter_name(flow):
-        if isinstance(flow['from'], (TYPEMAP["storage"],
-                                     TYPEMAP["asymmetric storage"])):
+        if isinstance(
+            flow["from"], (TYPEMAP["storage"], TYPEMAP["asymmetric storage"])
+        ):
             return "capacity_discharge_invest"
 
-        if isinstance(flow['to'], (TYPEMAP["storage"],
-                                   TYPEMAP["asymmetric storage"])):
+        if isinstance(flow["to"], (TYPEMAP["storage"], TYPEMAP["asymmetric storage"])):
             return "capacity_charge_invest"
 
         return np.nan
@@ -103,16 +111,16 @@ def get_capacities(es):
         endogenous.rename(columns={"type": "var_name"}, inplace=True)
 
         # Update "var_name" with Storage specific parameter names for charge and discharge devices
-        df = pd.DataFrame({'var_name': endogenous.apply(get_parameter_name, axis=1)})
+        df = pd.DataFrame({"var_name": endogenous.apply(get_parameter_name, axis=1)})
         endogenous.update(df)
 
-        endogenous["region"] = endogenous.apply(get_facade_attr('region'), axis=1)
-        endogenous["name"] = endogenous.apply(get_facade_attr('label'), axis=1)
-        endogenous["type"] = endogenous.apply(get_facade_attr('type'), axis=1)
-        endogenous["carrier"] = endogenous.apply(get_facade_attr('carrier'), axis=1)
-        endogenous["tech"] = endogenous.apply(get_facade_attr('tech'), axis=1)
+        endogenous["region"] = endogenous.apply(get_facade_attr("region"), axis=1)
+        endogenous["name"] = endogenous.apply(get_facade_attr("label"), axis=1)
+        endogenous["type"] = endogenous.apply(get_facade_attr("type"), axis=1)
+        endogenous["carrier"] = endogenous.apply(get_facade_attr("carrier"), axis=1)
+        endogenous["tech"] = endogenous.apply(get_facade_attr("tech"), axis=1)
 
-        endogenous.drop(['from', 'to'], axis=1, inplace=True)
+        endogenous.drop(["from", "to"], axis=1, inplace=True)
 
         endogenous.set_index(
             ["region", "name", "type", "carrier", "tech", "var_name"], inplace=True
@@ -133,12 +141,16 @@ def get_capacities(es):
 
                 # WORKAROUND Skip 'capacity' to safe some effort in aggregation and elsewhere
                 # possible because storages are greenfield optimized only: 'capacity' = 0
-                parameters_to_read = ['storage_capacity']
+                parameters_to_read = ["storage_capacity"]
 
             elif isinstance(node, TYPEMAP["asymmetric storage"]):
-                parameters_to_read = ['capacity_charge', 'capacity_discharge', 'storage_capacity']
+                parameters_to_read = [
+                    "capacity_charge",
+                    "capacity_discharge",
+                    "storage_capacity",
+                ]
             elif getattr(node, "capacity", None) is not None:
-                parameters_to_read = ['capacity']
+                parameters_to_read = ["capacity"]
 
             # Update dict with values in oemof's parameter->value structure
             for p in parameters_to_read:
@@ -149,54 +161,58 @@ def get_capacities(es):
                     node.type,
                     node.carrier,
                     node.tech,  # tech & carrier are oemof-tabular specific
-                    p
+                    p,
                 )  # for oemof logic
-                d[key] = {'var_value': getattr(node, p)}
+                d[key] = {"var_value": getattr(node, p)}
 
     exogenous = pd.DataFrame.from_dict(d).T  # .dropna()
 
     if not exogenous.empty:
         exogenous.index = exogenous.index.set_names(
-            ['region', 'name', 'type', 'carrier', 'tech', 'var_name']
+            ["region", "name", "type", "carrier", "tech", "var_name"]
         )
 
     # Read storage capacities (from oemof.heat)
     # only component_results() knows about 'storage_capacity'
     try:
-        components = pd.concat(pp.component_results(es, es.results, select='scalars'))
-        components.name = 'var_value'
+        components = pd.concat(pp.component_results(es, es.results, select="scalars"))
+        components.name = "var_value"
 
         storage = components.reset_index()
 
-        storage.drop('level_0', 1, inplace=True)
+        storage.drop("level_0", 1, inplace=True)
 
-        storage.columns = ['name', 'to', 'var_name', 'var_value']
-        storage['region'] = [
-            getattr(t, "region", np.nan) for t in components.index.get_level_values('from')
+        storage.columns = ["name", "to", "var_name", "var_value"]
+        storage["region"] = [
+            getattr(t, "region", np.nan)
+            for t in components.index.get_level_values("from")
         ]
-        storage['type'] = [
-            getattr(t, "type", np.nan) for t in components.index.get_level_values('from')
+        storage["type"] = [
+            getattr(t, "type", np.nan)
+            for t in components.index.get_level_values("from")
         ]
-        storage['carrier'] = [
-            getattr(t, "carrier", np.nan) for t in components.index.get_level_values('from')
+        storage["carrier"] = [
+            getattr(t, "carrier", np.nan)
+            for t in components.index.get_level_values("from")
         ]
-        storage['tech'] = [
-            getattr(t, "tech", np.nan) for t in components.index.get_level_values('from')
+        storage["tech"] = [
+            getattr(t, "tech", np.nan)
+            for t in components.index.get_level_values("from")
         ]
-        storage = storage.loc[storage['to'].isna()]
-        storage.drop('to', 1, inplace=True)
-        storage = storage[['region', 'name', 'type', 'carrier', 'tech', 'var_name', 'var_value']]
+        storage = storage.loc[storage["to"].isna()]
+        storage.drop("to", 1, inplace=True)
+        storage = storage[
+            ["region", "name", "type", "carrier", "tech", "var_name", "var_value"]
+        ]
 
         # Delete unused 'init_cap' rows - parameter name misleading! (oemof issue)
-        storage.drop(storage.loc[storage['var_name'] == 'init_cap'].index, axis=0, inplace=True)
-
-        storage.replace(
-            ['invest'],
-            ['storage_capacity_invest'],
-            inplace=True
+        storage.drop(
+            storage.loc[storage["var_name"] == "init_cap"].index, axis=0, inplace=True
         )
+
+        storage.replace(["invest"], ["storage_capacity_invest"], inplace=True)
         storage.set_index(
-            ['region', "name", "type", "carrier", "tech", "var_name"], inplace=True
+            ["region", "name", "type", "carrier", "tech", "var_name"], inplace=True
         )
 
     except ValueError:
@@ -209,15 +225,15 @@ def get_capacities(es):
 
 def format_capacities(oemoflex_scalars, capacities):
     df = pd.DataFrame(columns=oemoflex_scalars.columns)
-    df.loc[:, 'name'] = capacities.reset_index().loc[:, 'name']
-    df.loc[:, 'tech'] = capacities.reset_index().loc[:, 'tech']
-    df.loc[:, 'carrier'] = capacities.reset_index().loc[:, 'carrier']
-    df.loc[:, 'var_name'] = capacities.reset_index().loc[:, 'var_name']
-    df.loc[:, 'var_value'] = capacities.reset_index().loc[:, 'var_value']
-    df.loc[:, 'type'] = capacities.reset_index().loc[:, 'type']
-    df.loc[:, 'region'] = capacities.reset_index().loc[:, 'region']
+    df.loc[:, "name"] = capacities.reset_index().loc[:, "name"]
+    df.loc[:, "tech"] = capacities.reset_index().loc[:, "tech"]
+    df.loc[:, "carrier"] = capacities.reset_index().loc[:, "carrier"]
+    df.loc[:, "var_name"] = capacities.reset_index().loc[:, "var_name"]
+    df.loc[:, "var_value"] = capacities.reset_index().loc[:, "var_value"]
+    df.loc[:, "type"] = capacities.reset_index().loc[:, "type"]
+    df.loc[:, "region"] = capacities.reset_index().loc[:, "region"]
 
-    df['var_unit'] = 'MW'
+    df["var_unit"] = "MW"
 
     return df
 
@@ -238,7 +254,9 @@ def get_sequences_by_tech(results):
         Dictionary containing sequences with carrier-tech as keys.
     """
     # copy to avoid manipulating the data in es.results
-    sequences = copy.deepcopy({key: value['sequences'] for key, value in results.items()})
+    sequences = copy.deepcopy(
+        {key: value["sequences"] for key, value in results.items()}
+    )
 
     sequences_by_tech = []
 
@@ -255,15 +273,17 @@ def get_sequences_by_tech(results):
 
             if isinstance(component, TYPEMAP["link"]):
                 if bus == component.from_bus:
-                    var_name = 'flow_gross_forward'
+                    var_name = "flow_gross_forward"
                 elif bus == component.to_bus:
-                    var_name = 'flow_gross_backward'
+                    var_name = "flow_gross_backward"
 
-            elif isinstance(component, (TYPEMAP["extraction"], TYPEMAP["backpressure"])):
-                var_name = 'flow_fuel'
+            elif isinstance(
+                component, (TYPEMAP["extraction"], TYPEMAP["backpressure"])
+            ):
+                var_name = "flow_fuel"
 
             else:
-                var_name = 'flow_in'
+                var_name = "flow_in"
 
         if isinstance(key[1], Bus):
             bus = key[1]
@@ -271,42 +291,44 @@ def get_sequences_by_tech(results):
 
             if isinstance(component, TYPEMAP["link"]):
                 if bus == component.to_bus:
-                    var_name = 'flow_net_forward'
+                    var_name = "flow_net_forward"
                 elif bus == component.from_bus:
-                    var_name = 'flow_net_backward'
+                    var_name = "flow_net_backward"
 
-            elif isinstance(component, (TYPEMAP["extraction"], TYPEMAP["backpressure"])):
+            elif isinstance(
+                component, (TYPEMAP["extraction"], TYPEMAP["backpressure"])
+            ):
                 if bus == component.electricity_bus:
-                    var_name = 'flow_electricity'
+                    var_name = "flow_electricity"
 
                 elif bus == component.heat_bus:
-                    var_name = 'flow_heat'
+                    var_name = "flow_heat"
 
             elif component in reservoir_inflows:
-                var_name = 'flow_inflow'
+                var_name = "flow_inflow"
 
             else:
-                var_name = 'flow_out'
+                var_name = "flow_out"
 
         if key[1] is None:
             component = key[0]
-            var_name = 'storage_content'
+            var_name = "storage_content"
 
         # Ignore sequences FROM internal busses (concerns ReservoirWithPump, Bev)
         if bus in internal_busses and component not in reservoir_inflows:
             continue
 
-        carrier_tech = component.carrier + '-' + component.tech
+        carrier_tech = component.carrier + "-" + component.tech
 
         if isinstance(component, TYPEMAP["link"]):
             # Replace AT-DE by AT_DE to be ready to be merged with DataFrames from preprocessing
-            region = component.label.replace('-', '_')
+            region = component.label.replace("-", "_")
         else:
             # Take AT from AT-ch4-gt, string op since sub-nodes lack of a 'region' attribute
-            region = component.label.split('-')[0]
+            region = component.label.split("-")[0]
 
         df.columns = pd.MultiIndex.from_tuples([(region, carrier_tech, var_name)])
-        df.columns.names = ['region', 'carrier_tech', 'var_name']
+        df.columns.names = ["region", "carrier_tech", "var_name"]
         sequences_by_tech.append(df)
 
     sequences_by_tech = pd.concat(sequences_by_tech, axis=1)
@@ -340,9 +362,11 @@ def get_subnodes_by_type(sequences, cls):
 
     subnodes_list = []
     for component in to_nodes:
-        if hasattr(component, 'subnodes'):
+        if hasattr(component, "subnodes"):
             # Only get subnodes of type 'cls'
-            subnodes_per_component = [n for n in component.subnodes if isinstance(n, cls)]
+            subnodes_per_component = [
+                n for n in component.subnodes if isinstance(n, cls)
+            ]
             subnodes_list.extend(subnodes_per_component)
 
     return subnodes_list
@@ -353,41 +377,47 @@ def get_summed_sequences(sequences_by_tech, prep_elements):
     base = pd.concat(prep_elements.values())
     df = base.loc[:, basic_columns]
     sum = sequences_by_tech.sum()
-    sum.name = 'var_value'
+    sum.name = "var_value"
     sum_df = sum.reset_index()
     # Form helper column for proper merging with component definition
-    df['carrier_tech'] = df['carrier'] + '-' + df['tech']
-    summed_sequences = pd.merge(df, sum_df, on=['region', 'carrier_tech'])
+    df["carrier_tech"] = df["carrier"] + "-" + df["tech"]
+    summed_sequences = pd.merge(df, sum_df, on=["region", "carrier_tech"])
     # Drop helper column
-    summed_sequences.drop('carrier_tech', axis=1, inplace=True)
+    summed_sequences.drop("carrier_tech", axis=1, inplace=True)
 
-    summed_sequences = summed_sequences.loc[summed_sequences['var_name'] != 'storage_content']
-    summed_sequences['var_unit'] = 'MWh'
+    summed_sequences = summed_sequences.loc[
+        summed_sequences["var_name"] != "storage_content"
+    ]
+    summed_sequences["var_unit"] = "MWh"
 
     return summed_sequences
 
 
 def get_re_generation(oemoflex_scalars):
-    renewable_carriers = ['solar', 'wind']
+    renewable_carriers = ["solar", "wind"]
     re_generation = pd.DataFrame(columns=oemoflex_scalars.columns)
 
-    re_flow = oemoflex_scalars.loc[(oemoflex_scalars['carrier'].isin(renewable_carriers)) &
-                                   (oemoflex_scalars['var_name'] == 'flow_out')]
+    re_flow = oemoflex_scalars.loc[
+        (oemoflex_scalars["carrier"].isin(renewable_carriers))
+        & (oemoflex_scalars["var_name"] == "flow_out")
+    ]
 
-    curtailment = oemoflex_scalars.loc[(oemoflex_scalars['carrier'] == 'electricity') &
-                                       (oemoflex_scalars['tech'] == 'curtailment') &
-                                       (oemoflex_scalars['var_name'] == 'flow_in')]
+    curtailment = oemoflex_scalars.loc[
+        (oemoflex_scalars["carrier"] == "electricity")
+        & (oemoflex_scalars["tech"] == "curtailment")
+        & (oemoflex_scalars["var_name"] == "flow_in")
+    ]
 
-    sum = re_flow.groupby('region').sum() - curtailment.groupby('region').sum()
+    sum = re_flow.groupby("region").sum() - curtailment.groupby("region").sum()
 
-    re_generation['region'] = sum.index
-    re_generation['carrier'] = 're'
-    re_generation['type'] = 'none'
-    re_generation['tech'] = 'none'
-    re_generation['var_name'] = 're_generation'
-    re_generation = re_generation.drop('var_value', 1)
-    re_generation = pd.merge(re_generation, sum['var_value'], on='region')
-    re_generation['var_unit'] = 'MWh'
+    re_generation["region"] = sum.index
+    re_generation["carrier"] = "re"
+    re_generation["type"] = "none"
+    re_generation["tech"] = "none"
+    re_generation["var_name"] = "re_generation"
+    re_generation = re_generation.drop("var_value", 1)
+    re_generation = pd.merge(re_generation, sum["var_value"], on="region")
+    re_generation["var_unit"] = "MWh"
 
     return re_generation
 
@@ -397,19 +427,21 @@ def get_transmission_losses(oemoflex_scalars):
 
     def gross_minus_net_flow(direction):
         flow_gross = oemoflex_scalars.loc[
-            oemoflex_scalars['var_name'] == f'flow_gross_{direction}'].set_index('name')
+            oemoflex_scalars["var_name"] == f"flow_gross_{direction}"
+        ].set_index("name")
 
         flow_net = oemoflex_scalars.loc[
-            oemoflex_scalars['var_name'] == f'flow_net_{direction}'].set_index('name')
+            oemoflex_scalars["var_name"] == f"flow_net_{direction}"
+        ].set_index("name")
 
         loss = flow_gross.copy()
-        loss['var_name'] = f'loss_{direction}'
-        loss['var_value'] = flow_gross['var_value'] - flow_net['var_value']
+        loss["var_name"] = f"loss_{direction}"
+        loss["var_value"] = flow_gross["var_value"] - flow_net["var_value"]
 
         return loss
 
     losses = []
-    for direction in ['forward', 'backward']:
+    for direction in ["forward", "backward"]:
         loss = gross_minus_net_flow(direction)
         losses.append(loss)
 
@@ -421,30 +453,38 @@ def get_transmission_losses(oemoflex_scalars):
 
 def get_storage_losses(oemoflex_scalars):
     storage_data = oemoflex_scalars.loc[
-        oemoflex_scalars['type'].isin(['storage', 'asymmetric storage'])
+        oemoflex_scalars["type"].isin(["storage", "asymmetric storage"])
     ]
-    flow_in = storage_data.loc[storage_data['var_name'] == 'flow_in'].set_index('name')
-    flow_out = storage_data.loc[storage_data['var_name'] == 'flow_out'].set_index('name')
+    flow_in = storage_data.loc[storage_data["var_name"] == "flow_in"].set_index("name")
+    flow_out = storage_data.loc[storage_data["var_name"] == "flow_out"].set_index(
+        "name"
+    )
 
     losses = flow_in.copy()
-    losses['var_name'] = 'loss'
-    losses['var_value'] = flow_in['var_value'] - flow_out['var_value']
+    losses["var_name"] = "loss"
+    losses["var_value"] = flow_in["var_value"] - flow_out["var_value"]
     losses = losses.reset_index()
 
     return losses
 
 
 def get_reservoir_losses(oemoflex_scalars):
-    reservoir_data = oemoflex_scalars.loc[
-        oemoflex_scalars['type'].isin(['reservoir'])
-    ]
-    flow_in = reservoir_data.loc[reservoir_data['var_name'] == 'flow_in'].set_index('name')
-    flow_out = reservoir_data.loc[reservoir_data['var_name'] == 'flow_out'].set_index('name')
-    flow_inflow = reservoir_data.loc[reservoir_data['var_name'] == 'flow_inflow'].set_index('name')
+    reservoir_data = oemoflex_scalars.loc[oemoflex_scalars["type"].isin(["reservoir"])]
+    flow_in = reservoir_data.loc[reservoir_data["var_name"] == "flow_in"].set_index(
+        "name"
+    )
+    flow_out = reservoir_data.loc[reservoir_data["var_name"] == "flow_out"].set_index(
+        "name"
+    )
+    flow_inflow = reservoir_data.loc[
+        reservoir_data["var_name"] == "flow_inflow"
+    ].set_index("name")
 
     losses = flow_in.copy()
-    losses['var_name'] = 'losses'
-    losses['var_value'] = flow_inflow['var_value'] - (flow_out['var_value'] - flow_in['var_value'])
+    losses["var_name"] = "losses"
+    losses["var_value"] = flow_inflow["var_value"] - (
+        flow_out["var_value"] - flow_in["var_value"]
+    )
     losses = losses.reset_index()
 
     return losses
@@ -452,105 +492,124 @@ def get_reservoir_losses(oemoflex_scalars):
 
 def aggregate_storage_capacities(oemoflex_scalars):
     storage = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'].isin(['storage_capacity', 'storage_capacity_invest'])].copy()
+        oemoflex_scalars["var_name"].isin(
+            ["storage_capacity", "storage_capacity_invest"]
+        )
+    ].copy()
 
     # Make sure that values in columns used to group on are strings and thus equatable
     storage[basic_columns] = storage[basic_columns].astype(str)
 
     storage = storage.groupby(by=basic_columns, as_index=False).sum()
-    storage['var_name'] = 'storage_capacity_sum'
-    storage['var_value'] = storage['var_value'] * 1e-3  # MWh -> GWh
-    storage['var_unit'] = 'GWh'
+    storage["var_name"] = "storage_capacity_sum"
+    storage["var_value"] = storage["var_value"] * 1e-3  # MWh -> GWh
+    storage["var_unit"] = "GWh"
 
     charge = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'].isin(['capacity_charge', 'capacity_charge_invest'])]
+        oemoflex_scalars["var_name"].isin(["capacity_charge", "capacity_charge_invest"])
+    ]
     charge = charge.groupby(by=basic_columns, as_index=False).sum()
-    charge['var_name'] = 'capacity_charge_sum'
-    charge['var_unit'] = 'MW'
+    charge["var_name"] = "capacity_charge_sum"
+    charge["var_unit"] = "MW"
 
     discharge = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'].isin(['capacity_discharge', 'capacity_discharge_invest'])]
+        oemoflex_scalars["var_name"].isin(
+            ["capacity_discharge", "capacity_discharge_invest"]
+        )
+    ]
     discharge = discharge.groupby(by=basic_columns, as_index=False).sum()
-    discharge['var_name'] = 'capacity_discharge_sum'
-    discharge['var_unit'] = 'MW'
+    discharge["var_name"] = "capacity_discharge_sum"
+    discharge["var_unit"] = "MW"
 
     return pd.concat([storage, charge, discharge])
 
 
 def aggregate_other_capacities(oemoflex_scalars):
     capacities = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'].isin(['capacity', 'invest'])
-        ].copy()
+        oemoflex_scalars["var_name"].isin(["capacity", "invest"])
+    ].copy()
 
     # Make sure that values in columns used to group on are strings and thus equatable
     capacities[basic_columns] = capacities[basic_columns].astype(str)
 
     capacities = capacities.groupby(by=basic_columns, as_index=False).sum()
-    capacities['var_name'] = 'capacity_sum'
-    capacities['var_unit'] = 'MW'
+    capacities["var_name"] = "capacity_sum"
+    capacities["var_unit"] = "MW"
 
     return capacities
 
 
 def get_emissions(oemoflex_scalars, scalars_raw):
     try:
-        emissions = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'cost_emission'].copy()
+        emissions = oemoflex_scalars.loc[
+            oemoflex_scalars["var_name"] == "cost_emission"
+        ].copy()
     except KeyError:
         logging.info("No key 'cost_emissions' found to calculate 'emissions'.")
         return None
 
-    price_emission = get_parameter_values(scalars_raw, 'Energy_Price_CO2')
+    price_emission = get_parameter_values(scalars_raw, "Energy_Price_CO2")
 
-    emissions['var_value'] *= 1/price_emission
+    emissions["var_value"] *= 1 / price_emission
 
-    emissions['var_name'] = 'emissions'
+    emissions["var_name"] = "emissions"
 
-    emissions['var_unit'] = 'tCO2'
+    emissions["var_unit"] = "tCO2"
 
     return emissions
 
 
 def map_link_direction(oemoflex_scalars):
     r"""Swaps name and region for backward flows of links."""
-    backward = (
-        (oemoflex_scalars['type'] == 'link') &
-        (oemoflex_scalars['var_name'].str.contains('backward'))
+    backward = (oemoflex_scalars["type"] == "link") & (
+        oemoflex_scalars["var_name"].str.contains("backward")
     )
 
     def swap(series, delimiter):
         return series.str.split(delimiter).apply(lambda x: delimiter.join(x[::-1]))
 
     def drop_regex(series, regex):
-        return series.str.replace(regex, '', regex=True)
+        return series.str.replace(regex, "", regex=True)
 
-    oemoflex_scalars.loc[backward, 'name'] = swap(oemoflex_scalars.loc[backward, 'name'], '-')
-    oemoflex_scalars.loc[backward, 'region'] = swap(oemoflex_scalars.loc[backward, 'region'], '_')
+    oemoflex_scalars.loc[backward, "name"] = swap(
+        oemoflex_scalars.loc[backward, "name"], "-"
+    )
+    oemoflex_scalars.loc[backward, "region"] = swap(
+        oemoflex_scalars.loc[backward, "region"], "_"
+    )
 
-    oemoflex_scalars.loc[:, 'var_name'] = drop_regex(
-        oemoflex_scalars.loc[:, 'var_name'], '.backward|.forward'
+    oemoflex_scalars.loc[:, "var_name"] = drop_regex(
+        oemoflex_scalars.loc[:, "var_name"], ".backward|.forward"
     )
 
     return oemoflex_scalars
 
 
-def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, scenario):
-    mapping = mapping.set_index('Parameter')
+def map_to_flexmex_results(
+    oemoflex_scalars, flexmex_scalars_template, mapping, scenario
+):
+    mapping = mapping.set_index("Parameter")
     flexmex_scalars = flexmex_scalars_template.copy()
-    oemoflex_scalars = oemoflex_scalars.set_index(['region', 'carrier', 'tech', 'var_name'])
-    oemoflex_scalars.loc[oemoflex_scalars['var_unit'] == 'MWh', 'var_value'] *= 1e-3  # MWh to GWh
+    oemoflex_scalars = oemoflex_scalars.set_index(
+        ["region", "carrier", "tech", "var_name"]
+    )
+    oemoflex_scalars.loc[
+        oemoflex_scalars["var_unit"] == "MWh", "var_value"
+    ] *= 1e-3  # MWh to GWh
 
-    for i, row in flexmex_scalars.loc[flexmex_scalars['UseCase'] == scenario].iterrows():
+    for i, row in flexmex_scalars.loc[
+        flexmex_scalars["UseCase"] == scenario
+    ].iterrows():
         try:
-            select = mapping.loc[row['Parameter'], :]
+            select = mapping.loc[row["Parameter"], :]
         except KeyError:
             continue
 
         try:
             value = oemoflex_scalars.loc[
-                (row['Region'],
-                 select['carrier'],
-                 select['tech'],
-                 select['var_name']), 'var_value']
+                (row["Region"], select["carrier"], select["tech"], select["var_name"]),
+                "var_value",
+            ]
 
         except KeyError:
             logging.info(
@@ -562,9 +621,9 @@ def map_to_flexmex_results(oemoflex_scalars, flexmex_scalars_template, mapping, 
             continue
 
         if isinstance(value, float):
-            flexmex_scalars.loc[i, 'Value'] = np.around(value)
+            flexmex_scalars.loc[i, "Value"] = np.around(value)
 
-    flexmex_scalars.loc[:, 'Modell'] = 'oemof'
+    flexmex_scalars.loc[:, "Modell"] = "oemof"
 
     return flexmex_scalars
 
@@ -586,30 +645,30 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
     """
     varom_cost = []
     for prep_el in prep_elements.values():
-        if 'marginal_cost' in prep_el.columns:
+        if "marginal_cost" in prep_el.columns:
             df = prep_el[basic_columns]
-            if prep_el['type'][0] == 'excess':
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
-            elif prep_el['type'][0] in ['backpressure', 'extraction']:
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_electricity']
-            elif prep_el['type'][0] in ['link', 'electrical line']:
-                net_flows = ['flow_net_forward', 'flow_net_backward']
+            if prep_el["type"][0] == "excess":
+                flow = oemoflex_scalars.loc[oemoflex_scalars["var_name"] == "flow_in"]
+            elif prep_el["type"][0] in ["backpressure", "extraction"]:
                 flow = oemoflex_scalars.loc[
-                    oemoflex_scalars['var_name'].isin(net_flows)]
+                    oemoflex_scalars["var_name"] == "flow_electricity"
+                ]
+            elif prep_el["type"][0] in ["link", "electrical line"]:
+                net_flows = ["flow_net_forward", "flow_net_backward"]
+                flow = oemoflex_scalars.loc[
+                    oemoflex_scalars["var_name"].isin(net_flows)
+                ]
                 flow = flow.groupby(basic_columns, as_index=False).sum()
             else:
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_out']
-            df = pd.merge(
-                df, flow,
-                on=basic_columns
-            )
-            df['var_value'] = df['var_value'] * prep_el['marginal_cost']
-            df['var_name'] = 'cost_varom'
+                flow = oemoflex_scalars.loc[oemoflex_scalars["var_name"] == "flow_out"]
+            df = pd.merge(df, flow, on=basic_columns)
+            df["var_value"] = df["var_value"] * prep_el["marginal_cost"]
+            df["var_name"] = "cost_varom"
 
             varom_cost.append(df)
 
     varom_cost = pd.concat(varom_cost)
-    varom_cost['var_unit'] = 'Eur'
+    varom_cost["var_unit"] = "Eur"
 
     return varom_cost
 
@@ -617,18 +676,15 @@ def get_varom_cost(oemoflex_scalars, prep_elements):
 def get_carrier_cost(oemoflex_scalars, prep_elements):
     carrier_cost = []
     for prep_el in prep_elements.values():
-        if 'carrier_cost' in prep_el.columns:
+        if "carrier_cost" in prep_el.columns:
             df = prep_el[basic_columns]
-            if prep_el['type'][0] in ['backpressure', 'extraction']:
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_fuel']
+            if prep_el["type"][0] in ["backpressure", "extraction"]:
+                flow = oemoflex_scalars.loc[oemoflex_scalars["var_name"] == "flow_fuel"]
             else:
-                flow = oemoflex_scalars.loc[oemoflex_scalars['var_name'] == 'flow_in']
-            df = pd.merge(
-                df, flow,
-                on=basic_columns
-            )
-            df['var_value'] = df['var_value'] * prep_el['carrier_cost']
-            df['var_name'] = 'cost_carrier'
+                flow = oemoflex_scalars.loc[oemoflex_scalars["var_name"] == "flow_in"]
+            df = pd.merge(df, flow, on=basic_columns)
+            df["var_value"] = df["var_value"] * prep_el["carrier_cost"]
+            df["var_name"] = "cost_carrier"
 
             carrier_cost.append(df)
 
@@ -637,7 +693,7 @@ def get_carrier_cost(oemoflex_scalars, prep_elements):
     else:
         carrier_cost = pd.DataFrame(carrier_cost)
 
-    carrier_cost['var_unit'] = 'Eur'
+    carrier_cost["var_unit"] = "Eur"
 
     return carrier_cost
 
@@ -669,22 +725,25 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     # Iterate over oemof.tabular components (technologies)
     for prep_el in prep_elements.values():
-        if 'carrier_cost' in prep_el.columns:
+        if "carrier_cost" in prep_el.columns:
 
             # Set up a list of the current technology's elements
             df = prep_el.loc[:, basic_columns]
 
             # Select carriers from the parameter map
-            carrier_name = prep_el['carrier'][0]
-            parameters = FlexMex_Parameter_Map['carrier'][carrier_name]
+            carrier_name = prep_el["carrier"][0]
+            parameters = FlexMex_Parameter_Map["carrier"][carrier_name]
 
             # Only re-calculate if there is a CO2 emission
-            if 'emission_factor' in parameters.keys():
+            if "emission_factor" in parameters.keys():
 
-                price_carrier = get_parameter_values(scalars_raw, parameters['carrier_price'])
+                price_carrier = get_parameter_values(
+                    scalars_raw, parameters["carrier_price"]
+                )
 
-                price_emission = get_parameter_values(scalars_raw, parameters['co2_price'])\
-                    * get_parameter_values(scalars_raw, parameters['emission_factor'])
+                price_emission = get_parameter_values(
+                    scalars_raw, parameters["co2_price"]
+                ) * get_parameter_values(scalars_raw, parameters["emission_factor"])
 
                 factor = price_carrier / (price_carrier + price_emission)
 
@@ -692,11 +751,11 @@ def get_fuel_cost(oemoflex_scalars, prep_elements, scalars_raw):
             else:
                 factor = 1.0
 
-            df = get_calculated_parameters(df, oemoflex_scalars, 'cost_carrier', factor)
+            df = get_calculated_parameters(df, oemoflex_scalars, "cost_carrier", factor)
 
             # Update other columns
-            df['var_name'] = 'cost_fuel'
-            df['var_unit'] = 'Eur'
+            df["var_name"] = "cost_fuel"
+            df["var_unit"] = "Eur"
 
             # Append current technology elements to the return DataFrame
             fuel_cost = pd.concat([fuel_cost, df])
@@ -726,32 +785,37 @@ def get_emission_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     # Iterate over oemof.tabular components (technologies)
     for prep_el in prep_elements.values():
-        if 'carrier_cost' in prep_el.columns:
+        if "carrier_cost" in prep_el.columns:
 
             # Set up a list of the current technology's elements
             df = prep_el.loc[:, basic_columns]
 
             # Select carriers from the parameter map
-            carrier_name = prep_el['carrier'][0]
-            parameters = FlexMex_Parameter_Map['carrier'][carrier_name]
+            carrier_name = prep_el["carrier"][0]
+            parameters = FlexMex_Parameter_Map["carrier"][carrier_name]
 
             # Only re-calculate if there is a CO2 emission
-            if 'emission_factor' in parameters.keys():
-                price_carrier = get_parameter_values(scalars_raw, parameters['carrier_price'])
+            if "emission_factor" in parameters.keys():
+                price_carrier = get_parameter_values(
+                    scalars_raw, parameters["carrier_price"]
+                )
 
-                price_emission = get_parameter_values(scalars_raw, parameters['co2_price']) \
-                    * get_parameter_values(scalars_raw, parameters['emission_factor'])
+                price_emission = get_parameter_values(
+                    scalars_raw, parameters["co2_price"]
+                ) * get_parameter_values(scalars_raw, parameters["emission_factor"])
 
                 factor = price_emission / (price_carrier + price_emission)
 
-                df = get_calculated_parameters(df, oemoflex_scalars, 'cost_carrier', factor)
+                df = get_calculated_parameters(
+                    df, oemoflex_scalars, "cost_carrier", factor
+                )
 
             else:
-                df['var_value'] = 0.0
+                df["var_value"] = 0.0
 
             # Update other columns
-            df['var_name'] = 'cost_emission'
-            df['var_unit'] = 'Eur'
+            df["var_name"] = "cost_emission"
+            df["var_unit"] = "Eur"
 
             # Append current technology elements to the return DataFrame
             emission_cost = pd.concat([emission_cost, df])
@@ -781,23 +845,25 @@ def get_calculated_parameters(df, oemoflex_scalars, parameter_name, factor):
 
     """
     calculated_parameters = oemoflex_scalars.loc[
-        oemoflex_scalars['var_name'] == parameter_name].copy()
+        oemoflex_scalars["var_name"] == parameter_name
+    ].copy()
 
     if calculated_parameters.empty:
-        logging.info("No key '{}' found as input"
-                     "for postprocessing calculation.".format(parameter_name))
+        logging.info(
+            "No key '{}' found as input"
+            "for postprocessing calculation.".format(parameter_name)
+        )
 
     # Make sure that values in columns to merge on are strings
     # See here:
     # https://stackoverflow.com/questions/39582984/pandas-merging-on-string-columns-not-working-bug
-    calculated_parameters[basic_columns] = calculated_parameters[basic_columns].astype(str)
-
-    df = pd.merge(
-        df, calculated_parameters,
-        on=basic_columns
+    calculated_parameters[basic_columns] = calculated_parameters[basic_columns].astype(
+        str
     )
 
-    df['var_value'] = df['var_value'] * factor
+    df = pd.merge(df, calculated_parameters, on=basic_columns)
+
+    df["var_value"] = df["var_value"] * factor
 
     return df
 
@@ -808,53 +874,64 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     for prep_el in prep_elements.values():
         # In the following line: Not 'is'! pandas overloads operators!
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # noqa: E712, E501 # pylint: disable=C0121
+        if (
+            "expandable" in prep_el.columns and prep_el["expandable"][0] == True
+        ):  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
-            tech_name = prep_el['tech'][0]
-            parameters = FlexMex_Parameter_Map['tech'][tech_name]
+            tech_name = prep_el["tech"][0]
+            parameters = FlexMex_Parameter_Map["tech"][tech_name]
 
-            interest = get_parameter_values(
-                scalars_raw,
-                'EnergyConversion_InterestRate_ALL') * 1e-2  # percent -> 0...1
+            interest = (
+                get_parameter_values(scalars_raw, "EnergyConversion_InterestRate_ALL")
+                * 1e-2
+            )  # percent -> 0...1
 
             # Special treatment for storages
-            if tech_name in ['h2_cavern', 'liion_battery']:
+            if tech_name in ["h2_cavern", "liion_battery"]:
 
                 # Charge device
-                capex = get_parameter_values(scalars_raw, parameters['charge_capex'])
+                capex = get_parameter_values(scalars_raw, parameters["charge_capex"])
 
-                lifetime = get_parameter_values(scalars_raw, parameters['charge_lifetime'])
+                lifetime = get_parameter_values(
+                    scalars_raw, parameters["charge_lifetime"]
+                )
 
                 annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
-                df_charge = get_calculated_parameters(df, oemoflex_scalars,
-                                                      'capacity_charge_invest',
-                                                      annualized_cost)
+                df_charge = get_calculated_parameters(
+                    df, oemoflex_scalars, "capacity_charge_invest", annualized_cost
+                )
 
                 # Discharge device
-                capex = get_parameter_values(scalars_raw, parameters['discharge_capex'])
+                capex = get_parameter_values(scalars_raw, parameters["discharge_capex"])
 
-                lifetime = get_parameter_values(scalars_raw, parameters['discharge_lifetime'])
+                lifetime = get_parameter_values(
+                    scalars_raw, parameters["discharge_lifetime"]
+                )
 
                 annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
-                df_discharge = get_calculated_parameters(df, oemoflex_scalars,
-                                                         'capacity_discharge_invest',
-                                                         annualized_cost)
+                df_discharge = get_calculated_parameters(
+                    df, oemoflex_scalars, "capacity_discharge_invest", annualized_cost
+                )
 
                 # Storage cavern
-                capex = get_parameter_values(scalars_raw,
-                                             parameters['storage_capex']) * 1e-3  # €/MWh -> €/GWh
+                capex = (
+                    get_parameter_values(scalars_raw, parameters["storage_capex"])
+                    * 1e-3
+                )  # €/MWh -> €/GWh
 
-                lifetime = get_parameter_values(scalars_raw, parameters['storage_lifetime'])
+                lifetime = get_parameter_values(
+                    scalars_raw, parameters["storage_lifetime"]
+                )
 
                 annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
-                df_storage = get_calculated_parameters(df, oemoflex_scalars,
-                                                       'storage_capacity_invest',
-                                                       annualized_cost)
+                df_storage = get_calculated_parameters(
+                    df, oemoflex_scalars, "storage_capacity_invest", annualized_cost
+                )
 
                 df = pd.concat([df_charge, df_discharge, df_storage])
 
@@ -862,16 +939,18 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 df = df.groupby(by=basic_columns, as_index=False).sum()
 
             else:
-                capex = get_parameter_values(scalars_raw, parameters['capex'])
+                capex = get_parameter_values(scalars_raw, parameters["capex"])
 
-                lifetime = get_parameter_values(scalars_raw, parameters['lifetime'])
+                lifetime = get_parameter_values(scalars_raw, parameters["lifetime"])
 
                 annualized_cost = annuity(capex=capex, n=lifetime, wacc=interest)
 
-                df = get_calculated_parameters(df, oemoflex_scalars, 'invest', annualized_cost)
+                df = get_calculated_parameters(
+                    df, oemoflex_scalars, "invest", annualized_cost
+                )
 
-            df['var_name'] = 'cost_invest'
-            df['var_unit'] = 'Eur'
+            df["var_name"] = "cost_invest"
+            df["var_unit"] = "Eur"
 
             invest_cost = pd.concat([invest_cost, df])
 
@@ -884,39 +963,53 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
     for prep_el in prep_elements.values():
         # not 'is'! pandas overloads operators!
-        if 'expandable' in prep_el.columns and prep_el['expandable'][0] == True:  # noqa: E712, E501 # pylint: disable=C0121
+        if (
+            "expandable" in prep_el.columns and prep_el["expandable"][0] == True
+        ):  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
 
-            tech_name = prep_el['tech'][0]
-            parameters = FlexMex_Parameter_Map['tech'][tech_name]
+            tech_name = prep_el["tech"][0]
+            parameters = FlexMex_Parameter_Map["tech"][tech_name]
 
             # Special treatment for storages
-            if tech_name in ['h2_cavern', 'liion_battery']:
+            if tech_name in ["h2_cavern", "liion_battery"]:
 
                 # One fix cost factor for all sub-components
-                fix_cost_factor = get_parameter_values(
-                    scalars_raw, parameters['fixom']) * 1e-2  # percent -> 0...1
+                fix_cost_factor = (
+                    get_parameter_values(scalars_raw, parameters["fixom"]) * 1e-2
+                )  # percent -> 0...1
 
                 # Charge device
-                capex = get_parameter_values(scalars_raw, parameters['charge_capex'])
-                df_charge = get_calculated_parameters(df, oemoflex_scalars,
-                                                      'capacity_charge_invest',
-                                                      fix_cost_factor * capex)
+                capex = get_parameter_values(scalars_raw, parameters["charge_capex"])
+                df_charge = get_calculated_parameters(
+                    df,
+                    oemoflex_scalars,
+                    "capacity_charge_invest",
+                    fix_cost_factor * capex,
+                )
 
                 # Discharge device
-                capex = get_parameter_values(scalars_raw, parameters['discharge_capex'])
-                df_discharge = get_calculated_parameters(df, oemoflex_scalars,
-                                                         'capacity_discharge_invest',
-                                                         fix_cost_factor * capex)
+                capex = get_parameter_values(scalars_raw, parameters["discharge_capex"])
+                df_discharge = get_calculated_parameters(
+                    df,
+                    oemoflex_scalars,
+                    "capacity_discharge_invest",
+                    fix_cost_factor * capex,
+                )
 
                 # Storage cavern
-                capex = get_parameter_values(scalars_raw,
-                                             parameters['storage_capex']) * 1e-3  # €/MWh -> €/GWh
+                capex = (
+                    get_parameter_values(scalars_raw, parameters["storage_capex"])
+                    * 1e-3
+                )  # €/MWh -> €/GWh
 
-                df_storage = get_calculated_parameters(df, oemoflex_scalars,
-                                                       'storage_capacity_invest',
-                                                       fix_cost_factor * capex)
+                df_storage = get_calculated_parameters(
+                    df,
+                    oemoflex_scalars,
+                    "storage_capacity_invest",
+                    fix_cost_factor * capex,
+                )
 
                 df = pd.concat([df_charge, df_discharge, df_storage])
 
@@ -924,17 +1017,18 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
                 df = df.groupby(by=basic_columns, as_index=False).sum()
 
             else:
-                capex = get_parameter_values(scalars_raw, parameters['capex'])
+                capex = get_parameter_values(scalars_raw, parameters["capex"])
 
-                fix_cost_factor = get_parameter_values(
-                    scalars_raw, parameters['fixom']) * 1e-2  # percent -> 0...1
+                fix_cost_factor = (
+                    get_parameter_values(scalars_raw, parameters["fixom"]) * 1e-2
+                )  # percent -> 0...1
 
-                df = get_calculated_parameters(df, oemoflex_scalars,
-                                               'invest',
-                                               fix_cost_factor * capex)
+                df = get_calculated_parameters(
+                    df, oemoflex_scalars, "invest", fix_cost_factor * capex
+                )
 
-            df['var_name'] = 'cost_fixom'
-            df['var_unit'] = 'Eur'
+            df["var_name"] = "cost_fixom"
+            df["var_unit"] = "Eur"
 
             fixom_cost = pd.concat([fixom_cost, df])
 
@@ -943,12 +1037,12 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
 
 def aggregate_by_country(df):
     if not df.empty:
-        aggregated = df.groupby(['region', 'var_name', 'var_unit']).sum()
+        aggregated = df.groupby(["region", "var_name", "var_unit"]).sum()
 
-        aggregated['name'] = 'energysystem'
-        aggregated['carrier'] = 'ALL'
-        aggregated['tech'] = 'ALL'
-        aggregated['type'] = 'ALL'
+        aggregated["name"] = "energysystem"
+        aggregated["carrier"] = "ALL"
+        aggregated["tech"] = "ALL"
+        aggregated["type"] = "ALL"
 
         aggregated = aggregated.reset_index()
 
@@ -958,44 +1052,46 @@ def aggregate_by_country(df):
 
 
 def get_total_system_cost(oemoflex_scalars):
-    cost_list = ['cost_varom', 'cost_fuel', 'cost_invest', 'cost_emission']
-    df = oemoflex_scalars.loc[oemoflex_scalars['var_name'].isin(cost_list)]
+    cost_list = ["cost_varom", "cost_fuel", "cost_invest", "cost_emission"]
+    df = oemoflex_scalars.loc[oemoflex_scalars["var_name"].isin(cost_list)]
     total_system_cost = pd.DataFrame(columns=oemoflex_scalars.columns)
-    total_system_cost.loc[0, 'var_name'] = 'total_system_cost'
-    total_system_cost.loc[0, 'var_value'] = df['var_value'].sum()
-    total_system_cost['carrier'] = 'ALL'
-    total_system_cost['tech'] = 'ALL'
-    total_system_cost['region'] = 'ALL'
-    total_system_cost['var_unit'] = 'Eur'
+    total_system_cost.loc[0, "var_name"] = "total_system_cost"
+    total_system_cost.loc[0, "var_value"] = df["var_value"].sum()
+    total_system_cost["carrier"] = "ALL"
+    total_system_cost["tech"] = "ALL"
+    total_system_cost["region"] = "ALL"
+    total_system_cost["var_unit"] = "Eur"
 
     return total_system_cost
 
 
 def save_flexmex_timeseries(sequences_by_tech, scenario, model, year, dir):
 
-    for carrier_tech in sequences_by_tech.columns.unique(level='carrier_tech'):
+    for carrier_tech in sequences_by_tech.columns.unique(level="carrier_tech"):
         try:
             components_paths = map_output_timeseries[carrier_tech]
         except KeyError:
-            logging.info(f"No entry found in {path_map_output_timeseries} for '{carrier_tech}'.")
+            logging.info(
+                f"No entry found in {path_map_output_timeseries} for '{carrier_tech}'."
+            )
             continue
 
         idx = pd.IndexSlice
         for var_name, subdir in components_paths.items():
             df_var_value = sequences_by_tech.loc[:, idx[:, carrier_tech, var_name]]
-            for region in df_var_value.columns.get_level_values('region'):
+            for region in df_var_value.columns.get_level_values("region"):
                 filename = os.path.join(
-                    dir,
-                    subdir,
-                    '_'.join([scenario, model, region, year]) + '.csv'
+                    dir, subdir, "_".join([scenario, model, region, year]) + ".csv"
                 )
 
                 single_column = df_var_value.loc[:, region]
                 single_column = single_column.reset_index(drop=True)
-                single_column.columns = single_column.columns.droplevel('carrier_tech')
+                single_column.columns = single_column.columns.droplevel("carrier_tech")
                 remaining_column_name = list(single_column)[0]
-                single_column.rename(columns={remaining_column_name: 'value'}, inplace=True)
-                single_column.index.name = 'timeindex'
+                single_column.rename(
+                    columns={remaining_column_name: "value"}, inplace=True
+                )
+                single_column.index.name = "timeindex"
                 single_column.to_csv(filename, header=True)
 
     delete_empty_subdirs(dir)
@@ -1006,18 +1102,20 @@ def sum_transmission_flows(sequences_by_tech):
     idx = pd.IndexSlice
 
     try:
-        flow_net_fw = sequences_by_tech. \
-            loc[:, idx[:, 'electricity-transmission', 'flow_net_forward']]
+        flow_net_fw = sequences_by_tech.loc[
+            :, idx[:, "electricity-transmission", "flow_net_forward"]
+        ]
 
-        flow_net_bw = sequences_by_tech. \
-            loc[:, idx[:, 'electricity-transmission', 'flow_net_backward']]
+        flow_net_bw = sequences_by_tech.loc[
+            :, idx[:, "electricity-transmission", "flow_net_backward"]
+        ]
 
     except KeyError:
         return None
 
-    flow_net_fw = flow_net_fw.rename(columns={'flow_net_forward': 'flow_net_sum'})
+    flow_net_fw = flow_net_fw.rename(columns={"flow_net_forward": "flow_net_sum"})
 
-    flow_net_bw = flow_net_bw.rename(columns={'flow_net_backward': 'flow_net_sum'})
+    flow_net_bw = flow_net_bw.rename(columns={"flow_net_backward": "flow_net_sum"})
 
     flow_net_sum = flow_net_fw - flow_net_bw
 
@@ -1029,16 +1127,16 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
     idx = pd.IndexSlice
 
     # Sum flow_out sequences from renewable energies
-    renewable_techs = ['wind-offshore', 'wind-onshore', 'solar-pv']
-    df_renewable = sequences_by_tech.loc[:, idx[:, renewable_techs, 'flow_out']]
-    df_renewable_sum = df_renewable.groupby(['region'], axis=1).sum()
+    renewable_techs = ["wind-offshore", "wind-onshore", "solar-pv"]
+    df_renewable = sequences_by_tech.loc[:, idx[:, renewable_techs, "flow_out"]]
+    df_renewable_sum = df_renewable.groupby(["region"], axis=1).sum()
     df_renewable_sum.columns = pd.MultiIndex.from_product(
-        [list(df_renewable_sum.columns), ['energysystem'], ['re_generation']],
-        names=['region', 'carrier_tech', 'var_name']
+        [list(df_renewable_sum.columns), ["energysystem"], ["re_generation"]],
+        names=["region", "carrier_tech", "var_name"],
     )
 
     # Substract Curtailment
-    df_curtailment = sequences_by_tech.loc[:, (slice(None), 'electricity-curtailment')]
+    df_curtailment = sequences_by_tech.loc[:, (slice(None), "electricity-curtailment")]
     df_curtailment.columns = df_renewable_sum.columns
     df_re_generation = df_renewable_sum.sub(df_curtailment, axis=0)
 
@@ -1056,7 +1154,7 @@ def export_bus_sequences(es, destination):
         if value.empty:
             continue
 
-        file_path = os.path.join(destination, key + '.csv')
+        file_path = os.path.join(destination, key + ".csv")
 
         value.to_csv(file_path)
 
@@ -1064,18 +1162,22 @@ def export_bus_sequences(es, destination):
 def log_solver_time_to_file(meta_results, path):
     r"""Log solver time from oemof.outputlib.processing.meta_results() to a log file in 'path'"""
 
-    sys_time = meta_results['solver']['System time']  # equals 'Total time (CPU seconds)' in stdout
-    wc_time = meta_results['solver']['Wallclock time']
-    user_time = meta_results['solver']['User time']  # Always -1 so far
-    time = meta_results['solver']['Time']  # Not clear what this means
-    output_path = os.path.join(path, 'solver_time.csv')
+    sys_time = meta_results["solver"][
+        "System time"
+    ]  # equals 'Total time (CPU seconds)' in stdout
+    wc_time = meta_results["solver"]["Wallclock time"]
+    user_time = meta_results["solver"]["User time"]  # Always -1 so far
+    time = meta_results["solver"]["Time"]  # Not clear what this means
+    output_path = os.path.join(path, "solver_time.csv")
 
     df = pd.DataFrame(
-        {'system_time': [sys_time],
-         'wallclock_time': [wc_time],
-         'user_time': [user_time],
-         'time': [time],
-         })
+        {
+            "system_time": [sys_time],
+            "wallclock_time": [wc_time],
+            "user_time": [user_time],
+            "time": [time],
+        }
+    )
     df.to_csv(output_path, index=False)
 
 
@@ -1083,16 +1185,18 @@ def log_problem_metrics_to_file(meta_results, path):
     r"""Log a number of solver metrics from oemof.outputlib.processing.meta_results()
     to a log file in 'path'"""
 
-    no_of_constraints = meta_results['problem']['Number of constraints']
-    no_of_vars = meta_results['problem']['Number of variables']
-    no_of_nonzeros = meta_results['problem']['Number of nonzeros']
-    output_path = os.path.join(path, 'problem_metrics.csv')
+    no_of_constraints = meta_results["problem"]["Number of constraints"]
+    no_of_vars = meta_results["problem"]["Number of variables"]
+    no_of_nonzeros = meta_results["problem"]["Number of nonzeros"]
+    output_path = os.path.join(path, "problem_metrics.csv")
 
     df = pd.DataFrame(
-        {'constraints': [no_of_constraints],
-         'vars': [no_of_vars],
-         'nonzeros': [no_of_nonzeros],
-         })
+        {
+            "constraints": [no_of_constraints],
+            "vars": [no_of_vars],
+            "nonzeros": [no_of_nonzeros],
+        }
+    )
     df.to_csv(output_path, index=False)
 
 
@@ -1103,16 +1207,20 @@ def run_postprocessing(scenario_specs, exp_paths):
     scalars_raw = load_scalar_input_data(scenario_specs, exp_paths.data_raw)
 
     # load scalars templates
-    flexmex_scalars_template = pd.read_csv(os.path.join(exp_paths.results_template, 'Scalars.csv'))
+    flexmex_scalars_template = pd.read_csv(
+        os.path.join(exp_paths.results_template, "Scalars.csv")
+    )
     flexmex_scalars_template = flexmex_scalars_template.loc[
-        flexmex_scalars_template['UseCase'] == scenario_specs['scenario']
+        flexmex_scalars_template["UseCase"] == scenario_specs["scenario"]
     ]
 
     # load mapping
-    mapping = pd.read_csv(os.path.join(path_mappings, 'mapping-output-scalars.csv'))
+    mapping = pd.read_csv(os.path.join(path_mappings, "mapping-output-scalars.csv"))
 
     # Load preprocessed elements
-    prep_elements = load_elements(os.path.join(exp_paths.data_preprocessed, 'data', 'elements'))
+    prep_elements = load_elements(
+        os.path.join(exp_paths.data_preprocessed, "data", "elements")
+    )
 
     # restore EnergySystem with results
     es = EnergySystem()
@@ -1134,14 +1242,14 @@ def run_postprocessing(scenario_specs, exp_paths):
 
     oemoflex_scalars = pd.DataFrame(
         columns=[
-            'region',
-            'name',
-            'type',
-            'carrier',
-            'tech',
-            'var_name',
-            'var_value',
-            'var_unit'
+            "region",
+            "name",
+            "type",
+            "carrier",
+            "tech",
+            "var_name",
+            "var_value",
+            "var_unit",
         ]
     )
 
@@ -1157,12 +1265,9 @@ def run_postprocessing(scenario_specs, exp_paths):
     transmission_losses = get_transmission_losses(oemoflex_scalars)
     storage_losses = get_storage_losses(oemoflex_scalars)
     reservoir_losses = get_reservoir_losses(oemoflex_scalars)
-    oemoflex_scalars = pd.concat([
-        oemoflex_scalars,
-        transmission_losses,
-        storage_losses,
-        reservoir_losses
-    ])
+    oemoflex_scalars = pd.concat(
+        [oemoflex_scalars, transmission_losses, storage_losses, reservoir_losses]
+    )
 
     # get capacities
     capacities = get_capacities(es)
@@ -1177,15 +1282,17 @@ def run_postprocessing(scenario_specs, exp_paths):
     aggregated_emission_cost = aggregate_by_country(emission_cost)
     invest_cost = get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw)
     fixom_cost = get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw)
-    oemoflex_scalars = pd.concat([
-        oemoflex_scalars,
-        varom_cost,
-        carrier_cost,
-        fuel_cost,
-        aggregated_emission_cost,
-        invest_cost,
-        fixom_cost
-    ])
+    oemoflex_scalars = pd.concat(
+        [
+            oemoflex_scalars,
+            varom_cost,
+            carrier_cost,
+            fuel_cost,
+            aggregated_emission_cost,
+            invest_cost,
+            fixom_cost,
+        ]
+    )
 
     # emissions
     emissions = get_emissions(oemoflex_scalars, scalars_raw)
@@ -1202,38 +1309,41 @@ def run_postprocessing(scenario_specs, exp_paths):
     oemoflex_scalars = map_link_direction(oemoflex_scalars)
 
     # set experiment info
-    oemoflex_scalars['usecase'] = scenario_specs['scenario']
-    oemoflex_scalars['year'] = scenario_specs['year']
+    oemoflex_scalars["usecase"] = scenario_specs["scenario"]
+    oemoflex_scalars["year"] = scenario_specs["year"]
 
     # oemoflex_scalars.to_csv('~/Desktop/oemoflex_scalars.csv')
 
     # map to FlexMex data format
     flexmex_scalar_results = map_to_flexmex_results(
-        oemoflex_scalars, flexmex_scalars_template, mapping, scenario_specs['scenario']
+        oemoflex_scalars, flexmex_scalars_template, mapping, scenario_specs["scenario"]
     )
 
     # save results
     flexmex_scalar_results.to_csv(
-        os.path.join(exp_paths.results_postprocessed, 'Scalars.csv'),
-        index=False
+        os.path.join(exp_paths.results_postprocessed, "Scalars.csv"), index=False
     )
 
     save_oemoflex_scalars = True
     if save_oemoflex_scalars:
-        oemoflex_scalars.sort_values(['carrier', 'tech', 'var_name'], axis=0, inplace=True)
+        oemoflex_scalars.sort_values(
+            ["carrier", "tech", "var_name"], axis=0, inplace=True
+        )
         oemoflex_scalars.to_csv(
-            os.path.join(exp_paths.results_postprocessed, 'oemoflex_scalars.csv'),
-            index=False
+            os.path.join(exp_paths.results_postprocessed, "oemoflex_scalars.csv"),
+            index=False,
         )
 
     save_oemoflex_timeseries = False
     if save_oemoflex_timeseries:
         export_bus_sequences(
-            es,
-            os.path.join(exp_paths.results_postprocessed, 'oemoflex-timeseries')
+            es, os.path.join(exp_paths.results_postprocessed, "oemoflex-timeseries")
         )
 
     save_flexmex_timeseries(
-        sequences_by_tech, scenario_specs['scenario'], 'oemof', '2050',
-        exp_paths.results_postprocessed
+        sequences_by_tech,
+        scenario_specs["scenario"],
+        "oemof",
+        "2050",
+        exp_paths.results_postprocessed,
     )
