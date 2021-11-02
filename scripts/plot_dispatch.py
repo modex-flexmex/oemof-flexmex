@@ -3,6 +3,7 @@ import sys
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import itertools
 import oemoflex.tools.plots as plots
 from oemof_flexmex.model_config import plot_labels, colors_odict
 import pandas as pd
@@ -104,6 +105,8 @@ if __name__ == "__main__":
     carriers = ["electricity.csv", "heat_decentral", "heat_central"]
     # possible regions: "AT", "BE", "CH", "CZ", "DK", "DE", "FR", "IT", "LU", "NL", "PL"
     regions = ["DE", "FR", "PL"]
+    # possible file types: ".png", ".html", ".pdf"
+    file_types = [".html", ".png"]
 
 
     selected_timeseries_files = [file for file in timeseries_files for carrier in carriers for region in regions
@@ -125,25 +128,27 @@ if __name__ == "__main__":
             data, bus_name=bus_name, demand_name="demand", labels_dict=plot_labels
         )
 
-        # interactive plotly dispatch plot
-        fig_plotly = plots.plot_dispatch_plotly(
-            df=df,
-            df_demand=df_demand,
-            unit="W",
-            colors_odict=colors_odict
-        )
+        if ".html" in file_types:
+            # interactive plotly dispatch plot
+            fig_plotly = plots.plot_dispatch_plotly(
+                df=df,
+                df_demand=df_demand,
+                unit="W",
+                colors_odict=colors_odict
+            )
 
-        file_name = bus_name + "_dispatch_interactive" + ".html"
-        fig_plotly.write_html(
-            file=os.path.join(paths.plotted, file_name),
-            # include_plotlyjs=False,
-            # full_html=False
-        )
+            file_name = bus_name + "_dispatch_interactive" + ".html"
+            fig_plotly.write_html(
+                file=os.path.join(paths.plotted, file_name),
+                # include_plotlyjs=False,
+                # full_html=False
+            )
 
+        for (start_date, end_date), type in itertools.product(timeframe, file_types):
+            if type == ".html":
+                pass
+            else:
+                fig = draw_plots(df=df, start_date=start_date, end_date=end_date, bus_name=bus_name, colors_odict=colors_odict)
 
-        for start_date, end_date in timeframe:
-            fig = draw_plots(df=df, start_date=start_date, end_date=end_date, bus_name=bus_name, colors_odict=colors_odict)
-            file_name = bus_name + "_" + start_date[5:7] + ".png"
-            plt.savefig(os.path.join(paths.plotted, file_name), bbox_inches="tight")
-            file_name = bus_name + "_" + start_date[5:7] + ".pdf"
-            plt.savefig(os.path.join(paths.plotted, file_name), bbox_inches="tight")
+                file_name = bus_name + "_" + start_date[5:7] + type
+                plt.savefig(os.path.join(paths.plotted, file_name), bbox_inches="tight")
