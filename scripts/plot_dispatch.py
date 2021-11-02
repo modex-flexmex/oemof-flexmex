@@ -20,7 +20,7 @@ def sum_demands(data, bus_name, demand_name):
 
 
 def draw_plots(df, start_date, end_date, bus_name, colors_odict):
-    """
+    r"""
     Creates a dispatch plot for the specified bus and time frame.
 
     Parameters
