@@ -84,6 +84,22 @@ if __name__ == "__main__":
                 df[column] = capacities.loc[:, column]
         df = df / 1000 # from MWh to GWh
 
+        # separate df into several dataframes that will be plotted each on a separate axis
+        df_elec = pd.DataFrame()
+        df_h2 = pd.DataFrame()
+        df_heat = pd.DataFrame()
+        for i in df.columns:
+
+            if 'elec' in i[0] and 'h2' not in i[0] and 'bev' not in i[0]:
+                df_elec[i] = df[i]
+            if 'h2' in i[0]:
+                df_h2[i] = df[i]
+            if 'heat' in i[0]:
+                df_heat[i] = df[i]
+
+        dfs = [df_elec, df_h2, df_heat]
+
+
         # third step: rename columns into short, understandable labels
 
         df.columns = plots._rename_by_string_matching(columns=df.columns, labels_dict=labels_dict)
@@ -96,5 +112,3 @@ if __name__ == "__main__":
 
         figure = plot_storage_levels(df_time_filtered)
         plt.savefig(os.path.join(paths.plotted, region+"_"+timeframe[0][5:7]))
-
-        # Test CI 2
