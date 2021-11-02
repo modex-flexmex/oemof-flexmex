@@ -6,7 +6,7 @@ from oemof.outputlib import views
 
 from oemof_flexmex.facades import AsymmetricStorage, ReservoirWithPump, Bev
 
-solver = 'cbc'
+solver = "cbc"
 
 
 # def check_init_methods():
@@ -56,44 +56,29 @@ def check_asymmetric_storage_optimize_dispatch():
     Storage's capacities (storage, charge, discharge).
     """
 
-    energysystem = EnergySystem(timeindex=pd.date_range('2019', periods=3, freq='H'))
+    energysystem = EnergySystem(timeindex=pd.date_range("2019", periods=3, freq="H"))
 
-    bel = Bus(label='electricity')
+    bel = Bus(label="electricity")
 
     energysystem.add(bel)
 
-    energysystem.add(Sink(label='excess_el', inputs={bel: Flow()}))
+    energysystem.add(Sink(label="excess_el", inputs={bel: Flow()}))
 
     energysystem.add(
-        Source(
-            label='shortage_el',
-            outputs={bel: Flow(variable_costs=200)}
-        )
+        Source(label="shortage_el", outputs={bel: Flow(variable_costs=200)})
     )
 
     energysystem.add(
         Source(
-            label='plants',
-            outputs={
-                bel: Flow(
-                    nominal_value=6,
-                    actual_value=[1, 0, 0],
-                    fixed=True
-                )
-            }
+            label="plants",
+            outputs={bel: Flow(nominal_value=6, actual_value=[1, 0, 0], fixed=True)},
         )
     )
 
     energysystem.add(
         Sink(
-            label='demand',
-            inputs={
-                bel: Flow(
-                    nominal_value=6,
-                    actual_value=[0, 0.5, 0.5],
-                    fixed=True
-                )
-            }
+            label="demand",
+            inputs={bel: Flow(nominal_value=6, actual_value=[0, 0.5, 0.5], fixed=True)},
         )
     )
 
@@ -113,8 +98,9 @@ def check_asymmetric_storage_optimize_dispatch():
 
     optimization_model = Model(energysystem=energysystem)
 
-    optimization_model.solve(solver=solver,
-                             solve_kwargs={'tee': True, 'keepfiles': True})
+    optimization_model.solve(
+        solver=solver, solve_kwargs={"tee": True, "keepfiles": True}
+    )
 
     # data = views.node(optimization_model.results(), 'electricity')
     # res = pp.results(optimization_model)
@@ -122,10 +108,15 @@ def check_asymmetric_storage_optimize_dispatch():
     results = views.convert_keys_to_strings(optimization_model.results())
 
     # Check the limiting condition
-    assert all(results[('h2-cavern', 'electricity')]['sequences']['flow'].values == [0, 2., 2.])
+    assert all(
+        results[("h2-cavern", "electricity")]["sequences"]["flow"].values
+        == [0, 2.0, 2.0]
+    )
 
     # Check what follows from the limting condition
-    assert all(results[('electricity', 'h2-cavern')]['sequences']['flow'].values == [4., 0, 0])
+    assert all(
+        results[("electricity", "h2-cavern")]["sequences"]["flow"].values == [4.0, 0, 0]
+    )
 
 
 def check_asymmetric_storage_optimize_investment():
@@ -134,44 +125,29 @@ def check_asymmetric_storage_optimize_investment():
     Let the solver decide about the storage's capacities (storage, charge, discharge).
     """
 
-    energysystem = EnergySystem(timeindex=pd.date_range('2019', periods=3, freq='H'))
+    energysystem = EnergySystem(timeindex=pd.date_range("2019", periods=3, freq="H"))
 
-    bel = Bus(label='electricity')
+    bel = Bus(label="electricity")
 
     energysystem.add(bel)
 
-    energysystem.add(Sink(label='excess_el', inputs={bel: Flow()}))
+    energysystem.add(Sink(label="excess_el", inputs={bel: Flow()}))
 
     energysystem.add(
-        Source(
-            label='shortage_el',
-            outputs={bel: Flow(variable_costs=200)}
-        )
+        Source(label="shortage_el", outputs={bel: Flow(variable_costs=200)})
     )
 
     energysystem.add(
         Source(
-            label='plants',
-            outputs={
-                bel: Flow(
-                    nominal_value=6,
-                    actual_value=[1, 0, 0],
-                    fixed=True
-                )
-            }
+            label="plants",
+            outputs={bel: Flow(nominal_value=6, actual_value=[1, 0, 0], fixed=True)},
         )
     )
 
     energysystem.add(
         Sink(
-            label='demand',
-            inputs={
-                bel: Flow(
-                    nominal_value=6,
-                    actual_value=[0, 0.5, 0.5],
-                    fixed=True
-                )
-            }
+            label="demand",
+            inputs={bel: Flow(nominal_value=6, actual_value=[0, 0.5, 0.5], fixed=True)},
         )
     )
 
@@ -195,8 +171,9 @@ def check_asymmetric_storage_optimize_investment():
 
     optimization_model = Model(energysystem=energysystem)
 
-    optimization_model.solve(solver=solver,
-                             solve_kwargs={'tee': True, 'keepfiles': True})
+    optimization_model.solve(
+        solver=solver, solve_kwargs={"tee": True, "keepfiles": True}
+    )
 
     # data = views.node(optimization_model.results(), 'electricity')
     # res = pp.results(optimization_model)
@@ -204,42 +181,44 @@ def check_asymmetric_storage_optimize_investment():
     results = views.convert_keys_to_strings(optimization_model.results())
 
     # TODO Check actual invested capacities would be better
-    assert all(results[('h2-cavern', 'electricity')]['sequences']['flow'].values == [0, 3., 3.])
-    assert all(results[('electricity', 'h2-cavern')]['sequences']['flow'].values == [6., 0, 0])
+    assert all(
+        results[("h2-cavern", "electricity")]["sequences"]["flow"].values
+        == [0, 3.0, 3.0]
+    )
+    assert all(
+        results[("electricity", "h2-cavern")]["sequences"]["flow"].values == [6.0, 0, 0]
+    )
 
 
 def test_reservoir():
-    timeindex = pd.date_range('2020-01-01', periods=3, freq='H')
+    timeindex = pd.date_range("2020-01-01", periods=3, freq="H")
 
     es = EnergySystem(timeindex=timeindex)
     # Node.registry = es
 
-    el_bus = Bus(label='electricity')
+    el_bus = Bus(label="electricity")
 
     windpark = Source(
-        label='windpark',
-        outputs={el_bus: Flow(fixed=True,
-                              nominal_value=15,
-                              actual_value=[0.7, 0.2, 0.9])}
+        label="windpark",
+        outputs={
+            el_bus: Flow(fixed=True, nominal_value=15, actual_value=[0.7, 0.2, 0.9])
+        },
     )
 
     el_demand = Sink(
-        label='el_demand',
-        inputs={el_bus: Flow(fixed=True,
-                             nominal_value=100,
-                             actual_value=[0.1, 0.2, 0.1])}
+        label="el_demand",
+        inputs={
+            el_bus: Flow(fixed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])
+        },
     )
 
-    el_excess = Sink(
-        label='el_excess',
-        inputs={el_bus: Flow(variable_costs=0.0001)}
-    )
+    el_excess = Sink(label="el_excess", inputs={el_bus: Flow(variable_costs=0.0001)})
 
     reservoir = ReservoirWithPump(
-        label='my_reservoir',
+        label="my_reservoir",
         bus=el_bus,
-        carrier='water',
-        tech='reservoir',
+        carrier="water",
+        tech="reservoir",
         storage_capacity=1000,
         capacity_pump=20,
         capacity_turbine=50,
@@ -255,51 +234,50 @@ def test_reservoir():
 
     m = Model(es)
 
-    lp_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'lp-file.lp')
-    m.write(lp_file_path, io_options={'symbolic_solver_labels': True})
+    lp_file_path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)), "lp-file.lp"
+    )
+    m.write(lp_file_path, io_options={"symbolic_solver_labels": True})
 
     m.solve()
 
     results = m.results()
 
-    seq_dict = {k: v['sequences'] for k, v in results.items() if 'sequences' in v}
+    seq_dict = {k: v["sequences"] for k, v in results.items() if "sequences" in v}
     sequences = pd.concat(seq_dict.values(), 1)
     sequences.columns = seq_dict.keys()
     print(sequences)
 
 
 def test_bev():
-    timeindex = pd.date_range('2020-01-01', periods=3, freq='H')
+    timeindex = pd.date_range("2020-01-01", periods=3, freq="H")
 
     es = EnergySystem(timeindex=timeindex)
     # Node.registry = es
 
-    el_bus = Bus(label='electricity')
+    el_bus = Bus(label="electricity")
 
     el_grid = Source(
-        label='windpark',
-        outputs={el_bus: Flow(fixed=True,
-                              nominal_value=150,
-                              actual_value=[0.7, 0.2, 0.9])}
+        label="windpark",
+        outputs={
+            el_bus: Flow(fixed=True, nominal_value=150, actual_value=[0.7, 0.2, 0.9])
+        },
     )
 
     el_demand = Sink(
-        label='el_demand',
-        inputs={el_bus: Flow(fixed=True,
-                             nominal_value=100,
-                             actual_value=[0.1, 0.2, 0.1])}
+        label="el_demand",
+        inputs={
+            el_bus: Flow(fixed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])
+        },
     )
 
-    el_excess = Sink(
-        label='el_excess',
-        inputs={el_bus: Flow(variable_costs=0.0001)}
-    )
+    el_excess = Sink(label="el_excess", inputs={el_bus: Flow(variable_costs=0.0001)})
 
     bev = Bev(
-        label='my_bev',
+        label="my_bev",
         bus=el_bus,
-        carrier='electricity',
-        tech='bev',
+        carrier="electricity",
+        tech="bev",
         storage_capacity=1000,
         capacity=50,
         availability=[0.8, 0.7, 0.6],  # GridAvailabilityRate
@@ -309,27 +287,29 @@ def test_bev():
         # initial_storage_level=0.5,
         min_storage_level=[0.1, 0.2, 0.15],  # MinBatteryLevel
         max_storage_level=[0.9, 0.95, 0.92],  # MaxBatteryLevel
-        efficiency=0.93
+        efficiency=0.93,
     )
 
     es.add(el_bus, el_grid, el_demand, el_excess, bev)
 
     m = Model(es)
 
-    lp_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'lp-file.lp')
-    m.write(lp_file_path, io_options={'symbolic_solver_labels': True})
+    lp_file_path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)), "lp-file.lp"
+    )
+    m.write(lp_file_path, io_options={"symbolic_solver_labels": True})
 
     m.solve()
 
     results = m.results()
 
-    seq_dict = {k: v['sequences'] for k, v in results.items() if 'sequences' in v}
+    seq_dict = {k: v["sequences"] for k, v in results.items() if "sequences" in v}
     sequences = pd.concat(seq_dict.values(), 1)
     sequences.columns = seq_dict.keys()
     print(sequences)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_reservoir()
     test_bev()
     check_asymmetric_storage_optimize_dispatch()
