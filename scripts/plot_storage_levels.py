@@ -100,12 +100,12 @@ if __name__ == "__main__":
 
 
         # third step: rename columns into short, understandable labels
-        for i in range(len(dfs)):
-            dfs[i].columns = plots._rename_by_string_matching(columns=dfs[i].columns, labels_dict=labels_dict)
+        for k, df in df_dict.items():
+            df.columns = plots._rename_by_string_matching(columns=df.columns, labels_dict=labels_dict)
 
             # fourth step: slice selected timeframes
 
-            dfs[i] = plots.filter_timeseries(df=dfs[i], start_date=timeframe[0], end_date=timeframe[1])
+            df_dict[k] = plots.filter_timeseries(df=df, start_date=timeframe[0], end_date=timeframe[1])
             import pdb
             pdb.set_trace()
         # fifth step: plot
