@@ -101,16 +101,16 @@ if __name__ == "__main__":
         ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
     ]
 
-    # possible carriers: "electricity.csv", "heat_decentral", "heat_central"
-    carriers = ["electricity.csv", "heat_decentral", "heat_central"]
+    # possible carriers: "electricity", "heat_decentral", "heat_central"
+    carriers = ["electricity", "heat_decentral", "heat_central"]
     # possible regions: "AT", "BE", "CH", "CZ", "DK", "DE", "FR", "IT", "LU", "NL", "PL"
     regions = ["DE", "FR", "PL"]
     # possible file types: ".png", ".html", ".pdf"
     file_types = [".html", ".png"]
 
-
+    # "bev-internal_bus" is explicitly excluded because it would otherwise be co-selected by the carrier "electricity"
     selected_timeseries_files = [file for file in timeseries_files for carrier in carriers for region in regions
-                                 if carrier in file and region in file]
+                                 if carrier in file and region in file if "bev-internal_bus" not in file]
 
     for bus_file in selected_timeseries_files:
 
