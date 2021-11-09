@@ -114,7 +114,8 @@ if __name__ == "__main__":
     # Factor to convert implicit units of results (MW) to SI unit (W)
     conv_number = 1000
 
-    # "bev-internal_bus" is explicitly excluded because it would otherwise be co-selected by the carrier "electricity"
+    # "bev-internal_bus" is explicitly excluded because it would otherwise be
+    # co-selected by the carrier "electricity"
     selected_timeseries_files = [
         file
         for file in timeseries_files
