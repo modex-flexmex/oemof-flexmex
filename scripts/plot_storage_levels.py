@@ -32,20 +32,21 @@ def plot_storage_levels(df_dict):
         n_rows = 1
     fig, axs = plt.subplots(nrows=n_rows, ncols=1, figsize=(14, 5), linewidth=20)
 
-    for i in df_elec.columns:
-        axs[0].plot(df_elec.index, df_elec[i], label=i, linewidth=2)
+    for i in df_dict["df_elec"].columns:
+        print(df_dict["df_elec"])
+        axs[0].plot(df_dict["df_elec"].index, df_dict["df_elec"][i], label=i, linewidth=2)
     axs[0].legend()
     if "df_heat" in df_dict.keys():
-        for i in df_heat.columns:
-            axs[1].plot(df_heat.index, df_heat[i], label=i, linewidth=2)
+        for i in df_dict["df_heat"].columns:
+            axs[1].plot(df_dict["df_heat"].index, df_dict["df_heat"][i], label=i, linewidth=2)
         axs[1].legend(loc='upper left')
         axs[1].set_ylabel('Electricity [GWh]')
 
     if "df_h2" in df_dict.keys():
         ax2 = axs[0].twinx()
         ax2.set(ylim=(0, 45))
-        for i in df_h2.columns:
-            ax2.plot(df_h2.index, df_h2[i] / 1000, label=i)  # , color=colors_odict[i])
+        for i in df_dict["df_h2"].columns:
+            ax2.plot(df_dict["df_h2"].index, df_dict["df_h2"][i] / 1000, label=i)  # , color=colors_odict[i])
         ax2.set_ylabel("Electricity [TWh]")
         ax2.legend(loc='upper right')
 
@@ -90,7 +91,8 @@ if __name__ == "__main__":
                         "elec" in column[0] and "h2" not in column[0] and "bev" not in column[0]]
         h2_columns = [column for column in df.columns if "h2" in column[0]]
 
-
+        # TODO: not sure if it is good to define them here because these dfs remain untouched
+        # even when I change those in the dict, which is confusing.
         df_heat = df[heat_columns]
         df_elec = df[elec_columns]
         df_h2 = df[h2_columns]
