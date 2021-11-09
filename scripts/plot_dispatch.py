@@ -9,6 +9,7 @@ from oemof_flexmex.model_config import plot_labels, colors_odict
 import pandas as pd
 from addict import Dict
 
+
 def sum_demands(data, bus_name, demand_name):
     d_demand = pd.DataFrame()
     for i in data.columns:
@@ -16,7 +17,7 @@ def sum_demands(data, bus_name, demand_name):
             d_demand[i] = data[i]
             data.drop(columns=[i], inplace=True)
     total_demand = d_demand.sum(axis=1)
-    data[(bus_name, bus_name + '-demand', 'flow')] = total_demand
+    data[(bus_name, bus_name + "-demand", "flow")] = total_demand
     return data
 
 
@@ -46,12 +47,14 @@ def draw_plots(df, df_demand, start_date, end_date, bus_name, colors_odict):
 
     # filter timeseries
     df_time_filtered = plots.filter_timeseries(df, start_date, end_date)
-    df_demand_time_filtered = plots.filter_timeseries(
-        df_demand, start_date, end_date
-    )
+    df_demand_time_filtered = plots.filter_timeseries(df_demand, start_date, end_date)
     # plot time filtered data
     plots.plot_dispatch(
-        ax=ax, df=df_time_filtered, df_demand=df_demand_time_filtered, unit="W", colors_odict=colors_odict
+        ax=ax,
+        df=df_time_filtered,
+        df_demand=df_demand_time_filtered,
+        unit="W",
+        colors_odict=colors_odict,
     )
 
     plt.grid()
@@ -66,9 +69,7 @@ def draw_plots(df, df_demand, start_date, end_date, bus_name, colors_odict):
 
     # Shrink current axis's height by 10% on the bottom
     box = ax.get_position()
-    ax.set_position(
-        [box.x0, box.y0 + box.height * 0.15, box.width, box.height * 0.85]
-    )
+    ax.set_position([box.x0, box.y0 + box.height * 0.15, box.width, box.height * 0.85])
     # Put a legend below current axis
     ax.legend(
         loc="upper center",
@@ -92,7 +93,9 @@ if __name__ == "__main__":
     if not os.path.exists(paths.plotted):
         os.makedirs(paths.plotted)
 
-    timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries", "bus")
+    timeseries_directory = os.path.join(
+        paths.postprocessed, "oemoflex-timeseries", "bus"
+    )
     timeseries_files = os.listdir(timeseries_directory)
 
     # select timeframe
@@ -112,8 +115,14 @@ if __name__ == "__main__":
     conv_number = 1000
 
     # "bev-internal_bus" is explicitly excluded because it would otherwise be co-selected by the carrier "electricity"
-    selected_timeseries_files = [file for file in timeseries_files for carrier in carriers for region in regions
-                                 if carrier in file and region in file if "bev-internal_bus" not in file]
+    selected_timeseries_files = [
+        file
+        for file in timeseries_files
+        for carrier in carriers
+        for region in regions
+        if carrier in file and region in file
+        if "bev-internal_bus" not in file
+    ]
 
     for bus_file in selected_timeseries_files:
 
@@ -133,10 +142,7 @@ if __name__ == "__main__":
         if ".html" in file_types:
             # interactive plotly dispatch plot
             fig_plotly = plots.plot_dispatch_plotly(
-                df=df,
-                df_demand=df_demand,
-                unit="W",
-                colors_odict=colors_odict
+                df=df, df_demand=df_demand, unit="W", colors_odict=colors_odict
             )
 
             file_name = bus_name + "_dispatch_interactive" + ".html"
@@ -156,7 +162,7 @@ if __name__ == "__main__":
                     start_date=start_date,
                     end_date=end_date,
                     bus_name=bus_name,
-                    colors_odict=colors_odict
+                    colors_odict=colors_odict,
                 )
 
                 file_name = bus_name + "_" + start_date[5:7] + type

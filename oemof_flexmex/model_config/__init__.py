@@ -5,7 +5,7 @@ from oemof_flexmex.helpers import load_yaml
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-plot_labels = load_yaml(os.path.join(here, 'plot_labels.yml'))
+plot_labels = load_yaml(os.path.join(here, "plot_labels.yml"))
 
 colors_csv = pd.read_csv(
     os.path.join(here, "plot_colors.csv"), header=[0], index_col=[0]
