@@ -33,9 +33,9 @@ def plot_storage_levels(df_dict):
     fig, axs = plt.subplots(nrows=n_rows, ncols=1, figsize=(14, 5), linewidth=20)
 
     for i in df_dict["df_elec"].columns:
-        print(df_dict["df_elec"])
         axs[0].plot(df_dict["df_elec"].index, df_dict["df_elec"][i], label=i, linewidth=2)
-    axs[0].legend()
+    axs[0].legend(loc="upper left")
+    axs[0].set_ylabel('Electricity [GWh]')
     if "df_heat" in df_dict.keys():
         for i in df_dict["df_heat"].columns:
             axs[1].plot(df_dict["df_heat"].index, df_dict["df_heat"][i], label=i, linewidth=2)
