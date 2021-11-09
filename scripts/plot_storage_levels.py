@@ -85,19 +85,20 @@ if __name__ == "__main__":
         df = df / 1000 # from MWh to GWh
 
         # separate df into several dataframes that will be plotted each on a separate axis
-        df_elec = pd.DataFrame()
-        df_h2 = pd.DataFrame()
-        df_heat = pd.DataFrame()
-        for i in df.columns:
 
-            if 'elec' in i[0] and 'h2' not in i[0] and 'bev' not in i[0]:
-                df_elec[i] = df[i]
-            if 'h2' in i[0]:
-                df_h2[i] = df[i]
-            if 'heat' in i[0]:
-                df_heat[i] = df[i]
+        heat_columns = [column for column in df.columns if "heat" in column[0]]
+        elec_columns = [column for column in df.columns if
+                        "elec" in column[0] and "h2" not in column[0] and "bev" not in column[0]]
+        h2_columns = [column for column in df.columns if "h2" in column[0]]
 
-        dfs = [df_elec, df_h2, df_heat]
+        dfs = []
+
+        df_heat = df[heat_columns]
+        df_elec = df[elec_columns]
+        df_h2 = df[h2_columns]
+        for df in [df_heat, df_elec, df_h2]:
+            if df.empty == False:
+                dfs.append(df)
 
 
         # third step: rename columns into short, understandable labels
