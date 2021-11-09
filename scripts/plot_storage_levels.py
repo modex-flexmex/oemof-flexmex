@@ -34,16 +34,16 @@ def plot_storage_levels(dfs):
 
     for i in df_elec.columns:
         axs[0].plot(df_elec.index, df_elec[i], label=i, linewidth=2)
-
+    axs[0].legend()
     if df_heat in dfs:
         for i in df_heat.columns:
             axs[1].plot(df_heat.index, df_heat[i], label=i, linewidth=2)
-        import pdb
-        pdb.set_trace()
         axs[1].legend(loc='upper left')
         axs[1].set_ylabel('Electricity [GWh]')
+    import pdb
+    pdb.set_trace()
     if df_h2 in dfs:
-        ax2 = ax1.twinx()
+        ax2 = ax[0].twinx()
         ax2.set(ylim=(0, 45))
         ax2.plot(df_h2.index, df_h2[i] / 1000, label=i)  # , color=colors_odict[i])
         ax2.set_ylabel("Electricity [TWh]")
@@ -90,24 +90,24 @@ if __name__ == "__main__":
                         "elec" in column[0] and "h2" not in column[0] and "bev" not in column[0]]
         h2_columns = [column for column in df.columns if "h2" in column[0]]
 
-        dfs = []
 
         df_heat = df[heat_columns]
         df_elec = df[elec_columns]
         df_h2 = df[h2_columns]
-        for df in [df_heat, df_elec, df_h2]:
-            if df.empty == False:
-                dfs.append(df)
+
+        dfs = {"df_heat" : df_heat, "df_elec" : df_elec, "df_h2" : df_h2}
+        df_dict = {k : df for k, df in dfs.items() if df.empty == False}
 
 
         # third step: rename columns into short, understandable labels
+        for i in range(len(dfs)):
+            dfs[i].columns = plots._rename_by_string_matching(columns=dfs[i].columns, labels_dict=labels_dict)
 
-        df.columns = plots._rename_by_string_matching(columns=df.columns, labels_dict=labels_dict)
+            # fourth step: slice selected timeframes
 
-        # fourth step: slice selected timeframes
-
-        df_time_filtered = plots.filter_timeseries(df=df, start_date=timeframe[0], end_date=timeframe[1])
-
+            dfs[i] = plots.filter_timeseries(df=dfs[i], start_date=timeframe[0], end_date=timeframe[1])
+            import pdb
+            pdb.set_trace()
         # fifth step: plot
 
         figure = plot_storage_levels(dfs)
