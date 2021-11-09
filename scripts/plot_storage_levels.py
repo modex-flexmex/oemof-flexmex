@@ -12,46 +12,45 @@ import oemoflex.tools.helpers as helpers
 # plots), which display the storage level change in the two timeframes selected for the dispatch plots. The file should
 # also use the colors and the labels files that are used in the dispatch plots.
 
-def plot_storage_levels(df):
+def plot_storage_levels(dfs):
     r"""
         Reads in the storage level time series from a dataframe and plots them according to their busses.
 
         Parameters
         ----------
-        df : pandas.DataFrame()
-            Dataframe with storage level time series for a single country.
+        dfs : list of pandas.DataFrame()
+            List with 1-3 dataframes, each for one bus,
+             with storage level time series for a single country.
 
         Returns
         -------
         figure
         """
-    fig, ax = plt.subplots(figsize=(14, 5), linewidth=20)
-    if df.columns.str.contains('heat').any():
-        ax1 = plt.subplot(2, 1, 1)
-        ax3 = plt.subplot(2, 1, 2, sharex=ax1)
+    if len(dfs) > 1:
+        n_rows = 2
     else:
-        ax1 = plt.subplot()
-    for i in df.columns:
-        if 'heat' in i:
-            ax3.plot(df.index, df[i], label=i, linewidth=2)  # , color=colors_odict[i])
-        elif 'BEV' in i:
-            pass
-        elif 'H2 cavern' in i:
-            ax2 = ax1.twinx()
-            ax2.set(ylim=(0, 45))
-            ax2.plot(df.index, df[i]/1000, label=i)#, color=colors_odict[i])
-            ax2.set_ylabel("Electricity [TWh]")
-            ax2.legend(loc='upper right')
+        n_rows = 1
+    fig, axs = plt.subplots(nrows=n_rows, ncols=1, figsize=(14, 5), linewidth=20)
+
+    for i in df_elec.columns:
+        axs[0].plot(df_elec.index, df_elec[i], label=i, linewidth=2)
+
+    if df_heat in dfs:
+        for i in df_heat.columns:
+            axs[1].plot(df_heat.index, df_heat[i], label=i, linewidth=2)
+        import pdb
+        pdb.set_trace()
+        axs[1].legend(loc='upper left')
+        axs[1].set_ylabel('Electricity [GWh]')
+    if df_h2 in dfs:
+        ax2 = ax1.twinx()
+        ax2.set(ylim=(0, 45))
+        ax2.plot(df_h2.index, df_h2[i] / 1000, label=i)  # , color=colors_odict[i])
+        ax2.set_ylabel("Electricity [TWh]")
+        ax2.legend(loc='upper right')
+
         # TODO: set colors as in https://matplotlib.org/stable/gallery/subplots_axes_and_figures/two_scales.html#sphx-glr-gallery-subplots-axes-and-figures-two-scales-py
-        else:
-            ax1.plot(df.index, df[i], label=i, linewidth=2)#, color=colors_odict[i])
-    ax1.legend(loc='upper left')
-    ax1.set_ylabel('Electricity [GWh]')
-    try:
-       ax3.legend()
-       ax3.set_ylabel('Heat [GWh]')
-    except UnboundLocalError:
-        pass
+
     return fig
 
 dir_name = os.path.abspath(os.path.dirname(__file__))
@@ -111,5 +110,5 @@ if __name__ == "__main__":
 
         # fifth step: plot
 
-        figure = plot_storage_levels(df_time_filtered)
+        figure = plot_storage_levels(dfs)
         plt.savefig(os.path.join(paths.plotted, region+"_"+timeframe[0][5:7]))
