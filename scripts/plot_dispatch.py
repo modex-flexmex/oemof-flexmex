@@ -92,7 +92,7 @@ if __name__ == "__main__":
     if not os.path.exists(paths.plotted):
         os.makedirs(paths.plotted)
 
-    timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries")
+    timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries", "bus")
     timeseries_files = os.listdir(timeseries_directory)
 
     # select timeframe
