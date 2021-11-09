@@ -12,13 +12,13 @@ import oemoflex.tools.helpers as helpers
 # plots), which display the storage level change in the two timeframes selected for the dispatch plots. The file should
 # also use the colors and the labels files that are used in the dispatch plots.
 
-def plot_storage_levels(dfs):
+def plot_storage_levels(df_dict):
     r"""
         Reads in the storage level time series from a dataframe and plots them according to their busses.
 
         Parameters
         ----------
-        dfs : list of pandas.DataFrame()
+        df_dict : dictionary of pandas.DataFrame()
             List with 1-3 dataframes, each for one bus,
              with storage level time series for a single country.
 
@@ -26,7 +26,7 @@ def plot_storage_levels(dfs):
         -------
         figure
         """
-    if len(dfs) > 1:
+    if len(df_dict.items()) > 1:
         n_rows = 2
     else:
         n_rows = 1
@@ -35,17 +35,17 @@ def plot_storage_levels(dfs):
     for i in df_elec.columns:
         axs[0].plot(df_elec.index, df_elec[i], label=i, linewidth=2)
     axs[0].legend()
-    if df_heat in dfs:
+    if "df_heat" in df_dict.keys():
         for i in df_heat.columns:
             axs[1].plot(df_heat.index, df_heat[i], label=i, linewidth=2)
         axs[1].legend(loc='upper left')
         axs[1].set_ylabel('Electricity [GWh]')
-    import pdb
-    pdb.set_trace()
-    if df_h2 in dfs:
-        ax2 = ax[0].twinx()
+
+    if "df_h2" in df_dict.keys():
+        ax2 = axs[0].twinx()
         ax2.set(ylim=(0, 45))
-        ax2.plot(df_h2.index, df_h2[i] / 1000, label=i)  # , color=colors_odict[i])
+        for i in df_h2.columns:
+            ax2.plot(df_h2.index, df_h2[i] / 1000, label=i)  # , color=colors_odict[i])
         ax2.set_ylabel("Electricity [TWh]")
         ax2.legend(loc='upper right')
 
@@ -106,9 +106,8 @@ if __name__ == "__main__":
             # fourth step: slice selected timeframes
 
             df_dict[k] = plots.filter_timeseries(df=df, start_date=timeframe[0], end_date=timeframe[1])
-            import pdb
-            pdb.set_trace()
+
         # fifth step: plot
 
-        figure = plot_storage_levels(dfs)
+        figure = plot_storage_levels(df_dict)
         plt.savefig(os.path.join(paths.plotted, region+"_"+timeframe[0][5:7]))
