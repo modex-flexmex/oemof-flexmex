@@ -108,6 +108,9 @@ if __name__ == "__main__":
     # possible file types: ".png", ".html", ".pdf"
     file_types = [".html", ".png"]
 
+    # Factor to convert implicit units of results (MW) to SI unit (W)
+    conv_number = 1000
+
     # "bev-internal_bus" is explicitly excluded because it would otherwise be co-selected by the carrier "electricity"
     selected_timeseries_files = [file for file in timeseries_files for carrier in carriers for region in regions
                                  if carrier in file and region in file if "bev-internal_bus" not in file]
@@ -121,7 +124,6 @@ if __name__ == "__main__":
 
         # prepare dispatch data
         # convert data to SI-unit
-        conv_number = 1000
         data = data * conv_number
         data = sum_demands(data, bus_name=bus_name, demand_name="demand")
         df, df_demand = plots.prepare_dispatch_data(
