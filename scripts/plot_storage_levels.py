@@ -10,12 +10,6 @@ import oemoflex.tools.helpers as helpers
 # from oemof_flexmex.model_config import colors_odict
 # from oemof_flexmex.model_config.user_definitions.py import timeframe, region # This results in a ModuleNotFoundError
 
-
-# Goal: In every scenario two png-files for each selected country (with selection being the same as in the dispatch
-# plots), which display the storage level change in the two timeframes selected for the dispatch plots. The file should
-# also use the colors and the labels files that are used in the dispatch plots.
-
-
 dir_name = os.path.abspath(os.path.dirname(__file__))
 labels_dict = helpers.load_yaml(
     os.path.join(dir_name, "../oemof_flexmex/model_config/plot_labels.yml")
@@ -81,7 +75,6 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
 
 
 if __name__ == "__main__":
-    # first step: data import
     paths = Dict()
     paths.postprocessed = sys.argv[1]
     paths.plotted = sys.argv[2]
@@ -96,8 +89,7 @@ if __name__ == "__main__":
         storage_level_data, header=[0, 1, 2], parse_dates=[0], index_col=[0]
     )
 
-    # second step: data selection: timeframe, country
-    # TODO: import this from user_definitions.py
+    # TODO: import this from user_definitions.py on top of this script
     timeframe = [
         ("2019-01-01 00:00:00", "2019-01-31 23:00:00"),
         ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
@@ -109,10 +101,9 @@ if __name__ == "__main__":
         for column in capacities.columns:
             if region in column[0]:
                 df[column] = capacities.loc[:, column]
-        df = df / 1000  # from MWh to GWh
+        df = df / 1000  # conversion from MWh to GWh
 
         # separate df into several dataframes that will be plotted each on a separate axis
-
         heat_columns = [column for column in df.columns if "heat" in column[0]]
         elec_columns = [
             column
@@ -130,19 +121,17 @@ if __name__ == "__main__":
         dfs = {"df_heat": df_heat, "df_elec": df_elec, "df_h2": df_h2}
         df_dict = {k: df for k, df in dfs.items() if df.empty == False}
 
-        # third step: rename columns into short, understandable labels
+        # rename columns into short, understandable labels
         for k, df in df_dict.items():
             df.columns = plots._rename_by_string_matching(
                 columns=df.columns, labels_dict=labels_dict
             )
 
-            # fourth step: slice selected timeframes
+            # slice selected timeframes
 
             df_dict[k] = plots.filter_timeseries(
                 df=df, start_date=timeframe[0], end_date=timeframe[1]
             )
-
-        # fifth step: plot
 
         figure = plot_storage_levels(df_dict)
         plt.savefig(os.path.join(paths.plotted, region + "_" + timeframe[0][5:7]))
