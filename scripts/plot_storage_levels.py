@@ -28,7 +28,7 @@ colors_odict = OrderedDict()
 for i in colors_csv.columns:
     colors_odict[i] = colors_csv.loc["Color", i]
 
-def plot_on_axes(ax, df):
+def plot_on_axes(ax, df, colors_odict=colors_odict):
     for i in df.columns:
         ax.plot(
             df.index,
@@ -60,6 +60,7 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
     plot_on_axes(ax1, df_dict["df_elec"])
     ax1.legend(loc="upper left")
     ax1.set_ylabel("Electricity [GWh]")
+    ax1.tick_params(axis='y', labelcolor=colors_odict["BAT"])
 
     if "df_heat" in df_dict.keys():
         plot_on_axes(ax2, df_dict["df_heat"])
@@ -73,6 +74,7 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
         plot_on_axes(ax3, df_dict["df_h2"])
         ax3.set_ylabel("Electricity [TWh]")
         ax3.legend(loc="upper right")
+        ax3.tick_params(axis='y', labelcolor=colors_odict["H2 cavern"])
 
     return fig
 
