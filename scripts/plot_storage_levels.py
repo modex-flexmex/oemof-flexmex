@@ -28,34 +28,33 @@ def plot_storage_levels(df_dict):
     figure
     """
     if len(df_dict.items()) > 1:
-        n_rows = 2
+        fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(14, 5), linewidth=20)
     else:
-        n_rows = 1
-    fig, axs = plt.subplots(nrows=n_rows, ncols=1, figsize=(14, 5), linewidth=20)
+        fig, (ax1) = plt.subplots(nrows=1, ncols=1, figsize=(14, 5), linewidth=20)
 
     for i in df_dict["df_elec"].columns:
-        axs[0].plot(
-            df_dict["df_elec"].index, df_dict["df_elec"][i], label=i, linewidth=2
+        ax1.plot(
+        df_dict["df_elec"].index, df_dict["df_elec"][i], label=i, linewidth=2
         )
-    axs[0].legend(loc="upper left")
-    axs[0].set_ylabel("Electricity [GWh]")
+    ax1.legend(loc="upper left")
+    ax1.set_ylabel("Electricity [GWh]")
     if "df_heat" in df_dict.keys():
         for i in df_dict["df_heat"].columns:
-            axs[1].plot(
+            ax2.plot(
                 df_dict["df_heat"].index, df_dict["df_heat"][i], label=i, linewidth=2
             )
-        axs[1].legend(loc="upper left")
-        axs[1].set_ylabel("Electricity [GWh]")
+        ax2.legend(loc="upper left")
+        ax2.set_ylabel("Electricity [GWh]")
 
     if "df_h2" in df_dict.keys():
-        ax2 = axs[0].twinx()
-        ax2.set(ylim=(0, 45))
+        ax3 = ax1.twinx()
+        ax3.set(ylim=(0, 45))
         for i in df_dict["df_h2"].columns:
-            ax2.plot(
+            ax3.plot(
                 df_dict["df_h2"].index, df_dict["df_h2"][i] / 1000, label=i
             )  # , color=colors_odict[i])
-        ax2.set_ylabel("Electricity [TWh]")
-        ax2.legend(loc="upper right")
+        ax3.set_ylabel("Electricity [TWh]")
+        ax3.legend(loc="upper right")
 
         # TODO: set colors as in https://matplotlib.org/stable/gallery/subplots_axes_and_figures/two_scales.html#sphx-glr-gallery-subplots-axes-and-figures-two-scales-py
 
