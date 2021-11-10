@@ -7,9 +7,9 @@ from oemof_flexmex.helpers import load_yaml
 # Path definitions
 module_path = os.path.dirname(os.path.abspath(__file__))
 
-MODEL_STRUCTURE = 'model_structure'
+MODEL_STRUCTURE = "model_structure"
 
-FOREIGN_KEYS = 'foreign_keys.yml'
+FOREIGN_KEYS = "foreign_keys.yml"
 
 
 all_foreign_keys = load_yaml(os.path.join(module_path, MODEL_STRUCTURE, FOREIGN_KEYS))
