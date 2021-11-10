@@ -8,6 +8,7 @@ from collections import OrderedDict
 import oemoflex.tools.plots as plots
 import oemoflex.tools.helpers as helpers
 # from oemof_flexmex.model_config import colors_odict
+# from oemof_flexmex.model_config.user_definitions.py import timeframe, region # This results in a ModuleNotFoundError
 
 
 # Goal: In every scenario two png-files for each selected country (with selection being the same as in the dispatch
@@ -29,6 +30,8 @@ colors_csv = colors_csv.T
 colors_odict = OrderedDict()
 for i in colors_csv.columns:
     colors_odict[i] = colors_csv.loc["Color", i]
+
+
 
 def plot_storage_levels(df_dict, colors_odict=colors_odict):
     r"""
@@ -73,8 +76,6 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
         ax3.set_ylabel("Electricity [TWh]")
         ax3.legend(loc="upper right")
 
-        # TODO: set colors as in https://matplotlib.org/stable/gallery/subplots_axes_and_figures/two_scales.html#sphx-glr-gallery-subplots-axes-and-figures-two-scales-py
-
     return fig
 
 
@@ -96,7 +97,7 @@ if __name__ == "__main__":
     )
 
     # second step: data selection: timeframe, country
-    # TODO: integrate time frame and region definition for dispatch plots and for storage level plots
+    # TODO: import this from user_definitions.py
     timeframe = [
         ("2019-01-01 00:00:00", "2019-01-31 23:00:00"),
         ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
