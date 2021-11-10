@@ -28,6 +28,15 @@ colors_odict = OrderedDict()
 for i in colors_csv.columns:
     colors_odict[i] = colors_csv.loc["Color", i]
 
+def plot_on_axes(ax, df):
+    for i in df.columns:
+        ax.plot(
+            df.index,
+            df[i],
+            label=i,
+            linewidth=2,
+            color=colors_odict[i],
+        )
 
 def plot_storage_levels(df_dict, colors_odict=colors_odict):
     r"""
@@ -48,38 +57,20 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
     else:
         fig, (ax1) = plt.subplots(nrows=1, ncols=1, figsize=(14, 5), linewidth=20)
 
-    for i in df_dict["df_elec"].columns:
-        ax1.plot(
-            df_dict["df_elec"].index,
-            df_dict["df_elec"][i],
-            label=i,
-            linewidth=2,
-            color=colors_odict[i],
-        )
+    plot_on_axes(ax1, df_dict["df_elec"])
     ax1.legend(loc="upper left")
     ax1.set_ylabel("Electricity [GWh]")
+
     if "df_heat" in df_dict.keys():
-        for i in df_dict["df_heat"].columns:
-            ax2.plot(
-                df_dict["df_heat"].index,
-                df_dict["df_heat"][i],
-                label=i,
-                linewidth=2,
-                color=colors_odict[i],
-            )
+        plot_on_axes(ax2, df_dict["df_heat"])
         ax2.legend(loc="upper left")
-        ax2.set_ylabel("Electricity [GWh]")
+        ax2.set_ylabel("Heat [GWh]")
 
     if "df_h2" in df_dict.keys():
         ax3 = ax1.twinx()
         ax3.set(ylim=(0, 45))
-        for i in df_dict["df_h2"].columns:
-            ax3.plot(
-                df_dict["df_h2"].index,
-                df_dict["df_h2"][i] / 1000,
-                label=i,
-                color=colors_odict[i],
-            )
+#        df_dict["df_h2"] = df_dict["df_h2"] / 1000 # conversion from GWh to TWh
+        plot_on_axes(ax3, df_dict["df_h2"])
         ax3.set_ylabel("Electricity [TWh]")
         ax3.legend(loc="upper right")
 
@@ -128,7 +119,7 @@ if __name__ == "__main__":
         # even when I change those in the dict, which is confusing.
         df_heat = df[heat_columns]
         df_elec = df[elec_columns]
-        df_h2 = df[h2_columns]
+        df_h2 = df[h2_columns] / 1000 # Conversion from GWh to TWh
 
         dfs = {"df_heat": df_heat, "df_elec": df_elec, "df_h2": df_h2}
         df_dict = {k: df for k, df in dfs.items() if df.empty == False}
