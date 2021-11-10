@@ -28,6 +28,7 @@ colors_odict = OrderedDict()
 for i in colors_csv.columns:
     colors_odict[i] = colors_csv.loc["Color", i]
 
+
 def plot_on_axes(ax, df, colors_odict=colors_odict):
     for i in df.columns:
         ax.plot(
@@ -37,6 +38,7 @@ def plot_on_axes(ax, df, colors_odict=colors_odict):
             linewidth=2,
             color=colors_odict[i],
         )
+
 
 def plot_storage_levels(df_dict, colors_odict=colors_odict):
     r"""
@@ -60,7 +62,7 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
     plot_on_axes(ax1, df_dict["df_elec"])
     ax1.legend(loc="upper left")
     ax1.set_ylabel("Electricity [GWh]")
-    ax1.tick_params(axis='y', labelcolor=colors_odict["BAT"])
+    ax1.tick_params(axis="y", labelcolor=colors_odict["BAT"])
 
     if "df_heat" in df_dict.keys():
         plot_on_axes(ax2, df_dict["df_heat"])
@@ -70,11 +72,11 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
     if "df_h2" in df_dict.keys():
         ax3 = ax1.twinx()
         ax3.set(ylim=(0, 45))
-#        df_dict["df_h2"] = df_dict["df_h2"] / 1000 # conversion from GWh to TWh
+        #        df_dict["df_h2"] = df_dict["df_h2"] / 1000 # conversion from GWh to TWh
         plot_on_axes(ax3, df_dict["df_h2"])
         ax3.set_ylabel("Electricity [TWh]")
         ax3.legend(loc="upper right")
-        ax3.tick_params(axis='y', labelcolor=colors_odict["H2 cavern"])
+        ax3.tick_params(axis="y", labelcolor=colors_odict["H2 cavern"])
 
     return fig
 
@@ -121,7 +123,7 @@ if __name__ == "__main__":
         # even when I change those in the dict, which is confusing.
         df_heat = df[heat_columns]
         df_elec = df[elec_columns]
-        df_h2 = df[h2_columns] / 1000 # Conversion from GWh to TWh
+        df_h2 = df[h2_columns] / 1000  # Conversion from GWh to TWh
 
         dfs = {"df_heat": df_heat, "df_elec": df_elec, "df_h2": df_h2}
         df_dict = {k: df for k, df in dfs.items() if df.empty == False}
