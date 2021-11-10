@@ -7,6 +7,7 @@ from addict import Dict
 from collections import OrderedDict
 import oemoflex.tools.plots as plots
 import oemoflex.tools.helpers as helpers
+
 # from oemof_flexmex.model_config import colors_odict
 # from oemof_flexmex.model_config.user_definitions.py import timeframe, region # This results in a ModuleNotFoundError
 
@@ -18,13 +19,14 @@ labels_dict = helpers.load_yaml(
 # The following part on colors is mainly copied from oemoflex/tools/plots.py. In the disptach plots script,
 # the colors_odict is simply being imported, but I don't understand how that works.
 colors_csv = pd.read_csv(
-    os.path.join(dir_name, "../oemof_flexmex/model_config/plot_colors.csv"), header=[0], index_col=[0]
+    os.path.join(dir_name, "../oemof_flexmex/model_config/plot_colors.csv"),
+    header=[0],
+    index_col=[0],
 )
 colors_csv = colors_csv.T
 colors_odict = OrderedDict()
 for i in colors_csv.columns:
     colors_odict[i] = colors_csv.loc["Color", i]
-
 
 
 def plot_storage_levels(df_dict, colors_odict=colors_odict):
@@ -48,14 +50,22 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
 
     for i in df_dict["df_elec"].columns:
         ax1.plot(
-        df_dict["df_elec"].index, df_dict["df_elec"][i], label=i, linewidth=2, color=colors_odict[i]
+            df_dict["df_elec"].index,
+            df_dict["df_elec"][i],
+            label=i,
+            linewidth=2,
+            color=colors_odict[i],
         )
     ax1.legend(loc="upper left")
     ax1.set_ylabel("Electricity [GWh]")
     if "df_heat" in df_dict.keys():
         for i in df_dict["df_heat"].columns:
             ax2.plot(
-                df_dict["df_heat"].index, df_dict["df_heat"][i], label=i, linewidth=2, color=colors_odict[i]
+                df_dict["df_heat"].index,
+                df_dict["df_heat"][i],
+                label=i,
+                linewidth=2,
+                color=colors_odict[i],
             )
         ax2.legend(loc="upper left")
         ax2.set_ylabel("Electricity [GWh]")
@@ -65,13 +75,15 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
         ax3.set(ylim=(0, 45))
         for i in df_dict["df_h2"].columns:
             ax3.plot(
-                df_dict["df_h2"].index, df_dict["df_h2"][i] / 1000, label=i, color=colors_odict[i]
+                df_dict["df_h2"].index,
+                df_dict["df_h2"][i] / 1000,
+                label=i,
+                color=colors_odict[i],
             )
         ax3.set_ylabel("Electricity [TWh]")
         ax3.legend(loc="upper right")
 
     return fig
-
 
 
 if __name__ == "__main__":
