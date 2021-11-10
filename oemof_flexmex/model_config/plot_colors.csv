@@ -1,0 +1,39 @@
+,Color
+PV,#bcbd22
+Wind on,#1f77b4
+Wind off,#1f77b4
+Biomass ST,#2ca02c
+Biomass GT,#007000
+CH4,#d62728
+BAT out,#9467bd
+BAT,#9467bd
+Import,#17becf
+Shortage,#ff7f0e
+BAT in,#e377c2
+Transmission out,#8c564b
+Transmission in,#a59491
+Curtailment,#7f7f7f
+El. demand,#000000
+Hydro reservoir in,#1786bd
+Hydro reservoir out,#033996
+BEV in,#fe7f9c
+BEV out,#b805b1
+Extraction CHP,#a81bc3
+H2 cavern in,#8e93dd
+H2 cavern out,#4350ff
+H2 cavern,#4350ff
+Resistance heating,#d82b2b
+Small heat pump,#6fbeee
+Large heat pump,#36b07b
+El. demand for H2,#000000
+
+Large heat storage in,#f4df0b
+Small heat storage in,#e5ca8a
+Large heat storage out,#c1a814
+Large heat storage,#c1a814
+Small heat storage out,#e5a305
+Small heat storage,#e5a305
+Heat shortage,#ff7f0e
+CH4 Boiler,#d46566
+Excess heat,#7f7f7f
+Heat demand,#000000
