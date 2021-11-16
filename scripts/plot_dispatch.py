@@ -94,33 +94,33 @@ if __name__ == "__main__":
         os.makedirs(paths.plotted)
 
     timeseries_directory = os.path.join(
-        paths.postprocessed, "oemoflex-timeseries", "bus"
+        paths.postprocessed, "oemoflex-timeseries"
     )
     timeseries_files = os.listdir(timeseries_directory)
 
     # select timeframe
-    timeframe = [
+    TIMEFRAME = (
         ("2019-01-01 00:00:00", "2019-01-31 23:00:00"),
         ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
-    ]
+    )
 
     # possible carriers: "electricity", "heat_decentral", "heat_central"
-    carriers = ["electricity", "heat_decentral", "heat_central"]
+    CARRIERS = ["electricity", "heat_decentral", "heat_central"]
     # possible regions: "AT", "BE", "CH", "CZ", "DK", "DE", "FR", "IT", "LU", "NL", "PL"
-    regions = ["DE", "FR", "PL"]
+    REGIONS = ["DE", "FR", "PL"]
     # possible file types: ".png", ".html", ".pdf"
-    file_types = [".html", ".png"]
+    OUTPUT_FILE_TYPES = [".html", ".png"]
 
     # Factor to convert implicit units of results (MW) to SI unit (W)
-    conv_number = 1000
+    CONV_NUMBER = 1000
 
     # "bev-internal_bus" is explicitly excluded because it would otherwise be
     # co-selected by the carrier "electricity"
     selected_timeseries_files = [
         file
         for file in timeseries_files
-        for carrier in carriers
-        for region in regions
+        for carrier in CARRIERS
+        for region in REGIONS
         if carrier in file and region in file
         if "bev-internal_bus" not in file
     ]
@@ -134,13 +134,13 @@ if __name__ == "__main__":
 
         # prepare dispatch data
         # convert data to SI-unit
-        data = data * conv_number
+        data = data * CONV_NUMBER
         data = sum_demands(data, bus_name=bus_name, demand_name="demand")
         df, df_demand = plots.prepare_dispatch_data(
             data, bus_name=bus_name, demand_name="demand", labels_dict=plot_labels
         )
 
-        if ".html" in file_types:
+        if ".html" in OUTPUT_FILE_TYPES:
             # interactive plotly dispatch plot
             fig_plotly = plots.plot_dispatch_plotly(
                 df=df, df_demand=df_demand, unit="W", colors_odict=colors_odict
@@ -153,7 +153,7 @@ if __name__ == "__main__":
                 # full_html=False
             )
 
-        for (start_date, end_date), type in itertools.product(timeframe, file_types):
+        for (start_date, end_date), type in itertools.product(TIMEFRAME, OUTPUT_FILE_TYPES):
             if type == ".html":
                 pass
             else:
