@@ -93,9 +93,7 @@ if __name__ == "__main__":
     if not os.path.exists(paths.plotted):
         os.makedirs(paths.plotted)
 
-    timeseries_directory = os.path.join(
-        paths.postprocessed, "oemoflex-timeseries"
-    )
+    timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries")
     timeseries_files = os.listdir(timeseries_directory)
 
     # select timeframe
@@ -153,7 +151,9 @@ if __name__ == "__main__":
                 # full_html=False
             )
 
-        for (start_date, end_date), type in itertools.product(TIMEFRAME, OUTPUT_FILE_TYPES):
+        for (start_date, end_date), type in itertools.product(
+            TIMEFRAME, OUTPUT_FILE_TYPES
+        ):
             if type == ".html":
                 pass
             else:
