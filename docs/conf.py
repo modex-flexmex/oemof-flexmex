@@ -42,7 +42,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
     'sphinx.ext.imgmath',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autosectionlabel'
 ]
 
 numpydoc_show_class_members = False
