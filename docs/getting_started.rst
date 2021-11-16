@@ -60,8 +60,8 @@ Required data
 
 **Not** provided with the github repository:
 
-* Raw input data, see :ref:`input data format`.
-* Output template data, see :ref:`postprocessing`.
+* Raw input data, see :ref:`Raw data`.
+* Output template data, see :ref:`Postprocessing`.
 
 This data is planned to be published at a later point in time by the project FlexMex.
 
