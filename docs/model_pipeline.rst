@@ -4,8 +4,6 @@
 Model pipeline
 ~~~~~~~~~~~~~~
 
-TODO: Start with a short section on snakemake, explain that this is the workflow management tool that is used.
-
 Data processing in oemof-flexmex is divided in 4 main steps:
 
 * preprocessing
@@ -13,7 +11,8 @@ Data processing in oemof-flexmex is divided in 4 main steps:
 * optimization
 * postprocessing
 
-TODO: Each of these steps is represented by a snakemake rule, which runs the script with the same name.
+The workflow is managed using the workflow management tool `snakemake <https://snakemake.github.io/>`_.
+Each of the 4 steps is represented by a snakemake rule in the Snakefile, which runs the script of the same name.
 
 The data each step is provided with is held in different forms:
 
