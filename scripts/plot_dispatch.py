@@ -12,10 +12,10 @@ from addict import Dict
 
 def sum_demands(data, bus_name, demand_name):
     d_demand = pd.DataFrame()
-    for i in data.columns:
-        if demand_name in i[1]:
-            d_demand[i] = data[i]
-            data.drop(columns=[i], inplace=True)
+    for col in data.columns:
+        if demand_name in col[1]:
+            d_demand[col] = data[col]
+            data.drop(columns=[col], inplace=True)
     total_demand = d_demand.sum(axis=1)
     data[(bus_name, bus_name + "-demand", "flow")] = total_demand
     return data
