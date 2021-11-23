@@ -93,7 +93,7 @@ if __name__ == "__main__":
     if not os.path.exists(paths.plotted):
         os.makedirs(paths.plotted)
 
-    timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries")
+    timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries", "bus")
     timeseries_files = os.listdir(timeseries_directory)
 
     # select timeframe
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     OUTPUT_FILE_TYPES = [".html", ".png"]
 
     # Factor to convert implicit units of results (MW) to SI unit (W)
-    CONV_NUMBER = 1000
+    CONV_NUMBER = 1000000
 
     # "bev-internal_bus" is explicitly excluded because it would otherwise be
     # co-selected by the carrier "electricity"
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         if carrier in file and region in file
         if "bev-internal_bus" not in file
     ]
-
+    print(selected_timeseries_files)
     for bus_file in selected_timeseries_files:
 
         bus_name = os.path.splitext(bus_file)[0]
