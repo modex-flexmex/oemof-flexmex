@@ -93,7 +93,9 @@ if __name__ == "__main__":
     if not os.path.exists(paths.plotted):
         os.makedirs(paths.plotted)
 
-    timeseries_directory = os.path.join(paths.postprocessed, "oemoflex-timeseries", "bus")
+    timeseries_directory = os.path.join(
+        paths.postprocessed, "oemoflex-timeseries", "bus"
+    )
     timeseries_files = os.listdir(timeseries_directory)
 
     # select timeframe
@@ -122,7 +124,7 @@ if __name__ == "__main__":
         if carrier in file and region in file
         if "bev-internal_bus" not in file
     ]
-    print(selected_timeseries_files)
+
     for bus_file in selected_timeseries_files:
 
         bus_name = os.path.splitext(bus_file)[0]
