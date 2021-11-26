@@ -21,10 +21,7 @@ if __name__ == "__main__":
     objects_2_2 = ["heat", "stor_heat"]
     combinations = list(itertools.product(scenarios, regions, objects_all))
     combinations.extend(list(itertools.product([scenarios[1]], regions, objects_2_2)))
-
-    # (delete later on)
-    for (scenario, region, object) in combinations:
-        print("This combination is " + scenario, object + " in " + region)
+    print(combinations)
 
     # create directory if it does not exist yet.
     if not os.path.exists(paths.results_joined_plotted):
@@ -41,6 +38,12 @@ if __name__ == "__main__":
 
     result_scalars.rename(columns={"UseCase": "Scenario"}, inplace=True)
 
+
+    for (scenario, region, object) in combinations:
+        df_in = result_scalars[result_scalars.loc[:, "Scenario"].str.contains(scenario)]
+        df_plot, demand = prepare.prepare(df_in, scenario, region, object, df_demand)
+    region = "DE" # remove later
+
     for scenario in scenarios:
         df_in = result_scalars[result_scalars.loc[:, "Scenario"].str.contains(scenario)]
 
@@ -48,35 +51,35 @@ if __name__ == "__main__":
             (
                 df_plot_conversion_electricity_FlexMex2_1,
                 electricity_demand_FlexMex2_1,
-            ) = prepare.conversion_electricity_FlexMex2_1(df_in, df_demand)
+            ) = prepare.conversion_electricity_FlexMex2_1(df_in, df_demand, region)
 
             df_plot_storage_electricity_FlexMex2_1 = prepare.electricity_storage_FlexMex2_1(
-                df_in
+                df_in, region
             )
 
 
-            df_plot_costs_FlexMex2_1 = prepare.costs_FlexMex2_1(df_in)
+            df_plot_costs_FlexMex2_1 = prepare.costs_FlexMex2_1(df_in, region)
 
 
         elif scenario == "FlexMex2_2":
             (
                 df_plot_conversion_electricity_FlexMex2_2,
                 electricity_demand_FlexMex2_2,
-            ) = prepare.conversion_electricity_FlexMex2_2(df_in, df_demand)
+            ) = prepare.conversion_electricity_FlexMex2_2(df_in, df_demand, region)
 
             df_plot_conversion_heat, heat_demand = prepare.conversion_heat_FlexMex2_2(
-                df_in, df_demand
+                df_in, df_demand, region
             )
 
             df_plot_storage_electricity_FlexMex2_2 = prepare.electricity_storage_FlexMex2_2(
-                df_in
+                df_in, region
             )
 
             df_plot_storage_heat = prepare.heat_storage_FlexMex2_2(
-             df_in
+             df_in, region
             )
 
-            df_plot_costs_FlexMex2_2 = prepare.costs_FlexMex2_2(df_in)
+            df_plot_costs_FlexMex2_2 = prepare.costs_FlexMex2_2(df_in, region)
 
     df_plot_conversion_electricity_FlexMex2_1.to_csv(os.path.join(os.path.dirname(__file__),
                                                                '../results/FlexMex2_plotted/conv_elec_2_1.csv'))
