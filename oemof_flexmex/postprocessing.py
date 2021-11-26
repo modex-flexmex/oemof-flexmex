@@ -875,7 +875,7 @@ def get_invest_cost(oemoflex_scalars, prep_elements, scalars_raw):
     for prep_el in prep_elements.values():
         # In the following line: Not 'is'! pandas overloads operators!
         if (
-            "expandable" in prep_el.columns and prep_el["expandable"][0] == True
+            "expandable" in prep_el.columns and prep_el["expandable"][0] == True # noqa: E712
         ):  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
@@ -964,7 +964,7 @@ def get_fixom_cost(oemoflex_scalars, prep_elements, scalars_raw):
     for prep_el in prep_elements.values():
         # not 'is'! pandas overloads operators!
         if (
-            "expandable" in prep_el.columns and prep_el["expandable"][0] == True
+            "expandable" in prep_el.columns and prep_el["expandable"][0] == True # noqa: E712
         ):  # noqa: E712, E501 # pylint: disable=C0121
             # element is expandable --> 'invest' values exist
             df = prep_el[basic_columns]
