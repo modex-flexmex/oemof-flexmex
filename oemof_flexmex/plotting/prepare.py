@@ -114,7 +114,8 @@ def generate_labels(df_plot, labels_dict):
     Parameters
     -------------
     df_plot: pandas.DataFrame
-        dataframe to be plotted; column names are the technologies and row names either scenarios or regions.
+        dataframe to be plotted;
+        column names are the technologies and row names either scenarios or regions.
     labels_dict: pandas.Dictionary (not completely sure about that yet)
         dictionary from stacked_plot_labels.yaml
     Returns

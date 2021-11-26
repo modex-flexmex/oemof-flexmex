@@ -37,7 +37,8 @@ if __name__ == "__main__":
 
     result_scalars = pd.read_csv(paths.results_joined)
 
-    # Retrieve the demand; demand for FlexMex2_1 can also be retrieved from the scalars of FlexMex2_2.
+    # Retrieve the demand; demand for FlexMex2_1 can also be
+    # retrieved from the scalars of FlexMex2_2.
     demand_file = os.path.join(
         os.path.dirname(__file__),
         "../data/In/v0.09/FlexMex2_Scalars_2a.csv",
