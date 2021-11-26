@@ -44,24 +44,27 @@ def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
     if df_plot.columns.str.contains('Transmission_Outgoing').any():
         new_df = df_plot.drop('Transmission_Outgoing', axis = 1)
         labels = generate_labels(new_df, labels_dict)
-        new_df.plot(kind='bar', stacked=True, bottom = df_plot.loc[:, 'Transmission_Outgoing'], color=colors_odict)
+        ax = new_df.plot(kind='bar', stacked=True, bottom = df_plot.loc[:, 'Transmission_Outgoing'], color=colors_odict)
     else:
         labels = generate_labels(df_plot, labels_dict)
-        df_plot.plot(kind='bar', stacked=True, color=colors_odict)
+        ax = df_plot.plot(kind='bar', stacked=True, color=colors_odict)
 
     #df_plot = df_plot.drop('Transmission_Outgoing', axis = 1)
 
     if demand > 0:
         # convert from GWh to TWh
         demand = demand/1000
-        plt.hlines(demand, plt.xlim()[0], plt.xlim()[1])#, label='Demand')
+        ax.hlines(demand, plt.xlim()[0], plt.xlim()[1])#, label='Demand')
         labels.insert(0, 'Demand')
         print(demand)
-    plt.axhline(0, color='black', label='_nolegend_')
+    ax.axhline(0, color='black', label='_nolegend_')
     #labels.insert(1, None)
-    plt.title(title)
+    ax.set_title(title)
 
     plt.xlabel(xlabel, fontsize = 12)
     plt.ylabel(ylabel, fontsize = 12)
     plt.legend(labels, bbox_to_anchor=(1,1), loc="upper left")
-    plt.savefig(os.path.join(os.path.dirname(__file__), '../../results/FlexMex2_plotted/' + title), bbox_inches='tight')
+
+    fig = ax.get_figure()
+
+    return fig

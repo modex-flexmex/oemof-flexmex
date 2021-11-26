@@ -2,6 +2,7 @@ import sys
 import os
 
 import pandas as pd
+import matplotlib.pyplot as plt
 from addict import Dict
 
 import oemof_flexmex.plotting.draw as draw
@@ -22,6 +23,9 @@ if __name__ == "__main__":
     combinations = list(itertools.product(scenarios, regions, objects_all))
     combinations.extend(list(itertools.product([scenarios[1]], regions, objects_2_2)))
 
+    # (delete later on)
+    for (scenario, region, object) in combinations:
+        print("This combination is " + scenario, object + " in " + region)
 
     # create directory if it does not exist yet.
     if not os.path.exists(paths.results_joined_plotted):
@@ -77,13 +81,15 @@ if __name__ == "__main__":
 
     df_plot_conversion_electricity_FlexMex2_1.to_csv(os.path.join(os.path.dirname(__file__),
                                                                '../results/FlexMex2_plotted/conv_elec_2_1.csv'))
-    draw.stacked_scalars(
+    fig = draw.stacked_scalars(
         df_plot_conversion_electricity_FlexMex2_1,
         electricity_demand_FlexMex2_1,
         "Electricity flows in FlexMex2_1",
         "Electricity in TWh",
         "Scenario",
     )
+    plt.savefig(os.path.join(os.path.dirname(__file__), '../results/FlexMex2_plotted/Electricity flows in FlexMex2_1'), bbox_inches='tight')
+
     df_plot_conversion_electricity_FlexMex2_2.to_csv(os.path.join(os.path.dirname(__file__),
                                                                '../results/FlexMex2_plotted/conv_elec_2_2.csv'))
     draw.stacked_scalars(
