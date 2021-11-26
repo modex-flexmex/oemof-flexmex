@@ -22,7 +22,7 @@ for i in colors_csv.columns:
     colors_odict[i] = colors_csv.loc["Color", i]
 
 
-def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
+def stacked_scalars(df_plot, demand, ylabel, xlabel):
     r"""
     Plots stacked scalars.
 
@@ -59,7 +59,6 @@ def stacked_scalars(df_plot, demand, title, ylabel, xlabel):
         print(demand)
     ax.axhline(0, color='black', label='_nolegend_')
     #labels.insert(1, None)
-    ax.set_title(title)
 
     plt.xlabel(xlabel, fontsize = 12)
     plt.ylabel(ylabel, fontsize = 12)
