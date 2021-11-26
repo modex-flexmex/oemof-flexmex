@@ -40,13 +40,16 @@ def prepare(plot_data, scenario, region, object, df_demand=False):
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
     parameters = [*parameters[object + "_" + scenario]]
+    import pdb
+    pdb.set_trace()
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
+    # TODO: Here the table should be sorted according to the order in the parameters.yaml file.
     if object == "elec":
         for step in ["a", "b", "c", "d"]:
             plot_data = sum_transmissions(plot_data, scenario + step, region)
     plot_data = pd.crosstab(index=plot_data["Scenario"], columns=plot_data.Parameter,
                                                  values=plot_data.Value / 1000, aggfunc='mean')
-    if object == "cost":
+    if object == "costs":
         plot_data = plot_data / 1000  # conversion from 1000 Euro to mio. Euro
     if df_demand is not False:  # This doesn't work.
         if scenario == "FlexMex2_1" and object == "elec":
