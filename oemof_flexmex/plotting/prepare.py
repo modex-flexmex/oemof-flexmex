@@ -41,8 +41,9 @@ def prepare(plot_data, scenario, region, object, df_demand=False):
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
     parameters = [*parameters[object + "_" + scenario]]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
-    for step in ["a", "b", "c", "d"]:
-        plot_data = sum_transmissions(plot_data, scenario + step, region)
+    if object == "elec":
+        for step in ["a", "b", "c", "d"]:
+            plot_data = sum_transmissions(plot_data, scenario + step, region)
     plot_data = pd.crosstab(index=plot_data["Scenario"], columns=plot_data.Parameter,
                                                  values=plot_data.Value / 1000, aggfunc='mean')
     if object == "cost":
