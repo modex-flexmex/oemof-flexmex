@@ -41,9 +41,23 @@ def prepare(plot_data, scenario, region, object, df_demand=False):
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
     parameters = [*parameters[object + "_" + scenario]]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
-    demand = 0
-    df_plot = plot_data
-    return df_plot, demand
+    for step in ["a", "b", "c", "d"]:
+        plot_data = sum_transmissions(plot_data, scenario + step, region)
+    if df_demand is not False:  # This doesn't work.
+        if scenario == "FlexMex2_1" and object == "elec":
+            demand_list = ["Energy_FinalEnergy_Electricity"]
+        elif scenario == "FlexMex2_2" and object == "elec":
+            demand_list = ["Energy_FinalEnergy_Electricity", 'Energy_FinalEnergy_Electricity_H2', 'Transport_AnnualDemand_Electricity_Cars']
+        elif scenario == "FlexMex2_2" and object == "heat":
+            demand_list = ['Energy_FinalEnergy_Heat_CHP', 'Energy_FinalEnergy_Heat_HeatPump']
+        else:
+            demand_list = []
+            #  print ("This scenario and / or object is not yet implemented in the scalar plotting function.")
+        demand = 0
+        for parameter in demand_list:
+            demand = demand + df_demand[(df_demand.loc[:, 'Parameter'] == parameter) & (df_demand.loc[:, 'Region'] == region)].loc[:, 'Value'].iloc[0]
+    print(demand)
+    return plot_data, demand
 
 def conversion_electricity_FlexMex2_1(plot_data, df_demand, region):
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
@@ -52,7 +66,7 @@ def conversion_electricity_FlexMex2_1(plot_data, df_demand, region):
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     # sum all outgoing and all ingoing transmissions for each scenario
     for scenario in ('FlexMex2_1a', 'FlexMex2_1b', 'FlexMex2_1c', 'FlexMex2_1d'):
-        plot_data = sum_transmissions(plot_data, scenario, region) #choose region here
+        plot_data = sum_transmissions(plot_data, scenario, region)
         demand = df_demand[(df_demand.loc[:, 'Parameter'] == 'Energy_FinalEnergy_Electricity') &
                                (df_demand.loc[:, 'Region'] == region)].loc[:, 'Value'].iloc[0]
 
