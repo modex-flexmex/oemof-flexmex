@@ -50,18 +50,6 @@ if __name__ == "__main__":
     for (scenario, region, object) in combinations:
         df_in = result_scalars[result_scalars.loc[:, "Scenario"].str.contains(scenario)]
         df_plot, demand = prepare.prepare(df_in, scenario, region, object, df_demand)
-        df_plot.to_csv(
-            os.path.join(
-                os.path.dirname(__file__),
-                "../results/FlexMex2_plotted/"
-                + scenario
-                + "_"
-                + object
-                + "_"
-                + region
-                + ".csv",
-            )
-        )
         fig = draw.stacked_scalars(df_plot, demand, "Scenario", ylabel_dict[object])
         plt.savefig(
             os.path.join(

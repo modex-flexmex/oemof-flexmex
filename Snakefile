@@ -174,7 +174,7 @@ rule plot_joined_scalars:
     message:
         "Plot joined scalars."
     wildcard_constraints:
-        experiment="(FlexMex1|FlexMex2)"
+        experiment="(FlexMex2)"
     input:
         script="scripts/plot_joined_scalars.py",  # re-run if updated
         scalars=os.path.join(results_joined_dir, "Scalars.csv")
