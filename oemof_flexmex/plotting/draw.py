@@ -56,7 +56,6 @@ def stacked_scalars(df_plot, demand, xlabel, ylabel):
         demand = demand/1000
         ax.hlines(demand, plt.xlim()[0], plt.xlim()[1])#, label='Demand')
         labels.insert(0, 'Demand')
-        print(demand)
     ax.axhline(0, color='black', label='_nolegend_')
     #labels.insert(1, None)
 
