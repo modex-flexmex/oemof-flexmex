@@ -43,6 +43,10 @@ def prepare(plot_data, scenario, region, object, df_demand=False):
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     for step in ["a", "b", "c", "d"]:
         plot_data = sum_transmissions(plot_data, scenario + step, region)
+    plot_data = pd.crosstab(index=plot_data["Scenario"], columns=plot_data.Parameter,
+                                                 values=plot_data.Value / 1000, aggfunc='mean')
+    if object == "cost":
+        plot_data = plot_data / 1000  # conversion from 1000 Euro to mio. Euro
     if df_demand is not False:  # This doesn't work.
         if scenario == "FlexMex2_1" and object == "elec":
             demand_list = ["Energy_FinalEnergy_Electricity"]

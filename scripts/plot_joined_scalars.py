@@ -23,6 +23,12 @@ if __name__ == "__main__":
     combinations.extend(list(itertools.product([scenarios[1]], regions, objects_2_2)))
     print(combinations)
 
+    ylabel_dict = {"elec" : "Electricity in TWh",
+                   "stor_elec" : "Storage in TWh",
+                   "costs" : "Costs in mio Euro",
+                   "heat" : "Heat in TWh",
+                   "stor_heat" : "Storage in TWh"}
+
     # create directory if it does not exist yet.
     if not os.path.exists(paths.results_joined_plotted):
         os.makedirs(paths.results_joined_plotted)
@@ -42,6 +48,11 @@ if __name__ == "__main__":
     for (scenario, region, object) in combinations:
         df_in = result_scalars[result_scalars.loc[:, "Scenario"].str.contains(scenario)]
         df_plot, demand = prepare.prepare(df_in, scenario, region, object, df_demand)
+        df_plot.to_csv(os.path.join(os.path.dirname(__file__), '../results/FlexMex2_plotted/new_'+object+scenario+region+'.csv'))
+        fig = draw.stacked_scalars(df_plot, demand, "Scenario", ylabel_dict[object])
+        plt.savefig(
+            os.path.join(os.path.dirname(__file__), '../results/FlexMex2_plotted/' + scenario + region + object),
+            bbox_inches='tight')
     region = "DE" # remove later
 
     for scenario in scenarios:
