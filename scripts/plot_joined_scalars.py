@@ -6,6 +6,7 @@ from addict import Dict
 
 import oemof_flexmex.plotting.draw as draw
 import oemof_flexmex.plotting.prepare as prepare
+import itertools
 
 if __name__ == "__main__":
     # get paths of input data and where to save plots.
@@ -15,6 +16,12 @@ if __name__ == "__main__":
 
     scenarios = ["FlexMex2_1", "FlexMex2_2"]
     onxaxes = 'Scenario'  # either Region or Scenario
+    regions = ["DE", "PL"]
+    objects_all = ["elec", "stor_elec", "costs"]
+    objects_2_2 = ["heat", "stor_heat"]
+    combinations = list(itertools.product(scenarios, regions, objects_all))
+    combinations.extend(list(itertools.product([scenarios[1]], regions, objects_2_2)))
+
 
     # create directory if it does not exist yet.
     if not os.path.exists(paths.results_joined_plotted):
