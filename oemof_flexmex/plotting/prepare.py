@@ -39,7 +39,8 @@ def prepare(plot_data, scenario, region, object, df_demand=False):
     print("Preparing data for " + object + " in " + region + " for " + scenario)
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
-    parameters = [*parameters['conversion_electricity_FlexMex2_1']]
+    parameters = [*parameters[object + "_" + scenario]]
+    plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     demand = 0
     df_plot = plot_data
     return df_plot, demand
@@ -47,7 +48,7 @@ def prepare(plot_data, scenario, region, object, df_demand=False):
 def conversion_electricity_FlexMex2_1(plot_data, df_demand, region):
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
-    parameters = [*parameters['conversion_electricity_FlexMex2_1']]
+    parameters = [*parameters['elec_FlexMex2_1']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     # sum all outgoing and all ingoing transmissions for each scenario
     for scenario in ('FlexMex2_1a', 'FlexMex2_1b', 'FlexMex2_1c', 'FlexMex2_1d'):
@@ -72,7 +73,7 @@ def conversion_electricity_FlexMex2_1(plot_data, df_demand, region):
 def conversion_electricity_FlexMex2_2(plot_data, df_demand, region):
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
-    parameters = [*parameters['conversion_electricity_FlexMex2_2']]
+    parameters = [*parameters['elec_FlexMex2_2']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     # sum all outgoing and all ingoing transmissions for each scenario
     for scenario in ('FlexMex2_2a', 'FlexMex2_2b', 'FlexMex2_2c', 'FlexMex2_2d'):
@@ -96,7 +97,7 @@ def conversion_electricity_FlexMex2_2(plot_data, df_demand, region):
 def conversion_heat_FlexMex2_2(plot_data, df_demand, region):
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
-    parameters = [*parameters['conversion_heat_FlexMex2_2']]
+    parameters = [*parameters['heat_FlexMex2_2']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     # sum all outgoing and all ingoing transmissions for each scenario
 
@@ -114,7 +115,7 @@ def conversion_heat_FlexMex2_2(plot_data, df_demand, region):
 def electricity_storage_FlexMex2_1(plot_data, region):
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
-    parameters = [*parameters['electricity_storage_FlexMex2_1']]
+    parameters = [*parameters['stor_elec_FlexMex2_1']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     df_plot_storage_electricity_FlexMex2_1 = pd.crosstab(index=plot_data["Scenario"], columns=plot_data.Parameter,
                                           values=plot_data.Value / 1000, aggfunc='mean')
@@ -123,7 +124,7 @@ def electricity_storage_FlexMex2_1(plot_data, region):
 def electricity_storage_FlexMex2_2(plot_data, region):
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
-    parameters = [*parameters['electricity_storage_FlexMex2_2']]
+    parameters = [*parameters['stor_elec_FlexMex2_2']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     df_plot_storage_electricity_FlexMex2_2 = pd.crosstab(index=plot_data["Scenario"], columns=plot_data.Parameter,
                                           values=plot_data.Value / 1000, aggfunc='mean')
@@ -132,7 +133,7 @@ def electricity_storage_FlexMex2_2(plot_data, region):
 def heat_storage_FlexMex2_2(plot_data, region):
     plot_data = plot_data.loc[plot_data['Region'].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
-    parameters = [*parameters['heat_storage_FlexMex2_2']]
+    parameters = [*parameters['stor_heat_FlexMex2_2']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]
     df_plot_storage_heat = pd.crosstab(index=plot_data["Scenario"], columns=plot_data.Parameter,
                                   values=plot_data.Value / 1000, aggfunc='mean')

@@ -1,11 +1,11 @@
-conversion_electricity_FlexMex2_1:
+elec_FlexMex2_1:
   EnergyConversion_SecondaryEnergy_Electricity_CH4_GT:
   EnergyConversion_SecondaryEnergy_Electricity_RE:
   EnergyConversion_SecondaryEnergy_Electricity_Slack:
   Transmission_Flows_Electricity_Grid:
   EnergyConversion_Curtailment_Electricity_RE:
 
-conversion_electricity_FlexMex2_2:
+elec_FlexMex2_2:
  EnergyConversion_SecondaryEnergy_Electricity_CH4_GT:
  EnergyConversion_SecondaryEnergy_Electricity_ElectricityHeat_CH4_ExCCGT:
  EnergyConversion_SecondaryEnergy_Electricity_RE:
@@ -15,7 +15,7 @@ conversion_electricity_FlexMex2_2:
  EnergyConversion_Curtailment_Electricity_RE:
  Transmission_Flows_Electricity_Grid:
 
-conversion_heat_FlexMex2_2:
+heat_FlexMex2_2:
   EnergyConversion_SecondaryEnergy_Heat_Electricity_Large:
   EnergyConversion_SecondaryEnergy_Heat_ElectricityHeat_CH4_ExCCGT:
   EnergyConversion_SecondaryEnergy_Heat_ElectricityHeat_Large:
@@ -23,11 +23,11 @@ conversion_heat_FlexMex2_2:
   EnergyConversion_SecondaryEnergy_Heat_Gas_Large:
   EnergyConversion_SecondaryEnergy_Heat_Slack:
 
-electricity_storage_FlexMex2_1:
+stor_elec_FlexMex2_1:
  Storage_Losses_Electricity_LiIonBatteryStorage:
  Storage_Output_Electricity_LiIonBatteryStorage:
 
-electricity_storage_FlexMex2_2:
+stor_elec_FlexMex2_2:
   Storage_Losses_Electricity_LiIonBatteryStorage:
   Storage_Losses_H2_H2CavernStorage:
   Storage_Losses_H2_H2TankStorage:
@@ -37,7 +37,7 @@ electricity_storage_FlexMex2_2:
   Transport_FeedIn_DrivePower_Electricity: #? TODO
   Transport_Shifting_DrivePower_Electricity:
 
-heat_storage_FlexMex2_2:
+stor_heat_FlexMex2_2:
   Storage_Losses_Heat_LargeStorage:
   Storage_Losses_Heat_SmallStorage:
   Storage_Output_Heat_LargeStorage:
