@@ -16,7 +16,6 @@ if __name__ == "__main__":
     paths.results_joined_plotted = sys.argv[2]
 
     scenarios = ["FlexMex2_1", "FlexMex2_2"]
-    onxaxes = 'Scenario'  # either Region or Scenario
     regions = ["DE", "PL"]
     objects_all = ["elec", "stor_elec", "costs"]
     objects_2_2 = ["heat", "stor_heat"]
@@ -49,35 +48,35 @@ if __name__ == "__main__":
             (
                 df_plot_conversion_electricity_FlexMex2_1,
                 electricity_demand_FlexMex2_1,
-            ) = prepare.conversion_electricity_FlexMex2_1(df_in, df_demand, onxaxes)
+            ) = prepare.conversion_electricity_FlexMex2_1(df_in, df_demand)
 
             df_plot_storage_electricity_FlexMex2_1 = prepare.electricity_storage_FlexMex2_1(
-                df_in, onxaxes
+                df_in
             )
 
 
-            df_plot_costs_FlexMex2_1 = prepare.costs_FlexMex2_1(df_in, onxaxes)
+            df_plot_costs_FlexMex2_1 = prepare.costs_FlexMex2_1(df_in)
 
 
         elif scenario == "FlexMex2_2":
             (
                 df_plot_conversion_electricity_FlexMex2_2,
                 electricity_demand_FlexMex2_2,
-            ) = prepare.conversion_electricity_FlexMex2_2(df_in, df_demand, onxaxes)
+            ) = prepare.conversion_electricity_FlexMex2_2(df_in, df_demand)
 
             df_plot_conversion_heat, heat_demand = prepare.conversion_heat_FlexMex2_2(
-                df_in, df_demand, onxaxes
+                df_in, df_demand
             )
 
             df_plot_storage_electricity_FlexMex2_2 = prepare.electricity_storage_FlexMex2_2(
-                df_in, onxaxes
+                df_in
             )
 
             df_plot_storage_heat = prepare.heat_storage_FlexMex2_2(
-             df_in, onxaxes
+             df_in
             )
 
-            df_plot_costs_FlexMex2_2 = prepare.costs_FlexMex2_2(df_in, onxaxes)
+            df_plot_costs_FlexMex2_2 = prepare.costs_FlexMex2_2(df_in)
 
     df_plot_conversion_electricity_FlexMex2_1.to_csv(os.path.join(os.path.dirname(__file__),
                                                                '../results/FlexMex2_plotted/conv_elec_2_1.csv'))
