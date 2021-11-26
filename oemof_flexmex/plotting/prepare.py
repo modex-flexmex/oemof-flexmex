@@ -50,7 +50,6 @@ def sum_transmissions(plot_data, scenario,  region):
 
 def conversion_electricity_FlexMex2_1(plot_data, df_demand, onxaxes):
     plot_data = onxaxes_preparation(plot_data, onxaxes, 'FlexMex2_1c')
-    plot_data.to_csv('2021-07-03_plot_data.csv')
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
     parameters = [*parameters['conversion_electricity_FlexMex2_1']]
     plot_data = plot_data.loc[plot_data['Parameter'].isin(parameters)]

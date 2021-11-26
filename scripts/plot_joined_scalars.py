@@ -20,21 +20,19 @@ if __name__ == "__main__":
     if not os.path.exists(paths.results_joined_plotted):
         os.makedirs(paths.results_joined_plotted)
 
-    scalars = pd.read_csv(paths.results_joined)
+    result_scalars = pd.read_csv(paths.results_joined)
 
-    # Retrieve the demand; demand is the same in all scenarios.
-    # TODO: This is true for demand, but is it also for the other values imported from this scalars file?
+    # Retrieve the demand; demand for FlexMex2_1 can also be retrieved from the scalars of FlexMex2_2.
     demand_file = os.path.join(
         os.path.dirname(__file__),
         "../data/In/v0.09/FlexMex2_Scalars_2a.csv",
     )
-
     df_demand = pd.read_csv(demand_file)
 
-    scalars.rename(columns={"UseCase": "Scenario"}, inplace=True)
+    result_scalars.rename(columns={"UseCase": "Scenario"}, inplace=True)
 
     for scenario in scenarios:
-        df_in = scalars[scalars.loc[:, "Scenario"].str.contains(scenario)]
+        df_in = result_scalars[result_scalars.loc[:, "Scenario"].str.contains(scenario)]
 
         if scenario == "FlexMex2_1":
             (
