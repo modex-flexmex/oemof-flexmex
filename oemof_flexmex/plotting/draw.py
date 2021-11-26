@@ -1,11 +1,6 @@
 import os
-import pdb
-
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import numpy as np
-from matplotlib.ticker import EngFormatter
 from collections import OrderedDict
 from oemoflex.tools.helpers import load_yaml
 from oemof_flexmex.plotting.prepare import generate_labels
