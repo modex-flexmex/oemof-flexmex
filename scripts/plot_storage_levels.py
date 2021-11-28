@@ -8,26 +8,8 @@ from collections import OrderedDict
 import oemoflex.tools.plots as plots
 import oemoflex.tools.helpers as helpers
 
-# from oemof_flexmex.model_config import colors_odict
-# from oemof_flexmex.model_config.user_definitions.py import timeframe, region # This results in a ModuleNotFoundError
-
-dir_name = os.path.abspath(os.path.dirname(__file__))
-labels_dict = helpers.load_yaml(
-    os.path.join(dir_name, "../oemof_flexmex/model_config/plot_labels.yml")
-)
-
-# The following part on colors is mainly copied from oemoflex/tools/plots.py. In the disptach plots script,
-# the colors_odict is simply being imported, but I don't understand how that works.
-colors_csv = pd.read_csv(
-    os.path.join(dir_name, "../oemof_flexmex/model_config/plot_colors.csv"),
-    header=[0],
-    index_col=[0],
-)
-colors_csv = colors_csv.T
-colors_odict = OrderedDict()
-for i in colors_csv.columns:
-    colors_odict[i] = colors_csv.loc["Color", i]
-
+from oemof_flexmex.model_config import plot_labels, colors_odict
+from oemof_flexmex.model_config.user_definitions import timeframe, regions
 
 def plot_on_axes(ax, df, colors_odict=colors_odict):
     for i in df.columns:
@@ -96,12 +78,6 @@ if __name__ == "__main__":
         storage_level_data, header=[0, 1, 2], parse_dates=[0], index_col=[0]
     )
 
-    # TODO: import this from user_definitions.py on top of this script
-    timeframe = [
-        ("2019-01-01 00:00:00", "2019-01-31 23:00:00"),
-        ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
-    ]
-    regions = ["DE", "PL"]
 
     for timeframe, region in itertools.product(timeframe, regions):
         df = pd.DataFrame()
@@ -131,7 +107,7 @@ if __name__ == "__main__":
         # rename columns into short, understandable labels
         for k, df in df_dict.items():
             df.columns = plots._rename_by_string_matching(
-                columns=df.columns, labels_dict=labels_dict
+                columns=df.columns, labels_dict=plot_labels
             )
 
             # slice selected timeframes
