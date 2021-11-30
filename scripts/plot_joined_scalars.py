@@ -15,15 +15,14 @@ if __name__ == "__main__":
     paths.results_joined = sys.argv[1]
     paths.results_joined_plotted = sys.argv[2]
 
-    scenarios = ["FlexMex2_1", "FlexMex2_2"]
-    regions = ["DE"]
-    objects_all = ["elec", "stor_elec", "costs"]
-    objects_2_2 = ["heat", "stor_heat"]
-    combinations = list(itertools.product(scenarios, regions, objects_all))
-    combinations.extend(list(itertools.product([scenarios[1]], regions, objects_2_2)))
-    print(combinations)
+    SCENARIOS = ["FlexMex2_1", "FlexMex2_2"]
+    REGIONS = ["DE"]
+    OBJECTS_ALL = ["elec", "stor_elec", "costs"]
+    OBJECTS_2_2 = ["heat", "stor_heat"]
+    combinations = list(itertools.product(SCENARIOS, REGIONS, OBJECTS_ALL))
+    combinations.extend(list(itertools.product([SCENARIOS[1]], REGIONS, OBJECTS_2_2)))
 
-    ylabel_dict = {
+    ylabel_dict = {  # These are the ylabels for the plots.
         "elec": "Electricity in TWh",
         "stor_elec": "Storage in TWh",
         "costs": "Costs in mio Euro",
@@ -37,7 +36,7 @@ if __name__ == "__main__":
 
     result_scalars = pd.read_csv(paths.results_joined)
 
-    # Retrieve the demand; demand for FlexMex2_1 can also be
+    # Load the demand file; demand for FlexMex2_1 can also be
     # retrieved from the scalars of FlexMex2_2.
     demand_file = os.path.join(
         os.path.dirname(__file__),
@@ -48,8 +47,11 @@ if __name__ == "__main__":
     result_scalars.rename(columns={"UseCase": "Scenario"}, inplace=True)
 
     for (scenario, region, object) in combinations:
+        # filter the scenario
         df_in = result_scalars[result_scalars.loc[:, "Scenario"].str.contains(scenario)]
+        # transform data into dataframes that only contain the numbers and labels to be plotted
         df_plot, demand = prepare.prepare(df_in, scenario, region, object, df_demand)
+        # plot the figures
         fig = draw.stacked_scalars(df_plot, demand, "Scenario", ylabel_dict[object])
         plt.savefig(
             os.path.join(

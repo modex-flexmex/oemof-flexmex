@@ -7,6 +7,23 @@ parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
 
 
 def sum_transmissions(plot_data, scenario, region):
+    r"""
+    Sums imports and exports of electricity by copying all relevant rows from the Dataframe,
+    adding the values together and then replacing the rows by their sum in the original Dataframe.
+
+    Parameters
+    -------------
+    plot_data: pandas.Dataframe
+    scenario: str
+    one single scenario, e.g. "FlexMex2_2b"
+    region: str
+    one single region, e.g. "DE"
+
+    Returns
+    ------------
+    plot_data: pandas.Dataframe
+    the input dataframe with summed transmission
+    """
     df_total_outgoing = plot_data[
         (plot_data.loc[:, "Parameter"] == "Transmission_Flows_Electricity_Grid")
         & (plot_data.loc[:, "Scenario"] == scenario)
@@ -46,8 +63,18 @@ def sum_transmissions(plot_data, scenario, region):
 
 
 def make_losses_negative(plot_data):
-    # TODO: This is very bad style. Generally, one shouldn't iterate over rows. -> improve
-    for i in range(len(plot_data)):
+    r"""
+    Searches for rows that report losses in the Dataframe and makes their values negative.
+
+    Parameters
+    -------------
+    plot_data: pandas.Dataframe
+
+    Returns
+    -------------
+    plot_data: pandas.Dataframe
+    """
+    for i in range(len(plot_data)): # TODO: This is very bad style. Generally, one shouldn't iterate over rows. -> improve
         if "Losses" in plot_data.loc[:, "Parameter"].iloc[i]:
             plot_data.iloc[i, plot_data.columns.get_loc("Value")] = (
                 plot_data.iloc[i, plot_data.columns.get_loc("Value")] * -1
@@ -56,6 +83,28 @@ def make_losses_negative(plot_data):
 
 
 def prepare(plot_data, scenario, region, object, df_demand=False):
+    r"""
+    Transforms the input dataframe into a dataframe that has the expansion steps as rows and the parameters as
+    columns. Furthermore, it extracts the relevant demands from the demand file, depending on the scenario.
+
+    Parameters
+    -------------------
+    plot_data: pandas.Dataframe
+    scenario: str
+    a scenario that has four expansion steps, e.g. "FlexMex2"
+    region: str
+    object: str
+    item that shall be plotted
+    df_demand: pandas.Dataframe
+    a dataframe that includes the demands
+
+    Returns
+    ----------------
+    plot_data: pandas.Dataframe
+    easily readable and plottable dataframe that contains only the information that shall be plotted
+    demand: str
+    sum of the demand for the object
+    """
     print("Preparing data for " + object + " in " + region + " for " + scenario)
     plot_data = plot_data.loc[plot_data["Region"].str.contains(region), :]
     parameters = load_yaml(os.path.join(dir_name, "parameters.yaml"))
@@ -103,7 +152,6 @@ def prepare(plot_data, scenario, region, object, df_demand=False):
                 .loc[:, "Value"]
                 .iloc[0]
             )
-    print(demand)
     return plot_data, demand
 
 
