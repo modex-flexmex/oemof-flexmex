@@ -74,7 +74,9 @@ def make_losses_negative(plot_data):
     -------------
     plot_data: pandas.Dataframe
     """
-    for i in range(len(plot_data)): # TODO: This is very bad style. Generally, one shouldn't iterate over rows. -> improve
+    for i in range(
+        len(plot_data)
+    ):  # TODO: This is very bad style. Generally, one shouldn't iterate over rows. -> improve
         if "Losses" in plot_data.loc[:, "Parameter"].iloc[i]:
             plot_data.iloc[i, plot_data.columns.get_loc("Value")] = (
                 plot_data.iloc[i, plot_data.columns.get_loc("Value")] * -1
