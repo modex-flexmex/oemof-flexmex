@@ -9,7 +9,7 @@ import oemoflex.tools.plots as plots
 import oemoflex.tools.helpers as helpers
 
 from oemof_flexmex.model_config import plot_labels, colors_odict
-from oemof_flexmex.model_config.user_definitions import timeframe, regions
+from oemof_flexmex.model_config.user_definitions import TIMEFRAME, REGIONS
 
 def plot_on_axes(ax, df, colors_odict=colors_odict):
     for i in df.columns:
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     )
 
 
-    for timeframe, region in itertools.product(timeframe, regions):
+    for timeframe, region in itertools.product(TIMEFRAME, REGIONS):
         df = pd.DataFrame()
         for column in capacities.columns:
             if region in column[0]:
