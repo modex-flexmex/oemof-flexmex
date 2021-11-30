@@ -24,6 +24,14 @@ def plot_on_axes(ax, df, colors_odict=colors_odict):
             color=colors_odict[i],
         )
 
+def get_storage_type(column):
+    if "heat" in column[0]:
+        return "df_heat"
+    elif "elec" in column[0] and "h2" not in column[0] and "bev" not in column[0]:
+        return "df_elec"
+    elif "h2" in column[0]:
+        return "df_h2"
+
 
 def plot_storage_levels(df_dict, colors_odict=colors_odict):
     r"""
@@ -90,20 +98,16 @@ if __name__ == "__main__":
         df = df / CONV_NUMBER  # conversion from MWh to GWh
 
         # separate df into several dataframes that will be plotted each on a separate axis
-        heat_columns = [column for column in df.columns if "heat" in column[0]]
-        elec_columns = [
-            column
-            for column in df.columns
-            if "elec" in column[0] and "h2" not in column[0] and "bev" not in column[0]
-        ]
-        h2_columns = [column for column in df.columns if "h2" in column[0]]
+        grouped = df.groupby(get_storage_type, axis=1)
+ #       grouped.transform(plots._rename_by_string_matching(columns, labels_dict=plot_labels))
 
-        df_heat = df[heat_columns]
-        df_elec = df[elec_columns]
-        df_h2 = df[h2_columns] / 1000  # Conversion from GWh to TWh
+        for name, group in grouped:
+            group.columns = plots._rename_by_string_matching(
+                columns=group.columns, labels_dict=plot_labels
+            )
+        import pdb
 
-        dfs = {"df_heat": df_heat, "df_elec": df_elec, "df_h2": df_h2}
-        df_dict = {k: df for k, df in dfs.items() if df.empty == False}
+        pdb.set_trace()
 
         # rename columns into short, understandable labels
         for k, df in df_dict.items():
