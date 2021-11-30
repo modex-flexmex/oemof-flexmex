@@ -9,7 +9,10 @@ import oemoflex.tools.plots as plots
 import oemoflex.tools.helpers as helpers
 
 from oemof_flexmex.model_config import plot_labels, colors_odict
-from oemof_flexmex.model_config.user_definitions import TIMEFRAME, REGIONS
+from oemof_flexmex.model_config.plot_settings import TIMEFRAME, REGIONS
+
+# Factor to convert implicit units of results (MWh) to plotting unit (GWh)
+CONV_NUMBER = 1000
 
 def plot_on_axes(ax, df, colors_odict=colors_odict):
     for i in df.columns:
@@ -29,8 +32,9 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
     Parameters
     ----------
     df_dict : dictionary of pandas.DataFrame()
-        List with 1-3 dataframes, each for one bus,
+        Dict with 1-3 dataframes, each for one bus,
          with storage level time series for a single country.
+         The keys have to be "df_elec", "df_heat" and "df_h2".
 
     Returns
     -------
@@ -54,7 +58,6 @@ def plot_storage_levels(df_dict, colors_odict=colors_odict):
     if "df_h2" in df_dict.keys():
         ax3 = ax1.twinx()
         ax3.set(ylim=(0, 45))
-        #        df_dict["df_h2"] = df_dict["df_h2"] / 1000 # conversion from GWh to TWh
         plot_on_axes(ax3, df_dict["df_h2"])
         ax3.set_ylabel("Electricity [TWh]")
         ax3.legend(loc="upper right")
@@ -84,7 +87,7 @@ if __name__ == "__main__":
         for column in capacities.columns:
             if region in column[0]:
                 df[column] = capacities.loc[:, column]
-        df = df / 1000  # conversion from MWh to GWh
+        df = df / CONV_NUMBER  # conversion from MWh to GWh
 
         # separate df into several dataframes that will be plotted each on a separate axis
         heat_columns = [column for column in df.columns if "heat" in column[0]]
@@ -95,8 +98,6 @@ if __name__ == "__main__":
         ]
         h2_columns = [column for column in df.columns if "h2" in column[0]]
 
-        # TODO: not sure if it is good to define them here because these dfs remain untouched
-        # even when I change those in the dict, which is confusing.
         df_heat = df[heat_columns]
         df_elec = df[elec_columns]
         df_h2 = df[h2_columns] / 1000  # Conversion from GWh to TWh
