@@ -1,12 +1,12 @@
-import os
-import logging
 import copy
+import logging
+import os
 
 import numpy as np
-import pandas as pd
-
-from oemof.solph import EnergySystem, Bus, Sink, Source
 import oemof.tabular.tools.postprocessing as pp
+import pandas as pd
+from oemof.outputlib.views import convert_to_multiindex
+from oemof.solph import Bus, EnergySystem, Sink, Source
 from oemof.tools.economics import annuity
 from oemof_flexmex.helpers import (
     delete_empty_subdirs,
@@ -1143,20 +1143,80 @@ def aggregate_re_generation_timeseries(sequences_by_tech):
     return df_re_generation
 
 
-def export_bus_sequences(es, destination):
+def get_seq_by_var(es, results):
 
-    if not os.path.exists(destination):
-        os.mkdir(destination)
+    # copy to avoid manipulating the data in es.results
+    sequences = copy.deepcopy(
+        {
+            key: value["sequences"]
+            for key, value in results.items()
+            if value["sequences"] is not None
+        }
+    )
 
-    bus_results = pp.bus_results(es, es.results)
+    sequences = convert_to_multiindex(sequences)
 
-    for key, value in bus_results.items():
-        if value.empty:
-            continue
+    idx = pd.IndexSlice
 
-        file_path = os.path.join(destination, key + ".csv")
+    variables = list(set(sequences.columns.get_level_values(2)))
 
-        value.to_csv(file_path)
+    sequences_by_variable = {}
+
+    for variable in variables:
+
+        var_results = sequences.loc[:, idx[:, :, variable]]
+
+        sequences_by_variable[variable] = var_results
+
+    return sequences_by_variable
+
+
+def get_sequences(es, kind=("bus", "component", "variable")):
+    def get_rel_paths(keys, *subdirs, file_ext=".csv"):
+        return {key: os.path.join(*subdirs, key + file_ext) for key in keys}
+
+    def drop_empty_dfs(dictionary):
+        return {key: value for key, value in dictionary.items() if not value.empty}
+
+    methods = {
+        "bus": pp.bus_results,
+        "component": pp.component_results,
+        "variable": get_seq_by_var,
+    }
+
+    methods = {k: v for k, v in methods.items() if k in kind}
+
+    data_seq = {}
+    rel_paths_seq = {}
+
+    for name, method in methods.items():
+        data = method(es, es.results)
+
+        data = drop_empty_dfs(data)
+
+        rel_paths = get_rel_paths(data, name)
+
+        data_seq.update(data)
+
+        rel_paths_seq.update(rel_paths)
+
+    return data_seq, rel_paths_seq
+
+
+def export_sequences(es, destination, kind=("bus", "component", "variable")):
+
+    data, rel_paths = get_sequences(es, kind)
+
+    for key, value in data.items():
+
+        full_path = os.path.join(destination, rel_paths[key])
+
+        root = os.path.split(full_path)[0]
+
+        if not os.path.exists(root):
+            os.makedirs(root)
+
+        value.to_csv(full_path)
 
 
 def log_solver_time_to_file(meta_results, path):
@@ -1336,8 +1396,9 @@ def run_postprocessing(scenario_specs, exp_paths):
 
     save_oemoflex_timeseries = True
     if save_oemoflex_timeseries:
-        export_bus_sequences(
-            es, os.path.join(exp_paths.results_postprocessed, "oemoflex-timeseries")
+        export_sequences(
+            es,
+            os.path.join(exp_paths.results_postprocessed, "oemoflex-timeseries"),
         )
 
     save_flexmex_timeseries(
