@@ -99,7 +99,6 @@ if __name__ == "__main__":
         df = df / CONV_NUMBER  # conversion from MWh to GWh
 
         # separate df into several dataframes that will be plotted each on a separate axis
-
         df_dict = dict(tuple(df.groupby(get_storage_type, axis=1)))
 
         # rename columns into short, understandable labels
@@ -109,7 +108,6 @@ if __name__ == "__main__":
             )
 
             # slice selected timeframes
-
             df_dict[k] = plots.filter_timeseries(
                 df=df, start_date=timeframe[0], end_date=timeframe[1]
             )
