@@ -14,6 +14,7 @@ from oemof_flexmex.model_config.plot_settings import TIMEFRAME, REGIONS
 # Factor to convert implicit units of results (MWh) to plotting unit (GWh)
 CONV_NUMBER = 1000
 
+
 def plot_on_axes(ax, df, colors_odict=colors_odict):
     for i in df.columns:
         ax.plot(
@@ -24,6 +25,7 @@ def plot_on_axes(ax, df, colors_odict=colors_odict):
             color=colors_odict[i],
         )
 
+
 def get_storage_type(column):
     if "heat" in column[0]:
         return "df_heat"
@@ -31,6 +33,7 @@ def get_storage_type(column):
         return "df_elec"
     elif "h2" in column[0]:
         return "df_h2"
+
 
 def plot_storage_levels(df_dict, colors_odict=colors_odict):
     r"""
@@ -87,7 +90,6 @@ if __name__ == "__main__":
     capacities = pd.read_csv(
         storage_level_data, header=[0, 1, 2], parse_dates=[0], index_col=[0]
     )
-
 
     for timeframe, region in itertools.product(TIMEFRAME, REGIONS):
         df = pd.DataFrame()
