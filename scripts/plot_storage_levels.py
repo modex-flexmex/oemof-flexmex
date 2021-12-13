@@ -32,7 +32,6 @@ def get_storage_type(column):
     elif "h2" in column[0]:
         return "df_h2"
 
-
 def plot_storage_levels(df_dict, colors_odict=colors_odict):
     r"""
     Reads in the storage level time series from a dataframe and plots them according to their busses.
@@ -98,16 +97,8 @@ if __name__ == "__main__":
         df = df / CONV_NUMBER  # conversion from MWh to GWh
 
         # separate df into several dataframes that will be plotted each on a separate axis
-        grouped = df.groupby(get_storage_type, axis=1)
- #       grouped.transform(plots._rename_by_string_matching(columns, labels_dict=plot_labels))
 
-        for name, group in grouped:
-            group.columns = plots._rename_by_string_matching(
-                columns=group.columns, labels_dict=plot_labels
-            )
-        import pdb
-
-        pdb.set_trace()
+        df_dict = dict(tuple(df.groupby(get_storage_type, axis=1)))
 
         # rename columns into short, understandable labels
         for k, df in df_dict.items():
