@@ -4,9 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import itertools
 from addict import Dict
-from collections import OrderedDict
 import oemoflex.tools.plots as plots
-import oemoflex.tools.helpers as helpers
 
 from oemof_flexmex.model_config import plot_labels, colors_odict
 from oemof_flexmex.model_config.plot_settings import TIMEFRAME, REGIONS
@@ -37,7 +35,8 @@ def get_storage_type(column):
 
 def plot_storage_levels(df_dict, colors_odict=colors_odict):
     r"""
-    Reads in the storage level time series from a dataframe and plots them according to their busses.
+    Reads in the storage level time series from a dataframe and
+    plots them according to their busses.
 
     Parameters
     ----------
@@ -85,7 +84,8 @@ if __name__ == "__main__":
     timeseries_directory = os.path.join(
         paths.postprocessed, "oemoflex-timeseries/variable"
     )
-    # oemof.solph 0.3.2 used 'capacity' to name this variable, oemof.solph > 0.4.0 renamed it to 'storage level'.
+    # oemof.solph 0.3.2 used 'capacity' to name this variable,
+    # oemof.solph > 0.4.0 renamed it to 'storage level'.
     storage_level_data = os.path.join(timeseries_directory, "capacity.csv")
     capacities = pd.read_csv(
         storage_level_data, header=[0, 1, 2], parse_dates=[0], index_col=[0]
