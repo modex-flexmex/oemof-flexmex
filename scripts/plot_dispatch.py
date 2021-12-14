@@ -8,6 +8,7 @@ import oemoflex.tools.plots as plots
 from oemof_flexmex.model_config import plot_labels, colors_odict
 import pandas as pd
 from addict import Dict
+from oemof_flexmex.model_config.plot_settings import TIMEFRAME, REGIONS
 
 
 def sum_demands(data, bus_name, demand_name):
@@ -98,16 +99,9 @@ if __name__ == "__main__":
     )
     timeseries_files = os.listdir(timeseries_directory)
 
-    # select timeframe
-    TIMEFRAME = (
-        ("2019-01-01 00:00:00", "2019-01-31 23:00:00"),
-        ("2019-07-01 00:00:00", "2019-07-31 23:00:00"),
-    )
-
     # possible carriers: "electricity", "heat_decentral", "heat_central"
     CARRIERS = ["electricity", "heat_decentral", "heat_central"]
-    # possible regions: "AT", "BE", "CH", "CZ", "DK", "DE", "FR", "IT", "LU", "NL", "PL"
-    REGIONS = ["DE", "FR", "PL"]
+
     # possible file types: ".png", ".html", ".pdf"
     OUTPUT_FILE_TYPES = [".html", ".png"]
 
