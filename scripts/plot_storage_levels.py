@@ -1,13 +1,14 @@
+import itertools
 import os
 import sys
-import pandas as pd
-import matplotlib.pyplot as plt
-import itertools
-from addict import Dict
-import oemoflex.tools.plots as plots
 
-from oemof_flexmex.model_config import plot_labels, colors_odict
-from oemof_flexmex.model_config.plot_settings import TIMEFRAME, REGIONS
+import matplotlib.pyplot as plt
+import oemoflex.tools.plots as plots
+import pandas as pd
+from addict import Dict
+
+from oemof_flexmex.model_config import colors_odict, plot_labels
+from oemof_flexmex.model_config.plot_settings import REGIONS, TIMEFRAME
 
 # Factor to convert implicit units of results (MWh) to plotting unit (GWh)
 CONV_NUMBER = 1000
