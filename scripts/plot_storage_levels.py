@@ -86,17 +86,17 @@ if __name__ == "__main__":
         paths.postprocessed, "oemoflex-timeseries/variable"
     )
     # oemof.solph 0.3.2 used 'capacity' to name this variable,
-    # oemof.solph > 0.4.0 renamed it to 'storage level'.
-    storage_level_data = os.path.join(timeseries_directory, "capacity.csv")
-    capacities = pd.read_csv(
-        storage_level_data, header=[0, 1, 2], parse_dates=[0], index_col=[0]
+    # oemof.solph > 0.4.0 renamed it to 'storage_content'.
+    path_storage_content = os.path.join(timeseries_directory, "capacity.csv")
+    storage_content = pd.read_csv(
+        path_storage_content, header=[0, 1, 2], parse_dates=[0], index_col=[0]
     )
 
     for timeframe, region in itertools.product(TIMEFRAME, REGIONS):
         df = pd.DataFrame()
-        for column in capacities.columns:
+        for column in storage_content.columns:
             if region in column[0]:
-                df[column] = capacities.loc[:, column]
+                df[column] = storage_content.loc[:, column]
         df = df / CONV_NUMBER  # conversion from MWh to GWh
 
         # separate df into several dataframes that will be plotted each on a separate axis
