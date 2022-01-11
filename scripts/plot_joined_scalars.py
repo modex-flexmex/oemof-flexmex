@@ -12,7 +12,7 @@ import itertools
 if __name__ == "__main__":
     # get paths of input data and where to save plots.
     paths = Dict()
-    paths.results_joined = sys.argv[1]
+    paths.results_joined = os.path.join(sys.argv[1], "Scalars.csv")
     paths.results_joined_plotted = sys.argv[2]
 
     SCENARIOS = ["FlexMex2_1", "FlexMex2_2"]

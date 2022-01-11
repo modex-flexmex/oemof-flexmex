@@ -177,7 +177,7 @@ rule plot_joined_scalars:
         experiment="(FlexMex2)"
     input:
         script="scripts/plot_joined_scalars.py",  # re-run if updated
-        scalars=os.path.join(results_joined_dir, "Scalars.csv")
+        scalars=results_joined_dir
     output:
         directory(results_joined_plotted_dir)
     shell:
