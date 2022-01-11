@@ -11,7 +11,7 @@ from oemof_flexmex.model_config import colors_odict, plot_labels
 from oemof_flexmex.model_config.plot_settings import REGIONS, TIMEFRAME
 
 # Factor to convert implicit units of results (MWh) to plotting unit (GWh)
-CONV_NUMBER = 1000
+MWH_TO_GWH = 1e-3
 
 
 def plot_on_axes(ax, df, colors_odict=colors_odict):
@@ -97,7 +97,7 @@ if __name__ == "__main__":
         for column in storage_content.columns:
             if region in column[0]:
                 df[column] = storage_content.loc[:, column]
-        df = df / CONV_NUMBER  # conversion from MWh to GWh
+        df = df * MWH_TO_GWH  # conversion from MWh to GWh
 
         # separate df into several dataframes that will be plotted each on a separate axis
         df_dict = dict(tuple(df.groupby(get_storage_type, axis=1)))
