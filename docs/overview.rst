@@ -16,9 +16,6 @@ It hosts different libraries for different purposes. This model, oemof-flexmex, 
 `oemof.solph <https://oemof-solph.readthedocs.io>`_ for linear optimisation models and
 `oemof.tabular <https://oemof-tabular.readthedocs.io>`_ for the handling of input data.
 
-oemof-flexmex uses these libraries to provide pre- and postprocessing routines to feed the
-project's harmonized input data into the model and transform the output data into the output data template.
-
 
 Scenarios
 =========
