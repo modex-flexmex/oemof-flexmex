@@ -17,22 +17,37 @@ The model structure defines the format of the preprocessed data which is ready t
 Elements
 --------
 
-All buses are defined in :file:`bus.csv`.
+All busses are defined in :file:`oemof_flexmex/model_structure/busses.csv`.
 
-The filenames for the components are of the form <carrier>-<tech>.csv (e.g. :file:`electricity-demand.csv`, :file:`gas-bpchp.csv`).
+The structure of the components is stored in :file:`oemof_flexmex/model_structure/component_attrs`
+The filenames for the components are of the form
 
-TODO: Explain the basic columns in the scalar files.
+::
+
+    {carrier}-{tech}.csv
+(e.g. :file:`electricity-demand.csv`, :file:`gas-bpchp.csv`).
+
+The first rows of the component scalars file are similar in all of the files. They contain the following information:
 
 * **region** Region of a component. Modelled regions are defined here (TODO: Add link to region
-  definition)
+  definition) (TODO: explain how that works)
 * **name** Unique name (:py:attr:`'region-carrier-tech'`, eg. :py:attr:`'LU-gas-bpchp'`,
-  :py:attr:`'AT-electricity-airsourcehp'`)
+  :py:attr:`'AT-electricity-airsourcehp'`) TODO: But the regions are not given there explicitly?
 * **type** Type of oemof.tabular.facade
 * **carrier** Energy sector according to carrier (e.g. solar, wind, biomass, coal, lignite, uranium, oil, gas, methane, hydro, waste, electricity, heat).
-* **tech** Specification of the technology (e.g. pv, onshore, offshore, battery, demand, curtailment,
-shortage, transmission, ror, st, ocgt, ccgt, extchp, bpchp)
+* **tech** Specification of the technology (e.g. pv, onshore, offshore, battery, demand, curtailment, shortage, transmission, ror, st, ocgt, ccgt, extchp, bpchp)
 
-TODO: Explain that other columns that follow describe the attributes of the components.
+Following these rows, the attributes for the respective components are defined. The number and kind of attributes
+varies between components.
+
+The columns are organized as follows:
+* **type** Python data type
+* **unit** The attribute's unit; n/a if it has no unit
+* **default**
+* **suffix**
+TODO: explain what the function of default and suffix is in the program, i.e. where they are used and (for default)
+how they can be overwritten.
+
 
 Sequences
 ---------
