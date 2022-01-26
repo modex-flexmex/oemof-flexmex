@@ -29,8 +29,7 @@ The filenames for the components are of the form
 
 The first rows of the component scalars file are similar in all of the files. They contain the following information:
 
-* **region** Region of a component. Modelled regions are defined here (TODO: Add link to region
-  definition) (TODO: explain how that works)
+* **region** Region of a component. Modelled :ref:`regions<Regions>` are defined here (TODO: explain how that works)
 * **name** Unique name (:py:attr:`'region-carrier-tech'`, eg. :py:attr:`'LU-gas-bpchp'`,
   :py:attr:`'AT-electricity-airsourcehp'`) TODO: But the regions are not given there explicitly?
 * **type** Type of oemof.tabular.facade
