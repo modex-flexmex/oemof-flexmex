@@ -20,6 +20,7 @@ Elements
 All busses are defined in :file:`oemof_flexmex/results/{scenario}/01_preprocessed/data/elements/bus.csv`.
 
 The preprocessed component data is also stored in :file:`oemof_flexmex/results/{scenario}/01_preprocessed/data/elements`
+
 The filenames for the components are of the form
 
 ::
@@ -29,9 +30,9 @@ The filenames for the components are of the form
 
 The first columns of the component scalars file are similar in all of the files. They contain the following information:
 
-* **region**: Region of a component. Modelled :ref:`regions<Regions>` are defined here (TODO: explain how that works)
+* **region**: Region of a component. Modelled :ref:`regions<Regions>` are defined here
 * **name**: Unique name (:py:attr:`'region-carrier-tech'`, eg. :py:attr:`'LU-gas-bpchp'`,
-  :py:attr:`'AT-electricity-airsourcehp'`) TODO: But the regions are not given there explicitly?
+  :py:attr:`'AT-electricity-airsourcehp'`)
 * **type**: Type of oemof.tabular.facade
 * **carrier**: Energy sector according to carrier (e.g. solar, wind, biomass, coal, lignite, uranium, oil, gas, methane, hydro, waste, electricity, heat).
 * **tech**: Specification of the technology (e.g. pv, onshore, offshore, battery, demand, curtailment, shortage, transmission, ror, st, ocgt, ccgt, extchp, bpchp)
