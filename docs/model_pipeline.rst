@@ -145,7 +145,7 @@ And here is the corresponding entry in ``mapping-input-timeseries.yml``:
 Preprocessing
 =============
 
-Preprocessing brings the raw data into the `oemof.tabular format <https://oemof-tabular.readthedocs.io/en/latest/usage.html>`_.
+Preprocessing brings the raw data into the `oemof.tabular <https://oemof-tabular.readthedocs.io/en/latest/usage.html>`_ format.
 In this step, scalars belonging to a component are mapped to the components model parameters and saved within an input CSV file.
 Timeseries are attached in a similar way.
 The so formed input data is held in a ``datapackage`` format comprising a JSON schema file (meta data) and the CSV files containing the actual data.
@@ -160,7 +160,7 @@ Inferring
 Optimization
 ============
 
-Optimization is performed by oemof-solph. Specifically, with the help of oemof.tabular, an :class:`EnergySystem` can be created from the data package
+Optimization is performed by oemof-solph. Specifically, with the help of oemof.tabular, an :class:`EnergySystem` is created from the data package
 created in preprocessing.
 
 
@@ -169,7 +169,7 @@ Postprocessing
 ==============
 
 Postprocessing translates the results into an exchange-friendly format defined by the FlexMex project partners.
-For that, a result template defines the parameters to be output for each scenario.
+For that, a result template defines the output parameters for each scenario.
 The oemof-flexmex-internal parameters are recalculated and mapped to the FlexMex parameter names.
 
 The results template is provided by the FlexMex project partners.
