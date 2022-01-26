@@ -110,7 +110,7 @@ They are held in CSV files with one time index-value pair per line and one times
 
 .. warning:: The time index is ignored at the moment. It will be overwritten by a ``pandas`` ``datetimeindex``.
 
-The paths to the timeseries are defined in ``flexmex_config/mapping-input-timeseries.yml`` per component.
+The paths to the timeseries are defined in :file:`flexmex_config/mapping-input-timeseries.yml` per component.
 If a component has no timeseries defined here, an info line is added to the log output.
 
 The found filenames are interpreted according to the following pattern::
@@ -120,7 +120,7 @@ The found filenames are interpreted according to the following pattern::
 .. note:: ``Experiment name`` and ``year`` are ignored at the moment.
 
 The following table shows the first lines of an exemplary time series csv file for heat demand in Austria,
-which is stored as ``data/In/Energy/FinalEnergy/Heat/FlexMex1_AT_2050.csv``.
+which is stored as :file:`data/In/Energy/FinalEnergy/Heat/FlexMex1_AT_2050.csv`.
 
 ==========  =============
 timeindex   load
@@ -132,7 +132,7 @@ timeindex   load
 5           0.000228666
 ==========  =============
 
-And here is the corresponding entry in ``mapping-input-timeseries.yml``:
+And here is the corresponding entry in :file:`mapping-input-timeseries.yml`:
 
 ::
 
