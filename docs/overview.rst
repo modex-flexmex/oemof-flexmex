@@ -17,16 +17,6 @@ It hosts different libraries for different purposes. This model, oemof-flexmex, 
 `oemof.tabular <https://oemof-tabular.readthedocs.io>`_ for the handling of input data.
 
 
-Scenarios
-=========
-
-In oemof-flexmex, each scenario defines its own energy system
-which can include different energy carriers (or sectors), primary energy sources, conversion, storage, transmission and demand.
-All scenarios are provided with the same set of input data, which consists out of scalars (e.g. capacities) and timeseries
-(e.g. energy demand or hourly capacity factors for renewable energies).
-Thus, the scenarios help to model different flexibility options within a given energy system.
-
-
 Energy system
 =============
 
@@ -50,3 +40,13 @@ Regions can be independent from each other (resulting in a number of isolated en
 Timeseries for demand and supply can be applied to each region seperately.
 
 .. Could regions be seen more general (with different timeseries to model the same energy system in different years)? Would extend the application field.
+
+
+Scenarios
+=========
+
+In oemof-flexmex, each scenario defines its own energy system
+which can include different energy carriers (or sectors), primary energy sources, conversion, storage, transmission and demand.
+All scenarios are provided with the same set of input data, which consists out of scalars (e.g. capacities) and timeseries
+(e.g. energy demand or hourly capacity factors for renewable energies).
+Thus, the scenarios help to model different flexibility options within a given energy system.
