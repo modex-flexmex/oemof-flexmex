@@ -47,6 +47,6 @@ Scenarios
 
 In oemof-flexmex, each scenario defines its own energy system
 which can include different energy carriers (or sectors), primary energy sources, conversion, storage, transmission and demand.
-All scenarios are provided with the same set of input data, which consists out of scalars (e.g. capacities) and timeseries
+All scenarios are provided with the same set of input data, which consists out of parameters (e.g. capacities) and timeseries
 (e.g. energy demand or hourly capacity factors for renewable energies).
 Thus, the scenarios help to model different flexibility options within a given energy system.
