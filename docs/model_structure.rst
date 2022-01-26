@@ -17,9 +17,9 @@ The model structure defines the format of the preprocessed data which is ready t
 Elements
 --------
 
-All busses are defined in :file:`oemof_flexmex/model_structure/busses.csv`.
+All busses are defined in :file:`oemof_flexmex/results/{scenario}/01_preprocessed/data/elements/bus.csv`.
 
-The structure of the components is stored in :file:`oemof_flexmex/model_structure/component_attrs`
+The preprocessed component data is also stored in :file:`oemof_flexmex/results/{scenario}/01_preprocessed/data/elements`
 The filenames for the components are of the form
 
 ::
@@ -27,42 +27,41 @@ The filenames for the components are of the form
     {carrier}-{tech}.csv
 (e.g. :file:`electricity-demand.csv`, :file:`gas-bpchp.csv`).
 
-The first rows of the component scalars file are similar in all of the files. They contain the following information:
+The first columns of the component scalars file are similar in all of the files. They contain the following information:
 
-* **region** Region of a component. Modelled :ref:`regions<Regions>` are defined here (TODO: explain how that works)
-* **name** Unique name (:py:attr:`'region-carrier-tech'`, eg. :py:attr:`'LU-gas-bpchp'`,
+* **region**: Region of a component. Modelled :ref:`regions<Regions>` are defined here (TODO: explain how that works)
+* **name**: Unique name (:py:attr:`'region-carrier-tech'`, eg. :py:attr:`'LU-gas-bpchp'`,
   :py:attr:`'AT-electricity-airsourcehp'`) TODO: But the regions are not given there explicitly?
-* **type** Type of oemof.tabular.facade
-* **carrier** Energy sector according to carrier (e.g. solar, wind, biomass, coal, lignite, uranium, oil, gas, methane, hydro, waste, electricity, heat).
-* **tech** Specification of the technology (e.g. pv, onshore, offshore, battery, demand, curtailment, shortage, transmission, ror, st, ocgt, ccgt, extchp, bpchp)
+* **type**: Type of oemof.tabular.facade
+* **carrier**: Energy sector according to carrier (e.g. solar, wind, biomass, coal, lignite, uranium, oil, gas, methane, hydro, waste, electricity, heat).
+* **tech**: Specification of the technology (e.g. pv, onshore, offshore, battery, demand, curtailment, shortage, transmission, ror, st, ocgt, ccgt, extchp, bpchp)
 
-Following these rows, the attributes for the respective components are defined. The number and kind of attributes
+Following these columns, the attributes for the respective components are defined. The number and kind of attributes
 varies between components.
-
-The columns are organized as follows:
-* **type** Python data type
-* **unit** The attribute's unit; n/a if it has no unit
-* **default**
-* **suffix**
-TODO: explain what the function of default and suffix is in the program, i.e. where they are used and (for default)
-how they can be overwritten.
 
 
 Sequences
 ---------
 
-The filenames are of the form <carrier>-<tech>_<profile>.csv (e.g.
-:file:`wind-offshore_profile.csv`, :file:`electricity-demand_profile.csv`).
-
-TODO: explain the columns and their names within the sequences files
-
-The found timeseries are combined into a new set of CSV files, with one file per technology and
-``{region code}-{component}-profile`` as column names.
-They are stored in ::
+The input timeseries are combined into a new set of CSV files, with one file per technology.
+The preprocessed sequences are stored in ::
 
     results/{scenario name}/01_preprocessed/data/sequences/{technology}_profile.csv
 
-for the optimization step.
+The filenames are of the form
+
+::
+
+    <carrier>-<tech>_<profile>.csv
+
+(e.g. :file:`wind-offshore_profile.csv`, :file:`electricity-demand_profile.csv`).
+
+Each sequence file contains the hourly profile of all the regions, organized in rows. They are indexed by a pandas
+datetimeindex. The column names have the structure ``{region}-{technology}-profile``.
+
+TODO: explain where to know the units from
+
+
 
 Available components
 ====================
@@ -79,7 +78,8 @@ Component attributes
 The component's attributes are defined in separate csv files contained in
 :file:`oemof-flexmex/model_structure/component_attrs/`
 
-TODO: Explain defaults, suffices
+TODO: explain what the function of default and suffix is in the program, i.e. where they are used and (for default)
+how they can be overwritten.
 
 
 Extra parameters
