@@ -4,7 +4,7 @@
 Model pipeline
 ~~~~~~~~~~~~~~
 
-Data processing in oemof-flexmex is divided in 4 main steps:
+Data processing in oemof-flexmex is divided into 4 main steps:
 
 * preprocessing
 * inferring
@@ -106,7 +106,7 @@ Timeseries
 ----------
 
 Timeseries in oemof-flexmex assign a value to every hour of the year (1...8760).
-They are hold in CSV files with time index-value pairs per line and one timeseries per file.
+They are held in CSV files with one time index-value pair per line and one timeseries per file.
 
 .. warning:: The time index is ignored at the moment. It will be overwritten by a ``pandas`` ``datetimeindex``.
 
@@ -119,6 +119,27 @@ The found filenames are interpreted according to the following pattern::
 
 .. note:: ``Experiment name`` and ``year`` are ignored at the moment.
 
+The following table shows the first lines of an exemplary time series csv file for heat demand in Austria,
+which is stored as ``data/In/Energy/FinalEnergy/Heat/FlexMex1_AT_2050.csv``.
+
+==========  =============
+timeindex   load
+==========  =============
+1           0.000213222
+2           0.000214263
+3           0.0002161
+4           0.000221314
+5           0.000228666
+==========  =============
+
+And here is the corresponding entry in ``mapping-input-timeseries.yml``:
+
+::
+
+    heat-demand:
+        profiles:
+            heat-demand:
+                input-path: Energy/FinalEnergy/Heat
 
 .. _preprocessing:
 Preprocessing
