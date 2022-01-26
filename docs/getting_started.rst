@@ -39,6 +39,8 @@ Requirements
 
     apt-get install coinor-cbc
 
+   cbc is the default solver. If you chose a different solver, you need to adapt it in oemof_flexmex/optimization.py.
+
 2. oemof-flexmex needs `oemof-tabular` for data preprocessing.
    Please install the dev version from github rather than installing from PyPi/pip.
 
