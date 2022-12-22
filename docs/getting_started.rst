@@ -70,5 +70,6 @@ This data is planned to be published at a later point in time by the project Fle
 Contributing to oemof-flexmex
 =============================
 
-You can write issues to announce bugs or errors or to propose
-enhancements.
+The project `FlexMex <https://reiner-lemoine-institut.de/en/flexmex/>`_, for which this model has been built,
+is completed and the model is no longer in development. You are welcome to contribute to a different project
+within the `oemof community <https://github.com/oemof>`_.
