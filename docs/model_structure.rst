@@ -60,9 +60,6 @@ The filenames are of the form
 Each sequence file contains the hourly profile of all the regions, organized in rows. They are indexed by a pandas
 datetimeindex. The column names have the structure ``{region}-{technology}-profile``.
 
-TODO: explain where to know the units from
-
-
 
 Available components
 ====================
@@ -78,9 +75,6 @@ Component attributes
 
 The component's attributes are defined in separate csv files contained in
 :file:`oemof-flexmex/model_structure/component_attrs/`
-
-TODO: explain what the function of default and suffix is in the program, i.e. where they are used and (for default)
-how they can be overwritten.
 
 
 Extra parameters

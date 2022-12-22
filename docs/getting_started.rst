@@ -71,5 +71,5 @@ Contributing to oemof-flexmex
 =============================
 
 The project `FlexMex <https://reiner-lemoine-institut.de/en/flexmex/>`_, for which this model has been built,
-is completed and the model is no longer in development. You are welcome to contribute to a different project
+is completed and the model is no longer maintained. You are welcome to contribute to a different project
 within the `oemof community <https://github.com/oemof>`_.
