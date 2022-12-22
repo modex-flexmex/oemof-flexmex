@@ -25,7 +25,6 @@ Welcome to oemof-flexmex's documentation!
    :caption: Reference
 
    whats_new
-   api
 
 
 Indices and tables
