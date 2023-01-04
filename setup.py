@@ -18,8 +18,8 @@ setup(
     packages=["oemof_flexmex"],
     install_requires=[
         "pandas",
-        "oemof",
-        "oemof.tabular",
+        "oemof==0.3.2",
+        "oemof.tabular==0.0.2",
         "pyyaml",
         "addict",
         "Pyomo==5.6.7",
