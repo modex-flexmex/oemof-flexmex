@@ -1399,8 +1399,7 @@ def run_postprocessing(scenario_specs, exp_paths):
     save_oemoflex_timeseries = True
     if save_oemoflex_timeseries:
         export_sequences(
-            es,
-            os.path.join(exp_paths.results_postprocessed, "oemoflex-timeseries"),
+            es, os.path.join(exp_paths.results_postprocessed, "oemoflex-timeseries")
         )
 
     save_flexmex_timeseries(
