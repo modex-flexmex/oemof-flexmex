@@ -23,7 +23,7 @@ Clone oemof-flexmex from github:
     git clone git@github.com:modex-flexmex/oemof-flexmex.git
 
 
-Now you can install it your local version of oemof-flexmex using pip:
+Now you can install your local version of oemof-flexmex using pip:
 
 ::
 
@@ -38,6 +38,8 @@ Requirements
    ::
 
     apt-get install coinor-cbc
+
+   cbc is the default solver. If you chose a different solver, you need to adapt it in oemof_flexmex/optimization.py.
 
 2. oemof-flexmex needs `oemof-tabular` for data preprocessing.
    Please install the dev version from github rather than installing from PyPi/pip.
@@ -60,13 +62,14 @@ Required data
 
 **Not** provided with the github repository:
 
-* Raw input data, see :ref:`input data format`.
-* Output template data, see :ref:`postprocessing`.
+* Raw input data, see :ref:`Raw data`.
+* Output template data, see :ref:`Postprocessing`.
 
-This data will be provided on github in the future.
+This data is planned to be published at a later point in time by the project FlexMex.
 
 Contributing to oemof-flexmex
 =============================
 
-You can write issues to announce bugs or errors or to propose
-enhancements.
+The project `FlexMex <https://reiner-lemoine-institut.de/en/flexmex/>`_, for which this model has been built,
+is completed and the model is no longer maintained. You are welcome to contribute to a different project
+within the `oemof community <https://github.com/oemof>`_.

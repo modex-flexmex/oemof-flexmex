@@ -4,18 +4,18 @@
 Overview
 ~~~~~~~~
 
-oemof-flexmex is sector-integrated multi-node energy system model featuring a lot of flexibility options.
+oemof-flexmex is a sector-integrated multi-node energy system model featuring a lot of flexibility options.
 Its region, interconnections and components can be adapted flexibly.
 
+oemof-flexmex builds upon the open energy modeling framework `oemof <https://oemof.org>`_, which
+is an open source, modular toolbox for building energy system models.
+It hosts different libraries for different purposes. This model, oemof-flexmex, uses
+`oemof.solph <https://oemof-solph.readthedocs.io>`_ for linear optimisation and
+`oemof.tabular <https://oemof-tabular.readthedocs.io>`_ for the handling of input data.
 
-Scenario
-=========
-
-In oemof-flexmex, each scenario (called *use case* in the first part of FlexMex project) defines its own energy system
-consisting of different types of energy supply, transport and demand.
-All scenarios are provided with the same set of timeseries, e.g. for energy demand and renewable energy supply.
-Thus, oemof-flexmex helps to model different flexibility options within a given (or future) energy system.
-
+The model has been developed in the context of the model comparison project
+`FlexMex <https://reiner-lemoine-institut.de/en/flexmex/>`_. The project is now completed and the model is
+no longer maintained.
 
 Energy system
 =============
@@ -40,3 +40,13 @@ Regions can be independent from each other (resulting in a number of isolated en
 Timeseries for demand and supply can be applied to each region seperately.
 
 .. Could regions be seen more general (with different timeseries to model the same energy system in different years)? Would extend the application field.
+
+
+Scenarios
+=========
+
+In oemof-flexmex, each scenario defines its own energy system
+which can include different energy carriers (or sectors), primary energy sources, conversion, storage, transmission and demand.
+All scenarios are provided with the same set of input data, which consists out of parameters (e.g. capacities) and timeseries
+(e.g. energy demand or hourly capacity factors for renewable energies).
+Thus, the scenarios help to model different flexibility options within a given energy system.

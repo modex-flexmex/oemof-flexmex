@@ -4,11 +4,15 @@
 Model pipeline
 ~~~~~~~~~~~~~~
 
-Data processing in oemof-flexmex is divided in 3 main steps:
+Data processing in oemof-flexmex is divided into 4 main steps:
 
 * preprocessing
+* inferring
 * optimization
 * postprocessing
+
+The workflow is managed using the workflow management tool `snakemake <https://snakemake.github.io/>`_.
+Each of the 4 steps is represented by a snakemake rule in the Snakefile, which runs the script of the same name.
 
 The data each step is provided with is held in different forms:
 
@@ -20,8 +24,7 @@ The data each step is provided with is held in different forms:
 .. Todo Simple Diagram?
 
 
-.. _input data format:
-
+.. _raw_data:
 Raw data
 ========
 
@@ -103,11 +106,11 @@ Timeseries
 ----------
 
 Timeseries in oemof-flexmex assign a value to every hour of the year (1...8760).
-They are hold in CSV files with time index-value pairs per line and one timeseries per file.
+They are held in CSV files with one time index-value pair per line and one timeseries per file.
 
 .. warning:: The time index is ignored at the moment. It will be overwritten by a ``pandas`` ``datetimeindex``.
 
-The paths to the timeseries are defined in ``flexmex_config/mapping-input-timeseries.yml`` per component.
+The paths to the timeseries are defined in :file:`flexmex_config/mapping-input-timeseries.yml` per component.
 If a component has no timeseries defined here, an info line is added to the log output.
 
 The found filenames are interpreted according to the following pattern::
@@ -116,52 +119,57 @@ The found filenames are interpreted according to the following pattern::
 
 .. note:: ``Experiment name`` and ``year`` are ignored at the moment.
 
+The following table shows the first lines of an exemplary time series csv file for heat demand in Austria,
+which is stored as :file:`data/In/Energy/FinalEnergy/Heat/FlexMex1_AT_2050.csv`.
 
+==========  =============
+timeindex   load
+==========  =============
+1           0.000213222
+2           0.000214263
+3           0.0002161
+4           0.000221314
+5           0.000228666
+==========  =============
+
+And here is the corresponding entry in :file:`mapping-input-timeseries.yml`:
+
+::
+
+    heat-demand:
+        profiles:
+            heat-demand:
+                input-path: Energy/FinalEnergy/Heat
+
+.. _preprocessing:
 Preprocessing
 =============
 
-Preprocessing brings the raw data into the `oemof.tabular format <https://oemof-tabular.readthedocs.io/en/latest/usage.html>`_.
+Preprocessing brings the raw data into the `oemof.tabular <https://oemof-tabular.readthedocs.io/en/latest/usage.html>`_ format.
 In this step, scalars belonging to a component are mapped to the components model parameters and saved within an input CSV file.
 Timeseries are attached in a similar way.
 The so formed input data is held in a ``datapackage`` format comprising a JSON schema file (meta data) and the CSV files containing the actual data.
 
-The found timeseries are combined into a new set of CSV files, with one file per technology and ``{region code}-{component}-profile`` as column names.
-They are stored in ::
 
-    results/{scenario name}/01_preprocessed/data/sequences/{technology}_profile.csv
+.. _inferring:
+Inferring
+=========
 
-for the optimization step.
 
-Extra parameters
-----------------
-
-tabular supports handing over extra ``output_parameters`` and ``input_parameters`` to the components’ classes.
-These have to be given as ``dict``'s in the corresponding CSV field.
-If you want to pass more than two parameters:
-
-A) Enclose the ``dict`` with quotes and use double-quotes in it (*less readable*).
-
-*OR*
-
-B) Make the CSV file semicolon-separated and separate the output_parameters and/or
-   input_parameters with commas (*better readable*).
-
-   More over, all component ``read_csv()`` function calls in ``preprocessing.csv`` must be adapted to the new separator (``sep=';'``).
-
-   See https://github.com/modex-flexmex/oemo-flex/issues/57 for details.
-
+.. _optimization:
 Optimization
 ============
 
-Optimization is performed by oemof-solph.
+Optimization is performed by oemof-solph. Specifically, with the help of oemof.tabular, an :class:`EnergySystem` is created from the data package
+created in preprocessing.
+
 
 .. _postprocessing:
-
 Postprocessing
 ==============
 
 Postprocessing translates the results into an exchange-friendly format defined by the FlexMex project partners.
-For that, a result template defines the parameters to be output for each scenario.
+For that, a result template defines the output parameters for each scenario.
 The oemof-flexmex-internal parameters are recalculated and mapped to the FlexMex parameter names.
 
 The results template is provided by the FlexMex project partners.

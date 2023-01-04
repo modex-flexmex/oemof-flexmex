@@ -689,9 +689,7 @@ class ExtractionTurbine(
 
         self.outputs.update(
             {
-                self.electricity_bus: Flow(
-                    variable_costs=self.marginal_cost,
-                ),
+                self.electricity_bus: Flow(variable_costs=self.marginal_cost),
                 self.heat_bus: Flow(),
             }
         )

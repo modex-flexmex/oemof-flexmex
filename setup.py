@@ -18,8 +18,8 @@ setup(
     packages=["oemof_flexmex"],
     install_requires=[
         "pandas",
-        "oemof",
-        "oemof.tabular",
+        "oemof==0.3.2",
+        "oemof.tabular==0.0.2",
         "pyyaml",
         "addict",
         "Pyomo==5.6.7",
@@ -27,5 +27,5 @@ setup(
         "Snakemake>=5.32.0",
     ],
     # black version is specified so that each contributor uses the same one
-    extras_require={"dev": ["pytest", "black==20.8b1", "coverage", "flake8"]},
+    extras_require={"dev": ["pytest", "black==22.3.0", "coverage", "flake8"]},
 )

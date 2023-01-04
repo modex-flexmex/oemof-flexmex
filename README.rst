@@ -2,14 +2,14 @@
 oemof-flexmex
 ~~~~~~~~~~~~~
 
-oemof-flexmex (Open Energy Model for FlexMex) is an oemof model built for model comparison within
+oemof-flexmex (open energy model for FlexMex) is an oemof model built for model comparison within
 the Modex project FlexMex.
 
-.. contents::
+The model has been developed in the context of the model comparison project FlexMex and builds upon the open energy modeling framework _oemof_.
+oemof-flexmex defines a data format to run energy system optimization using oemof.solph and oemof.tabular. It provides pre- and postprocessing routines
+to feed the project's harmonized input data into the model and transform the output data into the output data template.
 
-
-Getting started
-===============
+For more information, please visit the `docs <https://oemof-flexmex.readthedocs.io/>`_.
 
 Install oemof-flexmex and its dependencies by setting up a virtual environment and from within call
 

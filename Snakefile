@@ -48,7 +48,7 @@ rule preprocess:
 
 rule infer:
     message:
-        "Infer meta-data from preprcoessed data for scenario '{wildcards.scenario}'."
+        "Infer meta-data from preprocessed data for scenario '{wildcards.scenario}'."
     input:
         preprocessed_data,  # for Snakemake monitoring only
         scenario_yml=scenario_yml,

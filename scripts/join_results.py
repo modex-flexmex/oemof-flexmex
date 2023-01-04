@@ -52,9 +52,7 @@ for scenario_name, scenario_path in zip(scenarios, postprocessed_results_paths):
         scenario_path,
         dst,
         ignore=shutil.ignore_patterns(
-            "Scalars.csv",
-            "oemoflex.log*",
-            "oemoflex_scalars.csv",
+            "Scalars.csv", "oemoflex.log*", "oemoflex_scalars.csv"
         ),
     )
 
