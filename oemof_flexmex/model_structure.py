@@ -19,19 +19,21 @@ module_path = os.path.dirname(os.path.abspath(__file__))
 #
 
 regions_list = list(
-    pd.read_csv(os.path.join(module_path, 'model_structure', 'regions.csv'), squeeze=True)
+    pd.read_csv(
+        os.path.join(module_path, "model_structure", "regions.csv"), squeeze=True
+    )
 )
 
 link_list = list(
-    pd.read_csv(os.path.join(module_path, 'model_structure', 'links.csv'), squeeze=True)
+    pd.read_csv(os.path.join(module_path, "model_structure", "links.csv"), squeeze=True)
 )
 
 
 def create_default_elements(
-        dir,
-        busses_file=os.path.join(module_path, 'model_structure', 'busses.csv'),
-        components_file=os.path.join(module_path, 'model_structure', 'components.csv'),
-        select_components=None,
+    dir,
+    busses_file=os.path.join(module_path, "model_structure", "busses.csv"),
+    components_file=os.path.join(module_path, "model_structure", "components.csv"),
+    select_components=None,
 ):
     r"""
     Prepares oemoef.tabluar input CSV files:
@@ -56,7 +58,7 @@ def create_default_elements(
     -------
     None
     """
-    components_data = pd.read_csv(components_file).set_index('name')
+    components_data = pd.read_csv(components_file).set_index("name")
 
     components_dirname = os.path.dirname(components_file)
 
@@ -75,17 +77,17 @@ def create_default_elements(
 
         comp_data = components_data.loc[component_name, :]
 
-        component_path = comp_data['path']
+        component_path = comp_data["path"]
 
         component_attrs_file = os.path.join(components_dirname, component_path)
 
         df = create_component_element(component_attrs_file)
 
         # Write to target directory
-        df.to_csv(os.path.join(dir, component_name + '.csv'))
+        df.to_csv(os.path.join(dir, component_name + ".csv"))
 
     bus_df = create_bus_element(busses_file)
-    bus_df.to_csv(os.path.join(dir, 'bus.csv'))
+    bus_df.to_csv(os.path.join(dir, "bus.csv"))
 
 
 def create_bus_element(busses_file):
@@ -101,7 +103,7 @@ def create_bus_element(busses_file):
     bus_df : pd.DataFrame
         Bus element DataFrame
     """
-    busses = pd.read_csv(busses_file, index_col='carrier')
+    busses = pd.read_csv(busses_file, index_col="carrier")
 
     regions = []
     carriers = []
@@ -110,17 +112,14 @@ def create_bus_element(busses_file):
     for region in regions_list:
         for carrier, row in busses.iterrows():
             regions.append(region)
-            carriers.append(region + '-' + carrier)
-            balanced.append(row['balanced'])
+            carriers.append(region + "-" + carrier)
+            balanced.append(row["balanced"])
 
-    bus_df = pd.DataFrame({
-        'region': regions,
-        'name': carriers,
-        'type': 'bus',
-        'balanced': balanced
-    })
+    bus_df = pd.DataFrame(
+        {"region": regions, "name": carriers, "type": "bus", "balanced": balanced}
+    )
 
-    bus_df = bus_df.set_index('region')
+    bus_df = bus_df.set_index("region")
 
     return bus_df
 
@@ -148,23 +147,34 @@ def create_component_element(component_attrs_file):
         raise FileNotFoundError(f"There is no file {component_attrs_file}") from e
 
     # Collect default values and suffices for the component
-    defaults = component_attrs.loc[component_attrs['default'].notna(), 'default'].to_dict()
+    defaults = component_attrs.loc[
+        component_attrs["default"].notna(), "default"
+    ].to_dict()
 
-    suffices = component_attrs.loc[component_attrs['suffix'].notna(), 'suffix'].to_dict()
+    suffices = component_attrs.loc[
+        component_attrs["suffix"].notna(), "suffix"
+    ].to_dict()
 
     comp_data = {key: None for key in component_attrs.index}
 
     # Create dict for component data
-    if defaults['type'] == 'link':
+    if defaults["type"] == "link":
         # TODO: Check the diverging conventions of '-' and '_' and think about unifying.
-        comp_data['region'] = [link.replace('-', '_') for link in link_list]
-        comp_data['name'] = link_list
-        comp_data['from_bus'] = [link.split('-')[0] + suffices['from_bus'] for link in link_list]
-        comp_data['to_bus'] = [link.split('-')[1] + suffices['to_bus'] for link in link_list]
+        comp_data["region"] = [link.replace("-", "_") for link in link_list]
+        comp_data["name"] = [
+            "-".join([link, defaults["carrier"], defaults["tech"]])
+            for link in link_list
+        ]
+        comp_data["from_bus"] = [
+            link.split("-")[0] + suffices["from_bus"] for link in link_list
+        ]
+        comp_data["to_bus"] = [
+            link.split("-")[1] + suffices["to_bus"] for link in link_list
+        ]
 
     else:
-        comp_data['region'] = regions_list
-        comp_data['name'] = [region + suffices['name'] for region in regions_list]
+        comp_data["region"] = regions_list
+        comp_data["name"] = [region + suffices["name"] for region in regions_list]
 
         for key, value in suffices.items():
             comp_data[key] = [region + value for region in regions_list]
@@ -172,6 +182,6 @@ def create_component_element(component_attrs_file):
     for key, value in defaults.items():
         comp_data[key] = value
 
-    component_df = pd.DataFrame(comp_data).set_index('region')
+    component_df = pd.DataFrame(comp_data).set_index("region")
 
     return component_df

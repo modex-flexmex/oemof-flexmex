@@ -1,0 +1,31 @@
+biomass-gt: Biomass GT
+biomass-st': Biomass ST
+ch4-gt: CH4
+electricity-curtailment: Curtailment
+electricity-demand: El. demand
+electricity-liion-battery: BAT
+electricity-shortage: Shortage
+solar-pv: PV
+wind-onshore: Wind on
+wind-offshore: Wind off
+electricity-transmission: Transmission
+heat-demand: Heat demand
+ch4-boiler: CH4 Boiler
+ch4-extchp: Extraction CHP
+electricity-bev: BEV
+electricity-h2-cavern: H2 cavern
+electricity-heatpump-large: Large heat pump
+electricity-heatpump-small: Small heat pump
+electricity-pth: Resistance heating
+hydro-reservoir: Hydro reservoir
+electricity-h2_demand: El. demand for H2
+
+# for heat plots
+heat_central-excess: Excess heat
+heat_central-demand: Heat demand
+heat_central-shortage: Heat shortage
+heat_central-storage-large: Large heat storage
+heat_decentral-excess: Excess heat
+heat_decentral-demand: Heat demand
+heat_decentral-storage-small: Small heat storage
+heat_decentral-shortage: Heat shortage

@@ -9,11 +9,11 @@ import yaml
 
 
 def setup_logging(log_path):
-    define_logging(logpath=log_path, logfile='oemoflex.log')
+    define_logging(logpath=log_path, logfile="oemoflex.log")
 
 
 def load_yaml(file_path):
-    with open(file_path, 'r') as yaml_file:
+    with open(file_path, "r") as yaml_file:
         yaml_data = yaml.safe_load(yaml_file)
 
     return yaml_data
@@ -38,9 +38,9 @@ def read_csv_file(filepath):
     dataframe = pd.read_csv(
         filepath,
         header=0,
-        na_values=['not considered', 'no value'],
-        sep=',',
-        encoding='unicode_escape'  # for TimeSeries.csv (ISO-8859-1 encoded)
+        na_values=["not considered", "no value"],
+        sep=",",
+        encoding="unicode_escape",  # for TimeSeries.csv (ISO-8859-1 encoded)
     )
 
     return dataframe
@@ -71,7 +71,14 @@ def read_scalar_input_data(path_to_dir, experiment_name, identifier_columns=None
     """
 
     if identifier_columns is None:
-        identifier_columns = ['Scenario', 'Region', 'Year', 'Parameter', 'Unit', 'Value']
+        identifier_columns = [
+            "Scenario",
+            "Region",
+            "Year",
+            "Parameter",
+            "Unit",
+            "Value",
+        ]
 
     def is_scalars_data(df):
         r"""
@@ -146,16 +153,18 @@ def filter_scalar_input_data(scalars_in, scenario_select, scenario_overwrite):
 
     scalars_overwrite = scalars_in.copy()
 
-    scalars_overwrite = scalars_overwrite.loc[scalars_overwrite['Scenario'] == scenario_overwrite]
+    scalars_overwrite = scalars_overwrite.loc[
+        scalars_overwrite["Scenario"] == scenario_overwrite
+    ]
 
-    scalars = scalars.loc[scalars['Scenario'].isin(scenario_select), :]
+    scalars = scalars.loc[scalars["Scenario"].isin(scenario_select), :]
 
     # Save column order before setting and resetting index
     columns = scalars.columns
 
-    scalars.set_index(['Region', 'Parameter'], inplace=True)
+    scalars.set_index(["Region", "Parameter"], inplace=True)
 
-    scalars_overwrite.set_index(['Region', 'Parameter'], inplace=True)
+    scalars_overwrite.set_index(["Region", "Parameter"], inplace=True)
 
     scalars.update(scalars_overwrite)
 
@@ -187,7 +196,7 @@ def load_scalar_input_data(scenario_specs, path_to_input_data):
     """
 
     # Get experiment name - necessary as long as "Data_In" contains two versions of Scalars.csv
-    experiment_name = scenario_specs['scenario'].split('_')[0]
+    experiment_name = scenario_specs["scenario"].split("_")[0]
 
     # Load common input parameters
     scalars = read_scalar_input_data(path_to_input_data, experiment_name)
@@ -195,13 +204,15 @@ def load_scalar_input_data(scenario_specs, path_to_input_data):
     # Filter out only scenario-related input parameters
     scalars = filter_scalar_input_data(
         scalars,
-        scenario_select=scenario_specs['scenario_select'],
-        scenario_overwrite=scenario_specs['scenario_overwrite']
+        scenario_select=scenario_specs["scenario_select"],
+        scenario_overwrite=scenario_specs["scenario_overwrite"],
     )
 
     # After filtering there musn't be any duplicates left.
-    if has_duplicates(scalars, ['Scenario', 'Region', 'Parameter']):
-        raise ValueError('Found duplicates in Scalars data. Check input data and filtering.')
+    if has_duplicates(scalars, ["Scenario", "Region", "Parameter"]):
+        raise ValueError(
+            "Found duplicates in Scalars data. Check input data and filtering."
+        )
 
     return scalars
 
@@ -267,8 +278,8 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
     files_a = get_all_file_paths(dir_a)
     files_b = get_all_file_paths(dir_b)
 
-    files_a = [file for file in files_a if file.split('.')[-1] == 'csv']
-    files_b = [file for file in files_b if file.split('.')[-1] == 'csv']
+    files_a = [file for file in files_a if file.split(".")[-1] == "csv"]
+    files_b = [file for file in files_b if file.split(".")[-1] == "csv"]
 
     files_a.sort()
     files_b.sort()
@@ -278,9 +289,7 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
 
     diff = list(set(f_names_a).symmetric_difference(set(f_names_b)))
 
-    assert not diff,\
-        f"Lists of filenames are not the same." \
-        f" The diff is: {diff}"
+    assert not diff, f"Lists of filenames are not the same." f" The diff is: {diff}"
 
     for file_a, file_b in zip(files_a, files_b):
         try:
@@ -289,13 +298,17 @@ def check_if_csv_dirs_equal(dir_a, dir_b):
             diff.append([file_a, file_b])
 
     if diff:
-        error_message = ''
+        error_message = ""
         for pair in diff:
-            short_name_a, short_name_b = (os.path.join(*f.split(os.sep)[-4:]) for f in pair)
-            line = ' - ' + short_name_a + ' and ' + short_name_b + '\n'
+            short_name_a, short_name_b = (
+                os.path.join(*f.split(os.sep)[-4:]) for f in pair
+            )
+            line = " - " + short_name_a + " and " + short_name_b + "\n"
             error_message += line
 
-        raise AssertionError(f" The contents of these file are different:\n{error_message}")
+        raise AssertionError(
+            f" The contents of these file are different:\n{error_message}"
+        )
 
 
 def get_dir_diff(dir_a, dir_b, ignore_list=None):
@@ -314,7 +327,7 @@ def get_dir_diff(dir_a, dir_b, ignore_list=None):
     """
 
     if ignore_list is None:
-        ignore_list = ['*.log']
+        ignore_list = ["*.log"]
 
     # Concatenate patterns to a list of diff args of the form "-x PATTERN"
     exclusions = []
@@ -338,10 +351,10 @@ def get_dir_diff(dir_a, dir_b, ignore_list=None):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=working_directory,
-        check=False
+        check=False,
     )
 
-    return diff_process.stdout.decode('UTF-8')
+    return diff_process.stdout.decode("UTF-8")
 
 
 def delete_empty_subdirs(path):
@@ -376,9 +389,9 @@ def get_name_path_dict(dir):
     name_path_dict : dict
     """
     name_path_dict = {
-        file.split('.')[0]: os.path.join(dir, file)
+        file.split(".")[0]: os.path.join(dir, file)
         for file in os.listdir(dir)
-        if file.endswith('.csv')
+        if file.endswith(".csv")
     }
 
     return name_path_dict
